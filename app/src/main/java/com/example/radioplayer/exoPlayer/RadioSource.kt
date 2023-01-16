@@ -28,7 +28,7 @@ class RadioSource @Inject constructor(
     var stations = emptyList<MediaMetadataCompat>()
 
     suspend fun getRadioStations (isTopSearch : Boolean,
-        country : String = "", tag : String = "", name : String = ""
+        country : String = "", tag : String = "", name : String = "", offset : Int = 0
             ) = withContext(Dispatchers.IO) {
 
         state = STATE_PROCESSING
@@ -36,7 +36,7 @@ class RadioSource @Inject constructor(
         val response  = if(isTopSearch){
             radioApi.getTopVotedStations()
         } else {
-            radioApi.searchRadio(country, tag, name)
+            radioApi.searchRadio(country, tag, name, offset = offset)
         }
 
         if(response.isSuccessful){

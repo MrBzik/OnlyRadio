@@ -6,6 +6,11 @@ import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.liveData
+import com.example.radioplayer.adapters.RadioStationsDataSource
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.exoPlayer.RadioServiceConnection
 import com.example.radioplayer.exoPlayer.isPlayEnabled
@@ -15,6 +20,7 @@ import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Constants.NEW_SEARCH
 import com.example.radioplayer.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,6 +29,9 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
        private val _mediaItems = MutableLiveData<Resource<List<RadioStation>>>()
+       private val pagingMediaItems = MutableLiveData<PagingData<Resource<List<RadioStation>>>>()
+
+
        val mediaItems : LiveData<Resource<List<RadioStation>>> = _mediaItems
 
        val isConnected = radioServiceConnection.isConnected
@@ -31,7 +40,10 @@ class MainViewModel @Inject constructor(
        val playbackState = radioServiceConnection.playbackState
 
 
-        fun searchWithNewParams(tag : String = "", country : String = "", name : String = "") {
+        fun searchWithNewParams(
+            tag : String = "", country : String = "", name : String = "",
+            offset : Int = 0
+        ) {
 
             val bundle = Bundle().apply {
 
@@ -53,11 +65,31 @@ class MainViewModel @Inject constructor(
                     putString("NAME", name)
                 }
 
+                putInt("OFFSET", offset)
+
             }
             radioServiceConnection.sendCommand(NEW_SEARCH, bundle)
 
         }
 
+
+
+
+     fun searchStationsPaging(
+        tag : String, name : String, country : String
+    ): Flow<PagingData<RadioStation>> {
+
+        return Pager(
+            config = PagingConfig(
+                pageSize = 10,
+                enablePlaceholders = false,
+                initialLoadSize = 1
+            ),
+            pagingSourceFactory = {
+                RadioStationsDataSource(this, tag, name, country)
+            }, initialKey = 0
+        ).flow
+    }
 
 
        init {
@@ -84,6 +116,7 @@ class MainViewModel @Inject constructor(
                       }
 
                          _mediaItems.postValue(Resource.success(items))
+
                   }
             })
        }

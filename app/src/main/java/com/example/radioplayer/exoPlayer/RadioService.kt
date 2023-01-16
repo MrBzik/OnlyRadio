@@ -61,10 +61,12 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
 
-    private fun searchRadioStations(country : String = "", tag : String = "", name : String = "")
+    private fun searchRadioStations(
+        country : String = "", tag : String = "", name : String = "", offset : Int = 0
+    )
             = serviceScope.launch {
 
-        radioSource.getRadioStations(false, country, tag, name)
+        radioSource.getRadioStations(false, country, tag, name, offset)
     }
 
     private fun getTopVotedStations() = serviceScope.launch {
@@ -119,7 +121,9 @@ class RadioService : MediaBrowserServiceCompat() {
 
                     val newCountry = extras?.getString("COUNTRY") ?: ""
 
-                    searchRadioStations(newCountry, newTag, newName)
+                    val offset = extras?.getInt("OFFSET") ?: 0
+
+                    searchRadioStations(newCountry, newTag, newName, offset)
                 }
             }
         })
