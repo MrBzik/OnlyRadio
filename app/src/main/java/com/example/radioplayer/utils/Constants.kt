@@ -11,4 +11,6 @@ object Constants {
 
     const val NETWORK_ERROR = "network error"
 
+    const val NEW_SEARCH = "new search"
+
 }

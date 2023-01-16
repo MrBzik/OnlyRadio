@@ -12,6 +12,7 @@ import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.exoPlayer.isPrepared
 import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
+import com.example.radioplayer.utils.Constants.NEW_SEARCH
 import com.example.radioplayer.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -30,14 +31,30 @@ class MainViewModel @Inject constructor(
        val playbackState = radioServiceConnection.playbackState
 
 
-        fun searchWithNewTag(tag : String) {
-
-//            radioServiceConnection.newSearchTag.postValue(tag)
+        fun searchWithNewParams(tag : String = "", country : String = "", name : String = "") {
 
             val bundle = Bundle().apply {
-                putString("TAG", tag)
+
+                if(tag == "none"){
+                    putString("TAG", "")
+                } else {
+                    putString("TAG", tag)
+                }
+
+                if(country == "none"){
+                    putString("COUNTRY", "")
+                } else {
+                    putString("COUNTRY", country)
+                }
+
+                if(name == "none"){
+                    putString("NAME", "")
+                } else {
+                    putString("NAME", name)
+                }
+
             }
-            radioServiceConnection.sendCommand("NewTag", bundle)
+            radioServiceConnection.sendCommand(NEW_SEARCH, bundle)
 
         }
 

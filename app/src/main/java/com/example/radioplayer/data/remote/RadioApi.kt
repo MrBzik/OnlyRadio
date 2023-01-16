@@ -10,19 +10,36 @@ interface RadioApi {
         @POST("/json/stations/search")
         suspend fun searchRadio(
 
-            @Query("country")
+            @Query("countrycode")
             country : String,
 
             @Query("tag")
             tag : String,
 
+            @Query("name")
+            name : String = "",
+
             @Query("limit")
             limit : Int = 10,
 
             @Query("offset")
-            offset : Int = 0
+            offset : Int = 0,
+
+            @Query("hidebroken")
+            hidebroken : Boolean = true
 
         ) : Response<RadioStations>
 
+        @POST("/json/stations/topvote")
+        suspend fun getTopVotedStations(
+            @Query("limit")
+            limit : Int = 10,
+
+            @Query("offset")
+            offset : Int = 0,
+
+            @Query("hidebroken")
+            hidebroken : Boolean = true
+        ) : Response<RadioStations>
 
 }

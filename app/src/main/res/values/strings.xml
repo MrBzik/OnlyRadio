@@ -2,4 +2,6 @@
     <string name="app_name">RadioPlayer</string>
     <string name="notification_channel_name">Radio Channel</string>
     <string name="notification_channel_description">Shows the currently playing station</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
 </resources>

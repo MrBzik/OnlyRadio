@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.radioplayer.databinding.FragmentFavStationsBinding
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
+import com.example.radioplayer.ui.MainActivity
 
 class FavStationsFragment : Fragment() {
 
@@ -26,7 +27,9 @@ class FavStationsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        activity?.title = "Here are your favourite stations"
 
+        (activity as MainActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
 
     }

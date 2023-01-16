@@ -13,6 +13,7 @@ import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerNotificationListener
 import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Constants.NETWORK_ERROR
+import com.example.radioplayer.utils.Constants.NEW_SEARCH
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
@@ -58,27 +59,25 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private var isPlayerInitialized = false
 
-    private fun searchRadioStations(country : String = "Italy", tag : String = "jazz")
+
+
+    private fun searchRadioStations(country : String = "", tag : String = "", name : String = "")
             = serviceScope.launch {
 
-        radioSource.getRadioStations(country, tag)
-
+        radioSource.getRadioStations(false, country, tag, name)
     }
 
-//    private val observer = Observer<String>{
-//
-//        searchRadioStations(tag = it)
-//
-//    }
+    private fun getTopVotedStations() = serviceScope.launch {
+
+        radioSource.getRadioStations(true)
+    }
+
 
     override fun onCreate() {
         super.onCreate()
 
 
-        searchRadioStations()
-
-
-//        radioServiceConnection.newSearchTag.observeForever(observer)
+        getTopVotedStations()
 
 
         val activityIntent = packageManager?.getLaunchIntentForPackage(packageName)?.let {
@@ -112,11 +111,15 @@ class RadioService : MediaBrowserServiceCompat() {
 
             when(command){
 
-                "NewTag" -> {
+                NEW_SEARCH -> {
 
-                    val newTag = extras?.getString("TAG") ?: "rap"
+                    val newTag = extras?.getString("TAG") ?: ""
 
-                    searchRadioStations(tag = newTag)
+                    val newName = extras?.getString("NAME") ?: ""
+
+                    val newCountry = extras?.getString("COUNTRY") ?: ""
+
+                    searchRadioStations(newCountry, newTag, newName)
                 }
             }
         })
@@ -168,8 +171,6 @@ class RadioService : MediaBrowserServiceCompat() {
     override fun onDestroy() {
         super.onDestroy()
         serviceScope.cancel()
-
-//        radioServiceConnection.newSearchTag.removeObserver(observer)
 
         exoPlayer.removeListener(radioPlayerEventListener)
         exoPlayer.release()

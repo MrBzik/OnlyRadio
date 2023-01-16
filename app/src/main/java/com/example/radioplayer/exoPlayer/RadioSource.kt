@@ -7,6 +7,7 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
 import androidx.core.net.toUri
 import com.example.radioplayer.data.remote.RadioApi
+import com.example.radioplayer.data.remote.entities.RadioStations
 import com.example.radioplayer.data.remote.entities.RadioStationsItem
 import com.example.radioplayer.exoPlayer.State.*
 import com.example.radioplayer.ui.viewmodels.MainViewModel
@@ -16,6 +17,7 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 import javax.inject.Inject
 
 class RadioSource @Inject constructor(
@@ -25,10 +27,18 @@ class RadioSource @Inject constructor(
 
     var stations = emptyList<MediaMetadataCompat>()
 
-    suspend fun getRadioStations (country : String = "Italy", tag : String = "jazz") = withContext(Dispatchers.IO) {
+    suspend fun getRadioStations (isTopSearch : Boolean,
+        country : String = "", tag : String = "", name : String = ""
+            ) = withContext(Dispatchers.IO) {
 
         state = STATE_PROCESSING
-        val response = radioApi.searchRadio(country, tag)
+
+        val response  = if(isTopSearch){
+            radioApi.getTopVotedStations()
+        } else {
+            radioApi.searchRadio(country, tag, name)
+        }
+
         if(response.isSuccessful){
             response.body()?.let {
 
@@ -39,9 +49,9 @@ class RadioSource @Inject constructor(
                         .putString(METADATA_KEY_MEDIA_ID, station.stationuuid)
                         .putString(METADATA_KEY_ALBUM_ART_URI, station.favicon)
                         .putString(METADATA_KEY_DISPLAY_ICON_URI, station.favicon)
-                        .putString(METADATA_KEY_MEDIA_URI, station.url)
-                        .putString(METADATA_KEY_DISPLAY_SUBTITLE, station.tags)
-                        .putString(METADATA_KEY_DISPLAY_DESCRIPTION, station.tags)
+                        .putString(METADATA_KEY_MEDIA_URI, station.url_resolved)
+                        .putString(METADATA_KEY_DISPLAY_SUBTITLE, station.country)
+                        .putString(METADATA_KEY_DISPLAY_DESCRIPTION, station.country)
                         .build()
                 }
                withContext(Dispatchers.Main){
