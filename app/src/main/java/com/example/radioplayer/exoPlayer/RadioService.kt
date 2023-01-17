@@ -60,26 +60,17 @@ class RadioService : MediaBrowserServiceCompat() {
     private var isPlayerInitialized = false
 
 
-
-    private fun searchRadioStations(
+    private fun searchRadioStations(isTopSearch : Boolean = false,
         country : String = "", tag : String = "", name : String = "", offset : Int = 0
     )
             = serviceScope.launch {
 
-        radioSource.getRadioStations(false, country, tag, name, offset)
-    }
-
-    private fun getTopVotedStations() = serviceScope.launch {
-
-        radioSource.getRadioStations(true)
+        radioSource.getRadioStations(isTopSearch, country, tag, name, offset)
     }
 
 
     override fun onCreate() {
         super.onCreate()
-
-
-        getTopVotedStations()
 
 
         val activityIntent = packageManager?.getLaunchIntentForPackage(packageName)?.let {
@@ -123,7 +114,9 @@ class RadioService : MediaBrowserServiceCompat() {
 
                     val offset = extras?.getInt("OFFSET") ?: 0
 
-                    searchRadioStations(newCountry, newTag, newName, offset)
+                    val searchTop = extras?.getBoolean("SEARCH_TOP") ?: false
+
+                    searchRadioStations(searchTop, newCountry, newTag, newName, offset)
                 }
             }
         })

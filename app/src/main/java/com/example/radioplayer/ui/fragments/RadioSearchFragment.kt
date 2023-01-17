@@ -39,7 +39,7 @@ class RadioSearchFragment : Fragment() {
 
     private var selectedCountry = ""
 
-
+    private val fragmentScope = lifecycleScope
 
 //    @Inject
 //    lateinit var radioAdapter : RadioAdapter
@@ -82,12 +82,15 @@ class RadioSearchFragment : Fragment() {
 
         setRecycleView()
 
-//        subscribeToObservers()
 
         pagingRadioAdapter.setOnClickListener {
 
             viewModel.playOrToggleStation(it, true)
         }
+
+
+        subscribeToObservers()
+
     }
 
 //    private fun subscribeToObservers(){
@@ -108,6 +111,19 @@ class RadioSearchFragment : Fragment() {
 //            }
 //        }
 //    }
+
+    private fun subscribeToObservers(){
+
+
+        viewModel.stations.observe(viewLifecycleOwner) {
+            it?.let {
+                pagingRadioAdapter.submitData(lifecycle, it)
+            }
+
+        }
+
+
+    }
 
 
 
@@ -164,29 +180,16 @@ class RadioSearchFragment : Fragment() {
 
         }
 
-
         bind.btnSearch.setOnClickListener {
-           val stations = viewModel.searchStationsPaging(
+                viewModel.searchStations(
                 tag = bind.tvChosenTag.text.toString(),
                 country = selectedCountry,
-                name = bind.tvChosenName.text.toString()
+                name = bind.tvChosenName.text.toString(),
+                isTopSearch = false
             )
-
-            lifecycleScope.launch {
-
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-
-                    stations.collectLatest {
-                        pagingRadioAdapter.submitData(it)
-                    }
-                }
-            }
-
-
 
 
         }
-
     }
 
 

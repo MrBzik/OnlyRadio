@@ -10,13 +10,14 @@ class RadioStationsDataSource (
     private val tag : String,
     private val name : String,
     private val country : String,
+    private val isTopSearch : Boolean
     )
             : PagingSource<Int, RadioStation>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, RadioStation> {
         return try {
             val position = params.key ?: 0
-            viewModel.searchWithNewParams(tag, country, name, position)
+            viewModel.searchWithNewParams(tag, country, name, position, isTopSearch)
 
             LoadResult.Page(data = viewModel.mediaItems.value?.data!!, prevKey =
             if (position == 0) null
