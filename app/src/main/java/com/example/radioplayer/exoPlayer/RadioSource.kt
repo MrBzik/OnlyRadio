@@ -40,6 +40,7 @@ class RadioSource @Inject constructor(
         }
 
         if(response.isSuccessful){
+
             response.body()?.let {
 
                 stations = it.map { station ->
@@ -54,9 +55,9 @@ class RadioSource @Inject constructor(
                         .putString(METADATA_KEY_DISPLAY_DESCRIPTION, station.country)
                         .build()
                 }
-               withContext(Dispatchers.Main){
+
                    state = STATE_INITIALIZED
-               }
+
             }
         }
     }

@@ -3,12 +3,10 @@ package com.example.radioplayer.ui.viewmodels
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.*
 import com.example.radioplayer.adapters.RadioStationsDataSource
+import com.example.radioplayer.adapters.StationsPageLoader
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.exoPlayer.RadioServiceConnection
 import com.example.radioplayer.exoPlayer.isPlayEnabled
@@ -16,23 +14,23 @@ import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.exoPlayer.isPrepared
 import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Constants.NEW_SEARCH
-import com.example.radioplayer.utils.Resource
+import com.example.radioplayer.utils.Constants.PAGE_SIZE
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.flatMapLatest
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
+@FlowPreview
 @HiltViewModel
 class MainViewModel @Inject constructor(
        private val radioServiceConnection: RadioServiceConnection
 ) : ViewModel() {
 
-       private val _mediaItems = MutableLiveData<Resource<List<RadioStation>>>()
+       private val _mediaItems = MutableLiveData<List<RadioStation>>()
 
-       val mediaItems : LiveData<Resource<List<RadioStation>>> = _mediaItems
+       private var mediaItems : List<RadioStation>? = null
 
        val isConnected = radioServiceConnection.isConnected
        val currentRadioStation = radioServiceConnection.currentRadioStation
@@ -40,74 +38,77 @@ class MainViewModel @Inject constructor(
        val playbackState = radioServiceConnection.playbackState
 
 
-        fun searchWithNewParams(
-            tag : String = "", country : String = "", name : String = "",
-            offset : Int = 0, isTopSearch : Boolean
-        ) {
+       private fun searchWithNewParams(
+            limit : Int, offset : Int, bundle: Bundle
+        ) : Deferred<List<RadioStation>> = viewModelScope.async {
 
-            val bundle = Bundle().apply {
+                val calcOffset = limit * offset
 
-                if(tag == "none"){
-                    putString("TAG", "")
-                } else {
-                    putString("TAG", tag)
+                bundle.apply {
+
+                    putInt("OFFSET", calcOffset)
+
+                    putInt("LIMIT", limit)
                 }
 
-                if(country == "none"){
-                    putString("COUNTRY", "")
-                } else {
-                    putString("COUNTRY", country)
-                }
-
-                if(name == "none"){
-                    putString("NAME", "")
-                } else {
-                    putString("NAME", name)
-                }
-
-                putInt("OFFSET", offset)
-
-                putBoolean("SEARCH_TOP", isTopSearch)
-
-            }
             radioServiceConnection.sendCommand(NEW_SEARCH, bundle)
 
+//            withContext(Dispatchers.Default){
+//
+//                while (mediaItems == null || mediaItems == _mediaItems.value) {
+//
+//                    delay(100)
+//                }
+//                mediaItems = _mediaItems.value
+//
+//               mediaItems!!
+//            }
+
+               _mediaItems.value!!
+
+
+
         }
-
-    var stations : MutableLiveData<PagingData<RadioStation>> = MutableLiveData()
-
-    fun searchStations(tag : String = "", name : String = "", country : String = "", isTopSearch: Boolean) {
-
-            val response = searchStationsPaging(tag, name, country, isTopSearch)
-
-            stations.postValue(response.value)
-
-
-    }
 
 
 
     private fun searchStationsPaging(
-        tag : String, name : String, country : String, isTopSearch: Boolean
-    ): LiveData<PagingData<RadioStation>> {
+        bundle: Bundle
+    ): Flow<PagingData<RadioStation>> {
+        val loader : StationsPageLoader = { pageIndex, pageSize ->
+            searchWithNewParams(pageSize, pageIndex, bundle).await()
+        }
 
         return Pager(
             config = PagingConfig(
-                pageSize = 10,
+                pageSize = PAGE_SIZE,
                 enablePlaceholders = false,
-                initialLoadSize = 1
             ),
             pagingSourceFactory = {
-                RadioStationsDataSource(this, tag, name, country, isTopSearch)
-            }, initialKey = 0
-        ).liveData
+                RadioStationsDataSource(loader, PAGE_SIZE)
+            }
+        ).flow
     }
 
 
+    val stationsFlow : Flow<PagingData<RadioStation>>
+
+    private val searchBy = MutableLiveData(Bundle())
+
+    fun setSearchBy(value : Bundle){
+
+        searchBy.value?.let {
+        if(it.getString("TAG") == value.getString("TAG")
+            && it.getString("NAME") == value.getString("NAME")
+            && it.getString("COUNTRY") == value.getString("COUNTRY")
+            && it.getBoolean("SEARCH_TOP") == value.getBoolean("SEARCH_TOP")
+        )  return
+            searchBy.value = value
+        }
+
+    }
+
        init {
-
-
-//           _mediaItems.postValue(Resource.loading(null))
 
            radioServiceConnection.subscribe(MEDIA_ROOT_ID, object : MediaBrowserCompat.SubscriptionCallback(){
 
@@ -117,7 +118,8 @@ class MainViewModel @Inject constructor(
                   ) {
                          super.onChildrenLoaded(parentId, children)
 
-                    val items =  children.map{
+
+                    val stations =  children.map{
 
                             RadioStation(
                                    it.description.iconUri.toString(),
@@ -128,13 +130,21 @@ class MainViewModel @Inject constructor(
                             )
                       }
 
-                         _mediaItems.postValue(Resource.success(items))
+                         _mediaItems.postValue(stations)
+                      println("?????????????????????????????????????????????????")
+//                      println(_mediaItems.value?.get(0)?.tags)
 
                   }
             })
 
-           searchStations(isTopSearch = true)
+           stationsFlow = searchBy.asFlow()
+               .flatMapLatest {
+                   searchStationsPaging(it)
+               }
+               .cachedIn(viewModelScope)
+
        }
+
 
         fun playOrToggleStation(mediaItem : RadioStation, toggle : Boolean = false) {
 

@@ -66,11 +66,13 @@ class RadioService : MediaBrowserServiceCompat() {
             = serviceScope.launch {
 
         radioSource.getRadioStations(isTopSearch, country, tag, name, offset)
+
     }
 
 
     override fun onCreate() {
         super.onCreate()
+
 
 
         val activityIntent = packageManager?.getLaunchIntentForPackage(packageName)?.let {
@@ -117,6 +119,7 @@ class RadioService : MediaBrowserServiceCompat() {
                     val searchTop = extras?.getBoolean("SEARCH_TOP") ?: false
 
                     searchRadioStations(searchTop, newCountry, newTag, newName, offset)
+
                 }
             }
         })
@@ -131,6 +134,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
         exoPlayer.addListener(radioPlayerEventListener)
         radioNotificationManager.showNotification(exoPlayer)
+
+
     }
 
 
@@ -196,7 +201,7 @@ class RadioService : MediaBrowserServiceCompat() {
                                 preparePlayer(radioSource.stations, radioSource.stations[0], false)
                                 isPlayerInitialized = true
                             }
-                        } catch (e : Exception){
+                        } catch (e : java.lang.IllegalStateException){
                          notifyChildrenChanged(MEDIA_ROOT_ID)
                         }
                    } else {

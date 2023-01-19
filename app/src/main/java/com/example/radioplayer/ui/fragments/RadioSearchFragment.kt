@@ -24,10 +24,14 @@ import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.utils.Status
 import com.hbb20.countrypicker.models.CPCountry
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class RadioSearchFragment : Fragment() {
 
@@ -88,8 +92,7 @@ class RadioSearchFragment : Fragment() {
             viewModel.playOrToggleStation(it, true)
         }
 
-
-        subscribeToObservers()
+        observeStations()
 
     }
 
@@ -112,19 +115,6 @@ class RadioSearchFragment : Fragment() {
 //        }
 //    }
 
-    private fun subscribeToObservers(){
-
-
-        viewModel.stations.observe(viewLifecycleOwner) {
-            it?.let {
-                pagingRadioAdapter.submitData(lifecycle, it)
-            }
-
-        }
-
-
-    }
-
 
 
     private fun setRecycleView(){
@@ -144,6 +134,14 @@ class RadioSearchFragment : Fragment() {
         return toggle.onOptionsItemSelected(item)
 
 
+    }
+
+    private fun observeStations(){
+        viewLifecycleOwner.lifecycleScope.launch{
+            viewModel.stationsFlow.collectLatest {
+                pagingRadioAdapter.submitData(it)
+            }
+        }
     }
 
 
@@ -181,13 +179,37 @@ class RadioSearchFragment : Fragment() {
         }
 
         bind.btnSearch.setOnClickListener {
-                viewModel.searchStations(
-                tag = bind.tvChosenTag.text.toString(),
-                country = selectedCountry,
-                name = bind.tvChosenName.text.toString(),
-                isTopSearch = false
-            )
 
+               val tag = bind.tvChosenTag.text.toString()
+               val country = selectedCountry
+               val name = bind.tvChosenName.text.toString()
+               val isTopSearch = false
+
+               val bundle = Bundle().apply {
+
+                   if(tag == "none"){
+                       putString("TAG", "")
+                   } else {
+                       putString("TAG", tag)
+                   }
+
+                   if(country == "none"){
+                       putString("COUNTRY", "")
+                   } else {
+                       putString("COUNTRY", country)
+                   }
+
+                   if(name == "none"){
+                       putString("NAME", "")
+                   } else {
+                       putString("NAME", name)
+                   }
+
+                   putBoolean("SEARCH_TOP", isTopSearch)
+
+               }
+
+                viewModel.setSearchBy(bundle)
 
         }
     }

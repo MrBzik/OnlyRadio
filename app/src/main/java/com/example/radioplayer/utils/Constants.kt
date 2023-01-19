@@ -13,4 +13,6 @@ object Constants {
 
     const val NEW_SEARCH = "new search"
 
+    const val PAGE_SIZE = 10
+
 }

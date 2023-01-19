@@ -3,26 +3,29 @@ package com.example.radioplayer.adapters
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.radioplayer.data.local.entities.RadioStation
-import com.example.radioplayer.ui.viewmodels.MainViewModel
+
+typealias StationsPageLoader = suspend (pageIndex : Int, pageSize : Int) -> List<RadioStation>
+
 
 class RadioStationsDataSource (
-    private val viewModel : MainViewModel,
-    private val tag : String,
-    private val name : String,
-    private val country : String,
-    private val isTopSearch : Boolean
+   private val loader: StationsPageLoader,
+   private val pageSize: Int
     )
             : PagingSource<Int, RadioStation>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, RadioStation> {
-        return try {
-            val position = params.key ?: 0
-            viewModel.searchWithNewParams(tag, country, name, position, isTopSearch)
 
-            LoadResult.Page(data = viewModel.mediaItems.value?.data!!, prevKey =
-            if (position == 0) null
-            else position - 10,
-                nextKey = position+10)
+        val pageIndex = params.key ?: 0
+
+        return try {
+
+            val stations = loader(pageIndex, params.loadSize)
+
+            LoadResult.Page(
+                data = stations,
+                prevKey = if (pageIndex == 0) null else pageIndex - 1,
+                nextKey = pageIndex +1
+            )
 
         } catch (e: Exception) {
             LoadResult.Error(e)
@@ -30,9 +33,9 @@ class RadioStationsDataSource (
     }
 
     override fun getRefreshKey(state: PagingState<Int, RadioStation>): Int? {
-        return state.anchorPosition?.let { anchorPosition ->
-            state.closestPageToPosition(anchorPosition)?.prevKey?.plus(10)
-                ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(10)
-        }
+        val anchorPosition = state.anchorPosition ?: return null
+        val page = state.closestPageToPosition(anchorPosition) ?: return null
+        return page.prevKey?.plus(1) ?: page.nextKey?.minus(1)
     }
+
 }

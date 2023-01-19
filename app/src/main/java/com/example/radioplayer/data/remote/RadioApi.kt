@@ -1,6 +1,7 @@
 package com.example.radioplayer.data.remote
 
 import com.example.radioplayer.data.remote.entities.RadioStations
+import com.example.radioplayer.utils.Constants.PAGE_SIZE
 import retrofit2.Response
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -20,10 +21,10 @@ interface RadioApi {
             name : String = "",
 
             @Query("limit")
-            limit : Int = 10,
+            limit : Int = PAGE_SIZE,
 
             @Query("offset")
-            offset : Int = 0,
+            offset : Int,
 
             @Query("hidebroken")
             hidebroken : Boolean = true
