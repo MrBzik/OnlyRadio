@@ -3,13 +3,15 @@ package com.example.radioplayer.adapters
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.radioplayer.data.local.entities.RadioStation
+import com.example.radioplayer.ui.viewmodels.MainViewModel
 
 typealias StationsPageLoader = suspend (pageIndex : Int, pageSize : Int) -> List<RadioStation>
 
 
 class RadioStationsDataSource (
    private val loader: StationsPageLoader,
-   private val pageSize: Int
+   private val pageSize: Int,
+
     )
             : PagingSource<Int, RadioStation>() {
 

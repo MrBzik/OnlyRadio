@@ -29,6 +29,7 @@ class PagingRadioAdapter @Inject constructor(
        return RadioItemHolder(
            LayoutInflater.from(parent.context).inflate(R.layout.radio_item, parent, false)
        )
+
     }
 
     override fun onBindViewHolder(holder: RadioItemHolder, position: Int) {
@@ -37,7 +38,7 @@ class PagingRadioAdapter @Inject constructor(
         holder.bind.apply {
 
             tvPrimary.text = station.name
-            tvSecondary.text = station.tags
+            tvSecondary.text = station.country
             glide.load(station.favicon).into(ivItemImage)
         }
 

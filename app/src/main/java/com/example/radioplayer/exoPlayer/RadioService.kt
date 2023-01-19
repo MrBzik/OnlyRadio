@@ -8,6 +8,7 @@ import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.media.MediaBrowserServiceCompat
+import com.example.radioplayer.data.remote.entities.RadioStations
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlaybackPreparer
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerNotificationListener
@@ -60,18 +61,19 @@ class RadioService : MediaBrowserServiceCompat() {
     private var isPlayerInitialized = false
 
 
-    private fun searchRadioStations(isTopSearch : Boolean = false,
-        country : String = "", tag : String = "", name : String = "", offset : Int = 0
+    private fun searchRadioStations(
+
     )
             = serviceScope.launch {
 
-        radioSource.getRadioStations(isTopSearch, country, tag, name, offset)
+        radioSource.getRadioStations()
 
     }
 
 
     override fun onCreate() {
         super.onCreate()
+
 
 
 
@@ -99,10 +101,13 @@ class RadioService : MediaBrowserServiceCompat() {
 
             currentStation = it
 
-            preparePlayer(radioSource.stations,
-                    it,
-                true)
-        }, {command, extras ->
+            preparePlayer(
+                radioSource.stations,
+                it,
+                true
+            )
+        }, {
+            command, extras ->
 
             when(command){
 
@@ -118,10 +123,13 @@ class RadioService : MediaBrowserServiceCompat() {
 
                     val searchTop = extras?.getBoolean("SEARCH_TOP") ?: false
 
-                    searchRadioStations(searchTop, newCountry, newTag, newName, offset)
+                    searchRadioStations()
 
                 }
             }
+
+
+
         })
 
 

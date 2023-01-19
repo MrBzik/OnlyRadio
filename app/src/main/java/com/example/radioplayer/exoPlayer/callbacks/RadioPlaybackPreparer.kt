@@ -22,11 +22,8 @@ class RadioPlaybackPreparer (
         extras: Bundle?,
         cb: ResultReceiver?
     ): Boolean {
-
         onCommand(command, extras)
         return false
-
-
     }
 
     override fun getSupportedPrepareActions(): Long {

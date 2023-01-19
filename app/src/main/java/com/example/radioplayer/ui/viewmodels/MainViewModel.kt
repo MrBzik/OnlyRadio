@@ -1,23 +1,26 @@
 package com.example.radioplayer.ui.viewmodels
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.ResultReceiver
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
+import android.util.Log
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.example.radioplayer.adapters.RadioStationsDataSource
 import com.example.radioplayer.adapters.StationsPageLoader
 import com.example.radioplayer.data.local.entities.RadioStation
-import com.example.radioplayer.exoPlayer.RadioServiceConnection
-import com.example.radioplayer.exoPlayer.isPlayEnabled
-import com.example.radioplayer.exoPlayer.isPlaying
-import com.example.radioplayer.exoPlayer.isPrepared
+import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Constants.NEW_SEARCH
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
 import javax.inject.Inject
 
@@ -25,48 +28,60 @@ import javax.inject.Inject
 @FlowPreview
 @HiltViewModel
 class MainViewModel @Inject constructor(
-       private val radioServiceConnection: RadioServiceConnection
+       private val radioServiceConnection: RadioServiceConnection,
+       private val radioSource: RadioSource,
 ) : ViewModel() {
-
-       private val _mediaItems = MutableLiveData<List<RadioStation>>()
-
-       private var mediaItems : List<RadioStation>? = null
 
        val isConnected = radioServiceConnection.isConnected
        val currentRadioStation = radioServiceConnection.currentRadioStation
        val networkError = radioServiceConnection.networkError
        val playbackState = radioServiceConnection.playbackState
+       private val list = mutableListOf<RadioStation>()
 
 
-       private fun searchWithNewParams(
+       private suspend fun searchWithNewParams(
             limit : Int, offset : Int, bundle: Bundle
-        ) : Deferred<List<RadioStation>> = viewModelScope.async {
+        ) : List<RadioStation> {
 
-                val calcOffset = limit * offset
+           withContext(Dispatchers.IO) {
 
-                bundle.apply {
+               val calcOffset = limit * offset
 
-                    putInt("OFFSET", calcOffset)
+               bundle.apply {
 
-                    putInt("LIMIT", limit)
-                }
+                   val tag = this.getString("TAG") ?: ""
+                   val name = this.getString("NAME") ?: ""
+                   val country = getString("COUNTRY") ?: ""
+                   val isTopSearch = this.getBoolean("SEARCH_TOP")
 
-            radioServiceConnection.sendCommand(NEW_SEARCH, bundle)
+                   this.putInt("OFFSET", calcOffset)
 
-//            withContext(Dispatchers.Default){
-//
-//                while (mediaItems == null || mediaItems == _mediaItems.value) {
-//
-//                    delay(100)
-//                }
-//                mediaItems = _mediaItems.value
-//
-//               mediaItems!!
-//            }
-
-               _mediaItems.value!!
+                  val response = radioSource.getRadioStationsSource(
+                       offset = calcOffset,
+                       isTopSearch = isTopSearch,
+                       country = country,
+                       tag = tag,
+                       name = name)
 
 
+                   response?.forEach {
+                       list.add(
+                           RadioStation(
+                           favicon = it.favicon,
+                           name = it.name,
+                           stationuuid = it.stationuuid,
+                           country = it.country,
+                           url = it.url_resolved)
+                       )
+                   }
+
+               }
+
+       }
+
+           radioServiceConnection.sendCommand(NEW_SEARCH, bundle)
+
+           return list
 
         }
 
@@ -76,7 +91,7 @@ class MainViewModel @Inject constructor(
         bundle: Bundle
     ): Flow<PagingData<RadioStation>> {
         val loader : StationsPageLoader = { pageIndex, pageSize ->
-            searchWithNewParams(pageSize, pageIndex, bundle).await()
+            searchWithNewParams(pageSize, pageIndex, bundle)
         }
 
         return Pager(
@@ -111,31 +126,14 @@ class MainViewModel @Inject constructor(
        init {
 
            radioServiceConnection.subscribe(MEDIA_ROOT_ID, object : MediaBrowserCompat.SubscriptionCallback(){
+               override fun onChildrenLoaded(
+                   parentId: String,
+                   children: MutableList<MediaBrowserCompat.MediaItem>
+               ) {
+                   super.onChildrenLoaded(parentId, children)
+               }
 
-                  override fun onChildrenLoaded(
-                         parentId: String,
-                         children: MutableList<MediaBrowserCompat.MediaItem>
-                  ) {
-                         super.onChildrenLoaded(parentId, children)
-
-
-                    val stations =  children.map{
-
-                            RadioStation(
-                                   it.description.iconUri.toString(),
-                                   it.description.title.toString(),
-                                   it.mediaId,
-                                   it.description.subtitle.toString(),
-                                   it.description.mediaUri.toString()
-                            )
-                      }
-
-                         _mediaItems.postValue(stations)
-                      println("?????????????????????????????????????????????????")
-//                      println(_mediaItems.value?.get(0)?.tags)
-
-                  }
-            })
+           })
 
            stationsFlow = searchBy.asFlow()
                .flatMapLatest {

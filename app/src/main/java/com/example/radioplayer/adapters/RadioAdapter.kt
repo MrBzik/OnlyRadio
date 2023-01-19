@@ -35,7 +35,7 @@ class RadioAdapter @Inject constructor(
         holder.bind.apply {
 
             tvPrimary.text = station.name
-            tvSecondary.text = station.tags
+            tvSecondary.text = station.country
             glide.load(station.favicon).into(ivItemImage)
         }
 

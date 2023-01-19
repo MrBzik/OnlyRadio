@@ -132,6 +132,7 @@ class RadioServiceConnection (
             override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
                 resultCallback(resultCode, resultData)
             }
+
         })
         true
     } else {

@@ -23,16 +23,6 @@ import javax.inject.Singleton
 @InstallIn(ServiceComponent::class)
 object ServiceModule {
 
-    @Provides
-    @ServiceScoped
-    fun providesRadioApi () : RadioApi {
-
-        return Retrofit.Builder()
-            .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl(Constants.BASE_RADIO_URL)
-            .build()
-            .create(RadioApi::class.java)
-    }
 
 
     @Provides
