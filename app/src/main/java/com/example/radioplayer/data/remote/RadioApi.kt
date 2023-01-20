@@ -37,7 +37,7 @@ interface RadioApi {
         @POST("/json/stations/topvote")
         suspend fun getTopVotedStations(
             @Query("limit")
-            limit : Int = 10,
+            limit : Int = PAGE_SIZE,
 
             @Query("offset")
             offset : Int = 0,

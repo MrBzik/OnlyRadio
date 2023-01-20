@@ -16,9 +16,11 @@ import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Constants.NETWORK_ERROR
 import com.example.radioplayer.utils.Constants.NEW_SEARCH
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -58,11 +60,11 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
     private fun searchRadioStations(
-
+            isNewSearch : Boolean
     )
             = serviceScope.launch {
 
-        radioSource.getRadioStations()
+        radioSource.getRadioStations(isNewSearch)
 
     }
 
@@ -101,13 +103,15 @@ class RadioService : MediaBrowserServiceCompat() {
                 true
             )
         }, {
-            command, _ ->
+            command, extras ->
 
             when(command){
 
                 NEW_SEARCH -> {
 
-                    searchRadioStations()
+                   val isNewSearch = extras?.getBoolean("IS_NEW_SEARCH") ?: false
+
+                    searchRadioStations(isNewSearch)
 
                 }
             }
@@ -146,7 +150,12 @@ class RadioService : MediaBrowserServiceCompat() {
         var curStationIndex = if(currentStation == null) 0
         else stations.indexOf(itemToPlay)
 
+//        val mediaItem = MediaItem.fromUri(itemToPlay?.description?.mediaUri!!)
+//        val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
+//            .createMediaSource(mediaItem)
+
         exoPlayer.setMediaSource(radioSource.asMediaSource(dataSourceFactory))
+//        exoPlayer.setMediaSource(mediaSource)
         exoPlayer.prepare()
         exoPlayer.seekTo(curStationIndex, 0L)
         exoPlayer.playWhenReady = playNow

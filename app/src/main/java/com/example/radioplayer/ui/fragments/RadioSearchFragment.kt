@@ -1,28 +1,20 @@
 package com.example.radioplayer.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.core.view.get
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
-import com.example.radioplayer.adapters.RadioAdapter
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.viewmodels.MainViewModel
-import com.example.radioplayer.utils.Status
 import com.hbb20.countrypicker.models.CPCountry
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -91,8 +83,6 @@ class RadioSearchFragment : Fragment() {
         pagingRadioAdapter.setOnClickListener {
 
             viewModel.playOrToggleStation(it, true)
-
-        Log.d("STATIONUUID", it.stationuuid.toString())
 
         }
 
@@ -212,7 +202,7 @@ class RadioSearchFragment : Fragment() {
                    putBoolean("SEARCH_TOP", isTopSearch)
 
                }
-
+                viewModel.isNewSearch = true
                 viewModel.setSearchBy(bundle)
 
         }

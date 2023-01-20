@@ -29,49 +29,70 @@ class RadioSource @Inject constructor(
 
 ) {
 
-    var stations = emptyList<MediaMetadataCompat>()
+    var stations = mutableListOf<MediaMetadataCompat>()
 
     var stationsService : RadioStations? = RadioStations()
 
     suspend fun getRadioStationsSource (isTopSearch : Boolean,
-           country : String = "", tag : String = "", name : String = "", offset : Int = 0
+           country : String = "", tag : String = "", name : String = "", offset : Int = 0, pageSize : Int
     ) : RadioStations? {
 
         val response  = if(isTopSearch){
-            radioApi.getTopVotedStations()
+            radioApi.getTopVotedStations(offset = offset, limit = pageSize)
         } else {
-            radioApi.searchRadio(country, tag, name, offset = offset)
+            radioApi.searchRadio(country, tag, name, offset = offset, limit = pageSize)
         }
         stationsService = response.body()
+
+//        Log.d("CHECKNUMZ", stationsService?.size.toString())
 
         return response.body()
     }
 
-    suspend fun getRadioStations ()   {
+    suspend fun getRadioStations (isNewSearch : Boolean)   {
 
             state = STATE_PROCESSING
 
               stationsService?.let {
 
-                   stations = it.map { station ->
-                        MediaMetadataCompat.Builder()
-                            .putString(METADATA_KEY_TITLE, station.name)
-                            .putString(METADATA_KEY_DISPLAY_TITLE, station.name)
-                            .putString(METADATA_KEY_MEDIA_ID, station.stationuuid)
-                            .putString(METADATA_KEY_ALBUM_ART_URI, station.favicon)
-                            .putString(METADATA_KEY_DISPLAY_ICON_URI, station.favicon)
-                            .putString(METADATA_KEY_MEDIA_URI, station.url_resolved)
-                            .putString(METADATA_KEY_DISPLAY_SUBTITLE, station.country)
-                            .putString(METADATA_KEY_DISPLAY_DESCRIPTION, station.country)
-                            .build()
-                    }
+                  if(isNewSearch) {
+                      stations = it.map { station ->
+                          MediaMetadataCompat.Builder()
+                              .putString(METADATA_KEY_TITLE, station.name)
+                              .putString(METADATA_KEY_DISPLAY_TITLE, station.name)
+                              .putString(METADATA_KEY_MEDIA_ID, station.stationuuid)
+                              .putString(METADATA_KEY_ALBUM_ART_URI, station.favicon)
+                              .putString(METADATA_KEY_DISPLAY_ICON_URI, station.favicon)
+                              .putString(METADATA_KEY_MEDIA_URI, station.url_resolved)
+                              .putString(METADATA_KEY_DISPLAY_SUBTITLE, station.country)
+                              .putString(METADATA_KEY_DISPLAY_DESCRIPTION, station.country)
+                              .build()
+                      }.toMutableList()
+                  } else {
+
+                      it.map { station ->
+
+                          stations.add(
+                              MediaMetadataCompat.Builder()
+                                  .putString(METADATA_KEY_TITLE, station.name)
+                                  .putString(METADATA_KEY_DISPLAY_TITLE, station.name)
+                                  .putString(METADATA_KEY_MEDIA_ID, station.stationuuid)
+                                  .putString(METADATA_KEY_ALBUM_ART_URI, station.favicon)
+                                  .putString(METADATA_KEY_DISPLAY_ICON_URI, station.favicon)
+                                  .putString(METADATA_KEY_MEDIA_URI, station.url_resolved)
+                                  .putString(METADATA_KEY_DISPLAY_SUBTITLE, station.country)
+                                  .putString(METADATA_KEY_DISPLAY_DESCRIPTION, station.country)
+                                  .build()
+                          )
+
+                      }
+
+                  }
 
                         state = STATE_INITIALIZED
                 }
 
     }
-
-
 
 
     fun asMediaSource(dataSourceFactory : DefaultDataSource.Factory) : ConcatenatingMediaSource {

@@ -1,12 +1,9 @@
 package com.example.radioplayer.ui.viewmodels
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.ResultReceiver
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
-import android.util.Log
+import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.example.radioplayer.adapters.RadioStationsDataSource
@@ -19,8 +16,6 @@ import com.example.radioplayer.utils.Constants.PAGE_SIZE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
 import javax.inject.Inject
 
@@ -37,6 +32,7 @@ class MainViewModel @Inject constructor(
        val networkError = radioServiceConnection.networkError
        val playbackState = radioServiceConnection.playbackState
        private var listOfStations = listOf<RadioStation>()
+       var isNewSearch = true
 
 
        private suspend fun searchWithNewParams(
@@ -58,6 +54,7 @@ class MainViewModel @Inject constructor(
 
                    val response = radioSource.getRadioStationsSource(
                        offset = calcOffset,
+                       pageSize = limit,
                        isTopSearch = isTopSearch,
                        country = country,
                        tag = tag,
@@ -82,7 +79,15 @@ class MainViewModel @Inject constructor(
 
        }
 
-           radioServiceConnection.sendCommand(NEW_SEARCH, Bundle())
+           val firstRunBundle = Bundle().apply {
+
+             this.putBoolean("IS_NEW_SEARCH", isNewSearch)
+
+           }
+
+           radioServiceConnection.sendCommand(NEW_SEARCH, firstRunBundle)
+
+           isNewSearch = false
 
            return listOfStations
 
@@ -109,9 +114,15 @@ class MainViewModel @Inject constructor(
     }
 
 
-    val stationsFlow : Flow<PagingData<RadioStation>>
 
-    private val searchBy = MutableLiveData(Bundle())
+
+    private val searchBy = MutableLiveData(bundleOf(Pair("SEARCH_TOP", true)))
+
+    val stationsFlow = searchBy.asFlow()
+        .flatMapLatest {
+            searchStationsPaging(it)
+        }
+        .cachedIn(viewModelScope)
 
     fun setSearchBy(value : Bundle){
 
@@ -121,7 +132,9 @@ class MainViewModel @Inject constructor(
             && it.getString("COUNTRY") == value.getString("COUNTRY")
             && it.getBoolean("SEARCH_TOP") == value.getBoolean("SEARCH_TOP")
         )  return
-            searchBy.value = value
+
+                searchBy.value = value
+
         }
 
     }
@@ -138,33 +151,26 @@ class MainViewModel @Inject constructor(
 
            })
 
-           stationsFlow = searchBy.asFlow()
-               .flatMapLatest {
-                   searchStationsPaging(it)
-               }
-               .cachedIn(viewModelScope)
 
        }
 
 
         fun playOrToggleStation(station : RadioStation, toggle : Boolean = false) {
 
-            radioServiceConnection.transportControls.playFromMediaId(station.stationuuid, null)
+            val isPrepared = playbackState.value?.isPrepared ?: false
 
-//            val isPrepared = playbackState.value?.isPrepared ?: false
-//
-//            if(isPrepared && station.stationuuid
-//                    == currentRadioStation.value?.getString(METADATA_KEY_MEDIA_ID)){
-//                playbackState.value?.let { playbackState ->
-//                    when {
-//                        playbackState.isPlaying -> if(toggle) radioServiceConnection.transportControls.pause()
-//                        playbackState.isPlayEnabled -> radioServiceConnection.transportControls.play()
-//                        else -> radioServiceConnection.transportControls.pause()
-//                    }
-//                }
-//            } else{
-//                radioServiceConnection.transportControls.playFromMediaId(station.stationuuid, null)
-//            }
+            if(isPrepared && station.stationuuid
+                    == currentRadioStation.value?.getString(METADATA_KEY_MEDIA_ID)){
+                playbackState.value?.let { playbackState ->
+                    when {
+                        playbackState.isPlaying -> if(toggle) radioServiceConnection.transportControls.pause()
+                        playbackState.isPlayEnabled -> radioServiceConnection.transportControls.play()
+                        else -> radioServiceConnection.transportControls.pause()
+                    }
+                }
+            } else{
+                radioServiceConnection.transportControls.playFromMediaId(station.stationuuid, null)
+            }
         }
 
 

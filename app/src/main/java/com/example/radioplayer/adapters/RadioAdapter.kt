@@ -76,6 +76,11 @@ class RadioAdapter @Inject constructor(
 
     private val differ = AsyncListDiffer(this, diffCallback)
 
+    fun check (){
+
+
+    }
+
     var listOfStations : List<RadioStation>
     get() = differ.currentList
     set(value) = differ.submitList(value)

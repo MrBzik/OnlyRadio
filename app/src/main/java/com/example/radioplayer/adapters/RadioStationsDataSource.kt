@@ -26,7 +26,7 @@ class RadioStationsDataSource (
             LoadResult.Page(
                 data = stations,
                 prevKey = if (pageIndex == 0) null else pageIndex - 1,
-                nextKey = pageIndex +1
+                nextKey = if (stations.size == params.loadSize) pageIndex + (params.loadSize / pageSize) else null
             )
 
         } catch (e: Exception) {
