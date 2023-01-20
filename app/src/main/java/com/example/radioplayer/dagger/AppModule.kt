@@ -2,16 +2,21 @@ package com.example.radioplayer.dagger
 
 import android.app.Application
 import android.content.Context
+import androidx.room.Room
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.example.radioplayer.R
+import com.example.radioplayer.data.local.RadioDAO
+import com.example.radioplayer.data.local.RadioDB
 import com.example.radioplayer.data.remote.RadioApi
 import com.example.radioplayer.exoPlayer.RadioServiceConnection
 import com.example.radioplayer.exoPlayer.RadioSource
+import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.BASE_RADIO_URL
+import com.example.radioplayer.utils.Constants.DATABASE_NAME
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,6 +31,23 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    @Provides
+    @Singleton
+    fun providesRadioDB(
+        @ApplicationContext app : Context
+    ) : RadioDB = Room.databaseBuilder(app, RadioDB::class.java, DATABASE_NAME).build()
+
+    @Provides
+    @Singleton
+    fun providesRadioDAO(
+        radioDB: RadioDB
+    ) : RadioDAO =  radioDB.getRadioDAO()
+
+    @Provides
+    @Singleton
+    fun providesDatabaseRepository(
+        radioDAO: RadioDAO
+    ) = DatabaseRepository(radioDAO)
 
     @Provides
     @Singleton

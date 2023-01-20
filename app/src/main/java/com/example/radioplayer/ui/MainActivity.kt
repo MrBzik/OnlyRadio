@@ -8,6 +8,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.radioplayer.R
 import com.example.radioplayer.data.remote.RadioApi
 import com.example.radioplayer.databinding.ActivityMainBinding
+import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -21,6 +22,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 

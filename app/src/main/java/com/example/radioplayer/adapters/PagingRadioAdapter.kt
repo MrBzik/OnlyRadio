@@ -37,12 +37,12 @@ class PagingRadioAdapter @Inject constructor(
 
         holder.bind.apply {
 
-            tvPrimary.text = station.name
+            tvPrimary.helperText = station.name
             tvSecondary.text = station.country
             glide.load(station.favicon).into(ivItemImage)
         }
 
-        holder.itemView.setOnClickListener {
+        holder.bind.ivItemImage.setOnClickListener {
 
             onItemClickListener?.let { click ->
 
@@ -50,6 +50,16 @@ class PagingRadioAdapter @Inject constructor(
 
             }
         }
+
+        holder.bind.btnFav.setOnClickListener {
+
+            onHeartClickListener?.let { click ->
+
+                click(station)
+
+            }
+        }
+
     }
 
     private var onItemClickListener : ((RadioStation) -> Unit)? = null
@@ -58,7 +68,11 @@ class PagingRadioAdapter @Inject constructor(
         onItemClickListener = listener
     }
 
+    private var onHeartClickListener : ((RadioStation) -> Unit)? = null
 
+    fun setOnHeartClickListener(listener: (RadioStation) -> Unit){
+        onHeartClickListener = listener
+    }
 
 
 

@@ -14,6 +14,7 @@ import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
 import com.example.radioplayer.ui.MainActivity
+import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.hbb20.countrypicker.models.CPCountry
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,9 +33,12 @@ class RadioSearchFragment : Fragment() {
 
     lateinit var viewModel : MainViewModel
 
+    lateinit var viewModelDB : DatabaseViewModel
+
     lateinit var toggle : ActionBarDrawerToggle
 
     private var selectedCountry = ""
+
 
 
 
@@ -76,6 +80,7 @@ class RadioSearchFragment : Fragment() {
 
 
         viewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
+        viewModelDB = ViewModelProvider(requireActivity()).get(DatabaseViewModel::class.java)
 
         setRecycleView()
 
@@ -84,6 +89,11 @@ class RadioSearchFragment : Fragment() {
 
             viewModel.playOrToggleStation(it, true)
 
+        }
+
+        pagingRadioAdapter.setOnHeartClickListener {
+
+            viewModelDB.insertRadioStation(it)
         }
 
         observeStations()
@@ -118,6 +128,7 @@ class RadioSearchFragment : Fragment() {
 //            adapter = radioAdapter
 
             adapter = pagingRadioAdapter
+
 
             layoutManager = LinearLayoutManager(requireContext())
         }

@@ -12,9 +12,9 @@ import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.RadioItemBinding
 import javax.inject.Inject
 
-class RadioAdapter @Inject constructor(
+class RadioDatabaseAdapter @Inject constructor(
     private val glide : RequestManager
-) : RecyclerView.Adapter<RadioAdapter.RadioItemHolder>() {
+) : RecyclerView.Adapter<RadioDatabaseAdapter.RadioItemHolder>() {
 
     class RadioItemHolder (itemView : View) : RecyclerView.ViewHolder(itemView)  {
         var bind : RadioItemBinding
@@ -34,7 +34,7 @@ class RadioAdapter @Inject constructor(
 
         holder.bind.apply {
 
-            tvPrimary.text = station.name
+            tvPrimary.helperText = station.name
             tvSecondary.text = station.country
             glide.load(station.favicon).into(ivItemImage)
         }

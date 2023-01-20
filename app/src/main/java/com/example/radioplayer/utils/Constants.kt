@@ -15,4 +15,6 @@ object Constants {
 
     const val PAGE_SIZE = 10
 
+    const val DATABASE_NAME = "radio_stations_db"
+
 }
