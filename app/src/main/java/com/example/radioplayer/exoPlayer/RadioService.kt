@@ -30,10 +30,6 @@ private const val SERVICE_TAG = "service tag"
 @AndroidEntryPoint
 class RadioService : MediaBrowserServiceCompat() {
 
-
-    @Inject
-    lateinit var radioServiceConnection: RadioServiceConnection
-
     @Inject
     lateinit var dataSourceFactory : Factory
 

@@ -149,20 +149,22 @@ class MainViewModel @Inject constructor(
 
         fun playOrToggleStation(station : RadioStation, toggle : Boolean = false) {
 
-            val isPrepared = playbackState.value?.isPrepared ?: false
+            radioServiceConnection.transportControls.playFromMediaId(station.stationuuid, null)
 
-            if(isPrepared && station.stationuuid
-                    == currentRadioStation.value?.getString(METADATA_KEY_MEDIA_ID)){
-                playbackState.value?.let { playbackState ->
-                    when {
-                        playbackState.isPlaying -> if(toggle) radioServiceConnection.transportControls.pause()
-                        playbackState.isPlayEnabled -> radioServiceConnection.transportControls.play()
-                        else -> radioServiceConnection.transportControls.pause()
-                    }
-                }
-            } else{
-                radioServiceConnection.transportControls.playFromMediaId(station.stationuuid, null)
-            }
+//            val isPrepared = playbackState.value?.isPrepared ?: false
+//
+//            if(isPrepared && station.stationuuid
+//                    == currentRadioStation.value?.getString(METADATA_KEY_MEDIA_ID)){
+//                playbackState.value?.let { playbackState ->
+//                    when {
+//                        playbackState.isPlaying -> if(toggle) radioServiceConnection.transportControls.pause()
+//                        playbackState.isPlayEnabled -> radioServiceConnection.transportControls.play()
+//                        else -> radioServiceConnection.transportControls.pause()
+//                    }
+//                }
+//            } else{
+//                radioServiceConnection.transportControls.playFromMediaId(station.stationuuid, null)
+//            }
         }
 
 

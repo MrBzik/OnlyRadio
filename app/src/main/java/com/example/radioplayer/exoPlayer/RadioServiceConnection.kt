@@ -22,7 +22,6 @@ class RadioServiceConnection (
     context : Context
         ) {
 
-    val newSearchTag = MutableLiveData<String>()
 
     private val _isConnected = MutableLiveData<Event<Resource<Boolean>>>()
     val isConnected : LiveData<Event<Resource<Boolean>>> = _isConnected

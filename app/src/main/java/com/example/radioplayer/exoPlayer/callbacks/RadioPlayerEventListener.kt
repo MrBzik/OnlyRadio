@@ -1,5 +1,8 @@
 package com.example.radioplayer.exoPlayer.callbacks
 
+import android.app.Service.STOP_FOREGROUND_DETACH
+import android.app.Service.STOP_FOREGROUND_LEGACY
+import android.os.Build
 import android.widget.Toast
 import com.example.radioplayer.exoPlayer.RadioService
 import com.google.android.exoplayer2.PlaybackException
@@ -12,11 +15,13 @@ class RadioPlayerEventListener (
 
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
 
-        super.onPlayerStateChanged(playWhenReady, playbackState)
+        super.onPlayWhenReadyChanged(playWhenReady, playbackState)
 
         if(playbackState == Player.STATE_READY && !playWhenReady) {
 
-            radioService.stopForeground(false)
+            if(Build.VERSION.SDK_INT > 24) { radioService.stopForeground(STOP_FOREGROUND_DETACH)}
+            else {radioService.stopForeground(false)}
+
 
         }
     }

@@ -44,7 +44,7 @@ class RadioSearchFragment : Fragment() {
 
     private var selectedCountry = ""
 
-    private val fragmentScope = lifecycleScope
+
 
 //    @Inject
 //    lateinit var radioAdapter : RadioAdapter
