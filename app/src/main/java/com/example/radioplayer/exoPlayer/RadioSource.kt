@@ -49,10 +49,6 @@ class RadioSource @Inject constructor(
 
     suspend fun getRadioStations ()   {
 
-        Log.d("BRG", stationsService?.size.toString())
-
-        withContext(Dispatchers.IO) {
-
             state = STATE_PROCESSING
 
               stationsService?.let {
@@ -70,12 +66,8 @@ class RadioSource @Inject constructor(
                             .build()
                     }
 
-                    state = STATE_INITIALIZED
-
+                        state = STATE_INITIALIZED
                 }
-            }
-
-
 
     }
 

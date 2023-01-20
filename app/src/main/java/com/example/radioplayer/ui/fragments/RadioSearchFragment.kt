@@ -1,6 +1,7 @@
 package com.example.radioplayer.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -90,6 +91,9 @@ class RadioSearchFragment : Fragment() {
         pagingRadioAdapter.setOnClickListener {
 
             viewModel.playOrToggleStation(it, true)
+
+        Log.d("STATIONUUID", it.stationuuid.toString())
+
         }
 
         observeStations()

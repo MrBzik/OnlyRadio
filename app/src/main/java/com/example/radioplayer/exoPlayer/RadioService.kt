@@ -75,8 +75,6 @@ class RadioService : MediaBrowserServiceCompat() {
         super.onCreate()
 
 
-
-
         val activityIntent = packageManager?.getLaunchIntentForPackage(packageName)?.let {
 
             PendingIntent.getActivity(this, 0, it, 0)
@@ -107,28 +105,16 @@ class RadioService : MediaBrowserServiceCompat() {
                 true
             )
         }, {
-            command, extras ->
+            command, _ ->
 
             when(command){
 
                 NEW_SEARCH -> {
 
-                    val newTag = extras?.getString("TAG") ?: ""
-
-                    val newName = extras?.getString("NAME") ?: ""
-
-                    val newCountry = extras?.getString("COUNTRY") ?: ""
-
-                    val offset = extras?.getInt("OFFSET") ?: 0
-
-                    val searchTop = extras?.getBoolean("SEARCH_TOP") ?: false
-
                     searchRadioStations()
 
                 }
             }
-
-
 
         })
 

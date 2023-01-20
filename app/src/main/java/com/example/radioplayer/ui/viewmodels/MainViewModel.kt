@@ -36,7 +36,7 @@ class MainViewModel @Inject constructor(
        val currentRadioStation = radioServiceConnection.currentRadioStation
        val networkError = radioServiceConnection.networkError
        val playbackState = radioServiceConnection.playbackState
-       private val list = mutableListOf<RadioStation>()
+       private var listOfStations = listOf<RadioStation>()
 
 
        private suspend fun searchWithNewParams(
@@ -49,39 +49,42 @@ class MainViewModel @Inject constructor(
 
                bundle.apply {
 
-                   val tag = this.getString("TAG") ?: ""
-                   val name = this.getString("NAME") ?: ""
+                   val tag = getString("TAG") ?: ""
+                   val name = getString("NAME") ?: ""
                    val country = getString("COUNTRY") ?: ""
-                   val isTopSearch = this.getBoolean("SEARCH_TOP")
+                   val isTopSearch = getBoolean("SEARCH_TOP")
 
                    this.putInt("OFFSET", calcOffset)
 
-                  val response = radioSource.getRadioStationsSource(
+                   val response = radioSource.getRadioStationsSource(
                        offset = calcOffset,
                        isTopSearch = isTopSearch,
                        country = country,
                        tag = tag,
-                       name = name)
+                       name = name
+                   )
 
+                   response?.let {
 
-                   response?.forEach {
-                       list.add(
+                       listOfStations = it.map { station ->
+
                            RadioStation(
-                           favicon = it.favicon,
-                           name = it.name,
-                           stationuuid = it.stationuuid,
-                           country = it.country,
-                           url = it.url_resolved)
-                       )
+                               favicon = station.favicon,
+                               name = station.name,
+                               stationuuid = station.stationuuid,
+                               country = station.country,
+                               url = station.url_resolved
+                           )
+                       }
                    }
-
                }
+
 
        }
 
-           radioServiceConnection.sendCommand(NEW_SEARCH, bundle)
+           radioServiceConnection.sendCommand(NEW_SEARCH, Bundle())
 
-           return list
+           return listOfStations
 
         }
 
@@ -144,21 +147,21 @@ class MainViewModel @Inject constructor(
        }
 
 
-        fun playOrToggleStation(mediaItem : RadioStation, toggle : Boolean = false) {
+        fun playOrToggleStation(station : RadioStation, toggle : Boolean = false) {
 
             val isPrepared = playbackState.value?.isPrepared ?: false
 
-            if(isPrepared && mediaItem.stationuuid
+            if(isPrepared && station.stationuuid
                     == currentRadioStation.value?.getString(METADATA_KEY_MEDIA_ID)){
                 playbackState.value?.let { playbackState ->
                     when {
                         playbackState.isPlaying -> if(toggle) radioServiceConnection.transportControls.pause()
                         playbackState.isPlayEnabled -> radioServiceConnection.transportControls.play()
-                        else -> Unit
+                        else -> radioServiceConnection.transportControls.pause()
                     }
                 }
             } else{
-                radioServiceConnection.transportControls.playFromMediaId(mediaItem.stationuuid, null)
+                radioServiceConnection.transportControls.playFromMediaId(station.stationuuid, null)
             }
         }
 

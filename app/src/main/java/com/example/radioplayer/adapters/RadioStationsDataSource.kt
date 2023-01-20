@@ -35,9 +35,10 @@ class RadioStationsDataSource (
     }
 
     override fun getRefreshKey(state: PagingState<Int, RadioStation>): Int? {
-        val anchorPosition = state.anchorPosition ?: return null
-        val page = state.closestPageToPosition(anchorPosition) ?: return null
-        return page.prevKey?.plus(1) ?: page.nextKey?.minus(1)
+        return state.anchorPosition?.let { anchorPosition ->
+            state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
+                ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
+        }
     }
 
 }

@@ -27,7 +27,10 @@ interface RadioApi {
             offset : Int,
 
             @Query("hidebroken")
-            hidebroken : Boolean = true
+            hidebroken : Boolean = true,
+
+            @Query("order")
+            sortBy : String = "votes"
 
         ) : Response<RadioStations>
 
