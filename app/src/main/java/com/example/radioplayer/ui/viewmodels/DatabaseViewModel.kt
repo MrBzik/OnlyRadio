@@ -17,6 +17,15 @@ class DatabaseViewModel @Inject constructor(
 
     private val radioStations = repository.getAllStations()
 
+    val isExisting : MutableLiveData<Boolean> = MutableLiveData()
+
+
+    fun ifAlreadyInDatabase(id : String) = viewModelScope.launch {
+       val check = repository.checkIfExists(id)
+        isExisting.postValue(check != null)
+    }
+
+
     fun deleteStation (station: RadioStation) = viewModelScope.launch {
         repository.deleteRadioStation(station)
     }

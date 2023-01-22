@@ -16,5 +16,7 @@ class DatabaseRepository @Inject constructor(
 
     fun getAllStations () = radioDAO.getAllStations()
 
+    suspend fun checkIfExists (id : String) = radioDAO.checkIfExists(id)
+
 
 }

@@ -1,27 +1,23 @@
 package com.example.radioplayer.exoPlayer
 
+
+import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
-import android.util.Log
 import androidx.core.net.toUri
-import androidx.lifecycle.MutableLiveData
-import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.remote.RadioApi
 import com.example.radioplayer.data.remote.entities.RadioStations
 import com.example.radioplayer.data.remote.entities.RadioStationsItem
 import com.example.radioplayer.exoPlayer.State.*
-import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.utils.Constants.SPLIT
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import retrofit2.Response
+
 import javax.inject.Inject
 
 class RadioSource @Inject constructor(
@@ -57,6 +53,7 @@ class RadioSource @Inject constructor(
 
                   if(isNewSearch) {
                       stations = it.map { station ->
+
                           MediaMetadataCompat.Builder()
                               .putString(METADATA_KEY_TITLE, station.name)
                               .putString(METADATA_KEY_DISPLAY_TITLE, station.name)
@@ -65,7 +62,7 @@ class RadioSource @Inject constructor(
                               .putString(METADATA_KEY_DISPLAY_ICON_URI, station.favicon)
                               .putString(METADATA_KEY_MEDIA_URI, station.url_resolved)
                               .putString(METADATA_KEY_DISPLAY_SUBTITLE, station.country)
-                              .putString(METADATA_KEY_DISPLAY_DESCRIPTION, station.country)
+                              .putString(METADATA_KEY_DISPLAY_DESCRIPTION, generateDescription(station))
                               .build()
                       }.toMutableList()
                   } else {
@@ -73,6 +70,7 @@ class RadioSource @Inject constructor(
                       it.map { station ->
 
                           stations.add(
+
                               MediaMetadataCompat.Builder()
                                   .putString(METADATA_KEY_TITLE, station.name)
                                   .putString(METADATA_KEY_DISPLAY_TITLE, station.name)
@@ -81,7 +79,8 @@ class RadioSource @Inject constructor(
                                   .putString(METADATA_KEY_DISPLAY_ICON_URI, station.favicon)
                                   .putString(METADATA_KEY_MEDIA_URI, station.url_resolved)
                                   .putString(METADATA_KEY_DISPLAY_SUBTITLE, station.country)
-                                  .putString(METADATA_KEY_DISPLAY_DESCRIPTION, station.country)
+                                  .putString(METADATA_KEY_DISPLAY_DESCRIPTION, generateDescription(station))
+
                                   .build()
                           )
 
@@ -93,6 +92,29 @@ class RadioSource @Inject constructor(
                 }
 
     }
+
+    private fun generateDescription(station : RadioStationsItem)
+
+         = StringBuilder("")
+            .append(
+                if(station.homepage == "")
+                    "null"
+                 else station.homepage
+            )
+            .append(SPLIT)
+            .append(
+                if(station.tags == "")
+                    "unknown"
+                else station.tags
+            )
+            .append(SPLIT)
+            .append(
+                if(station.language == "")
+                    "unknown"
+                else station.language
+            ).toString()
+
+
 
 
     fun asMediaSource(dataSourceFactory : DefaultDataSource.Factory) : ConcatenatingMediaSource {
@@ -111,12 +133,14 @@ class RadioSource @Inject constructor(
 
     fun asMediaItems () = stations.map { station ->
 
+
         val description = MediaDescriptionCompat.Builder()
             .setMediaUri(station.description.mediaUri)
             .setTitle(station.description.title)
             .setSubtitle(station.description.subtitle)
             .setMediaId(station.description.mediaId)
             .setIconUri(station.description.iconUri)
+            .setDescription(station.description.description)
             .build()
 
         MediaBrowserCompat.MediaItem(description, FLAG_PLAYABLE)

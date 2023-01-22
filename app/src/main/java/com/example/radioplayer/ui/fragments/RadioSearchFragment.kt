@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
+import com.example.radioplayer.adapters.RadioDatabaseAdapter
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
@@ -39,11 +40,6 @@ class RadioSearchFragment : Fragment() {
 
     private var selectedCountry = ""
 
-
-
-
-//    @Inject
-//    lateinit var radioAdapter : RadioAdapter
 
     @Inject
     lateinit var pagingRadioAdapter : PagingRadioAdapter
@@ -91,10 +87,6 @@ class RadioSearchFragment : Fragment() {
 
         }
 
-        pagingRadioAdapter.setOnHeartClickListener {
-
-            viewModelDB.insertRadioStation(it)
-        }
 
         observeStations()
 
@@ -124,8 +116,6 @@ class RadioSearchFragment : Fragment() {
     private fun setRecycleView(){
 
         bind.rvSearchStations.apply {
-
-//            adapter = radioAdapter
 
             adapter = pagingRadioAdapter
 

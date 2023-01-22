@@ -3,6 +3,7 @@ package com.example.radioplayer.ui.viewmodels
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
+import android.util.Log
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
@@ -33,6 +34,7 @@ class MainViewModel @Inject constructor(
        val playbackState = radioServiceConnection.playbackState
        private var listOfStations = listOf<RadioStation>()
        var isNewSearch = true
+       var isDelayNeededForServiceConnection = true
 
 
        private suspend fun searchWithNewParams(
@@ -76,7 +78,10 @@ class MainViewModel @Inject constructor(
                    }
                }
 
-
+                if(isDelayNeededForServiceConnection){
+                    delay(1000)
+                    isDelayNeededForServiceConnection = false
+                }
        }
 
            val firstRunBundle = Bundle().apply {
@@ -134,23 +139,20 @@ class MainViewModel @Inject constructor(
         )  return
 
                 searchBy.value = value
-
         }
 
     }
 
        init {
 
-           radioServiceConnection.subscribe(MEDIA_ROOT_ID, object : MediaBrowserCompat.SubscriptionCallback(){
-               override fun onChildrenLoaded(
-                   parentId: String,
-                   children: MutableList<MediaBrowserCompat.MediaItem>
-               ) {
-                   super.onChildrenLoaded(parentId, children)
-               }
-
-           })
-
+//           radioServiceConnection.subscribe(MEDIA_ROOT_ID, object : MediaBrowserCompat.SubscriptionCallback(){
+//               override fun onChildrenLoaded(
+//                   parentId: String,
+//                   children: MutableList<MediaBrowserCompat.MediaItem>
+//               ) {
+//                   super.onChildrenLoaded(parentId, children)
+//               }
+//           })
 
        }
 
@@ -165,11 +167,25 @@ class MainViewModel @Inject constructor(
                     when {
                         playbackState.isPlaying -> if(toggle) radioServiceConnection.transportControls.pause()
                         playbackState.isPlayEnabled -> radioServiceConnection.transportControls.play()
-                        else -> radioServiceConnection.transportControls.pause()
+
                     }
                 }
             } else{
                 radioServiceConnection.transportControls.playFromMediaId(station.stationuuid, null)
+            }
+        }
+
+        fun togglePlayFromMain(){
+
+            val isPrepared = playbackState.value?.isPrepared ?: false
+            if(isPrepared) {
+                playbackState.value?.let { playbackState ->
+                    when {
+                        playbackState.isPlaying -> radioServiceConnection.transportControls.pause()
+                        playbackState.isPlayEnabled -> radioServiceConnection.transportControls.play()
+
+                    }
+                }
             }
         }
 

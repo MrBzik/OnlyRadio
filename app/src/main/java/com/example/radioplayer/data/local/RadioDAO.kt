@@ -20,6 +20,8 @@ interface  RadioDAO {
     @Query("SELECT * FROM radio_stations")
     fun  getAllStations() : LiveData<List<RadioStation>>
 
+    @Query("SELECT * FROM radio_stations WHERE stationuuid ==:id")
+    suspend fun checkIfExists (id : String) : RadioStation?
 
 
 }

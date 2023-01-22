@@ -4,4 +4,6 @@
     <string name="notification_channel_description">Shows the currently playing station</string>
     <string name="open">Open</string>
     <string name="close">Close</string>
+    <string name="Expand">EXPAND</string>
+    <string name="Hide">HIDE</string>
 </resources>

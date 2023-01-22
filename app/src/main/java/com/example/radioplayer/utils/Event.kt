@@ -2,7 +2,7 @@ package com.example.radioplayer.utils
 
 open class Event <out T> (private val data : T){
 
-    var hasBeenHandled = false
+   private  var hasBeenHandled = false
     private set
 
     fun getContentIfNotHandled () : T? {

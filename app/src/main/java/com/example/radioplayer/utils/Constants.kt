@@ -17,4 +17,7 @@ object Constants {
 
     const val DATABASE_NAME = "radio_stations_db"
 
+    const val SPLIT = "_UNIQSPLIT_"
+
+
 }

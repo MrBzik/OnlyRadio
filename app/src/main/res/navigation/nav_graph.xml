@@ -12,4 +12,19 @@
         android:id="@+id/favStationsFragment"
         android:name="com.example.radioplayer.ui.fragments.FavStationsFragment"
         android:label="FavStationsFragment" />
+    <fragment
+        android:id="@+id/stationDetailsFragment"
+        android:name="com.example.radioplayer.ui.fragments.StationDetailsFragment"
+        android:label="StationDetailsFragment" >
+
+        <action
+            android:id="@+id/action_stationDetailsFragment_to_radioSearchFragment2"
+            app:destination="@id/radioSearchFragment" />
+    </fragment>
+
+    <action
+        android:id="@+id/expandToStationDetails"
+        app:destination="@+id/stationDetailsFragment"/>
+
+
 </navigation>

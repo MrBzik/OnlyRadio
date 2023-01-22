@@ -10,7 +10,7 @@
       android:id="@+id/flFragment"
       android:layout_width="match_parent"
       android:layout_height="0dp"
-      app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+      app:layout_constraintBottom_toTopOf="@id/ivCurrentSongImage"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintHorizontal_bias="0.5"
       app:layout_constraintStart_toStartOf="parent"
@@ -26,6 +26,58 @@
         app:navGraph="@navigation/nav_graph" />
 
   </FrameLayout>
+
+  <ImageView
+      android:id="@+id/ivCurrentSongImage"
+      android:layout_width="60dp"
+      android:layout_height="60dp"
+      android:src="@drawable/ic_radio_default"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"/>
+
+  <TextView
+      android:id="@+id/tvStationTitle"
+      android:layout_width="0dp"
+      android:layout_height="60dp"
+      android:text="STATION NAME"
+      android:textSize="14sp"
+      android:paddingHorizontal="8dp"
+      android:paddingTop = "8dp"
+      app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+      app:layout_constraintStart_toEndOf="@+id/ivCurrentSongImage"
+      app:layout_constraintEnd_toStartOf="@+id/ivTogglePlayCurrentSong"/>
+
+  <TextView
+      android:id="@+id/tvExpandHideText"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="4dp"
+      android:layout_marginBottom="8dp"
+      android:text="@string/Expand"
+      android:textColor="@color/EXPANDtext"
+      android:textSize="18sp"
+      app:layout_constraintBottom_toBottomOf="@+id/tvStationTitle"
+      app:layout_constraintEnd_toEndOf="@+id/tvStationTitle" />
+
+  <ImageView
+     android:id="@+id/ivTogglePlayCurrentSong"
+     android:layout_width="60dp"
+     android:layout_height="60dp"
+     android:src="@drawable/ic_play_pause"
+     app:layout_constraintEnd_toEndOf="parent"
+     app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"/>
+
+  <com.google.android.material.floatingactionbutton.FloatingActionButton
+      android:id="@+id/fabAddToFav"
+      android:visibility="gone"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="30dp"
+      android:layout_marginBottom="50dp"
+      android:src="@drawable/ic_add_to_fav"
+      app:layout_constraintBottom_toBottomOf="@+id/flFragment"
+      app:layout_constraintEnd_toEndOf="parent" />
+
 
   <com.google.android.material.bottomnavigation.BottomNavigationView
       android:id="@+id/bottomNavigationView"

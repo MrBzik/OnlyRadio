@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "radio_stations")
 data class RadioStation (
     @PrimaryKey(autoGenerate = false)
-    val stationuuid: String?,
+    val stationuuid: String,
 
     val favicon: String?,
     val name: String?,

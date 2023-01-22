@@ -51,14 +51,6 @@ class PagingRadioAdapter @Inject constructor(
             }
         }
 
-        holder.bind.btnFav.setOnClickListener {
-
-            onHeartClickListener?.let { click ->
-
-                click(station)
-
-            }
-        }
 
     }
 
@@ -66,12 +58,6 @@ class PagingRadioAdapter @Inject constructor(
 
     fun setOnClickListener(listener : (RadioStation) -> Unit){
         onItemClickListener = listener
-    }
-
-    private var onHeartClickListener : ((RadioStation) -> Unit)? = null
-
-    fun setOnHeartClickListener(listener: (RadioStation) -> Unit){
-        onHeartClickListener = listener
     }
 
 
