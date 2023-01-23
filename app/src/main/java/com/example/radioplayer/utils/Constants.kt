@@ -11,7 +11,9 @@ object Constants {
 
     const val NETWORK_ERROR = "network error"
 
-    const val NEW_SEARCH = "new search"
+    const val COMMAND_NEW_SEARCH = "new search"
+
+    const val COMMAND_LOAD_FROM_DB = "load from db"
 
     const val PAGE_SIZE = 10
 

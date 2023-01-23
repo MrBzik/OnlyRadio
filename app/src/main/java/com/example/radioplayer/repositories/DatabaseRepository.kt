@@ -1,5 +1,6 @@
 package com.example.radioplayer.repositories
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.entities.RadioStation
@@ -14,7 +15,8 @@ class DatabaseRepository @Inject constructor(
 
     suspend fun deleteRadioStation (station: RadioStation) = radioDAO.delete(station)
 
-    fun getAllStations () = radioDAO.getAllStations()
+    suspend fun getAllStations () = radioDAO.getAllStations()
+
 
     suspend fun checkIfExists (id : String) = radioDAO.checkIfExists(id)
 

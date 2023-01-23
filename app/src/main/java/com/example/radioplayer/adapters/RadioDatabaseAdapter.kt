@@ -39,7 +39,7 @@ class RadioDatabaseAdapter @Inject constructor(
             glide.load(station.favicon).into(ivItemImage)
         }
 
-        holder.itemView.setOnClickListener {
+        holder.bind.ivItemImage.setOnClickListener {
 
             onItemClickListener?.let { click ->
 
@@ -75,11 +75,6 @@ class RadioDatabaseAdapter @Inject constructor(
     }
 
     private val differ = AsyncListDiffer(this, diffCallback)
-
-    fun check (){
-
-
-    }
 
     var listOfStations : List<RadioStation>
     get() = differ.currentList

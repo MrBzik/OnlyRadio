@@ -11,7 +11,8 @@ fun MediaMetadataCompat.toRadioStation() : RadioStation? {
             it.iconUri.toString(),
             it.title.toString(),
             it.subtitle.toString(),
-            it.mediaUri.toString()
+            it.mediaUri.toString(),
+            it.description.toString()
         )
     }
 

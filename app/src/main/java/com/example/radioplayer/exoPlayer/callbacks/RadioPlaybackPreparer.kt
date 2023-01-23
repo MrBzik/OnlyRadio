@@ -38,7 +38,12 @@ class RadioPlaybackPreparer (
         radioSource.whenReady {
             val itemToPlay = radioSource.stations.find {
                 it.description.mediaId == mediaId
+            } ?: run {
+                radioSource.stationsDB.find{
+                    it.description.mediaId == mediaId
+                }
             }
+
             playerPrepared(itemToPlay)
         }
 

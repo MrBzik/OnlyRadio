@@ -6,9 +6,11 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
@@ -76,9 +78,11 @@ class RadioSearchFragment : Fragment() {
 
 
         viewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
-        viewModelDB = ViewModelProvider(requireActivity()).get(DatabaseViewModel::class.java)
+
 
         setRecycleView()
+
+        setAdapterLoadStateListener()
 
 
         pagingRadioAdapter.setOnClickListener {
@@ -92,24 +96,6 @@ class RadioSearchFragment : Fragment() {
 
     }
 
-//    private fun subscribeToObservers(){
-//
-//        viewModel.mediaItems.observe(viewLifecycleOwner){
-//
-//            when(it.status){
-//                Status.SUCCESS -> {
-//                   bind.allSongsProgressBar.isVisible = false
-//                    it.data?.let { stations ->
-//                        radioAdapter.listOfStations = stations
-//                    }
-//                }
-//                Status.ERROR -> Unit
-//
-//                Status.LOADING -> bind.allSongsProgressBar.isVisible = true
-//
-//            }
-//        }
-//    }
 
 
 
@@ -118,11 +104,25 @@ class RadioSearchFragment : Fragment() {
         bind.rvSearchStations.apply {
 
             adapter = pagingRadioAdapter
-
-
             layoutManager = LinearLayoutManager(requireContext())
         }
     }
+
+    private fun setAdapterLoadStateListener(){
+
+        pagingRadioAdapter.addLoadStateListener {
+
+            if (it.refresh is LoadState.Loading ||
+                it.append is LoadState.Loading)
+                bind.loadStationsProgressBar.isVisible = true
+            else {
+                bind.loadStationsProgressBar.visibility = View.GONE
+            }
+
+        }
+
+    }
+
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

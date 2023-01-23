@@ -35,7 +35,7 @@ object AppModule {
     @Singleton
     fun providesRadioDB(
         @ApplicationContext app : Context
-    ) : RadioDB = Room.databaseBuilder(app, RadioDB::class.java, DATABASE_NAME).build()
+    ) : RadioDB = Room.databaseBuilder(app, RadioDB::class.java, DATABASE_NAME).fallbackToDestructiveMigration().build()
 
     @Provides
     @Singleton
@@ -82,5 +82,6 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRadioSource (radioApi: RadioApi) : RadioSource = RadioSource(radioApi)
+    fun provideRadioSource (radioApi: RadioApi, radioDAO: RadioDAO) : RadioSource
+            = RadioSource(radioApi, radioDAO)
 }

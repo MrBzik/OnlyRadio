@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import com.example.radioplayer.data.local.entities.RadioStation
 
 @Database (entities = [RadioStation::class],
-        version = 1)
+        version = 2)
 abstract class RadioDB : RoomDatabase() {
 
     abstract fun getRadioDAO() : RadioDAO

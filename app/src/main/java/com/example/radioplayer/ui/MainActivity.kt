@@ -13,6 +13,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.RequestManager
@@ -42,7 +43,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var tvExpandHide : TextView
     lateinit var fabAddToFav : FloatingActionButton
 
-   private val colorGray = Color.GRAY
+   private val colorGray = Color.DKGRAY
    private val colorRed = Color.RED
 
 
@@ -51,6 +52,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        window.navigationBarColor = colorGray
 
         currStationImage = findViewById(R.id.ivCurrentSongImage)
         currStationTitle = findViewById(R.id.tvStationTitle)
@@ -67,7 +70,26 @@ class MainActivity : AppCompatActivity() {
 
         bottomNavigationView.setupWithNavController(navController)
 
-        bottomNavigationView.setOnItemReselectedListener { /*DO NOTHING*/}
+
+        navController.addOnDestinationChangedListener(){ _, destination, _ ->
+
+
+            if(tvExpandHide.text == "HIDE") {
+                tvExpandHide.setText(R.string.Expand)
+                navController
+            } else {
+
+            }
+
+
+            fabAddToFav.visibility = View.GONE
+
+        }
+
+        bottomNavigationView.setOnItemReselectedListener {
+        }
+
+
 
 
         databaseViewModel.isExisting.observe(this){
@@ -89,10 +111,18 @@ class MainActivity : AppCompatActivity() {
                 navController.navigate(R.id.expandToStationDetails)
                 tvExpandHide.setText(R.string.Hide)
                 fabAddToFav.isVisible = true
+
             }
 
             else {
-                navController.popBackStack()
+                val item = bottomNavigationView.selectedItemId
+
+                if(item == R.id.radioSearchFragment) {
+                    navController.navigate(R.id.action_stationDetailsFragment_to_radioSearchFragment2)
+                } else {
+                    navController.navigate(R.id.action_DetailsFrag_to_Fav_frag)
+                }
+
                 tvExpandHide.setText(R.string.Expand)
                 fabAddToFav.visibility = View.GONE
             }
@@ -138,7 +168,12 @@ class MainActivity : AppCompatActivity() {
 
 
         togglePlay.setOnClickListener {
-            mainViewModel.togglePlayFromMain()
+
+            currentStation?.let {
+
+                mainViewModel.playOrToggleStation(it, true)
+            }
+
         }
 
         mainViewModel.playbackState.observe(this){
@@ -151,22 +186,6 @@ class MainActivity : AppCompatActivity() {
           }
         }
     }
-
-//    override fun onResume() {
-//        super.onResume()
-//        hideSystemUI()
-//    }
-//
-//
-//    private fun hideSystemUI() {
-//        WindowCompat.setDecorFitsSystemWindows(window, false)
-//        WindowInsetsControllerCompat(window,
-//            window.decorView.findViewById(android.R.id.content)).let { controller ->
-//            controller.hide(WindowInsetsCompat.Type.systemBars())
-//
-//            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-//        }
-//    }
 
 
 

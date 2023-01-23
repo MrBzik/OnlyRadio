@@ -1,9 +1,7 @@
 package com.example.radioplayer.ui.viewmodels
 
 import android.os.Bundle
-import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
-import android.util.Log
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
@@ -11,8 +9,7 @@ import com.example.radioplayer.adapters.RadioStationsDataSource
 import com.example.radioplayer.adapters.StationsPageLoader
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.exoPlayer.*
-import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
-import com.example.radioplayer.utils.Constants.NEW_SEARCH
+import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -72,7 +69,8 @@ class MainViewModel @Inject constructor(
                                name = station.name,
                                stationuuid = station.stationuuid,
                                country = station.country,
-                               url = station.url_resolved
+                               url = station.url_resolved,
+                               description = ""
                            )
                        }
                    }
@@ -90,7 +88,7 @@ class MainViewModel @Inject constructor(
 
            }
 
-           radioServiceConnection.sendCommand(NEW_SEARCH, firstRunBundle)
+           radioServiceConnection.sendCommand(COMMAND_NEW_SEARCH, firstRunBundle)
 
            isNewSearch = false
 
@@ -175,25 +173,12 @@ class MainViewModel @Inject constructor(
             }
         }
 
-        fun togglePlayFromMain(){
-
-            val isPrepared = playbackState.value?.isPrepared ?: false
-            if(isPrepared) {
-                playbackState.value?.let { playbackState ->
-                    when {
-                        playbackState.isPlaying -> radioServiceConnection.transportControls.pause()
-                        playbackState.isPlayEnabled -> radioServiceConnection.transportControls.play()
-
-                    }
-                }
-            }
-        }
 
 
        override fun onCleared() {
               super.onCleared()
 
-              radioServiceConnection.unsubscribe(MEDIA_ROOT_ID)
+//              radioServiceConnection.unsubscribe(MEDIA_ROOT_ID)
        }
 
 }

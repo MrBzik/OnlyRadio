@@ -48,7 +48,7 @@ class StationDetailsFragment : Fragment()
         activity?.onBackPressedDispatcher?.addCallback(
             this, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    findNavController().popBackStack()
+                    findNavController().navigate(R.id.action_stationDetailsFragment_to_radioSearchFragment2)
                     (activity as MainActivity).fabAddToFav.visibility = View.GONE
                     (activity as MainActivity).tvExpandHide.setText(R.string.Expand)
                 }
@@ -118,7 +118,6 @@ class StationDetailsFragment : Fragment()
 
 
     }
-
 
 
 }

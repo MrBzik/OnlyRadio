@@ -24,7 +24,15 @@
 
     <action
         android:id="@+id/expandToStationDetails"
-        app:destination="@+id/stationDetailsFragment"/>
+        app:destination="@+id/stationDetailsFragment"
+        app:popUpTo="@+id/nav_graph"
+        app:popUpToInclusive="true"
+        />
+
+    <action
+        android:id="@+id/action_DetailsFrag_to_Fav_frag"
+        app:destination="@+id/favStationsFragment"/>
+
 
 
 </navigation>

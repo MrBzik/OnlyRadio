@@ -6,15 +6,17 @@ import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_URI
 import android.support.v4.media.session.MediaSessionCompat
+import androidx.core.net.toUri
 import androidx.media.MediaBrowserServiceCompat
-import com.example.radioplayer.data.remote.entities.RadioStations
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlaybackPreparer
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerNotificationListener
+import com.example.radioplayer.utils.Constants.COMMAND_LOAD_FROM_DB
 import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Constants.NETWORK_ERROR
-import com.example.radioplayer.utils.Constants.NEW_SEARCH
+import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -68,6 +70,10 @@ class RadioService : MediaBrowserServiceCompat() {
 
     }
 
+    private fun loadStationsFromDB(){
+        radioSource.createMediaItemsFromDB()
+    }
+
 
     override fun onCreate() {
         super.onCreate()
@@ -98,7 +104,7 @@ class RadioService : MediaBrowserServiceCompat() {
             currentStation = it
 
             preparePlayer(
-                radioSource.stations,
+                radioSource.stations, radioSource.stationsDB,
                 it,
                 true
             )
@@ -107,13 +113,19 @@ class RadioService : MediaBrowserServiceCompat() {
 
             when(command){
 
-                NEW_SEARCH -> {
+                COMMAND_NEW_SEARCH -> {
 
                    val isNewSearch = extras?.getBoolean("IS_NEW_SEARCH") ?: false
 
                     searchRadioStations(isNewSearch)
 
                 }
+
+                COMMAND_LOAD_FROM_DB -> {
+
+                    loadStationsFromDB()
+                }
+
             }
 
         })
@@ -137,28 +149,45 @@ class RadioService : MediaBrowserServiceCompat() {
 
        override fun getMediaDescription(player: Player, windowIndex: Int): MediaDescriptionCompat {
 
-           return radioSource.stations[windowIndex].description
+            currentStation?.let {
+
+             return it.description
+
+           } ?: return radioSource.stations[windowIndex].description
 
        }
    }
 
     private fun preparePlayer(
         stations : List<MediaMetadataCompat>,
+        stationsDB : List<MediaMetadataCompat>,
         itemToPlay : MediaMetadataCompat?,
         playNow : Boolean
     ){
-        var curStationIndex = if(currentStation == null) 0
-        else stations.indexOf(itemToPlay)
 
-//        val mediaItem = MediaItem.fromUri(itemToPlay?.description?.mediaUri!!)
-//        val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
-//            .createMediaSource(mediaItem)
 
-        exoPlayer.setMediaSource(radioSource.asMediaSource(dataSourceFactory))
-//        exoPlayer.setMediaSource(mediaSource)
-        exoPlayer.prepare()
-        exoPlayer.seekTo(curStationIndex, 0L)
-        exoPlayer.playWhenReady = playNow
+      val mediaItem =  if(stations.indexOf(itemToPlay) != -1){
+
+             MediaItem.fromUri(stations[stations.indexOf(itemToPlay)]
+                .getString(METADATA_KEY_MEDIA_URI).toUri())
+
+        } else {
+          MediaItem.fromUri(stationsDB[stationsDB.indexOf(itemToPlay)]
+              .getString(METADATA_KEY_MEDIA_URI).toUri())
+        }
+
+
+            val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
+            .createMediaSource(mediaItem)
+             exoPlayer.setMediaSource(mediaSource)
+            exoPlayer.prepare()
+            exoPlayer.playWhenReady = playNow
+
+
+
+//        exoPlayer.setMediaSource(radioSource.asMediaSource(dataSourceFactory))
+//        exoPlayer.seekTo(curStationIndex, 0L)
+
 
     }
 
@@ -195,11 +224,13 @@ class RadioService : MediaBrowserServiceCompat() {
                val resultSent = radioSource.whenReady { isInitialized ->
                    if(isInitialized){
                         try{
-                            result.sendResult(radioSource.asMediaItems())
-                            if(!isPlayerInitialized && radioSource.stations.isNotEmpty()) {
-                                preparePlayer(radioSource.stations, radioSource.stations[0], false)
-                                isPlayerInitialized = true
-                            }
+
+//                            result.sendResult(radioSource.asMediaItems())
+
+//                            if(!isPlayerInitialized && radioSource.stations.isNotEmpty()) {
+//                                preparePlayer(radioSource.stations, radioSource.stations[0], false)
+//                                isPlayerInitialized = true
+//                            }
                         } catch (e : java.lang.IllegalStateException){
                          notifyChildrenChanged(MEDIA_ROOT_ID)
                         }
@@ -208,9 +239,9 @@ class RadioService : MediaBrowserServiceCompat() {
                        result.sendResult(null)
                    }
                }
-               if(!resultSent) {
-                   result.detach()
-               }
+//               if(!resultSent) {
+//                   result.detach()
+//               }
            }
        }
     }
