@@ -76,13 +76,13 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvChosenTag" />
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/btnAcceptTag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:backgroundTint="@android:color/transparent"
                 android:minHeight="48dp"
-                android:src="@drawable/ic_button_accept"
+                android:src="@drawable/radiobutton"
                 app:layout_constraintBottom_toBottomOf="@+id/etTag"
                 app:layout_constraintStart_toEndOf="@+id/etTag" />
 
@@ -116,13 +116,13 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvChosenName" />
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/btnAcceptName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:backgroundTint="@android:color/transparent"
                 android:minHeight="48dp"
-                android:src="@drawable/ic_button_accept"
+                android:src="@drawable/radiobutton"
                 app:layout_constraintBottom_toBottomOf="@+id/etName"
                 app:layout_constraintStart_toEndOf="@+id/etName" />
 
@@ -133,22 +133,22 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/etName"
-                app:cp_initialSelectionMode="specificCountry"
-                app:cp_initialSpecificCountry="IT"
                 app:cpDialog_allowClearSelection="true"
                 />
 
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/btnSearch"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:src="@drawable/ic_new_radio_search"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:backgroundTint="@android:color/transparent"
+                android:scaleType="fitCenter"
+                android:src="@drawable/telecom"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/etName" />
+                app:layout_constraintTop_toBottomOf="@+id/countryPicker" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

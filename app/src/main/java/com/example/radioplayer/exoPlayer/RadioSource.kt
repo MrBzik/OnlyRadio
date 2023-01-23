@@ -47,7 +47,7 @@ class RadioSource @Inject constructor(
            country : String = "", tag : String = "", name : String = "", offset : Int = 0, pageSize : Int
     ) : RadioStations? {
 
-        val response  = if(isTopSearch){
+        val response = if(isTopSearch){
             radioApi.getTopVotedStations(offset = offset, limit = pageSize)
         } else {
             radioApi.searchRadio(country, tag, name, offset = offset, limit = pageSize)

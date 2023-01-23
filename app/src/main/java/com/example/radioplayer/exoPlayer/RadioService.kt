@@ -23,10 +23,12 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
+import kotlin.math.max
 
 
 private const val SERVICE_TAG = "service tag"
@@ -99,15 +101,26 @@ class RadioService : MediaBrowserServiceCompat() {
             // song duration
         }
 
-        val radioPlaybackPreparer = RadioPlaybackPreparer(radioSource, {
+        val radioPlaybackPreparer = RadioPlaybackPreparer(radioSource, { itemToPlay, isFromDb ->
 
-            currentStation = it
+            currentStation = itemToPlay
 
-            preparePlayer(
-                radioSource.stations, radioSource.stationsDB,
-                it,
-                true
-            )
+            if(isFromDb){
+                preparePlayer(
+                    radioSource.stationsDB,
+                    itemToPlay,
+                    true
+                )
+            } else {
+                preparePlayer(
+                    radioSource.stations,
+                    itemToPlay,
+                    true
+                )
+            }
+
+
+
         }, {
             command, extras ->
 
@@ -160,28 +173,25 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private fun preparePlayer(
         stations : List<MediaMetadataCompat>,
-        stationsDB : List<MediaMetadataCompat>,
         itemToPlay : MediaMetadataCompat?,
         playNow : Boolean
     ){
 
 
-      val mediaItem =  if(stations.indexOf(itemToPlay) != -1){
+      val uri = stations[stations.indexOf(itemToPlay)].getString(METADATA_KEY_MEDIA_URI)
+      val mediaItem = MediaItem.fromUri(uri.toUri())
 
-             MediaItem.fromUri(stations[stations.indexOf(itemToPlay)]
-                .getString(METADATA_KEY_MEDIA_URI).toUri())
+      val mediaSource = if(uri.contains("m3u8")) {
+          HlsMediaSource.Factory(dataSourceFactory)
+              .createMediaSource(mediaItem)
+      } else {
+          ProgressiveMediaSource.Factory(dataSourceFactory)
+              .createMediaSource(mediaItem)
+      }
 
-        } else {
-          MediaItem.fromUri(stationsDB[stationsDB.indexOf(itemToPlay)]
-              .getString(METADATA_KEY_MEDIA_URI).toUri())
-        }
-
-
-            val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
-            .createMediaSource(mediaItem)
-             exoPlayer.setMediaSource(mediaSource)
-            exoPlayer.prepare()
-            exoPlayer.playWhenReady = playNow
+        exoPlayer.setMediaSource(mediaSource)
+        exoPlayer.prepare()
+        exoPlayer.playWhenReady = playNow
 
 
 

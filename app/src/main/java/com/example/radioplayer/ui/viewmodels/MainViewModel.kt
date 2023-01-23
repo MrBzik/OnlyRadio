@@ -32,7 +32,7 @@ class MainViewModel @Inject constructor(
        private var listOfStations = listOf<RadioStation>()
        var isNewSearch = true
        var isDelayNeededForServiceConnection = true
-
+       val newRadioStation : MutableLiveData<RadioStation> = MutableLiveData()
 
        private suspend fun searchWithNewParams(
             limit : Int, offset : Int, bundle: Bundle

@@ -65,6 +65,7 @@ class FavStationsFragment : Fragment() {
         dbAdapter.setOnClickListener {
 
             mainViewModel.playOrToggleStation(it)
+            mainViewModel.newRadioStation.postValue(it)
 
         }
 

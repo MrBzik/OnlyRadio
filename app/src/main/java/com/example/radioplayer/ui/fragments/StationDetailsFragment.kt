@@ -77,6 +77,16 @@ class StationDetailsFragment : Fragment()
         databaseViewModel = (activity as MainActivity).databaseViewModel
 
 
+        mainViewModel.newRadioStation.observe(viewLifecycleOwner){
+
+
+
+
+
+        }
+
+
+
 
         mainViewModel.currentRadioStation.observe(viewLifecycleOwner){
 

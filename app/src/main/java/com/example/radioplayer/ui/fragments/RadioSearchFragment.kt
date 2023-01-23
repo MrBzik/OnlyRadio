@@ -8,16 +8,13 @@ import android.view.ViewGroup
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
-import com.example.radioplayer.adapters.RadioDatabaseAdapter
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
 import com.example.radioplayer.ui.MainActivity
-import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.hbb20.countrypicker.models.CPCountry
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,9 +31,7 @@ class RadioSearchFragment : Fragment() {
 
     lateinit var bind : FragmentRadioSearchBinding
 
-    lateinit var viewModel : MainViewModel
-
-    lateinit var viewModelDB : DatabaseViewModel
+    lateinit var mainViewModel : MainViewModel
 
     lateinit var toggle : ActionBarDrawerToggle
 
@@ -77,7 +72,7 @@ class RadioSearchFragment : Fragment() {
         setSearchDrawer()
 
 
-        viewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
+        mainViewModel = (activity as MainActivity).mainViewModel
 
 
         setRecycleView()
@@ -87,16 +82,14 @@ class RadioSearchFragment : Fragment() {
 
         pagingRadioAdapter.setOnClickListener {
 
-            viewModel.playOrToggleStation(it, true)
-
+            mainViewModel.playOrToggleStation(it, true)
+            mainViewModel.newRadioStation.postValue(it)
         }
 
 
         observeStations()
 
     }
-
-
 
 
     private fun setRecycleView(){
@@ -133,7 +126,7 @@ class RadioSearchFragment : Fragment() {
 
     private fun observeStations(){
         viewLifecycleOwner.lifecycleScope.launch{
-            viewModel.stationsFlow.collectLatest {
+            mainViewModel.stationsFlow.collectLatest {
                 pagingRadioAdapter.submitData(it)
             }
         }
@@ -203,9 +196,9 @@ class RadioSearchFragment : Fragment() {
                    putBoolean("SEARCH_TOP", isTopSearch)
 
                }
-                viewModel.isNewSearch = true
-                viewModel.setSearchBy(bundle)
-
+                mainViewModel.isNewSearch = true
+                mainViewModel.setSearchBy(bundle)
+                bind.rvSearchStations.scrollToPosition(0)
         }
     }
 

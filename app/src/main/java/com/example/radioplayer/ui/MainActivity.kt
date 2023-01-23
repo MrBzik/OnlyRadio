@@ -26,6 +26,7 @@ import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -133,12 +134,14 @@ class MainActivity : AppCompatActivity() {
 
            if(databaseViewModel.isExisting.value == false) {
                databaseViewModel.insertRadioStation(currentStation!!)
-               Toast.makeText(this, "Station added", Toast.LENGTH_SHORT).show()
+               Snackbar.make(findViewById(R.id.rootLayout), "Station saved to favs", Snackbar.LENGTH_SHORT).show()
                databaseViewModel.isExisting.postValue(true)
 
            } else {
 
-               Toast.makeText(this, "Station already in the db", Toast.LENGTH_SHORT).show()
+               databaseViewModel.deleteStation(currentStation!!)
+               Snackbar.make(findViewById(R.id.rootLayout), "Station removed from favs", Snackbar.LENGTH_SHORT).show()
+               databaseViewModel.isExisting.postValue(false)
            }
         }
 
