@@ -13,5 +13,7 @@ data class RadioStation (
     val name: String?,
     val country: String?,
     val url: String?,
-    val description : String?
+    val homepage : String?,
+    val tags : String?,
+    val language : String?
         )

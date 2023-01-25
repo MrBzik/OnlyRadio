@@ -6,12 +6,15 @@ import android.support.v4.media.MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
+import android.util.Log
 import androidx.core.net.toUri
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.remote.RadioApi
 import com.example.radioplayer.data.remote.entities.RadioStations
 import com.example.radioplayer.data.remote.entities.RadioStationsItem
+import com.example.radioplayer.data.remote.entities.RadioTags
+import com.example.radioplayer.data.remote.entities.RadioTagsItem
 import com.example.radioplayer.exoPlayer.State.*
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.utils.Constants.SPLIT
@@ -35,6 +38,7 @@ class RadioSource @Inject constructor(
     var stationsService : RadioStations? = RadioStations()
     var stationsFromDB : List<RadioStation> = listOf()
 
+
     suspend fun loadStationsFromDB() : List<RadioStation> {
 
        val response = radioDAO.getAllStations()
@@ -43,18 +47,26 @@ class RadioSource @Inject constructor(
     }
 
 
+    suspend fun getAllTags() : RadioTags? {
+        return radioApi.getAllTags().body()
+    }
+
     suspend fun getRadioStationsSource (isTopSearch : Boolean,
            country : String = "", tag : String = "", name : String = "", offset : Int = 0, pageSize : Int
     ) : RadioStations? {
 
+
         val response = if(isTopSearch){
             radioApi.getTopVotedStations(offset = offset, limit = pageSize)
         } else {
-            radioApi.searchRadio(country, tag, name, offset = offset, limit = pageSize)
+            if(country != "") {
+                radioApi.searchRadio(country, tag, name, offset = offset, limit = pageSize)
+            } else {
+                radioApi.searchRadioWithoutCountry(tag = tag, name = name, offset = offset, limit = pageSize)
+            }
+
         }
         stationsService = response.body()
-
-//        Log.d("CHECKNUMZ", stationsService?.size.toString())
 
         return response.body()
     }
@@ -71,7 +83,6 @@ class RadioSource @Inject constructor(
                 .putString(METADATA_KEY_DISPLAY_ICON_URI, station.favicon)
                 .putString(METADATA_KEY_MEDIA_URI, station.url)
                 .putString(METADATA_KEY_DISPLAY_SUBTITLE, station.country)
-                .putString(METADATA_KEY_DISPLAY_DESCRIPTION, station.description)
                 .build()
         }.toMutableList()
     }
@@ -93,7 +104,6 @@ class RadioSource @Inject constructor(
                               .putString(METADATA_KEY_DISPLAY_ICON_URI, station.favicon)
                               .putString(METADATA_KEY_MEDIA_URI, station.url_resolved)
                               .putString(METADATA_KEY_DISPLAY_SUBTITLE, station.country)
-                              .putString(METADATA_KEY_DISPLAY_DESCRIPTION, generateDescription(station))
                               .build()
                       }.toMutableList()
                   } else {
@@ -110,12 +120,9 @@ class RadioSource @Inject constructor(
                                   .putString(METADATA_KEY_DISPLAY_ICON_URI, station.favicon)
                                   .putString(METADATA_KEY_MEDIA_URI, station.url_resolved)
                                   .putString(METADATA_KEY_DISPLAY_SUBTITLE, station.country)
-                                  .putString(METADATA_KEY_DISPLAY_DESCRIPTION, generateDescription(station))
                                   .build()
                           )
-
                       }
-
                   }
 
                         state = STATE_INITIALIZED
@@ -123,59 +130,9 @@ class RadioSource @Inject constructor(
 
     }
 
-    private fun generateDescription(station : RadioStationsItem)
-
-         = StringBuilder("")
-            .append(
-                if(station.homepage == "")
-                    "null"
-                 else station.homepage
-            )
-            .append(SPLIT)
-            .append(
-                if(station.tags == "")
-                    "unknown"
-                else station.tags
-            )
-            .append(SPLIT)
-            .append(
-                if(station.language == "")
-                    "unknown"
-                else station.language
-            ).toString()
 
 
 
-
-    fun asMediaSource(dataSourceFactory : DefaultDataSource.Factory) : ConcatenatingMediaSource {
-
-        val concatenatingMediaSource = ConcatenatingMediaSource()
-
-        stations.forEach { station ->
-
-            val mediaItem = MediaItem.fromUri(station.getString(METADATA_KEY_MEDIA_URI).toUri())
-            val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(mediaItem)
-            concatenatingMediaSource.addMediaSource(mediaSource)
-        }
-        return concatenatingMediaSource
-    }
-
-    fun asMediaItems () = stations.map { station ->
-
-
-        val description = MediaDescriptionCompat.Builder()
-            .setMediaUri(station.description.mediaUri)
-            .setTitle(station.description.title)
-            .setSubtitle(station.description.subtitle)
-            .setMediaId(station.description.mediaId)
-            .setIconUri(station.description.iconUri)
-            .setDescription(station.description.description)
-            .build()
-
-        MediaBrowserCompat.MediaItem(description, FLAG_PLAYABLE)
-
-    }.toMutableList()
 
 
     private val onReadyListeners = mutableListOf<(Boolean) -> Unit>()

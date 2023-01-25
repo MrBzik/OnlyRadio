@@ -1,30 +1,20 @@
 package com.example.radioplayer.ui.fragments
 
 import android.content.Intent
-import android.content.res.ColorStateList
-import android.content.res.Resources
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
-import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.FragmentStationDetailsBinding
-import com.example.radioplayer.exoPlayer.toRadioStation
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
-import com.example.radioplayer.utils.Constants.SPLIT
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -79,41 +69,19 @@ class StationDetailsFragment : Fragment()
 
         mainViewModel.newRadioStation.observe(viewLifecycleOwner){
 
+            bind.tvName.text = it.name
+            bind.tvCountry.text = it.country
 
+            glide.load(it.favicon).into(bind.ivIcon)
 
+            homepageUrl = it.homepage
 
+            val tags = it.tags?.replace(",", ", ")
+            bind.tvTags.text = "Tags : $tags"
 
+            bind.tvLanguage.text = "Languages : ${it.language}"
         }
 
-
-
-
-        mainViewModel.currentRadioStation.observe(viewLifecycleOwner){
-
-            var homeTagsLang = ""
-
-            it?.description?.apply {
-
-                bind.tvName.text = title
-                bind.tvCountry.text = subtitle
-                glide.load(iconUri).into(bind.ivIcon)
-                homeTagsLang = description.toString()
-
-            }
-
-              val array =  homeTagsLang.split(SPLIT)
-
-              homepageUrl = array[0]
-
-              val tags = array[1].replace(",", ", ")
-
-              val language = array[2]
-
-                  bind.tvTags.text = "Tags : $tags"
-
-                  bind.tvLanguage.text = "Language : $language"
-
-        }
 
         bind.fabStationHomePage.setOnClickListener {
 

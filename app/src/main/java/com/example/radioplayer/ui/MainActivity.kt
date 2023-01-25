@@ -9,9 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -21,7 +19,6 @@ import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
-import com.example.radioplayer.exoPlayer.toRadioStation
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -74,22 +71,16 @@ class MainActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener(){ _, destination, _ ->
 
-
             if(tvExpandHide.text == "HIDE") {
                 tvExpandHide.setText(R.string.Expand)
-                navController
-            } else {
 
             }
-
 
             fabAddToFav.visibility = View.GONE
 
         }
 
-        bottomNavigationView.setOnItemReselectedListener {
-        }
-
+        bottomNavigationView.setOnItemReselectedListener {/*DO NOTHING*/}
 
 
 
@@ -145,17 +136,13 @@ class MainActivity : AppCompatActivity() {
            }
         }
 
+        mainViewModel.newRadioStation.observe(this){ station ->
 
-        mainViewModel.currentRadioStation.observe(this){
+            currentStation = station
 
-            currentStation = it?.toRadioStation()
+            databaseViewModel.ifAlreadyInDatabase(station.stationuuid)
 
-            currentStation?.let { station ->
-
-                databaseViewModel.ifAlreadyInDatabase(station.stationuuid)
-            }
-
-           val newImage = it?.description?.iconUri
+            val newImage = station.favicon?.toUri()
 
             newImage?.let { uri ->
                 glide.load(uri).into(currStationImage)
@@ -163,11 +150,9 @@ class MainActivity : AppCompatActivity() {
                 currStationImage.setImageResource(R.drawable.ic_radio_default)
             }
 
-            val newTitle = it?.description?.title!!
-            currStationTitle.text = newTitle
+            currStationTitle.text = station.name
 
         }
-
 
 
         togglePlay.setOnClickListener {

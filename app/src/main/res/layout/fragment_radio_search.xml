@@ -47,74 +47,58 @@
             android:orientation="vertical"
             android:paddingHorizontal="16dp">
 
-            <TextView
-                android:id="@+id/textViewTag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
-                android:text="Chosen tag : "
-                android:textSize="18dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tvChosenTag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/ChosenGreen"
-                android:text="none"
-                android:textSize="18dp"
-                app:layout_constraintStart_toEndOf="@+id/textViewTag"
-                app:layout_constraintTop_toTopOf="@+id/textViewTag" />
-
-            <EditText
-                android:id="@+id/etTag"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:hint="rock, pop etc."
-                android:textSize="20sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvChosenTag" />
+                android:layout_marginTop="20dp"
+                app:layout_constraintStart_toStartOf="@+id/etName"
+                app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
-                android:id="@+id/btnAcceptTag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@android:color/transparent"
-                android:minHeight="48dp"
-                android:src="@drawable/radiobutton"
-                app:layout_constraintBottom_toBottomOf="@+id/etTag"
-                app:layout_constraintStart_toEndOf="@+id/etTag" />
+                <AutoCompleteTextView
+                    android:id="@+id/autoComplTvTags"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:hint="select tag"
+                    android:inputType="text" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
 
             <TextView
                 android:id="@+id/textViewStationName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
-                android:text="Station name : "
-                android:textSize="18dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/etTag" />
+                android:layout_marginTop="20dp"
+                android:text="NAME : "
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/etName"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
 
             <TextView
                 android:id="@+id/tvChosenName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/ChosenGreen"
                 android:text="none"
-                android:textSize="18dp"
-                app:layout_constraintStart_toEndOf="@+id/textViewStationName"
-                app:layout_constraintTop_toTopOf="@+id/textViewStationName" />
+                android:textColor="@color/EXPANDtext"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toTopOf="@+id/etName"
+                app:layout_constraintStart_toEndOf="@+id/textViewStationName" />
 
             <EditText
                 android:id="@+id/etName"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:hint="Whatever name"
+                android:hint="station name"
+                android:textColorHint="#78909C"
                 android:textSize="20sp"
+                app:layout_constraintEnd_toStartOf="@+id/btnAcceptName"
+                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvChosenName" />
+                app:layout_constraintTop_toBottomOf="@+id/textViewStationName" />
 
             <ImageView
                 android:id="@+id/btnAcceptName"
@@ -124,6 +108,8 @@
                 android:minHeight="48dp"
                 android:src="@drawable/radiobutton"
                 app:layout_constraintBottom_toBottomOf="@+id/etName"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/etName" />
 
 
@@ -131,11 +117,10 @@
                 android:id="@+id/countryPicker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/etName"
+                android:layout_marginTop="20dp"
                 app:cpDialog_allowClearSelection="true"
-                />
-
+                app:layout_constraintStart_toStartOf="@+id/etName"
+                app:layout_constraintTop_toBottomOf="@+id/etName" />
 
             <ImageView
                 android:id="@+id/btnSearch"
@@ -149,6 +134,19 @@
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/countryPicker" />
+
+            <TextView
+                android:id="@+id/tvTestingTags"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TAG"
+                app:layout_constraintBottom_toTopOf="@+id/btnSearch"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/countryPicker"
+                app:layout_constraintVertical_bias="0.477" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

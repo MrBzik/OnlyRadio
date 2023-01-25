@@ -1,21 +1,27 @@
 package com.example.radioplayer.ui.fragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
+import android.widget.ArrayAdapter
+import android.widget.CursorAdapter
+import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
+import com.example.radioplayer.ui.DialogPicker
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.utils.listOfTags
 import com.hbb20.countrypicker.models.CPCountry
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,7 +42,11 @@ class RadioSearchFragment : Fragment() {
     lateinit var toggle : ActionBarDrawerToggle
 
     private var selectedCountry = ""
+    private var selectedTag = ""
 
+    private val allTags = listOfTags
+
+    lateinit var tagsAdapter : ArrayAdapter<String>
 
     @Inject
     lateinit var pagingRadioAdapter : PagingRadioAdapter
@@ -44,7 +54,7 @@ class RadioSearchFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
+
     }
 
 
@@ -62,7 +72,11 @@ class RadioSearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        activity?.title = "Search your radio stations"
+        setupMenu()
+
+
+
+
 
         toggle = ActionBarDrawerToggle((activity as MainActivity), bind.drawerLayout, R.string.open, R.string.close )
         bind.drawerLayout.addDrawerListener(toggle)
@@ -92,6 +106,15 @@ class RadioSearchFragment : Fragment() {
     }
 
 
+    override fun onResume() {
+        super.onResume()
+
+        tagsAdapter = ArrayAdapter(requireContext(), R.layout.tags_dropdown_item, allTags)
+        bind.autoComplTvTags.setAdapter(tagsAdapter)
+
+    }
+
+
     private fun setRecycleView(){
 
         bind.rvSearchStations.apply {
@@ -117,13 +140,6 @@ class RadioSearchFragment : Fragment() {
     }
 
 
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return toggle.onOptionsItemSelected(item)
-
-
-    }
-
     private fun observeStations(){
         viewLifecycleOwner.lifecycleScope.launch{
             mainViewModel.stationsFlow.collectLatest {
@@ -135,15 +151,11 @@ class RadioSearchFragment : Fragment() {
 
     private fun setSearchDrawer(){
 
-        bind.btnAcceptTag.setOnClickListener {
-            bind.etTag.text.apply {
-                if(this.isEmpty()) {
-                    bind.tvChosenTag.text = "none"
-                } else {
-                    bind.tvChosenTag.text = this
-                }
-            }
+
+        bind.autoComplTvTags.setOnItemClickListener{ adapter, _, position, _ ->
+            selectedTag = adapter.getItemAtPosition(position) as String
         }
+
 
         bind.btnAcceptName.setOnClickListener {
             bind.etName.text.apply {
@@ -151,6 +163,7 @@ class RadioSearchFragment : Fragment() {
                     bind.tvChosenName.text = "none"
                 } else {
                     bind.tvChosenName.text = this
+                    bind.etName.setText("")
                 }
             }
         }
@@ -164,28 +177,31 @@ class RadioSearchFragment : Fragment() {
 
             selectedCountry = code?.alpha2 ?: ""
 
+
         }
+
+        bind.tvTestingTags.setOnClickListener {
+
+            DialogPicker(requireContext(), listOfTags, it as TextView).show()
+
+        }
+
+
 
         bind.btnSearch.setOnClickListener {
 
-               val tag = bind.tvChosenTag.text.toString()
-               val country = selectedCountry
+
                val name = bind.tvChosenName.text.toString()
-               val isTopSearch = false
+
 
                val bundle = Bundle().apply {
 
-                   if(tag == "none"){
-                       putString("TAG", "")
-                   } else {
-                       putString("TAG", tag)
-                   }
 
-                   if(country == "none"){
-                       putString("COUNTRY", "")
-                   } else {
-                       putString("COUNTRY", country)
-                   }
+                       putString("TAG", selectedTag)
+
+
+                       putString("COUNTRY", selectedCountry)
+
 
                    if(name == "none"){
                        putString("NAME", "")
@@ -193,7 +209,7 @@ class RadioSearchFragment : Fragment() {
                        putString("NAME", name)
                    }
 
-                   putBoolean("SEARCH_TOP", isTopSearch)
+                   putBoolean("SEARCH_TOP", false)
 
                }
                 mainViewModel.isNewSearch = true
@@ -203,6 +219,26 @@ class RadioSearchFragment : Fragment() {
     }
 
 
+    private fun setupMenu(){
 
+        (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
+            override fun onPrepareMenu(menu: Menu) {
+                // Handle for example visibility of menu items
+            }
+
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+//                menuInflater.inflate(R.menu.your_menu, menu)
+                menuInflater.inflate(R.menu.search_toolbar, menu)
+
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                // Validate and handle the selected menu item
+                toggle.onOptionsItemSelected(menuItem)
+                return true
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
 
 }
+

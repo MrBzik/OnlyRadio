@@ -44,7 +44,6 @@ class FavStationsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        activity?.title = "Here are your favourite stations"
 
         (activity as MainActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
