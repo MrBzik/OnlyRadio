@@ -1,5 +1,6 @@
 package com.example.radioplayer.data.remote
 
+import com.example.radioplayer.data.remote.entities.Countries
 import com.example.radioplayer.data.remote.entities.RadioStations
 import com.example.radioplayer.data.remote.entities.RadioTags
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
@@ -75,5 +76,8 @@ interface RadioApi {
 
         @POST("/json/tags")
         suspend fun getAllTags() : Response<RadioTags>
+
+        @POST("/json/countries")
+        suspend fun getAllCountries() : Response<Countries>
 
 }

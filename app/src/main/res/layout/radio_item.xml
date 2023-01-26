@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:layout_marginVertical="4dp"
-    >
+    android:layout_marginVertical="4dp">
 
     <ImageView
         android:id="@+id/ivItemImage"
@@ -14,31 +13,36 @@
         android:layout_height="75dp"
         />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tvPrimary"
-        android:layout_width="0dp"
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="75dp"
-        android:layout_weight="1"
+        android:orientation="vertical"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="8dp"
-        android:gravity="center|left"
-        app:helperText="sometext"
-        app:helperTextTextAppearance="@style/TextLabel"
+        >
 
-       >
+        <TextView
+            android:id="@+id/tvPrimary"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:textSize="20sp"
+            android:text="dwarwa"
+            android:gravity="center|start"
+            android:maxLines="2"
+            android:ellipsize="end" />
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tvSecondary"
-        android:layout_width="match_parent"
-        android:layout_height="20dp"
+        <TextView
+            android:id="@+id/tvSecondary"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
 
-        android:text="100 Songs"
-        android:textSize="14sp"
-
-        app:layout_constraintEnd_toEndOf="parent"
-        />
-</com.google.android.material.textfield.TextInputLayout>
-
+    </LinearLayout>
 
 
 

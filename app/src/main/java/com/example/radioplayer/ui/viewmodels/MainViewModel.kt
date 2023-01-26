@@ -1,5 +1,6 @@
 package com.example.radioplayer.ui.viewmodels
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
 import android.util.Log
@@ -13,6 +14,9 @@ import com.example.radioplayer.data.remote.entities.RadioTagsItem
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
+import com.hbb20.countrypicker.models.CPCountry
+import com.hbb20.countrypicker.view.CPViewHelper
+import com.hbb20.countrypicker.view.prepareCustomCountryPickerView
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +39,12 @@ class MainViewModel @Inject constructor(
        var isNewSearch = true
        var isDelayNeededForServiceConnection = true
        val newRadioStation : MutableLiveData<RadioStation> = MutableLiveData()
+
+       val searchParamTag : MutableLiveData<String> = MutableLiveData()
+       val searchParamName : MutableLiveData<String> = MutableLiveData()
+       val searchParamCountry : MutableLiveData<String> = MutableLiveData()
+
+
 
        private suspend fun searchWithNewParams(
             limit : Int, offset : Int, bundle: Bundle
@@ -165,6 +175,28 @@ class MainViewModel @Inject constructor(
                 radioServiceConnection.transportControls.playFromMediaId(station.stationuuid, null)
             }
         }
+
+
+
+
+
+    private fun getAllCountries () = viewModelScope.launch {
+
+        val response = radioSource.getAllCountries()
+
+        val result : LinkedHashMap<String, String> = LinkedHashMap()
+
+
+        result["Andorra"] = "AD"
+
+        response?.forEach {
+
+
+        }
+
+        Log.d("CHECKTAGS", result.toString())
+
+    }
 
 
 

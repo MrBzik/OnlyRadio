@@ -11,10 +11,7 @@ import androidx.core.net.toUri
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.remote.RadioApi
-import com.example.radioplayer.data.remote.entities.RadioStations
-import com.example.radioplayer.data.remote.entities.RadioStationsItem
-import com.example.radioplayer.data.remote.entities.RadioTags
-import com.example.radioplayer.data.remote.entities.RadioTagsItem
+import com.example.radioplayer.data.remote.entities.*
 import com.example.radioplayer.exoPlayer.State.*
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.utils.Constants.SPLIT
@@ -49,6 +46,10 @@ class RadioSource @Inject constructor(
 
     suspend fun getAllTags() : RadioTags? {
         return radioApi.getAllTags().body()
+    }
+
+    suspend fun getAllCountries() : Countries? {
+        return radioApi.getAllCountries().body()
     }
 
     suspend fun getRadioStationsSource (isTopSearch : Boolean,

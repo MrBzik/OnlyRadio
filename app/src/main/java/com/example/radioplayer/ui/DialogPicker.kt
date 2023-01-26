@@ -8,11 +8,12 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDialog
 import com.example.radioplayer.databinding.PickTagDialogBinding
+import com.example.radioplayer.ui.viewmodels.MainViewModel
 
 class DialogPicker (
     private val requireContext : Context,
     private val listOfItems : List<String>,
-    private val textView : TextView
+    private val mainViewModel: MainViewModel
     )
     : AppCompatDialog(requireContext) {
 
@@ -43,15 +44,21 @@ class DialogPicker (
 
         bind.listView.setOnItemClickListener { parent, view, position, id ->
 
-            textView.text = parent.getItemAtPosition(position) as String
+            val newValue = parent.getItemAtPosition(position) as String
+
+            mainViewModel.searchParamTag.postValue(newValue)
 
             dismiss()
 
         }
 
         bind.tvClearSelection.setOnClickListener{
+
+            mainViewModel.searchParamTag.postValue("Tag")
+
             dismiss()
         }
+
 
     }
 

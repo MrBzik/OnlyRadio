@@ -60,8 +60,6 @@ class StationDetailsFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (activity as MainActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
-
 
         mainViewModel = (activity as MainActivity).mainViewModel
         databaseViewModel = (activity as MainActivity).databaseViewModel

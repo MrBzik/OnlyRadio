@@ -10,4 +10,5 @@
     <color name="ChosenGreen">#004D40</color>
     <color name="EXPANDtext">#F57F17</color>
     <color name="grayColor">#877E7E</color>
+    <color name="background">#121111</color>
 </resources>

@@ -1,28 +1,31 @@
 package com.example.radioplayer.ui.fragments
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.ArrayAdapter
-import android.widget.CursorAdapter
+import android.widget.EditText
 import android.widget.TextView
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.core.view.MenuHost
-import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.radioplayer.R
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.radioplayer.adapters.PagingRadioAdapter
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
 import com.example.radioplayer.ui.DialogPicker
 import com.example.radioplayer.ui.MainActivity
+import com.example.radioplayer.ui.NameDialog
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.utils.listOfTags
+import com.google.android.material.snackbar.Snackbar
+import com.hbb20.countrypicker.config.CPViewConfig
 import com.hbb20.countrypicker.models.CPCountry
+import com.hbb20.countrypicker.view.CPViewHelper
+import com.hbb20.countrypicker.view.prepareCustomCountryPickerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -39,30 +42,29 @@ class RadioSearchFragment : Fragment() {
 
     lateinit var mainViewModel : MainViewModel
 
-    lateinit var toggle : ActionBarDrawerToggle
-
     private var selectedCountry = ""
-    private var selectedTag = ""
 
     private val allTags = listOfTags
 
-    lateinit var tagsAdapter : ArrayAdapter<String>
+    lateinit var  cpViewHelper : CPViewHelper
 
     @Inject
     lateinit var pagingRadioAdapter : PagingRadioAdapter
 
+    private var isOnCreateCalled = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        isOnCreateCalled = true
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
 
         bind = FragmentRadioSearchBinding.inflate(inflater, container, false)
 
@@ -72,22 +74,11 @@ class RadioSearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupMenu()
-
-
-
-
-
-        toggle = ActionBarDrawerToggle((activity as MainActivity), bind.drawerLayout, R.string.open, R.string.close )
-        bind.drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
-        (activity as MainActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        setSearchDrawer()
-
-
         mainViewModel = (activity as MainActivity).mainViewModel
 
+        setSearchParamsObservers()
+
+        setSearchToolbar()
 
         setRecycleView()
 
@@ -102,15 +93,8 @@ class RadioSearchFragment : Fragment() {
 
 
         observeStations()
-
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-
-        tagsAdapter = ArrayAdapter(requireContext(), R.layout.tags_dropdown_item, allTags)
-        bind.autoComplTvTags.setAdapter(tagsAdapter)
+        setOnRefreshSearch()
+        listenSearchButton()
 
     }
 
@@ -121,6 +105,7 @@ class RadioSearchFragment : Fragment() {
 
             adapter = pagingRadioAdapter
             layoutManager = LinearLayoutManager(requireContext())
+
         }
     }
 
@@ -131,9 +116,13 @@ class RadioSearchFragment : Fragment() {
             if (it.refresh is LoadState.Loading ||
                 it.append is LoadState.Loading)
                 bind.loadStationsProgressBar.isVisible = true
+
+
             else {
                 bind.loadStationsProgressBar.visibility = View.GONE
             }
+
+        bind.rvSearchStations
 
         }
 
@@ -149,96 +138,138 @@ class RadioSearchFragment : Fragment() {
     }
 
 
-    private fun setSearchDrawer(){
+    private fun setupCountryPicker() {
+
+         cpViewHelper = requireContext().prepareCustomCountryPickerView(
+            containerViewGroup = bind.llCountryViewGroup,
+            tvSelectedCountryInfo = bind.tvSelectedCountry,
+            allowClearSelection = true,
+            selectedCountryInfoTextGenerator = {cpCountry: CPCountry ->  cpCountry.alpha2 }
+
+        )
 
 
-        bind.autoComplTvTags.setOnItemClickListener{ adapter, _, position, _ ->
-            selectedTag = adapter.getItemAtPosition(position) as String
+        mainViewModel.searchParamCountry.value?.let { code ->
+            cpViewHelper.setCountryForAlphaCode(code)
         }
 
+            cpViewHelper.selectedCountry.observe(viewLifecycleOwner){
 
-        bind.btnAcceptName.setOnClickListener {
-            bind.etName.text.apply {
-                if(this.isEmpty()) {
-                    bind.tvChosenName.text = "none"
-                } else {
-                    bind.tvChosenName.text = this
-                    bind.etName.setText("")
-                }
+                    it?.let { country ->
+                        mainViewModel.searchParamCountry.postValue(country.alpha2)
+                        isOnCreateCalled = false
+                    } ?: run {
+                        if (isOnCreateCalled) {
+                            isOnCreateCalled = false
+                        } else {
+                            mainViewModel.searchParamCountry.postValue("")
+                        }
+                    }
             }
+
+
+    }
+
+    private fun setSearchToolbar() {
+
+
+        bind.tvTag.setOnClickListener {
+
+            DialogPicker(requireContext(), allTags, mainViewModel).show()
         }
 
-        bind.countryPicker.cpViewHelper.cpViewConfig.viewTextGenerator = { cpCountry: CPCountry ->
-            "${cpCountry.name} (${cpCountry.alpha2})"
-        }
-        bind.countryPicker.cpViewHelper.refreshView()
+        setupCountryPicker()
 
-        bind.countryPicker.cpViewHelper.selectedCountry.observe(viewLifecycleOwner){ code ->
+        bind.tvName.setOnClickListener {
 
-            selectedCountry = code?.alpha2 ?: ""
-
+            NameDialog(requireContext(), it as TextView, mainViewModel).show()
 
         }
 
-        bind.tvTestingTags.setOnClickListener {
+    }
 
-            DialogPicker(requireContext(), listOfTags, it as TextView).show()
 
+    private fun setOnRefreshSearch(){
+
+
+
+        bind.swipeRefresh.setOnRefreshListener {
+
+            initiateNewSearch()
+
+            bind.swipeRefresh.isRefreshing = false
+        }
+    }
+
+    private fun listenSearchButton(){
+
+        bind.ivInitiateSearch.setOnClickListener {
+            initiateNewSearch()
         }
 
+    }
 
 
-        bind.btnSearch.setOnClickListener {
+    private fun initiateNewSearch(){
+
+        val name = bind.tvName.text.toString()
+
+        val tag = bind.tvTag.text.toString()
+
+        val bundle = Bundle().apply {
 
 
-               val name = bind.tvChosenName.text.toString()
+            if(tag == "Tag") {
+                putString("TAG", "")
+            } else {
+                putString("TAG", tag)
+            }
+
+            putString("COUNTRY", selectedCountry)
+
+            if(name == "Name"){
+                putString("NAME", "")
+            } else {
+                putString("NAME", name)
+            }
+
+            putBoolean("SEARCH_TOP", false)
+
+        }
+        mainViewModel.isNewSearch = true
+        mainViewModel.setSearchBy(bundle)
+
+        bind.rvSearchStations.smoothScrollToPosition(0)
 
 
-               val bundle = Bundle().apply {
+    }
 
 
-                       putString("TAG", selectedTag)
+    private fun setSearchParamsObservers(){
 
+        mainViewModel.searchParamTag.observe(viewLifecycleOwner){
+            bind.tvTag.text = it
+        }
 
-                       putString("COUNTRY", selectedCountry)
+        mainViewModel.searchParamName.observe(viewLifecycleOwner){
+            bind.tvName.text = it
+        }
 
+        mainViewModel.searchParamCountry.observe(viewLifecycleOwner){
 
-                   if(name == "none"){
-                       putString("NAME", "")
-                   } else {
-                       putString("NAME", name)
-                   }
+            Log.d("CHECKTAGS", "1, $it")
 
-                   putBoolean("SEARCH_TOP", false)
-
-               }
-                mainViewModel.isNewSearch = true
-                mainViewModel.setSearchBy(bundle)
-                bind.rvSearchStations.scrollToPosition(0)
+          selectedCountry = it
         }
     }
 
 
-    private fun setupMenu(){
 
-        (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
-            override fun onPrepareMenu(menu: Menu) {
-                // Handle for example visibility of menu items
-            }
 
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-//                menuInflater.inflate(R.menu.your_menu, menu)
-                menuInflater.inflate(R.menu.search_toolbar, menu)
-
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                // Validate and handle the selected menu item
-                toggle.onOptionsItemSelected(menuItem)
-                return true
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
-    }
 
 }
+
+
+
+
 

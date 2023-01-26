@@ -8,13 +8,17 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.radioplayer.R
 import com.example.radioplayer.adapters.RadioDatabaseAdapter
 import com.example.radioplayer.databinding.FragmentFavStationsBinding
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -45,7 +49,7 @@ class FavStationsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
-        (activity as MainActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
+       
 
         databaseViewModel = (activity as MainActivity).databaseViewModel
         mainViewModel = (activity as MainActivity).mainViewModel
@@ -54,9 +58,9 @@ class FavStationsFragment : Fragment() {
 
         databaseViewModel.radioStations.observe(viewLifecycleOwner){
 
-            it?.let {
                 dbAdapter.listOfStations = it
-            }
+
+
         }
 
          databaseViewModel.getAllItems()
@@ -68,16 +72,56 @@ class FavStationsFragment : Fragment() {
 
         }
 
+
+
     }
 
     private fun setupRecycleView(){
 
         bind.rvFavStations.apply {
 
-            adapter = dbAdapter
             layoutManager = LinearLayoutManager(requireContext())
+            adapter = dbAdapter
+
+            ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this)
 
         }
+    }
+
+
+    private val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(
+        0,
+        ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT
+    ) {
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            return true
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            val position = viewHolder.layoutPosition
+            val item = dbAdapter.listOfStations[position]
+
+            databaseViewModel.deleteStation(item).also {
+                databaseViewModel.getAllItems()
+                Snackbar.make(
+                    requireActivity().findViewById(R.id.rootLayout),
+                    "Station removed from favs", Snackbar.LENGTH_LONG
+                    ).apply {
+
+                        setAction("UNDO"){
+                            databaseViewModel.insertRadioStation(item)
+                            databaseViewModel.getAllItems()
+                        }
+                }.show()
+            }
+
+        }
+
+
     }
 
 

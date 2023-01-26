@@ -34,7 +34,7 @@ class RadioDatabaseAdapter @Inject constructor(
 
         holder.bind.apply {
 
-            tvPrimary.helperText = station.name
+            tvPrimary.text = station.name
             tvSecondary.text = station.country
             glide.load(station.favicon).into(ivItemImage)
         }
@@ -70,7 +70,7 @@ class RadioDatabaseAdapter @Inject constructor(
         }
 
         override fun areContentsTheSame(oldItem: RadioStation, newItem: RadioStation): Boolean {
-            return oldItem.hashCode() == newItem.hashCode()
+            return oldItem == newItem
         }
     }
 
