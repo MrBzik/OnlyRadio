@@ -71,6 +71,8 @@ class RadioSource @Inject constructor(
 
     fun createMediaItemsFromDB(listOfStations : List<RadioStation>){
 
+        state = STATE_PROCESSING
+
         stationsDB = listOfStations.map { station ->
             MediaMetadataCompat.Builder()
                 .putString(METADATA_KEY_TITLE, station.name)
@@ -82,6 +84,8 @@ class RadioSource @Inject constructor(
                 .putString(METADATA_KEY_DISPLAY_SUBTITLE, station.country)
                 .build()
         }.toMutableList()
+
+        state = STATE_INITIALIZED
     }
 
     suspend fun getRadioStations (isNewSearch : Boolean)   {

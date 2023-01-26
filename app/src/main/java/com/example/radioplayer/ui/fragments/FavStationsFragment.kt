@@ -61,7 +61,7 @@ class FavStationsFragment : Fragment() {
 
         dbAdapter.setOnClickListener {
 
-            mainViewModel.playOrToggleStation(it)
+            mainViewModel.playOrToggleStation(it, true)
             mainViewModel.newRadioStation.postValue(it)
 
         }
@@ -79,7 +79,7 @@ class FavStationsFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = dbAdapter
 
-//            ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this)
+            ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this)
 
         }
     }
