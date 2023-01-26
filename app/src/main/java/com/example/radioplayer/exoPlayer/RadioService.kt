@@ -9,11 +9,12 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_URI
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.core.net.toUri
+import androidx.lifecycle.Observer
 import androidx.media.MediaBrowserServiceCompat
+import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlaybackPreparer
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerNotificationListener
-import com.example.radioplayer.utils.Constants.COMMAND_LOAD_FROM_DB
 import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Constants.NETWORK_ERROR
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
@@ -28,7 +29,7 @@ import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
-import kotlin.math.max
+
 
 
 private const val SERVICE_TAG = "service tag"
@@ -62,6 +63,11 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private var isPlayerInitialized = false
 
+    private val observerForDatabase = Observer<List<RadioStation>>{
+        radioSource.createMediaItemsFromDB(it)
+    }
+
+
 
     private fun searchRadioStations(
             isNewSearch : Boolean
@@ -70,10 +76,6 @@ class RadioService : MediaBrowserServiceCompat() {
 
         radioSource.getRadioStations(isNewSearch)
 
-    }
-
-    private fun loadStationsFromDB(){
-        radioSource.createMediaItemsFromDB()
     }
 
 
@@ -134,10 +136,6 @@ class RadioService : MediaBrowserServiceCompat() {
 
                 }
 
-                COMMAND_LOAD_FROM_DB -> {
-
-                    loadStationsFromDB()
-                }
 
             }
 
@@ -153,6 +151,11 @@ class RadioService : MediaBrowserServiceCompat() {
 
         exoPlayer.addListener(radioPlayerEventListener)
         radioNotificationManager.showNotification(exoPlayer)
+
+
+
+        radioSource.getAllItemsTEST().observeForever(observerForDatabase)
+
 
 
     }
@@ -211,6 +214,7 @@ class RadioService : MediaBrowserServiceCompat() {
     override fun onDestroy() {
         super.onDestroy()
         serviceScope.cancel()
+        radioSource.getAllItemsTEST().removeObserver(observerForDatabase)
 
         exoPlayer.removeListener(radioPlayerEventListener)
         exoPlayer.release()

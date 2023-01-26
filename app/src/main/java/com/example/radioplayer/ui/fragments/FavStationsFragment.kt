@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.InvalidationTracker
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.RadioDatabaseAdapter
 import com.example.radioplayer.databinding.FragmentFavStationsBinding
@@ -49,21 +50,14 @@ class FavStationsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
-       
 
         databaseViewModel = (activity as MainActivity).databaseViewModel
         mainViewModel = (activity as MainActivity).mainViewModel
 
         setupRecycleView()
 
-        databaseViewModel.radioStations.observe(viewLifecycleOwner){
-
-                dbAdapter.listOfStations = it
 
 
-        }
-
-         databaseViewModel.getAllItems()
 
         dbAdapter.setOnClickListener {
 
@@ -72,7 +66,9 @@ class FavStationsFragment : Fragment() {
 
         }
 
-
+        databaseViewModel.getAllStationsTEST.observe(viewLifecycleOwner){
+            dbAdapter.listOfStations = it
+        }
 
     }
 
@@ -83,7 +79,7 @@ class FavStationsFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = dbAdapter
 
-            ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this)
+//            ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this)
 
         }
     }
@@ -106,7 +102,7 @@ class FavStationsFragment : Fragment() {
             val item = dbAdapter.listOfStations[position]
 
             databaseViewModel.deleteStation(item).also {
-                databaseViewModel.getAllItems()
+
                 Snackbar.make(
                     requireActivity().findViewById(R.id.rootLayout),
                     "Station removed from favs", Snackbar.LENGTH_LONG
@@ -114,7 +110,7 @@ class FavStationsFragment : Fragment() {
 
                         setAction("UNDO"){
                             databaseViewModel.insertRadioStation(item)
-                            databaseViewModel.getAllItems()
+
                         }
                 }.show()
             }

@@ -8,6 +8,7 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
 import android.util.Log
 import androidx.core.net.toUri
+import androidx.lifecycle.LiveData
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.remote.RadioApi
@@ -32,16 +33,11 @@ class RadioSource @Inject constructor(
 
     var stationsDB = mutableListOf<MediaMetadataCompat>()
 
-    var stationsService : RadioStations? = RadioStations()
-    var stationsFromDB : List<RadioStation> = listOf()
+   private var stationsService : RadioStations? = RadioStations()
 
 
-    suspend fun loadStationsFromDB() : List<RadioStation> {
+    fun getAllItemsTEST () = radioDAO.getAllStationsTEST()
 
-       val response = radioDAO.getAllStations()
-        stationsFromDB = response
-        return response
-    }
 
 
     suspend fun getAllTags() : RadioTags? {
@@ -73,9 +69,9 @@ class RadioSource @Inject constructor(
     }
 
 
-    fun createMediaItemsFromDB(){
+    fun createMediaItemsFromDB(listOfStations : List<RadioStation>){
 
-        stationsDB = stationsFromDB.map { station ->
+        stationsDB = listOfStations.map { station ->
             MediaMetadataCompat.Builder()
                 .putString(METADATA_KEY_TITLE, station.name)
                 .putString(METADATA_KEY_DISPLAY_TITLE, station.name)

@@ -257,8 +257,6 @@ class RadioSearchFragment : Fragment() {
 
         mainViewModel.searchParamCountry.observe(viewLifecycleOwner){
 
-            Log.d("CHECKTAGS", "1, $it")
-
           selectedCountry = it
         }
     }

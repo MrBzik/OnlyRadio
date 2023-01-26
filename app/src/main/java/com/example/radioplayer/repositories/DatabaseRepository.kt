@@ -15,9 +15,6 @@ class DatabaseRepository @Inject constructor(
 
     suspend fun deleteRadioStation (station: RadioStation) = radioDAO.delete(station)
 
-    suspend fun getAllStations () = radioDAO.getAllStations()
-
-
     suspend fun checkIfExists (id : String) = radioDAO.checkIfExists(id)
 
 

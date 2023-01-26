@@ -20,22 +20,12 @@ import javax.inject.Inject
 class DatabaseViewModel @Inject constructor(
         private val repository: DatabaseRepository,
         private val radioSource: RadioSource,
-        private val radioServiceConnection: RadioServiceConnection
 ) : ViewModel() {
 
-    val radioStations : MutableLiveData<List<RadioStation>> = MutableLiveData()
+    val getAllStationsTEST = radioSource.getAllItemsTEST()
+
 
     val isExisting : MutableLiveData<Boolean> = MutableLiveData()
-
-    fun getAllItems () = viewModelScope.launch {
-
-        val response = radioSource.loadStationsFromDB()
-
-        radioStations.postValue(response)
-
-        radioServiceConnection.sendCommand(COMMAND_LOAD_FROM_DB, Bundle())
-    }
-
 
 
     fun ifAlreadyInDatabase(id : String) = viewModelScope.launch {
