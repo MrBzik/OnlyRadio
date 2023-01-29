@@ -32,7 +32,10 @@
     <action
         android:id="@+id/action_DetailsFrag_to_Fav_frag"
         app:destination="@+id/favStationsFragment"/>
-
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="com.example.radioplayer.ui.fragments.HistoryFragment"
+        android:label="HistoryFragment" />
 
 
 </navigation>

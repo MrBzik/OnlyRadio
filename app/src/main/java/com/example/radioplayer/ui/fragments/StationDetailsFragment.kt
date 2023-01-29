@@ -11,10 +11,15 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
+import com.example.radioplayer.data.local.entities.Playlist
+import com.example.radioplayer.data.local.entities.RadioStation
+import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.databinding.FragmentStationDetailsBinding
 import com.example.radioplayer.ui.MainActivity
+import com.example.radioplayer.ui.dialogs.AddStationToPlaylistDialog
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -28,8 +33,12 @@ class StationDetailsFragment : Fragment()
 
     private var homepageUrl : String? = null
 
+    private var listOfPlaylists : List<Playlist> = emptyList()
+
     @Inject
     lateinit var glide : RequestManager
+
+    private var currentRadioStation : RadioStation? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +74,29 @@ class StationDetailsFragment : Fragment()
         databaseViewModel = (activity as MainActivity).databaseViewModel
 
 
+        subscribeToObservers()
+
+        setAddToPlaylistClickListener()
+
+        setFabStationHomePageClickListener()
+
+    }
+
+
+    private fun subscribeToObservers(){
+
+        observeCurrentStationAndUpdateUI()
+
+        updateListOfPlaylists()
+
+    }
+
+
+    private fun observeCurrentStationAndUpdateUI(){
+
         mainViewModel.newRadioStation.observe(viewLifecycleOwner){
+
+            currentRadioStation = it
 
             bind.tvName.text = it.name
             bind.tvCountry.text = it.country
@@ -79,21 +110,63 @@ class StationDetailsFragment : Fragment()
 
             bind.tvLanguage.text = "Languages : ${it.language}"
         }
+    }
 
+
+    private fun updateListOfPlaylists(){
+
+        databaseViewModel.listOfAllPlaylists.observe(viewLifecycleOwner){
+
+            listOfPlaylists = it
+        }
+    }
+
+
+    private fun setFabStationHomePageClickListener(){
 
         bind.fabStationHomePage.setOnClickListener {
 
             if(homepageUrl != "null") {
                 val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(homepageUrl))
                 startActivity(webIntent)
-
             }
+        }
+    }
 
+    private fun setAddToPlaylistClickListener(){
+
+        bind.ivAddToPlaylist.setOnClickListener {
+            AddStationToPlaylistDialog(
+                requireContext(), listOfPlaylists, databaseViewModel
+            ) { playlistName ->
+
+                insertStationInPlaylist(playlistName)
+
+            }.show()
         }
 
-
-
     }
+
+
+    private fun insertStationInPlaylist(playlistName : String){
+
+        currentRadioStation?.let { station ->
+
+            databaseViewModel.checkIfInPlaylistOrIncrement(playlistName, station.stationuuid)
+
+            databaseViewModel.insertStationPlaylistCrossRef(
+                StationPlaylistCrossRef(
+                    station.stationuuid, playlistName
+                )
+            )
+
+            Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
+                "Station was added to $playlistName",
+                Snackbar.LENGTH_SHORT).show()
+        }
+    }
+
+
 
 
 }

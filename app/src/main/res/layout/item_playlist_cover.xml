@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="100dp"
+    android:layout_height="120dp"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/ivPlaylistCover"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_radio_default"/>
+    <TextView
+        android:id="@+id/tvPlaylistName"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:text="album name"
+        android:textAlignment="center"
+        />
+
+</LinearLayout>

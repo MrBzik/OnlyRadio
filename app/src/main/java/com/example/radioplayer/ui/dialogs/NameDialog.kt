@@ -1,10 +1,10 @@
-package com.example.radioplayer.ui
+package com.example.radioplayer.ui.dialogs
 
 import android.content.Context
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDialog
-import com.example.radioplayer.databinding.PickNameDialogBinding
+import com.example.radioplayer.databinding.DialogPickNameBinding
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 
 class NameDialog (
@@ -14,11 +14,11 @@ class NameDialog (
 
 ) : AppCompatDialog(requireContext) {
 
-    lateinit var bind : PickNameDialogBinding
+    lateinit var bind : DialogPickNameBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        bind = PickNameDialogBinding.inflate(layoutInflater)
+        bind = DialogPickNameBinding.inflate(layoutInflater)
 
         super.onCreate(savedInstanceState)
         setContentView(bind.root)

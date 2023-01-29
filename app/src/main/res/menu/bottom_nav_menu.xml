@@ -4,13 +4,18 @@
 
     <item
         android:id="@+id/radioSearchFragment"
-        android:title="Search stations"
+        android:title="Search"
         android:icon="@drawable/ic_radio_search"/>
 
     <item
         android:id="@+id/favStationsFragment"
-        android:title="Favourite stations"
+        android:title="Playlists"
         android:icon="@drawable/ic_radio_favourite"/>
+
+    <item
+        android:id="@+id/historyFragment"
+        android:title="History"
+        android:icon="@drawable/ic_history_tab"/>
 
 
 </menu>

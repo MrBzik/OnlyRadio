@@ -21,6 +21,8 @@ object Constants {
 
     const val SPLIT = "_UNIQSPLIT_"
 
+    const val MAIN_PLAY_LIST = "Main play list"
+
 
 
 }

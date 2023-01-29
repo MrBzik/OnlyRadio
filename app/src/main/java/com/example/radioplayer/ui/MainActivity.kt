@@ -4,23 +4,25 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
-import androidx.navigation.findNavController
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
+import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.utils.Constants.MAIN_PLAY_LIST
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -41,11 +43,11 @@ class MainActivity : AppCompatActivity() {
     lateinit var tvExpandHide : TextView
     lateinit var fabAddToFav : FloatingActionButton
 
-   private val colorGray = Color.DKGRAY
-   private val colorRed = Color.RED
-
-
+    private val colorGray = Color.DKGRAY
+    private val colorRed = Color.RED
     private var currentStation : RadioStation? = null
+    private var isFavoured = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,8 +70,76 @@ class MainActivity : AppCompatActivity() {
 
         bottomNavigationView.setupWithNavController(navController)
 
+        bottomNavigationView.setOnItemReselectedListener {/*DO NOTHING*/}
 
-        navController.addOnDestinationChangedListener(){ _, destination, _ ->
+        clickListenerToHandleNavigationWithDetailsFragment(navController, bottomNavigationView)
+
+        listenerToHandleNavFromDetailsFragmentToOtherFragments(navController)
+
+        observeNewStation()
+
+        observeIfNewStationExistsInDB()
+
+        observeIfNewStationFavoured()
+
+        onClickListenerForTogglePlay()
+
+        observePlaybackStateToChangeIcons()
+
+        addToFavClickListener()
+
+    }
+
+    private fun observeIfNewStationExistsInDB(){
+
+        databaseViewModel.isStationInDB.observe(this){
+
+            addNewStationToHistory(it)
+
+        }
+
+    }
+
+    private fun observeIfNewStationFavoured(){
+
+        databaseViewModel.isStationFavoured.observe(this){
+
+            paintButtonAddToFav(it)
+
+            isFavoured = it
+
+
+        }
+    }
+
+    private fun addNewStationToHistory(isInDB: Boolean){
+
+        if(isInDB) {/*DO NOTHING*/}
+        else {
+            currentStation?.let {
+                databaseViewModel.insertRadioStation(it)
+            }
+
+        }
+
+    }
+
+
+    private fun paintButtonAddToFav(isInDB : Boolean){
+        if(!isInDB){
+            fabAddToFav.backgroundTintList = ColorStateList.valueOf(colorGray)
+
+        } else {
+            fabAddToFav.backgroundTintList = ColorStateList.valueOf(colorRed)
+
+        }
+    }
+
+
+    private fun listenerToHandleNavFromDetailsFragmentToOtherFragments(
+        navController: NavController
+    ){
+        navController.addOnDestinationChangedListener{ _, destination, _ ->
 
             if(tvExpandHide.text == "HIDE") {
                 tvExpandHide.setText(R.string.Expand)
@@ -79,23 +149,12 @@ class MainActivity : AppCompatActivity() {
             fabAddToFav.visibility = View.GONE
 
         }
+    }
 
-        bottomNavigationView.setOnItemReselectedListener {/*DO NOTHING*/}
-
-
-
-        databaseViewModel.isExisting.observe(this){
-
-            if(!it){
-                fabAddToFav.backgroundTintList = ColorStateList.valueOf(colorGray)
-
-
-            } else {
-               fabAddToFav.backgroundTintList = ColorStateList.valueOf(colorRed)
-
-            }
-
-        }
+    private fun clickListenerToHandleNavigationWithDetailsFragment(
+        navController: NavController,
+        bottomNavigationView: BottomNavigationView
+    ){
 
         currStationTitle.setOnClickListener{
 
@@ -121,39 +180,66 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+    }
+
+    private fun addToFavClickListener(){
+
         fabAddToFav.setOnClickListener {
 
-           if(databaseViewModel.isExisting.value == false) {
-               databaseViewModel.insertRadioStation(currentStation!!)
-               Snackbar.make(findViewById(R.id.rootLayout), "Station saved to favs", Snackbar.LENGTH_SHORT).show()
-               databaseViewModel.isExisting.postValue(true)
+            if(isFavoured) {
 
-           } else {
+                currentStation?.let {
+                    databaseViewModel.updateIsFavouredState(0, it.stationuuid)
+                    Snackbar.make(findViewById(R.id.rootLayout),
+                        "Station removed from favs", Snackbar.LENGTH_SHORT).show()
+                    databaseViewModel.isStationFavoured.postValue(false)
+                }
 
-               databaseViewModel.deleteStation(currentStation!!)
-               Snackbar.make(findViewById(R.id.rootLayout), "Station removed from favs", Snackbar.LENGTH_SHORT).show()
-               databaseViewModel.isExisting.postValue(false)
-           }
+            } else {
+                currentStation?.let {
+                    databaseViewModel.updateIsFavouredState(1, it.stationuuid)
+                    Snackbar.make(findViewById(R.id.rootLayout),
+                        "Station saved to favs", Snackbar.LENGTH_SHORT).show()
+                    databaseViewModel.isStationFavoured.postValue(true)
+                }
+            }
         }
+    }
+
+
+    private fun observeNewStation(){
 
         mainViewModel.newRadioStation.observe(this){ station ->
 
             currentStation = station
 
-            databaseViewModel.ifAlreadyInDatabase(station.stationuuid)
+            checkIfStationFavoured(station)
 
-            val newImage = station.favicon?.toUri()
-
-            newImage?.let { uri ->
-                glide.load(uri).into(currStationImage)
-            } ?: run {
-                currStationImage.setImageResource(R.drawable.ic_radio_default)
-            }
-
-            currStationTitle.text = station.name
+            updateImageAndTitle(station)
 
         }
+    }
 
+    private fun checkIfStationFavoured(station: RadioStation){
+        databaseViewModel.checkIfStationIsFavoured(station.stationuuid)
+    }
+
+
+    private fun updateImageAndTitle(station : RadioStation){
+
+        val newImage = station.favicon?.toUri()
+
+        newImage?.let { uri ->
+            glide.load(uri).into(currStationImage)
+        } ?: run {
+            currStationImage.setImageResource(R.drawable.ic_radio_default)
+        }
+
+        currStationTitle.text = station.name
+
+    }
+
+    private fun onClickListenerForTogglePlay(){
 
         togglePlay.setOnClickListener {
 
@@ -161,21 +247,23 @@ class MainActivity : AppCompatActivity() {
 
                 mainViewModel.playOrToggleStation(it, true)
             }
-
-        }
-
-        mainViewModel.playbackState.observe(this){
-
-          it?.let {
-              when{
-                  it.isPlaying -> togglePlay.setImageResource(R.drawable.ic_pause_play)
-                  it.isPlayEnabled -> togglePlay.setImageResource(R.drawable.ic_play_pause)
-              }
-          }
         }
     }
 
 
+    private fun observePlaybackStateToChangeIcons (){
+
+        mainViewModel.playbackState.observe(this){
+
+            it?.let {
+                when{
+                    it.isPlaying -> togglePlay.setImageResource(R.drawable.ic_pause_play)
+                    it.isPlayEnabled -> togglePlay.setImageResource(R.drawable.ic_play_pause)
+                }
+            }
+        }
+
+    }
 
 }
 

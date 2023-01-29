@@ -1,28 +1,21 @@
 package com.example.radioplayer.ui.fragments
 
-import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.*
-import android.widget.EditText
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.radioplayer.adapters.PagingRadioAdapter
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
-import com.example.radioplayer.ui.DialogPicker
+import com.example.radioplayer.ui.dialogs.DialogPicker
 import com.example.radioplayer.ui.MainActivity
-import com.example.radioplayer.ui.NameDialog
+import com.example.radioplayer.ui.dialogs.NameDialog
+import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.utils.listOfTags
-import com.google.android.material.snackbar.Snackbar
-import com.hbb20.countrypicker.config.CPViewConfig
 import com.hbb20.countrypicker.models.CPCountry
 import com.hbb20.countrypicker.view.CPViewHelper
 import com.hbb20.countrypicker.view.prepareCustomCountryPickerView
@@ -41,6 +34,7 @@ class RadioSearchFragment : Fragment() {
     lateinit var bind : FragmentRadioSearchBinding
 
     lateinit var mainViewModel : MainViewModel
+    lateinit var databaseViewModel : DatabaseViewModel
 
     private var selectedCountry = ""
 
@@ -75,6 +69,7 @@ class RadioSearchFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         mainViewModel = (activity as MainActivity).mainViewModel
+        databaseViewModel = (activity as MainActivity).databaseViewModel
 
         setSearchParamsObservers()
 
@@ -84,17 +79,26 @@ class RadioSearchFragment : Fragment() {
 
         setAdapterLoadStateListener()
 
+        setAdapterOnClickListener()
+
+        observeStationsForAdapter()
+
+        setOnRefreshSearch()
+
+        listenSearchButton()
+
+    }
+
+
+    private fun setAdapterOnClickListener(){
 
         pagingRadioAdapter.setOnClickListener {
 
             mainViewModel.playOrToggleStation(it, true)
             mainViewModel.newRadioStation.postValue(it)
+            databaseViewModel.ifStationAlreadyInDatabase(it.stationuuid)
+
         }
-
-
-        observeStations()
-        setOnRefreshSearch()
-        listenSearchButton()
 
     }
 
@@ -129,7 +133,7 @@ class RadioSearchFragment : Fragment() {
     }
 
 
-    private fun observeStations(){
+    private fun observeStationsForAdapter(){
         viewLifecycleOwner.lifecycleScope.launch{
             mainViewModel.stationsFlow.collectLatest {
                 pagingRadioAdapter.submitData(it)
@@ -190,8 +194,6 @@ class RadioSearchFragment : Fragment() {
 
 
     private fun setOnRefreshSearch(){
-
-
 
         bind.swipeRefresh.setOnRefreshListener {
 

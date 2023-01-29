@@ -1,22 +1,23 @@
 package com.example.radioplayer.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.InvalidationTracker
 import com.example.radioplayer.R
+import com.example.radioplayer.adapters.PlaylistsAdapter
 import com.example.radioplayer.adapters.RadioDatabaseAdapter
+import com.example.radioplayer.data.local.entities.Playlist
+import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.databinding.FragmentFavStationsBinding
-import com.example.radioplayer.databinding.FragmentRadioSearchBinding
+import com.example.radioplayer.ui.dialogs.CreatePlaylistDialog
 import com.example.radioplayer.ui.MainActivity
+import com.example.radioplayer.ui.dialogs.RemovePlaylistDialog
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.google.android.material.snackbar.Snackbar
@@ -29,9 +30,14 @@ class FavStationsFragment : Fragment() {
     lateinit var bind : FragmentFavStationsBinding
     lateinit var databaseViewModel : DatabaseViewModel
     lateinit var mainViewModel: MainViewModel
+    lateinit var playlistAdapter : PlaylistsAdapter
+    lateinit var dialogCreateNewPlaylist : CreatePlaylistDialog
+    lateinit var dialogDeletePlaylist : RemovePlaylistDialog
+    lateinit var currentPlaylistName : String
+
 
     @Inject
-    lateinit var dbAdapter: RadioDatabaseAdapter
+    lateinit var mainAdapter: RadioDatabaseAdapter
 
 
     override fun onCreateView(
@@ -49,37 +55,141 @@ class FavStationsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-
         databaseViewModel = (activity as MainActivity).databaseViewModel
         mainViewModel = (activity as MainActivity).mainViewModel
 
-        setupRecycleView()
+        dialogCreateNewPlaylist = CreatePlaylistDialog(requireContext(), emptyList(), databaseViewModel)
+        dialogDeletePlaylist = RemovePlaylistDialog(requireContext(), emptyList()) { playlistName ->
+            databaseViewModel.deletePlaylist(Playlist(playlistName))
+        }
 
 
 
+        setupMainRecycleView()
 
-        dbAdapter.setOnClickListener {
+        setupPlaylistRecycleView()
 
-            mainViewModel.playOrToggleStation(it, true)
-            mainViewModel.newRadioStation.postValue(it)
+        subscribeToObservers()
+
+        setMainAdapterClickListener()
+
+        setPlaylistAdapterClickListeners()
+
+        setArrowToFavClickListener()
+
+    }
+
+
+
+    private fun setArrowToFavClickListener(){
+
+        bind.ivArrowBackToFav.setOnClickListener {
+
+            databaseViewModel.getAllFavouredStations()
+        }
+    }
+
+    private fun setPlaylistAdapterClickListeners(){
+
+        playlistAdapter.setAddPlaylistClickListener {
+            dialogCreateNewPlaylist.show()
+        }
+
+        playlistAdapter.setPlaylistClickListener {
+
+            databaseViewModel.getStationsInPlaylist(it.playlistName)
+
 
         }
 
-        databaseViewModel.getAllStationsTEST.observe(viewLifecycleOwner){
-            dbAdapter.listOfStations = it
+        playlistAdapter.setDeletePlaylistClickListener {
+
+            dialogDeletePlaylist.show()
         }
 
     }
 
-    private fun setupRecycleView(){
+    private fun subscribeToObservers(){
+
+        observeListOfPlaylistNames()
+
+        observeFavOrPlaylistStateForUI()
+
+        databaseViewModel.currentPlaylistName.observe(viewLifecycleOwner){
+
+            bind.tvPlaylistName.text = it
+            currentPlaylistName = it
+
+        }
+
+        databaseViewModel.observableListOfStations.observe(viewLifecycleOwner){
+
+            mainAdapter.listOfStations = it
+        }
+
+    }
+
+    private fun observeFavOrPlaylistStateForUI(){
+
+        databaseViewModel.isInFavouriteTab.observe(viewLifecycleOwner){
+
+            if(it){
+                bind.tvPlaylistName.text = "Favoured stations"
+                bind.ivArrowBackToFav.visibility = View.GONE
+            } else{
+
+                bind.ivArrowBackToFav.isVisible = true
+
+            }
+        }
+
+    }
+
+
+    private fun observeListOfPlaylistNames (){
+
+        databaseViewModel.listOfAllPlaylists.observe(viewLifecycleOwner){
+
+            playlistAdapter.differ.submitList(it)
+
+            dialogCreateNewPlaylist.listOfPlaylists = it
+
+            dialogDeletePlaylist.listOfPlaylists = it
+
+        }
+
+    }
+
+    private fun setMainAdapterClickListener(){
+
+        mainAdapter.setOnClickListener {
+
+            mainViewModel.playOrToggleStation(it, true)
+            mainViewModel.newRadioStation.postValue(it)
+            databaseViewModel.isStationInDB.postValue(true)
+
+        }
+    }
+
+    private fun setupMainRecycleView(){
 
         bind.rvFavStations.apply {
 
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = dbAdapter
+            adapter = mainAdapter
 
             ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this)
+
+        }
+    }
+
+    private fun setupPlaylistRecycleView(){
+
+        playlistAdapter = PlaylistsAdapter()
+
+        bind.rvPlaylists.apply {
+            adapter = playlistAdapter
+            layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
 
         }
     }
@@ -99,27 +209,53 @@ class FavStationsFragment : Fragment() {
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val position = viewHolder.layoutPosition
-            val item = dbAdapter.listOfStations[position]
+            val stationID = mainAdapter.listOfStations[position].stationuuid
 
-            databaseViewModel.deleteStation(item).also {
-
-                Snackbar.make(
-                    requireActivity().findViewById(R.id.rootLayout),
-                    "Station removed from favs", Snackbar.LENGTH_LONG
-                    ).apply {
-
-                        setAction("UNDO"){
-                            databaseViewModel.insertRadioStation(item)
-
-                        }
-                }.show()
+            if(databaseViewModel.isInFavouriteTab.value!!){
+                handleSwipeOnFavStation(stationID)
+            } else{
+                handleSwipeOnPlaylistStation(stationID)
             }
-
         }
-
-
     }
 
+    private fun handleSwipeOnFavStation(stationID : String){
 
+        databaseViewModel.updateIsFavouredState(0, stationID).also{
+            Snackbar.make(
+                requireActivity().findViewById(R.id.rootLayout),
+                "Station removed from favs", Snackbar.LENGTH_LONG
+            ).apply {
+                setAction("UNDO"){
+                    databaseViewModel.updateIsFavouredState(1, stationID)
+                }
+            }.show()
+        }
+    }
+
+    private fun handleSwipeOnPlaylistStation(stationID : String){
+
+        databaseViewModel.deleteStationPlaylistCrossRef(
+            StationPlaylistCrossRef(stationID, currentPlaylistName)
+        )
+        databaseViewModel.decrementRadioStationPlaylist(stationID)
+
+        databaseViewModel.getStationsInPlaylist(currentPlaylistName, true)
+
+        Snackbar.make(
+            requireActivity().findViewById(R.id.rootLayout),
+            "Station removed from $currentPlaylistName", Snackbar.LENGTH_LONG
+        ).apply {
+            setAction("UNDO"){
+
+                databaseViewModel.insertStationPlaylistCrossRef(
+                    StationPlaylistCrossRef(stationID, currentPlaylistName)
+                )
+                databaseViewModel.incrementRadioStationPlaylist(stationID)
+
+                databaseViewModel.getStationsInPlaylist(currentPlaylistName, true)
+            }
+        }.show()
+    }
 
 }

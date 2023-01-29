@@ -1,4 +1,4 @@
-package com.example.radioplayer.ui
+package com.example.radioplayer.ui.dialogs
 
 import android.content.Context
 import android.os.Bundle
@@ -7,7 +7,7 @@ import android.text.TextWatcher
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDialog
-import com.example.radioplayer.databinding.PickTagDialogBinding
+import com.example.radioplayer.databinding.DialogPickTagBinding
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 
 class DialogPicker (
@@ -17,11 +17,11 @@ class DialogPicker (
     )
     : AppCompatDialog(requireContext) {
 
-    lateinit var bind : PickTagDialogBinding
+    lateinit var bind : DialogPickTagBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        bind = PickTagDialogBinding.inflate(layoutInflater)
+        bind = DialogPickTagBinding.inflate(layoutInflater)
 
         super.onCreate(savedInstanceState)
         setContentView(bind.root)
