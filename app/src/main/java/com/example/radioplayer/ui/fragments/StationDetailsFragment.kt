@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
@@ -20,6 +21,7 @@ import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.dialogs.AddStationToPlaylistDialog
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.ui.viewmodels.PixabayViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -31,6 +33,7 @@ class StationDetailsFragment : Fragment()
 
     lateinit var mainViewModel: MainViewModel
     lateinit var databaseViewModel: DatabaseViewModel
+    lateinit var pixabayViewModel: PixabayViewModel
 
     private var homepageUrl : String? = null
 
@@ -73,7 +76,7 @@ class StationDetailsFragment : Fragment()
 
         mainViewModel = (activity as MainActivity).mainViewModel
         databaseViewModel = (activity as MainActivity).databaseViewModel
-
+        pixabayViewModel = ViewModelProvider(requireActivity())[PixabayViewModel::class.java]
 
         subscribeToObservers()
 
@@ -139,7 +142,7 @@ class StationDetailsFragment : Fragment()
 
         bind.ivAddToPlaylist.setOnClickListener {
             AddStationToPlaylistDialog(
-                requireContext(), listOfPlaylists, databaseViewModel
+                requireContext(), listOfPlaylists, databaseViewModel, pixabayViewModel, glide
             ) { playlistName ->
 
                 insertStationInPlaylist(playlistName)

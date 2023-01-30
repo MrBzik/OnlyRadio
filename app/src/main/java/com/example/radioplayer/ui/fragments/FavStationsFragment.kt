@@ -6,9 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PlaylistsAdapter
 import com.example.radioplayer.adapters.RadioDatabaseAdapter
@@ -20,6 +22,7 @@ import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.dialogs.RemovePlaylistDialog
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.ui.viewmodels.PixabayViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -33,10 +36,13 @@ class FavStationsFragment : Fragment() {
     lateinit var playlistAdapter : PlaylistsAdapter
     lateinit var currentPlaylistName : String
     private lateinit var listOfPlaylists : List<Playlist>
+    lateinit var pixabayViewModel: PixabayViewModel
 
     @Inject
     lateinit var mainAdapter: RadioDatabaseAdapter
 
+    @Inject
+    lateinit var glide : RequestManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,7 +61,7 @@ class FavStationsFragment : Fragment() {
 
         databaseViewModel = (activity as MainActivity).databaseViewModel
         mainViewModel = (activity as MainActivity).mainViewModel
-
+        pixabayViewModel = ViewModelProvider(requireActivity())[PixabayViewModel::class.java]
 
 
 
@@ -88,7 +94,9 @@ class FavStationsFragment : Fragment() {
     private fun setPlaylistAdapterClickListeners(){
 
         playlistAdapter.setAddPlaylistClickListener {
-            CreatePlaylistDialog(requireContext(), listOfPlaylists, databaseViewModel).show()
+           val dialog = CreatePlaylistDialog(
+                requireContext(), listOfPlaylists, databaseViewModel, pixabayViewModel, glide).show()
+
         }
 
         playlistAdapter.setPlaylistClickListener {

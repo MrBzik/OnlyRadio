@@ -1,9 +1,9 @@
-package com.example.radioplayer.adapters
+package com.example.radioplayer.adapters.datasources
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.radioplayer.data.local.entities.RadioStation
-import com.example.radioplayer.ui.viewmodels.MainViewModel
+
 
 typealias StationsPageLoader = suspend (pageIndex : Int, pageSize : Int) -> List<RadioStation>
 

@@ -4,6 +4,8 @@ object Constants {
 
     const val BASE_RADIO_URL = "https://de1.api.radio-browser.info"
 
+    const val PIXABAY_BASE_URL = "https://pixabay.com"
+
     const val NOTIFICATION_ID = 1
     const val CHANNEL_ID = "radio"
 

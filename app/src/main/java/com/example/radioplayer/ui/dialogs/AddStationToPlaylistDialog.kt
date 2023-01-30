@@ -6,14 +6,19 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatDialog
 import androidx.core.view.isVisible
+import com.bumptech.glide.RequestManager
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.databinding.DialogAddStationToPlaylistBinding
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
+import com.example.radioplayer.ui.viewmodels.PixabayViewModel
+import javax.inject.Inject
 
 class AddStationToPlaylistDialog(
     private val requireContext : Context,
     private val listOfPlaylists : List<Playlist>,
     private val databaseViewModel: DatabaseViewModel,
+    private val pixabayViewModel: PixabayViewModel,
+    private  val glide : RequestManager,
     private val insertStationInPlaylist : (String) -> Unit
 
 
@@ -61,7 +66,7 @@ class AddStationToPlaylistDialog(
 
         bind.tvCreateNewPlaylist.setOnClickListener {
 
-            CreatePlaylistDialog(requireContext, listOfPlaylists, databaseViewModel).show()
+            CreatePlaylistDialog(requireContext, listOfPlaylists, databaseViewModel, pixabayViewModel, glide).show()
             dismiss()
         }
     }

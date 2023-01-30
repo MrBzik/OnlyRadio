@@ -10,6 +10,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.RadioDB
+import com.example.radioplayer.data.remote.PixabayApi
 import com.example.radioplayer.data.remote.RadioApi
 import com.example.radioplayer.exoPlayer.RadioServiceConnection
 import com.example.radioplayer.exoPlayer.RadioSource
@@ -17,6 +18,7 @@ import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.BASE_RADIO_URL
 import com.example.radioplayer.utils.Constants.DATABASE_NAME
+import com.example.radioplayer.utils.Constants.PIXABAY_BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -84,4 +86,17 @@ object AppModule {
     @Singleton
     fun provideRadioSource (radioApi: RadioApi, radioDAO: RadioDAO) : RadioSource
             = RadioSource(radioApi, radioDAO)
+
+
+
+    @Provides
+    @Singleton
+    fun providesPixabayApi() : PixabayApi {
+
+        return Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(PIXABAY_BASE_URL)
+            .build()
+            .create(PixabayApi::class.java)
+    }
 }

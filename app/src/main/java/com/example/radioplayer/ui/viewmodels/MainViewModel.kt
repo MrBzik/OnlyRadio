@@ -7,8 +7,8 @@ import android.util.Log
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
-import com.example.radioplayer.adapters.RadioStationsDataSource
-import com.example.radioplayer.adapters.StationsPageLoader
+import com.example.radioplayer.adapters.datasources.RadioStationsDataSource
+import com.example.radioplayer.adapters.datasources.StationsPageLoader
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.remote.entities.RadioTagsItem
 import com.example.radioplayer.exoPlayer.*
