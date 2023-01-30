@@ -1,6 +1,8 @@
 package com.example.radioplayer.exoPlayer
 
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
@@ -85,7 +87,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
         val activityIntent = packageManager?.getLaunchIntentForPackage(packageName)?.let {
 
-            PendingIntent.getActivity(this, 0, it, 0)
+            PendingIntent.getActivity(this, 0, it, FLAG_IMMUTABLE)
         }
 
         mediaSession = MediaSessionCompat(this, SERVICE_TAG).apply {

@@ -3,6 +3,7 @@ package com.example.radioplayer.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -19,7 +20,11 @@ private const val FOOTER_DELETE_PLAYLIST = 2
 class PlaylistsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
-     class FooterDeletePlaylist (itemView: View) : RecyclerView.ViewHolder(itemView)
+
+    class FooterDeletePlaylist (itemView: View) : RecyclerView.ViewHolder(itemView)
+
+    var footerDeletePlaylist: FooterDeletePlaylist? = null
+
 
      class FooterViewHolder (itemView : View) : RecyclerView.ViewHolder(itemView)
 
@@ -51,15 +56,21 @@ class PlaylistsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         if(viewType == FOOTER_DELETE_PLAYLIST){
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_delete_playlist_footer, parent, false)
-            val footer = FooterDeletePlaylist(view)
-                footer.itemView.setOnClickListener {
-                    deletePlaylistClickListener?.let { click ->
-                        click(it)
-                    }
-                }
-             return footer
-        }
+            footerDeletePlaylist = FooterDeletePlaylist(view)
 
+                footerDeletePlaylist?.let { footer ->
+                    footer.itemView.setOnClickListener { view ->
+                        deletePlaylistClickListener?.let { click ->
+                            click(view)
+                        }
+                    }
+
+                    return footer
+                }
+
+
+
+        }
 
              val view = LayoutInflater.from(parent.context)
                  .inflate(R.layout.item_playlist_cover, parent, false)
@@ -81,11 +92,8 @@ class PlaylistsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun getItemCount(): Int {
-       return if(differ.currentList.size == 0){
-           1
-       } else {
-           differ.currentList.size +2
-       }
+
+       return differ.currentList.size +2
     }
 
 
@@ -133,8 +141,6 @@ class PlaylistsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
 
-
-
     private var playlistClickListener : ((Playlist) -> Unit)? = null
 
     fun setPlaylistClickListener (listener : (Playlist) -> Unit){
@@ -142,5 +148,6 @@ class PlaylistsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         playlistClickListener = listener
 
     }
+
 
 }

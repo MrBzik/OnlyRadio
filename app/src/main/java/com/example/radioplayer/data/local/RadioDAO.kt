@@ -73,8 +73,13 @@ interface  RadioDAO {
     suspend fun getStationsInPlaylist(playlistName : String) : List<PlaylistWithStations>
 
     @Query("SELECT * FROM RadioStation WHERE isFavoured = 1")
-     fun getAllFavouredStations() : LiveData<List<RadioStation>>
+    fun getAllFavouredStations() : LiveData<List<RadioStation>>
 
 
+    @Query("DELETE FROM StationPlaylistCrossRef WHERE playlistName =:playlistName")
+    suspend fun deleteAllCrossRefOfPlaylist(playlistName: String)
 
+
+    @Query("SELECT * FROM RadioStation WHERE inPlaylists = 1")
+    suspend fun testGetAllOneTimePlaylistStations() : List<RadioStation>
 }

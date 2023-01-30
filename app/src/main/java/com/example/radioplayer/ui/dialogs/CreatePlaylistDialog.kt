@@ -69,6 +69,7 @@ class CreatePlaylistDialog (
             else
 
                 databaseViewModel.insertNewPlayList(Playlist(nameField))
+                bind.etPlaylistName.text.clear()
                 dismiss()
         }
 

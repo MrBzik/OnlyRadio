@@ -31,10 +31,8 @@ class FavStationsFragment : Fragment() {
     lateinit var databaseViewModel : DatabaseViewModel
     lateinit var mainViewModel: MainViewModel
     lateinit var playlistAdapter : PlaylistsAdapter
-    lateinit var dialogCreateNewPlaylist : CreatePlaylistDialog
-    lateinit var dialogDeletePlaylist : RemovePlaylistDialog
     lateinit var currentPlaylistName : String
-
+    private lateinit var listOfPlaylists : List<Playlist>
 
     @Inject
     lateinit var mainAdapter: RadioDatabaseAdapter
@@ -58,10 +56,6 @@ class FavStationsFragment : Fragment() {
         databaseViewModel = (activity as MainActivity).databaseViewModel
         mainViewModel = (activity as MainActivity).mainViewModel
 
-        dialogCreateNewPlaylist = CreatePlaylistDialog(requireContext(), emptyList(), databaseViewModel)
-        dialogDeletePlaylist = RemovePlaylistDialog(requireContext(), emptyList()) { playlistName ->
-            databaseViewModel.deletePlaylist(Playlist(playlistName))
-        }
 
 
 
@@ -86,32 +80,38 @@ class FavStationsFragment : Fragment() {
         bind.ivArrowBackToFav.setOnClickListener {
 
             databaseViewModel.getAllFavouredStations()
+
+            databaseViewModel.testGetAllOneTimePlaylistStations()
         }
     }
 
     private fun setPlaylistAdapterClickListeners(){
 
         playlistAdapter.setAddPlaylistClickListener {
-            dialogCreateNewPlaylist.show()
+            CreatePlaylistDialog(requireContext(), listOfPlaylists, databaseViewModel).show()
         }
 
         playlistAdapter.setPlaylistClickListener {
 
             databaseViewModel.getStationsInPlaylist(it.playlistName)
 
-
         }
 
         playlistAdapter.setDeletePlaylistClickListener {
 
-            dialogDeletePlaylist.show()
+            RemovePlaylistDialog(requireContext(), listOfPlaylists) { playlistName ->
+                databaseViewModel.deleteStationsFromPlaylist(playlistName)
+                databaseViewModel.deletePlaylist(Playlist(playlistName))
+
+            }.show()
+
         }
 
     }
 
     private fun subscribeToObservers(){
 
-        observeListOfPlaylistNames()
+        observeListOfPlaylists()
 
         observeFavOrPlaylistStateForUI()
 
@@ -146,15 +146,15 @@ class FavStationsFragment : Fragment() {
     }
 
 
-    private fun observeListOfPlaylistNames (){
+    private fun observeListOfPlaylists (){
 
         databaseViewModel.listOfAllPlaylists.observe(viewLifecycleOwner){
 
             playlistAdapter.differ.submitList(it)
 
-            dialogCreateNewPlaylist.listOfPlaylists = it
+            listOfPlaylists = it
 
-            dialogDeletePlaylist.listOfPlaylists = it
+            playlistAdapter.footerDeletePlaylist?.itemView?.isVisible = it.isNotEmpty()
 
         }
 

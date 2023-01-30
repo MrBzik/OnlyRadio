@@ -41,7 +41,7 @@ class DatabaseRepository @Inject constructor(
             = radioDAO.incrementRadioStationPlaylist(stationID)
 
     suspend fun decrementRadioStationPlaylist (stationID : String)
-            = radioDAO.incrementRadioStationPlaylist(stationID)
+            = radioDAO.decrementRadioStationPlaylist(stationID)
 
     suspend fun checkIfPlaylistExists (playlistName: String)
             = radioDAO.checkIfPlaylistExists(playlistName)
@@ -54,5 +54,12 @@ class DatabaseRepository @Inject constructor(
 
     suspend fun getStationsInPlaylist(playlistName : String)
             = radioDAO.getStationsInPlaylist(playlistName)
+
+    suspend fun deleteAllCrossRefOfPlaylist(playlistName: String)
+            = radioDAO.deleteAllCrossRefOfPlaylist(playlistName)
+
+
+    suspend fun testGetAllOneTimePlaylistStations()
+            = radioDAO.testGetAllOneTimePlaylistStations()
 
 }

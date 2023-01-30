@@ -1,5 +1,6 @@
 package com.example.radioplayer.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -135,7 +136,6 @@ class DatabaseViewModel @Inject constructor(
             isInFavouriteTab.postValue(false)
         }
 
-
         val response =  repository.getStationsInPlaylist(playlistName)
         val playlist = response.first().radioStations
 
@@ -154,7 +154,24 @@ class DatabaseViewModel @Inject constructor(
     }
 
 
+    fun deleteStationsFromPlaylist(playlistName: String) = viewModelScope.launch {
 
+       val stations = repository.getStationsInPlaylist(playlistName).first().radioStations
+        stations.forEach {
+            repository.decrementRadioStationPlaylist(it.stationuuid)
+        }
+            repository.deleteAllCrossRefOfPlaylist(playlistName)
+
+    }
+
+
+    fun testGetAllOneTimePlaylistStations() = viewModelScope.launch {
+
+        val stations = repository.testGetAllOneTimePlaylistStations()
+
+        Log.d("CHECKTAGS", stations.size.toString())
+
+    }
 
 
 }
