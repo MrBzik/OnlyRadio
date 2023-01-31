@@ -21,12 +21,6 @@ interface  RadioDAO {
     @Delete
     suspend fun deleteRadioStation(station : RadioStation)
 
-    @Query("SELECT * FROM RadioStation")
-    suspend fun getAllStations() : List<RadioStation>
-
-    @Query("SELECT * FROM RadioStation")
-    fun  getAllStationsTEST() : LiveData<List<RadioStation>>
-
     @Query("SELECT EXISTS(SELECT * FROM RadioStation WHERE stationuuid =:id) ")
     suspend fun checkIfRadioStationInDB (id : String) : Boolean
 
@@ -42,8 +36,8 @@ interface  RadioDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNewPlaylist (playlist : Playlist)
 
-    @Delete
-    suspend fun deletePlaylist (playlist: Playlist)
+    @Query("DELETE FROM Playlist WHERE playlistName =:playlistName")
+    suspend fun deletePlaylist (playlistName: String)
 
     @Query("SELECT * FROM Playlist")
     fun getAllPlaylists() : LiveData<List<Playlist>>

@@ -26,7 +26,7 @@ class DatabaseRepository @Inject constructor(
 
     suspend fun insertNewPlaylist (playlist : Playlist) = radioDAO.insertNewPlaylist(playlist)
 
-    suspend fun deletePlaylist (playlist: Playlist) = radioDAO.deletePlaylist(playlist)
+    suspend fun deletePlaylist (playlistName: String) = radioDAO.deletePlaylist(playlistName)
 
     suspend fun checkIfInPlaylist (playlistName : String, stationID : String)
             = radioDAO.checkIfInPlaylist(playlistName, stationID)
@@ -52,8 +52,6 @@ class DatabaseRepository @Inject constructor(
 
      fun getAllFavouredStations() = radioDAO.getAllFavouredStations()
 
-    suspend fun getStationsInPlaylist(playlistName : String)
-            = radioDAO.getStationsInPlaylist(playlistName)
 
     suspend fun deleteAllCrossRefOfPlaylist(playlistName: String)
             = radioDAO.deleteAllCrossRefOfPlaylist(playlistName)

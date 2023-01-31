@@ -12,7 +12,7 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 class RadioPlaybackPreparer (
 
     private val radioSource: RadioSource,
-    private val playerPrepared : (MediaMetadataCompat?, Boolean) -> Unit,
+    private val playerPrepared : (MediaMetadataCompat?, Int) -> Unit,
     private val onCommand : (String, Bundle?) -> Unit
         ) : MediaSessionConnector.PlaybackPreparer {
 
@@ -35,19 +35,24 @@ class RadioPlaybackPreparer (
 
     override fun onPrepareFromMediaId(mediaId: String, playWhenReady: Boolean, extras: Bundle?) {
 
-        var isFromDB = false
+        var isApiFavPl = 0
 
         radioSource.whenReady {
             val itemToPlay = radioSource.stations.find {
                 it.description.mediaId == mediaId
             } ?: run {
-                isFromDB = true
-                radioSource.stationsDB.find{
+                isApiFavPl = 1
+                radioSource.stationsFavoured.find{
+                    it.description.mediaId == mediaId
+                }
+            } ?: run {
+                 isApiFavPl = 2
+                radioSource.stationsFromPlaylist.find {
                     it.description.mediaId == mediaId
                 }
             }
 
-            playerPrepared(itemToPlay, isFromDB)
+            playerPrepared(itemToPlay, isApiFavPl)
         }
 
     }

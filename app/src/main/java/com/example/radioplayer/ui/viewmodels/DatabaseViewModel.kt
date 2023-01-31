@@ -1,5 +1,6 @@
 package com.example.radioplayer.ui.viewmodels
 
+import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,8 +9,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
+import com.example.radioplayer.exoPlayer.RadioServiceConnection
 import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.repositories.DatabaseRepository
+import com.example.radioplayer.utils.Constants.COMMAND_LOAD_FROM_PLAYLIST
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,9 +21,9 @@ import javax.inject.Inject
 class DatabaseViewModel @Inject constructor(
         private val repository: DatabaseRepository,
         private val radioSource: RadioSource,
+        private val radioServiceConnection: RadioServiceConnection
 ) : ViewModel() {
 
-    val getAllStationsTEST = radioSource.getAllItemsTEST()
 
     val isStationInDB : MutableLiveData<Boolean> = MutableLiveData()
 
@@ -58,8 +61,8 @@ class DatabaseViewModel @Inject constructor(
         repository.insertNewPlaylist(playlist)
     }
 
-    fun deletePlaylist (playlist: Playlist) = viewModelScope.launch {
-        repository.deletePlaylist(playlist)
+    fun deletePlaylist (playlistName: String) = viewModelScope.launch {
+        repository.deletePlaylist(playlistName)
     }
 
     fun checkIfInPlaylistOrIncrement (playlistName : String, stationID : String)
@@ -136,10 +139,12 @@ class DatabaseViewModel @Inject constructor(
             isInFavouriteTab.postValue(false)
         }
 
-        val response =  repository.getStationsInPlaylist(playlistName)
-        val playlist = response.first().radioStations
+        val response =  radioSource.getStationsInPlaylist(playlistName)
+        val playlist = response
 
         stationsInPlaylist.postValue(playlist)
+
+        sendServiceCommandToUpdatePlaylist()
 
     }
 
@@ -156,7 +161,7 @@ class DatabaseViewModel @Inject constructor(
 
     fun deleteStationsFromPlaylist(playlistName: String) = viewModelScope.launch {
 
-       val stations = repository.getStationsInPlaylist(playlistName).first().radioStations
+       val stations = radioSource.getStationsInPlaylist(playlistName)
         stations.forEach {
             repository.decrementRadioStationPlaylist(it.stationuuid)
         }
@@ -170,6 +175,12 @@ class DatabaseViewModel @Inject constructor(
         val stations = repository.testGetAllOneTimePlaylistStations()
 
         Log.d("CHECKTAGS", stations.size.toString())
+
+    }
+
+    private fun sendServiceCommandToUpdatePlaylist(){
+
+        radioServiceConnection.sendCommand(COMMAND_LOAD_FROM_PLAYLIST, Bundle())
 
     }
 

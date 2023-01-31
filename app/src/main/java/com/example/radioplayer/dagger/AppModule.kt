@@ -77,7 +77,7 @@ object AppModule {
 
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl(Constants.BASE_RADIO_URL)
+            .baseUrl(Constants.BASE_RADIO_URL2)
             .build()
             .create(RadioApi::class.java)
     }

@@ -12,7 +12,7 @@ import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
         Playlist::class,
         StationPlaylistCrossRef::class
                ],
-        version = 5
+        version = 6
 )
 abstract class RadioDB : RoomDatabase() {
 

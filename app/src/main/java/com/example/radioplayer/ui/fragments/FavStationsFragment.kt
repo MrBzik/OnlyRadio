@@ -33,13 +33,15 @@ class FavStationsFragment : Fragment() {
     lateinit var bind : FragmentFavStationsBinding
     lateinit var databaseViewModel : DatabaseViewModel
     lateinit var mainViewModel: MainViewModel
-    lateinit var playlistAdapter : PlaylistsAdapter
     lateinit var currentPlaylistName : String
     private lateinit var listOfPlaylists : List<Playlist>
     lateinit var pixabayViewModel: PixabayViewModel
 
     @Inject
     lateinit var mainAdapter: RadioDatabaseAdapter
+
+    @Inject
+    lateinit var playlistAdapter : PlaylistsAdapter
 
     @Inject
     lateinit var glide : RequestManager
@@ -94,7 +96,7 @@ class FavStationsFragment : Fragment() {
     private fun setPlaylistAdapterClickListeners(){
 
         playlistAdapter.setAddPlaylistClickListener {
-           val dialog = CreatePlaylistDialog(
+           CreatePlaylistDialog(
                 requireContext(), listOfPlaylists, databaseViewModel, pixabayViewModel, glide).show()
 
         }
@@ -109,7 +111,7 @@ class FavStationsFragment : Fragment() {
 
             RemovePlaylistDialog(requireContext(), listOfPlaylists) { playlistName ->
                 databaseViewModel.deleteStationsFromPlaylist(playlistName)
-                databaseViewModel.deletePlaylist(Playlist(playlistName))
+                databaseViewModel.deletePlaylist(playlistName)
 
             }.show()
 
@@ -133,6 +135,8 @@ class FavStationsFragment : Fragment() {
         databaseViewModel.observableListOfStations.observe(viewLifecycleOwner){
 
             mainAdapter.listOfStations = it
+
+
         }
 
     }
@@ -192,8 +196,6 @@ class FavStationsFragment : Fragment() {
     }
 
     private fun setupPlaylistRecycleView(){
-
-        playlistAdapter = PlaylistsAdapter()
 
         bind.rvPlaylists.apply {
             adapter = playlistAdapter

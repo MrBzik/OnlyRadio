@@ -41,18 +41,10 @@ class HistoryFragment : Fragment() {
 
         setupRecyclerView()
 
-        observeHistory()
 
 
     }
 
-    private fun observeHistory(){
-
-        databaseViewModel.getAllStationsTEST.observe(viewLifecycleOwner){
-            historyAdapter.listOfStations = it
-        }
-
-    }
 
     private fun setupRecyclerView (){
 

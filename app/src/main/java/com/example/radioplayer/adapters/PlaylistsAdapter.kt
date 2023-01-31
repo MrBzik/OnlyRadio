@@ -7,9 +7,11 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.databinding.ItemPlaylistCoverBinding
+import javax.inject.Inject
 
 
 private const val FOOTER_ADD_PLAYLIST = 1
@@ -17,7 +19,9 @@ private const val FOOTER_ADD_PLAYLIST = 1
 private const val FOOTER_DELETE_PLAYLIST = 2
 
 
-class PlaylistsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PlaylistsAdapter @Inject constructor(
+    private val glide : RequestManager
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
 
@@ -88,6 +92,7 @@ class PlaylistsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         if(holder is PlaylistHolder) {
             val playlist = differ.currentList[position]
             holder.bind.tvPlaylistName.text = playlist.playlistName
+            glide.load(playlist.coverURI).into(holder.bind.ivPlaylistCover)
         }
     }
 

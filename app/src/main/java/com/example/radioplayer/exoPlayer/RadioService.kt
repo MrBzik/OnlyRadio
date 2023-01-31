@@ -2,7 +2,6 @@ package com.example.radioplayer.exoPlayer
 
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
-import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
@@ -17,6 +16,8 @@ import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlaybackPreparer
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerNotificationListener
+import com.example.radioplayer.utils.Constants
+import com.example.radioplayer.utils.Constants.COMMAND_LOAD_FROM_PLAYLIST
 import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Constants.NETWORK_ERROR
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
@@ -105,22 +106,29 @@ class RadioService : MediaBrowserServiceCompat() {
             // song duration
         }
 
-        val radioPlaybackPreparer = RadioPlaybackPreparer(radioSource, { itemToPlay, isFromDb ->
+        val radioPlaybackPreparer = RadioPlaybackPreparer(radioSource, { itemToPlay, isApiFavPl ->
 
             currentStation = itemToPlay
 
-            if(isFromDb){
+            if(isApiFavPl == 1){
                 preparePlayer(
-                    radioSource.stationsDB,
+                    radioSource.stationsFavoured,
                     itemToPlay,
                     true
                 )
-            } else {
+            } else if(isApiFavPl == 0) {
                 preparePlayer(
                     radioSource.stations,
                     itemToPlay,
                     true
                 )
+            } else {
+                preparePlayer(
+                    radioSource.stationsFromPlaylist,
+                    itemToPlay,
+                    true
+                )
+
             }
 
 
@@ -138,7 +146,11 @@ class RadioService : MediaBrowserServiceCompat() {
 
                 }
 
+                COMMAND_LOAD_FROM_PLAYLIST -> {
 
+                    radioSource.createMediaItemsFromPlaylist()
+
+                }
             }
 
         })
@@ -156,7 +168,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
 
-        radioSource.getAllItemsTEST().observeForever(observerForDatabase)
+        radioSource.subscribeToFavouredStations.observeForever(observerForDatabase)
 
 
 
@@ -216,7 +228,7 @@ class RadioService : MediaBrowserServiceCompat() {
     override fun onDestroy() {
         super.onDestroy()
         serviceScope.cancel()
-        radioSource.getAllItemsTEST().removeObserver(observerForDatabase)
+        radioSource.subscribeToFavouredStations.removeObserver(observerForDatabase)
 
         exoPlayer.removeListener(radioPlayerEventListener)
         exoPlayer.release()

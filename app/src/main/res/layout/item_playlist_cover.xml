@@ -8,11 +8,14 @@
         android:id="@+id/ivPlaylistCover"
         android:layout_width="match_parent"
         android:layout_height="100dp"
+        android:scaleType="centerCrop"
         android:src="@drawable/ic_radio_default"/>
     <TextView
         android:id="@+id/tvPlaylistName"
         android:layout_width="match_parent"
         android:layout_height="20dp"
+        android:textColor="@color/EXPANDtext"
+        android:textSize="13sp"
         android:text="album name"
         android:textAlignment="center"
         />

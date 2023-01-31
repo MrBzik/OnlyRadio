@@ -8,6 +8,6 @@ import androidx.room.PrimaryKey
 data class Playlist (
 
     @PrimaryKey(autoGenerate = false)
-    val playlistName : String
-
+    val playlistName : String,
+    val coverURI : String
         )

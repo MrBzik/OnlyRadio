@@ -126,8 +126,6 @@ class RadioSearchFragment : Fragment() {
                 bind.loadStationsProgressBar.visibility = View.GONE
             }
 
-        bind.rvSearchStations
-
         }
 
     }
