@@ -1,6 +1,5 @@
 package com.example.radioplayer.ui.fragments
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,17 +9,20 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingHistoryAdapter
-import com.example.radioplayer.adapters.RadioDatabaseAdapter
 import com.example.radioplayer.databinding.FragmentHistoryBinding
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.dialogs.HistorySettingsDialog
+import com.example.radioplayer.ui.dialogs.HistoryWarningDialog
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
-import com.example.radioplayer.utils.Constants.DATE_FORMAT
+import com.example.radioplayer.utils.Utils.fromDateToString
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
+import java.sql.Date
+import java.util.Calendar
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -55,24 +57,57 @@ class HistoryFragment : Fragment() {
 
         setupRecyclerView()
 
+        showSelectedHistoryOption()
+
         subscribeToHistory()
 
         historySettingsClickListener()
 
         setOnSaveOptionsClickListener()
 
+        databaseViewModel.updateHistory.postValue(true)
+
     }
+
+    private fun showSelectedHistoryOption(){
+
+       val option = databaseViewModel.getHistoryOptionsPref()
+
+        bind.tvCurrentMode.text = option
+    }
+
 
     private fun setOnSaveOptionsClickListener(){
 
         bind.tvSaveOption.setOnClickListener {
 
-            AlertDialog.Builder(requireContext())
-                .setTitle("Saving new option may result in cleaning history")
-                .show()
+            val previousOption = databaseViewModel.getHistoryOptionsPref()
+            val newOption = bind.tvCurrentMode.text.toString()
+            val prevVal = databaseViewModel.getDatesValueOfPref(previousOption)
+            val newVal = databaseViewModel.getDatesValueOfPref(newOption)
 
+             if (prevVal <= newVal) {
+
+                 saveNewOption(newOption)
+
+             } else {
+                HistoryWarningDialog(requireContext()){
+                    saveNewOption(newOption)
+                        databaseViewModel.compareDatesWithPrefAndCLeanIfNeeded(true)
+
+                }.show()
+             }
         }
+    }
 
+    private fun saveNewOption(newOption : String){
+
+        databaseViewModel.setHistoryOptionsPref(newOption)
+        bind.tvSaveOption.isVisible = false
+        Snackbar.make(
+            (activity as MainActivity).findViewById(R.id.rootLayout),
+            "Option was saved",
+            Snackbar.LENGTH_SHORT).show()
 
     }
 
@@ -80,10 +115,11 @@ class HistoryFragment : Fragment() {
 
         bind.tvHistorySettings.setOnClickListener {
 
-            HistorySettingsDialog(requireContext()){
+            HistorySettingsDialog(requireContext()){ newOption ->
 
-                bind.tvCurrentMode.text = it
-                bind.tvSaveOption.isVisible = true
+                bind.tvCurrentMode.text = newOption
+
+                bind.tvSaveOption.isVisible = newOption != databaseViewModel.getHistoryOptionsPref()
 
             }.show()
 
@@ -92,23 +128,25 @@ class HistoryFragment : Fragment() {
 
     private fun subscribeToHistory(){
 
-        lifecycleScope.launch{
+        viewLifecycleOwner.lifecycleScope.launch{
 
-            databaseViewModel.getStationsHistory().collectLatest {
+                databaseViewModel.historyFlow.collectLatest {
 
-                historyAdapter.currentDate = currentDate
-                historyAdapter.submitData(it)
+                    historyAdapter.currentDate = currentDate
+                    historyAdapter.submitData(it)
 
+                }
             }
-        }
 
     }
 
     private fun updateCurrentDate(){
 
        val time = System.currentTimeMillis()
-       val format = SimpleDateFormat(DATE_FORMAT)
-       currentDate =  format.format(time)
+       val calendar = Calendar.getInstance()
+       calendar.time = Date(time)
+        val parsedDate = fromDateToString(calendar)
+       currentDate =  parsedDate
 
     }
 

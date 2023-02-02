@@ -1,11 +1,9 @@
 package com.example.radioplayer.ui.viewmodels
 
+import android.app.Application
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -13,7 +11,7 @@ import androidx.paging.cachedIn
 import com.example.radioplayer.adapters.datasources.HistoryDataSource
 import com.example.radioplayer.adapters.datasources.HistoryDateLoader
 import com.example.radioplayer.adapters.models.StationWithDateModel
-import com.example.radioplayer.data.local.entities.Date
+import com.example.radioplayer.data.local.entities.HistoryDate
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.relations.StationDateCrossRef
@@ -22,19 +20,28 @@ import com.example.radioplayer.exoPlayer.RadioServiceConnection
 import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.utils.Constants.COMMAND_LOAD_FROM_PLAYLIST
-import com.example.radioplayer.utils.Constants.DATE_FORMAT
+import com.example.radioplayer.utils.Constants.HISTORY_30_DATES
+import com.example.radioplayer.utils.Constants.HISTORY_3_DATES
+import com.example.radioplayer.utils.Constants.HISTORY_7_DATES
+import com.example.radioplayer.utils.Constants.HISTORY_NEVER_CLEAN
+import com.example.radioplayer.utils.Constants.HISTORY_ONE_DAY
+import com.example.radioplayer.utils.Constants.HISTORY_OPTIONS
+import com.example.radioplayer.utils.Utils.fromDateToString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
+import java.sql.Date
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class DatabaseViewModel @Inject constructor(
+        app : Application,
         private val repository: DatabaseRepository,
         private val radioSource: RadioSource,
         private val radioServiceConnection: RadioServiceConnection
-) : ViewModel() {
+) : AndroidViewModel(app) {
 
 
     val isStationInDB: MutableLiveData<Boolean> = MutableLiveData()
@@ -181,32 +188,25 @@ class DatabaseViewModel @Inject constructor(
 
 
 
-    private val time = System.currentTimeMillis()
-    private val format = SimpleDateFormat(DATE_FORMAT)
+
     private var initialDate: String = ""
-
-    init {
-
-        initialDate = format.format(time)
-
-    }
-
-    private var isDateInDBAlreadyInserted = false
+    private val calendar = Calendar.getInstance()
 
 
     fun checkDateAndUpdateHistory(stationID: String) = viewModelScope.launch {
 
         val newTime = System.currentTimeMillis()
-        val update = format.format(newTime)
+        calendar.time = Date(newTime)
+        val update = fromDateToString(calendar)
 
-        if (isDateInDBAlreadyInserted && update == initialDate) {/*DO NOTHING*/
+        if (update == initialDate) {/*DO NOTHING*/
         } else {
             val check = repository.checkLastDateRecordInDB(update)
             if (!check) {
-                repository.insertNewDate(Date(update, newTime))
+                repository.insertNewDate(HistoryDate(update, newTime))
                 initialDate = update
+                compareDatesWithPrefAndCLeanIfNeeded(false)
             }
-            isDateInDBAlreadyInserted = true
         }
 
         repository.insertStationDateCrossRef(StationDateCrossRef(stationID, update))
@@ -215,6 +215,7 @@ class DatabaseViewModel @Inject constructor(
 
 
     // For RecyclerView
+
 
     private suspend fun getStationsInDate(limit: Int, offset: Int): List<StationWithDateModel> {
 
@@ -235,9 +236,16 @@ class DatabaseViewModel @Inject constructor(
         return stationsWithDate
     }
 
+    val updateHistory : MutableLiveData<Boolean> = MutableLiveData()
+
+    val historyFlow = updateHistory.asFlow()
+        .flatMapLatest {
+            stationsHistoryFlow()
+        }.cachedIn(viewModelScope)
 
 
-     fun getStationsHistory(): Flow<PagingData<StationWithDateModel>> {
+
+    private fun stationsHistoryFlow() : Flow<PagingData<StationWithDateModel>> {
         val loader : HistoryDateLoader = { dateIndex ->
             getStationsInDate(1, dateIndex)
         }
@@ -250,9 +258,91 @@ class DatabaseViewModel @Inject constructor(
             pagingSourceFactory = {
                 HistoryDataSource(loader)
             }
-        ).flow.cachedIn(viewModelScope)
+        ).flow
+    }
+
+        // Cleaning up database
+
+    private suspend fun removeUnusedStationsOnStart(){
+
+        val stations = repository.gatherStationsForCleaning()
+
+        stations.forEach {
+
+          val check = repository.checkIfRadioStationInHistory(it.stationuuid)
+
+            if(!check){
+
+                repository.deleteRadioStation(it)
+            }
+        }
+    }
+
+    init {
+        viewModelScope.launch {
+            removeUnusedStationsOnStart()
+
+        }
     }
 
 
+    // Handle history options and cleaning history
+
+    private val historyOptionsPref = app.getSharedPreferences(HISTORY_OPTIONS, Context.MODE_PRIVATE)
+
+    private val editor = historyOptionsPref.edit()
+
+    fun getHistoryOptionsPref() : String {
+
+        return historyOptionsPref.getString(HISTORY_OPTIONS, HISTORY_NEVER_CLEAN).toString()
+    }
+
+    fun setHistoryOptionsPref(newOption : String) {
+
+        editor.putString(HISTORY_OPTIONS, newOption)
+        editor.commit()
+    }
+
+
+    fun compareDatesWithPrefAndCLeanIfNeeded(isRefreshNeed : Boolean)
+            = viewModelScope.launch {
+
+        val pref = getHistoryOptionsPref()
+
+        if(pref == HISTORY_NEVER_CLEAN) return@launch
+
+        val prefValue = getDatesValueOfPref(pref)
+
+        val numberOfDatesInDB =  repository.getNumberOfDates()
+
+        if(prefValue >= numberOfDatesInDB) return@launch
+        else {
+
+            val numberOfDatesToDelete = numberOfDatesInDB - prefValue
+            val deleteList = repository.getDatesToDelete(numberOfDatesToDelete)
+
+            deleteList.forEach {
+                repository.deleteAllCrossRefWithDate(it.date)
+                repository.deleteDate(it)
+            }
+        }
+
+        if(isRefreshNeed){
+            updateHistory.postValue(true)
+        }
+    }
+
+
+    fun getDatesValueOfPref(pref : String) : Int {
+
+       return when (pref){
+            HISTORY_ONE_DAY -> 1
+            HISTORY_3_DATES -> 3
+            HISTORY_7_DATES -> 7
+            HISTORY_30_DATES -> 30
+            else -> 666
+        }
+
+    }
 
 }

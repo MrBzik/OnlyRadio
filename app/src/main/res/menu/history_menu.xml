@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <item
+        android:id="@+id/miOneDay"
+        app:showAsAction="never"
+        android:title="One day"/>
+    <item
+        android:id="@+id/mi3Dates"
+        app:showAsAction="never"
+        android:title="3 dates"/>
+    <item
+        android:id="@+id/mi7Dates"
+        app:showAsAction="never"
+        android:title="7 dates"/>
+    <item
+        android:id="@+id/mi30Dates"
+        app:showAsAction="never"
+        android:title="30 dates"/>
+    <item
+        android:id="@+id/miNeverClean"
+        app:showAsAction="never"
+        android:title="Never clean"/>
+
+</menu>

@@ -7,13 +7,14 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.example.radioplayer.data.local.entities.Date
+import com.example.radioplayer.data.local.entities.HistoryDate
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.relations.DateWithStations
 import com.example.radioplayer.data.local.relations.PlaylistWithStations
 import com.example.radioplayer.data.local.relations.StationDateCrossRef
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
+
 
 @Dao
 interface  RadioDAO {
@@ -77,11 +78,11 @@ interface  RadioDAO {
 
     // Date
 
-    @Query("SELECT EXISTS(SELECT * FROM Date WHERE date = :currentDate)")
+    @Query("SELECT EXISTS(SELECT * FROM HistoryDate WHERE date = :currentDate)")
     suspend fun checkLastDateRecordInDB(currentDate : String) : Boolean
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertNewDate(date : Date)
+    suspend fun insertNewDate(date : HistoryDate)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStationDateCrossRef(stationDateCrossRef: StationDateCrossRef)
@@ -89,26 +90,34 @@ interface  RadioDAO {
     // For recyclerView
 
     @Transaction
-    @Query("SELECT * FROM Date ORDER BY dateInMills DESC LIMIT :limit OFFSET :offset")
+    @Query("SELECT * FROM HistoryDate ORDER BY time DESC LIMIT :limit OFFSET :offset")
     suspend fun getStationsInDate(limit: Int, offset : Int) : DateWithStations
 
 
 
-    // For database cleaning
+    // For database RadioStations cleaning
+
+    @Query("SELECT * FROM RadioStation WHERE isFavoured = 0 AND inPlaylists = 0")
+    suspend fun gatherStationsForCleaning() : List<RadioStation>
+
+    @Query("SELECT EXISTS(SELECT * FROM StationDateCrossRef WHERE stationuuid =:stationID)")
+    suspend fun checkIfRadioStationInHistory(stationID : String) : Boolean
+
+    @Delete
+    suspend fun deleteRadioStation(station : RadioStation)
+
+    // For Dates cleaning
+
+    @Query("SELECT COUNT(date) FROM HistoryDate")
+    suspend fun getNumberDates() : Int
+
+    @Query("SELECT * FROM HistoryDate ORDER BY time LIMIT :limit")
+    suspend fun getDatesToDelete(limit: Int) : List<HistoryDate>
 
     @Query("DELETE FROM StationDateCrossRef WHERE date =:date")
     suspend fun deleteAllCrossRefWithDate(date : String)
 
     @Delete
-    suspend fun deleteDate(date : Date)
-
-    @Query("SELECT * FROM RadioStation WHERE isFavoured = 0 AND inPlaylists = 0")
-    suspend fun gatherStationsForCleaning() : List<RadioStation>
-
-    @Query("SELECT EXISTS(SELECT * FROM StationDateCrossRef WHERE date =:date AND stationuuid =:stationID)")
-    suspend fun checkIfRadioStationInHistory(date : String, stationID : String) : Boolean
-
-    @Delete
-    suspend fun deleteRadioStation(station : RadioStation)
+    suspend fun deleteDate(date : HistoryDate)
 
 }

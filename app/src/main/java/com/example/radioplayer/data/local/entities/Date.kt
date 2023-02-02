@@ -4,9 +4,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class Date (
+data class HistoryDate (
     @PrimaryKey(autoGenerate = false)
     val date : String,
-
-    val dateInMills : Long
+    val time : Long
         )

@@ -28,8 +28,17 @@ object Constants {
     const val SEARCH_FROM_FAVOURITES = 1
     const val SEARCH_FROM_PLAYLIST = 2
 
+
+
     const val DATE_FORMAT = "dd.MM.yyyy"
 
+
+    const val HISTORY_OPTIONS = "History options"
+    const val HISTORY_ONE_DAY = "one day"
+    const val HISTORY_3_DATES = "3 dates"
+    const val HISTORY_7_DATES = "7 dates"
+    const val HISTORY_30_DATES = "30 dates"
+    const val HISTORY_NEVER_CLEAN = "never clean"
 
 
 }

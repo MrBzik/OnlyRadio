@@ -1,11 +1,13 @@
 package com.example.radioplayer.repositories
 
+
 import com.example.radioplayer.data.local.RadioDAO
-import com.example.radioplayer.data.local.entities.Date
+import com.example.radioplayer.data.local.entities.HistoryDate
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.relations.StationDateCrossRef
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
+import java.sql.Date
 import javax.inject.Inject
 
 class DatabaseRepository @Inject constructor(
@@ -14,8 +16,6 @@ class DatabaseRepository @Inject constructor(
 
 
     suspend fun insertRadioStation (station : RadioStation) = radioDAO.insertRadioStation(station)
-
-    suspend fun deleteRadioStation (station: RadioStation) = radioDAO.deleteRadioStation(station)
 
     suspend fun checkIfRadioStationInDB (id : String) = radioDAO.checkIfRadioStationInDB(id)
 
@@ -66,7 +66,7 @@ class DatabaseRepository @Inject constructor(
     suspend fun checkLastDateRecordInDB(currentDate : String)
         = radioDAO.checkLastDateRecordInDB(currentDate)
 
-    suspend fun insertNewDate(date : Date) = radioDAO.insertNewDate(date)
+    suspend fun insertNewDate(date : HistoryDate) = radioDAO.insertNewDate(date)
 
     suspend fun insertStationDateCrossRef(stationDateCrossRef: StationDateCrossRef)
         = radioDAO.insertStationDateCrossRef(stationDateCrossRef)
@@ -75,5 +75,30 @@ class DatabaseRepository @Inject constructor(
 
     suspend fun getStationsInDate(limit : Int, offset : Int)
          = radioDAO.getStationsInDate(limit, offset)
+
+
+
+
+    // Cleaning unused stations
+
+
+    suspend fun gatherStationsForCleaning() : List<RadioStation>
+        = radioDAO.gatherStationsForCleaning()
+
+    suspend fun checkIfRadioStationInHistory(stationID : String) : Boolean
+        = radioDAO.checkIfRadioStationInHistory(stationID)
+
+    suspend fun deleteRadioStation (station : RadioStation) = radioDAO.deleteRadioStation(station)
+
+
+    // Cleaning dates
+
+    suspend fun getNumberOfDates() : Int = radioDAO.getNumberDates()
+
+    suspend fun getDatesToDelete(limit: Int) : List<HistoryDate> = radioDAO.getDatesToDelete(limit)
+
+    suspend fun deleteAllCrossRefWithDate(date : String) = radioDAO.deleteAllCrossRefWithDate(date)
+
+    suspend fun deleteDate(date : HistoryDate) = radioDAO.deleteDate(date)
 
 }

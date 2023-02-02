@@ -10,6 +10,11 @@ import androidx.appcompat.app.AppCompatDialog
 import com.example.radioplayer.databinding.DialogHistorySettingsBinding
 import com.example.radioplayer.databinding.DialogPickTagBinding
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.utils.Constants.HISTORY_30_DATES
+import com.example.radioplayer.utils.Constants.HISTORY_3_DATES
+import com.example.radioplayer.utils.Constants.HISTORY_7_DATES
+import com.example.radioplayer.utils.Constants.HISTORY_NEVER_CLEAN
+import com.example.radioplayer.utils.Constants.HISTORY_ONE_DAY
 
 class HistorySettingsDialog (
     private val requireContext : Context,
@@ -20,11 +25,7 @@ class HistorySettingsDialog (
     lateinit var bind : DialogHistorySettingsBinding
 
     private val listOfOptions = listOf(
-        "One day",
-        "3 dates",
-        "7 dates",
-        "30 dates",
-        "Never clean"
+        HISTORY_ONE_DAY, HISTORY_3_DATES, HISTORY_7_DATES, HISTORY_30_DATES, HISTORY_NEVER_CLEAN
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {

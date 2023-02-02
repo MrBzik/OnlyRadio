@@ -18,16 +18,17 @@ class RadioSource @Inject constructor(
 ) {
 
     var stations = mutableListOf<MediaMetadataCompat>()
+    private var _stations : RadioStations? = RadioStations()
 
+    val subscribeToFavouredStations = radioDAO.getAllFavouredStations()
     var stationsFavoured = mutableListOf<MediaMetadataCompat>()
 
     var stationsFromPlaylist = mutableListOf<MediaMetadataCompat>()
-
-    private var stationsService : RadioStations? = RadioStations()
-
     private var _stationsFromPlaylist : List<RadioStation> = emptyList()
 
-    val subscribeToFavouredStations = radioDAO.getAllFavouredStations()
+    var stationsFromHistory = mutableListOf<MediaMetadataCompat>()
+    private var _stationsFromHistory : MutableList<RadioStation> = mutableListOf()
+
 
 
     suspend fun getStationsInPlaylist(playlistName : String) : List<RadioStation> {
@@ -54,7 +55,7 @@ class RadioSource @Inject constructor(
             }
 
         }
-        stationsService = response.body()
+        _stations = response.body()
 
         return response.body()
     }
@@ -80,7 +81,7 @@ class RadioSource @Inject constructor(
 
             state = STATE_PROCESSING
 
-              stationsService?.let {
+              _stations?.let {
 
                   if(isNewSearch) {
                       stations = it.map { station ->
