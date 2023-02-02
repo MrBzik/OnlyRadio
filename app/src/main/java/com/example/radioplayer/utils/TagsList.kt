@@ -1,6 +1,6 @@
 package com.example.radioplayer.utils
 
-val listOfTags = listOf( "none", "50s", "60s", "70s", "80s", "90s", "00s",
+val listOfTags = listOf("50s", "60s", "70s", "80s", "90s", "00s",
     "hits", "top", "pop", "rock", "adult contemporary", "country", "dance", "electro","eclectic",
     "jazz", "oldies", "classic","alternative", "house", "ambient", "folk", "blues",
     "charts", "disco", "edm", "funk", "grupera", "heavy metal", "hip-hop", "indie", "instrumental",

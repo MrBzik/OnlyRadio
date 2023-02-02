@@ -5,14 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/ivInitiateSearch"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@drawable/ic_new_radio_search"
-        android:scaleType="centerCrop"
-        app:backgroundTint="@color/background"
         android:layout_margin="4dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_new_radio_search"
+        app:backgroundTint="@color/background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout" />
 
@@ -30,6 +31,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -40,53 +50,70 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/tvTag"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="10dp"
-                android:text="Tag"
-                android:textColor="@color/EXPANDtext"
-                android:textSize="18sp"
-                android:textStyle="bold"
+                android:orientation="horizontal"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/llName"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.5" />
+                app:layout_constraintVertical_bias="0.5" >
 
-            <ImageView
-                android:id="@+id/imageView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_arrow_drop_down"
-                app:layout_constraintBottom_toBottomOf="@+id/tvTag"
-                app:layout_constraintStart_toEndOf="@+id/tvTag"
-                app:layout_constraintTop_toTopOf="@+id/tvTag" />
+                <TextView
+                    android:id="@+id/tvTag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tag"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textColor="@color/interactive_text_color"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    />
 
-            <TextView
-                android:id="@+id/tvName"
-                android:layout_width="wrap_content"
+                <ImageView
+                    android:id="@+id/imageView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_arrow_drop_down"/>
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/llName"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Name"
-                android:textColor="@color/EXPANDtext"
-                android:textSize="18sp"
-                android:textStyle="bold"
+                android:layout_marginStart="-40dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/llCountryViewGroup"
-                app:layout_constraintStart_toEndOf="@+id/tvTag"
+                app:layout_constraintStart_toStartOf="@+id/guideline3"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.5" />
+                app:layout_constraintVertical_bias="0.5" >
 
+                <TextView
+                    android:id="@+id/tvName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Name"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textColor="@color/interactive_text_color"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    />
 
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_arrow_drop_down"
-                app:layout_constraintBottom_toBottomOf="@+id/tvName"
-                app:layout_constraintStart_toEndOf="@+id/tvName"
-                app:layout_constraintTop_toTopOf="@+id/tvName" />
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_arrow_drop_down"
+                    />
 
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/llCountryViewGroup"
@@ -101,8 +128,8 @@
                     android:id="@+id/tvSelectedCountry"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/EXPANDtext"
-                    android:textSize="20sp"
+                    android:textColor="@color/interactive_text_color"
+                    android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -117,7 +144,6 @@
                 android:id="@+id/ivArrowCountry"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
                 android:src="@drawable/ic_arrow_drop_down"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/toolbar"
@@ -159,7 +185,6 @@
             android:layout_height="match_parent" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
 
 
 

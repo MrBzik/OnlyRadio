@@ -166,6 +166,8 @@ class StationDetailsFragment : Fragment()
                 )
             )
 
+            databaseViewModel.getStationsInPlaylist(playlistName, true)
+
             Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
                 "Station was added to $playlistName",
                 Snackbar.LENGTH_SHORT).show()

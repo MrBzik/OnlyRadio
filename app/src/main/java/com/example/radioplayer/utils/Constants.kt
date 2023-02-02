@@ -23,9 +23,12 @@ object Constants {
 
     const val DATABASE_NAME = "radio_stations_db"
 
-    const val SPLIT = "_UNIQSPLIT_"
 
-    const val MAIN_PLAY_LIST = "Main play list"
+    const val SEARCH_FROM_API = 0
+    const val SEARCH_FROM_FAVOURITES = 1
+    const val SEARCH_FROM_PLAYLIST = 2
+
+    const val DATE_FORMAT = "dd.MM.yyyy"
 
 
 

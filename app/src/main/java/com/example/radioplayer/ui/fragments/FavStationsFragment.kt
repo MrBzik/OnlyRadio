@@ -23,6 +23,8 @@ import com.example.radioplayer.ui.dialogs.RemovePlaylistDialog
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -33,9 +35,15 @@ class FavStationsFragment : Fragment() {
     lateinit var bind : FragmentFavStationsBinding
     lateinit var databaseViewModel : DatabaseViewModel
     lateinit var mainViewModel: MainViewModel
-    lateinit var currentPlaylistName : String
+    private var currentPlaylistName : String = ""
     private lateinit var listOfPlaylists : List<Playlist>
     lateinit var pixabayViewModel: PixabayViewModel
+
+    private var isInFavouriteTab = false
+
+    private var isPlaylistsVisible = false
+
+    private var searchFlag : Int = 1
 
     @Inject
     lateinit var mainAdapter: RadioDatabaseAdapter
@@ -79,8 +87,53 @@ class FavStationsFragment : Fragment() {
 
         setArrowToFavClickListener()
 
+        setOnPlaylistsExpandClickListener()
+
+        observePlaylistsVisibilityState()
+
+        deletePlaylistClickListener()
+
     }
 
+    private fun deletePlaylistClickListener(){
+
+        bind.tvPlaylistDelete.setOnClickListener {
+
+            RemovePlaylistDialog(requireContext(), currentPlaylistName){
+
+               val stations = mainAdapter.listOfStations
+
+                databaseViewModel.deletePlaylistAndContent(currentPlaylistName, stations)
+
+                databaseViewModel.getAllFavouredStations()
+
+
+            }.show()
+
+        }
+
+    }
+
+    private fun observePlaylistsVisibilityState(){
+
+        pixabayViewModel.togglePlaylistsVisibility.observe(viewLifecycleOwner){
+            bind.rvPlaylists.isVisible = it
+            isPlaylistsVisible = it
+            bind.ivArrowPlaylistsShrink.isVisible = it
+            bind.ivArrowPlaylistsExpand.isVisible = !it
+            bind.ivArrowBackToFav.isVisible = it && !isInFavouriteTab
+        }
+    }
+
+
+    private fun setOnPlaylistsExpandClickListener(){
+        bind.tvPlaylistsExpand.setOnClickListener {
+           pixabayViewModel.togglePlaylistsVisibility.postValue(
+               !isPlaylistsVisible
+           )
+
+        }
+    }
 
 
     private fun setArrowToFavClickListener(){
@@ -89,7 +142,6 @@ class FavStationsFragment : Fragment() {
 
             databaseViewModel.getAllFavouredStations()
 
-            databaseViewModel.testGetAllOneTimePlaylistStations()
         }
     }
 
@@ -107,15 +159,6 @@ class FavStationsFragment : Fragment() {
 
         }
 
-        playlistAdapter.setDeletePlaylistClickListener {
-
-            RemovePlaylistDialog(requireContext(), listOfPlaylists) { playlistName ->
-                databaseViewModel.deleteStationsFromPlaylist(playlistName)
-                databaseViewModel.deletePlaylist(playlistName)
-
-            }.show()
-
-        }
 
     }
 
@@ -123,35 +166,42 @@ class FavStationsFragment : Fragment() {
 
         observeListOfPlaylists()
 
-        observeFavOrPlaylistStateForUI()
 
         databaseViewModel.currentPlaylistName.observe(viewLifecycleOwner){
 
             bind.tvPlaylistName.text = it
             currentPlaylistName = it
-
         }
+
+        observeFavOrPlaylistState()
 
         databaseViewModel.observableListOfStations.observe(viewLifecycleOwner){
 
             mainAdapter.listOfStations = it
 
-
         }
 
     }
 
-    private fun observeFavOrPlaylistStateForUI(){
+    private fun observeFavOrPlaylistState(){
 
         databaseViewModel.isInFavouriteTab.observe(viewLifecycleOwner){
 
+            bind.ivArrowBackToFav.isVisible = !it && isPlaylistsVisible
+
+            bind.tvPlaylistDelete.isVisible = !it
+            bind.tvPlaylistDelete.text = "Delete : $currentPlaylistName"
+
+            isInFavouriteTab = it
+
+
             if(it){
                 bind.tvPlaylistName.text = "Favoured stations"
-                bind.ivArrowBackToFav.visibility = View.GONE
+                searchFlag = SEARCH_FROM_FAVOURITES
+
             } else{
 
-                bind.ivArrowBackToFav.isVisible = true
-
+                searchFlag = SEARCH_FROM_PLAYLIST
             }
         }
 
@@ -166,7 +216,6 @@ class FavStationsFragment : Fragment() {
 
             listOfPlaylists = it
 
-            playlistAdapter.footerDeletePlaylist?.itemView?.isVisible = it.isNotEmpty()
 
         }
 
@@ -176,7 +225,7 @@ class FavStationsFragment : Fragment() {
 
         mainAdapter.setOnClickListener {
 
-            mainViewModel.playOrToggleStation(it, true)
+            mainViewModel.playOrToggleStation(it, searchFlag)
             mainViewModel.newRadioStation.postValue(it)
             databaseViewModel.isStationInDB.postValue(true)
 

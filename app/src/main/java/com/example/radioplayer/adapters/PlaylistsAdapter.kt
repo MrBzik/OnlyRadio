@@ -16,18 +16,11 @@ import javax.inject.Inject
 
 private const val FOOTER_ADD_PLAYLIST = 1
 
-private const val FOOTER_DELETE_PLAYLIST = 2
 
 
 class PlaylistsAdapter @Inject constructor(
     private val glide : RequestManager
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-
-
-    class FooterDeletePlaylist (itemView: View) : RecyclerView.ViewHolder(itemView)
-
-    var footerDeletePlaylist: FooterDeletePlaylist? = null
 
 
      class FooterViewHolder (itemView : View) : RecyclerView.ViewHolder(itemView)
@@ -57,24 +50,6 @@ class PlaylistsAdapter @Inject constructor(
             return footer
         }
 
-        if(viewType == FOOTER_DELETE_PLAYLIST){
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_delete_playlist_footer, parent, false)
-            footerDeletePlaylist = FooterDeletePlaylist(view)
-
-                footerDeletePlaylist?.let { footer ->
-                    footer.itemView.setOnClickListener { view ->
-                        deletePlaylistClickListener?.let { click ->
-                            click(view)
-                        }
-                    }
-
-                    return footer
-                }
-
-
-
-        }
 
              val view = LayoutInflater.from(parent.context)
                  .inflate(R.layout.item_playlist_cover, parent, false)
@@ -98,7 +73,7 @@ class PlaylistsAdapter @Inject constructor(
 
     override fun getItemCount(): Int {
 
-       return differ.currentList.size +2
+       return differ.currentList.size +1
     }
 
 
@@ -108,9 +83,6 @@ class PlaylistsAdapter @Inject constructor(
             return FOOTER_ADD_PLAYLIST
         }
 
-        if(position == differ.currentList.size +1){
-            return FOOTER_DELETE_PLAYLIST
-        }
 
         return super.getItemViewType(position)
     }
@@ -137,13 +109,6 @@ class PlaylistsAdapter @Inject constructor(
 
     }
 
-    private var deletePlaylistClickListener : ((View) -> Unit)? = null
-
-    fun setDeletePlaylistClickListener (listener : (View) -> Unit){
-
-        deletePlaylistClickListener = listener
-
-    }
 
 
     private var playlistClickListener : ((Playlist) -> Unit)? = null

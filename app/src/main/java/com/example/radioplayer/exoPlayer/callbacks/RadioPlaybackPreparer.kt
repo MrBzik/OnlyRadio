@@ -6,6 +6,9 @@ import android.os.ResultReceiver
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import com.example.radioplayer.exoPlayer.RadioSource
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 
@@ -35,24 +38,27 @@ class RadioPlaybackPreparer (
 
     override fun onPrepareFromMediaId(mediaId: String, playWhenReady: Boolean, extras: Bundle?) {
 
-        var isApiFavPl = 0
+        var flag = 666
+
+        extras?.let {
+            flag = it.getInt("SEARCH_FLAG", 0)
+        }
 
         radioSource.whenReady {
-            val itemToPlay = radioSource.stations.find {
-                it.description.mediaId == mediaId
-            } ?: run {
-                isApiFavPl = 1
-                radioSource.stationsFavoured.find{
-                    it.description.mediaId == mediaId
-                }
-            } ?: run {
-                 isApiFavPl = 2
-                radioSource.stationsFromPlaylist.find {
-                    it.description.mediaId == mediaId
-                }
-            }
+            val itemToPlay =
+                    when(flag){
+                        SEARCH_FROM_API -> radioSource.stations.find {
+                            it.description.mediaId == mediaId
+                        }
+                         SEARCH_FROM_FAVOURITES -> radioSource.stationsFavoured.find{
+                             it.description.mediaId == mediaId
+                         }
+                         else -> radioSource.stationsFromPlaylist.find {
+                             it.description.mediaId == mediaId
+                         }
+                    }
 
-            playerPrepared(itemToPlay, isApiFavPl)
+            playerPrepared(itemToPlay, flag)
         }
 
     }

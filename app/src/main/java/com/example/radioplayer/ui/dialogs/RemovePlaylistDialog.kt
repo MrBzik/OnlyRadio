@@ -13,17 +13,15 @@ import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 
 class RemovePlaylistDialog(
     private val requireContext : Context,
-     var listOfPlaylists : List<Playlist>,
-    private val deletePlaylist : (String) -> Unit
+    private val currentPlaylist : String,
+    private val deletePlaylist : () -> Unit
 
 
     ) : AppCompatDialog(requireContext) {
 
     private lateinit var bind : DialogDeletePlaylistBinding
 
-    private lateinit var listOfNamesOfPlaylists : List<String>
 
-    private lateinit var  arrayAdapter : ArrayAdapter<String>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,27 +31,19 @@ class RemovePlaylistDialog(
         super.onCreate(savedInstanceState)
         setContentView(bind.root)
 
-            listOfNamesOfPlaylists = listOfPlaylists.map {
-                it.playlistName
-            }
-
-            arrayAdapter = ArrayAdapter(requireContext, R.layout.simple_list_item_1, listOfNamesOfPlaylists)
-
-            bind.listView.adapter = arrayAdapter
-
-            bind.listView.setOnItemClickListener { parent, view, position, id ->
-
-                val playlist = parent.getItemAtPosition(position) as String
-
-                deletePlaylist(playlist)
-
-                dismiss()
-            }
-
+        bind.tvTitle.text = "Delete playlist $currentPlaylist and its content?"
 
 
         bind.tvBack.setOnClickListener {
             dismiss()
+        }
+
+        bind.tvDeletePlaylist.setOnClickListener {
+
+            deletePlaylist()
+
+            dismiss()
+
         }
 
     }

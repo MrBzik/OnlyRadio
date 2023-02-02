@@ -1,8 +1,10 @@
 package com.example.radioplayer.repositories
 
 import com.example.radioplayer.data.local.RadioDAO
+import com.example.radioplayer.data.local.entities.Date
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
+import com.example.radioplayer.data.local.relations.StationDateCrossRef
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import javax.inject.Inject
 
@@ -57,7 +59,21 @@ class DatabaseRepository @Inject constructor(
             = radioDAO.deleteAllCrossRefOfPlaylist(playlistName)
 
 
-    suspend fun testGetAllOneTimePlaylistStations()
-            = radioDAO.testGetAllOneTimePlaylistStations()
+
+
+    // Date
+
+    suspend fun checkLastDateRecordInDB(currentDate : String)
+        = radioDAO.checkLastDateRecordInDB(currentDate)
+
+    suspend fun insertNewDate(date : Date) = radioDAO.insertNewDate(date)
+
+    suspend fun insertStationDateCrossRef(stationDateCrossRef: StationDateCrossRef)
+        = radioDAO.insertStationDateCrossRef(stationDateCrossRef)
+
+    // For recyclerView
+
+    suspend fun getStationsInDate(limit : Int, offset : Int)
+         = radioDAO.getStationsInDate(limit, offset)
 
 }

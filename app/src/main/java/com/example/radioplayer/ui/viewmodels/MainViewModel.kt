@@ -160,7 +160,7 @@ class MainViewModel @Inject constructor(
 
 
 
-        fun playOrToggleStation(station : RadioStation, toggle : Boolean = false) {
+        fun playOrToggleStation(station : RadioStation, searchFlag : Int = 0) {
 
             val isPrepared = playbackState.value?.isPrepared ?: false
 
@@ -168,13 +168,14 @@ class MainViewModel @Inject constructor(
                     == currentRadioStation.value?.getString(METADATA_KEY_MEDIA_ID)){
                 playbackState.value?.let { playbackState ->
                     when {
-                        playbackState.isPlaying -> if(toggle) radioServiceConnection.transportControls.pause()
+                        playbackState.isPlaying -> radioServiceConnection.transportControls.pause()
                         playbackState.isPlayEnabled -> radioServiceConnection.transportControls.play()
 
                     }
                 }
             } else{
-                radioServiceConnection.transportControls.playFromMediaId(station.stationuuid, null)
+                radioServiceConnection.transportControls
+                    .playFromMediaId(station.stationuuid, bundleOf(Pair("SEARCH_FLAG", searchFlag)))
             }
         }
 

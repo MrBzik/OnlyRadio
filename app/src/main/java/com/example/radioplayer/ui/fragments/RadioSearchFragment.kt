@@ -15,6 +15,7 @@ import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.dialogs.NameDialog
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.listOfTags
 import com.hbb20.countrypicker.models.CPCountry
 import com.hbb20.countrypicker.view.CPViewHelper
@@ -94,9 +95,10 @@ class RadioSearchFragment : Fragment() {
 
         pagingRadioAdapter.setOnClickListener {
 
-            mainViewModel.playOrToggleStation(it, true)
+            mainViewModel.playOrToggleStation(it, SEARCH_FROM_API)
             mainViewModel.newRadioStation.postValue(it)
             databaseViewModel.ifStationAlreadyInDatabase(it.stationuuid)
+            databaseViewModel.checkDateAndUpdateHistory(it.stationuuid)
 
         }
 

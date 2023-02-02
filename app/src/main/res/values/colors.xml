@@ -8,7 +8,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="ChosenGreen">#004D40</color>
-    <color name="EXPANDtext">#F57F17</color>
+    <color name="EXPANDtext">#FD7F20</color>
     <color name="grayColor">#877E7E</color>
     <color name="background">#121111</color>
+    <color name="textNonInteractive">#FDB750</color>
+    <color name="textChangeColor">#FC2E20</color>
 </resources>

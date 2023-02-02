@@ -4,7 +4,6 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -17,12 +16,10 @@ import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
-import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
-import com.example.radioplayer.utils.Constants.MAIN_PLAY_LIST
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -245,7 +242,7 @@ class MainActivity : AppCompatActivity() {
 
             currentStation?.let {
 
-                mainViewModel.playOrToggleStation(it, true)
+                mainViewModel.playOrToggleStation(it)
             }
         }
     }

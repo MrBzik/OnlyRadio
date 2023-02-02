@@ -5,10 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import androidx.paging.*
 import com.example.radioplayer.adapters.datasources.ImagesPageLoader
 import com.example.radioplayer.adapters.datasources.PixabayDataSource
 import com.example.radioplayer.data.remote.pixabay.Hit
@@ -19,6 +16,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -27,6 +25,9 @@ import javax.inject.Inject
 class PixabayViewModel @Inject constructor(
     private val repository: PixabayRepository
 ) : ViewModel() {
+
+
+    val togglePlaylistsVisibility : MutableLiveData<Boolean> = MutableLiveData(false)
 
 
 

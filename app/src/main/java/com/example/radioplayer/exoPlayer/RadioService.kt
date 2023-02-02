@@ -21,6 +21,8 @@ import com.example.radioplayer.utils.Constants.COMMAND_LOAD_FROM_PLAYLIST
 import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Constants.NETWORK_ERROR
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -106,17 +108,17 @@ class RadioService : MediaBrowserServiceCompat() {
             // song duration
         }
 
-        val radioPlaybackPreparer = RadioPlaybackPreparer(radioSource, { itemToPlay, isApiFavPl ->
+        val radioPlaybackPreparer = RadioPlaybackPreparer(radioSource, { itemToPlay, flag ->
 
             currentStation = itemToPlay
 
-            if(isApiFavPl == 1){
+            if(flag == SEARCH_FROM_FAVOURITES){
                 preparePlayer(
                     radioSource.stationsFavoured,
                     itemToPlay,
                     true
                 )
-            } else if(isApiFavPl == 0) {
+            } else if(flag == SEARCH_FROM_API) {
                 preparePlayer(
                     radioSource.stations,
                     itemToPlay,

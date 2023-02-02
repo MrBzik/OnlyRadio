@@ -7,9 +7,12 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import com.example.radioplayer.data.local.entities.Date
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
+import com.example.radioplayer.data.local.relations.DateWithStations
 import com.example.radioplayer.data.local.relations.PlaylistWithStations
+import com.example.radioplayer.data.local.relations.StationDateCrossRef
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 
 @Dao
@@ -17,9 +20,6 @@ interface  RadioDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRadioStation(station : RadioStation)
-
-    @Delete
-    suspend fun deleteRadioStation(station : RadioStation)
 
     @Query("SELECT EXISTS(SELECT * FROM RadioStation WHERE stationuuid =:id) ")
     suspend fun checkIfRadioStationInDB (id : String) : Boolean
@@ -69,11 +69,46 @@ interface  RadioDAO {
     @Query("SELECT * FROM RadioStation WHERE isFavoured = 1")
     fun getAllFavouredStations() : LiveData<List<RadioStation>>
 
-
     @Query("DELETE FROM StationPlaylistCrossRef WHERE playlistName =:playlistName")
     suspend fun deleteAllCrossRefOfPlaylist(playlistName: String)
 
 
-    @Query("SELECT * FROM RadioStation WHERE inPlaylists = 1")
-    suspend fun testGetAllOneTimePlaylistStations() : List<RadioStation>
+
+
+    // Date
+
+    @Query("SELECT EXISTS(SELECT * FROM Date WHERE date = :currentDate)")
+    suspend fun checkLastDateRecordInDB(currentDate : String) : Boolean
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertNewDate(date : Date)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertStationDateCrossRef(stationDateCrossRef: StationDateCrossRef)
+
+    // For recyclerView
+
+    @Transaction
+    @Query("SELECT * FROM Date ORDER BY dateInMills DESC LIMIT :limit OFFSET :offset")
+    suspend fun getStationsInDate(limit: Int, offset : Int) : DateWithStations
+
+
+
+    // For database cleaning
+
+    @Query("DELETE FROM StationDateCrossRef WHERE date =:date")
+    suspend fun deleteAllCrossRefWithDate(date : String)
+
+    @Delete
+    suspend fun deleteDate(date : Date)
+
+    @Query("SELECT * FROM RadioStation WHERE isFavoured = 0 AND inPlaylists = 0")
+    suspend fun gatherStationsForCleaning() : List<RadioStation>
+
+    @Query("SELECT EXISTS(SELECT * FROM StationDateCrossRef WHERE date =:date AND stationuuid =:stationID)")
+    suspend fun checkIfRadioStationInHistory(date : String, stationID : String) : Boolean
+
+    @Delete
+    suspend fun deleteRadioStation(station : RadioStation)
+
 }
