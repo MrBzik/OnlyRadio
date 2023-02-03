@@ -3,6 +3,7 @@ package com.example.radioplayer.ui.viewmodels
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.lifecycle.*
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -39,8 +40,7 @@ import javax.inject.Inject
 class DatabaseViewModel @Inject constructor(
         app : Application,
         private val repository: DatabaseRepository,
-        private val radioSource: RadioSource,
-        private val radioServiceConnection: RadioServiceConnection
+        private val radioSource: RadioSource
 ) : AndroidViewModel(app) {
 
 
@@ -66,9 +66,6 @@ class DatabaseViewModel @Inject constructor(
     }
 
 
-    fun deleteStation(station: RadioStation) = viewModelScope.launch {
-        repository.deleteRadioStation(station)
-    }
 
     fun insertRadioStation(station: RadioStation) = viewModelScope.launch {
         repository.insertRadioStation(station)
@@ -103,9 +100,6 @@ class DatabaseViewModel @Inject constructor(
     fun decrementRadioStationPlaylist(stationID: String) = viewModelScope.launch {
         repository.decrementRadioStationPlaylist(stationID)
     }
-
-    suspend fun checkIfPlaylistExists(playlistName: String) =
-        repository.checkIfPlaylistExists(playlistName)
 
     val listOfAllPlaylists = repository.getAllPlaylists()
 
@@ -151,7 +145,6 @@ class DatabaseViewModel @Inject constructor(
 
             stationsInPlaylist.postValue(playlist)
 
-            sendServiceCommandToUpdatePlaylist()
 
         }
 
@@ -178,11 +171,6 @@ class DatabaseViewModel @Inject constructor(
         }
 
 
-    private fun sendServiceCommandToUpdatePlaylist() {
-
-        radioServiceConnection.sendCommand(COMMAND_LOAD_FROM_PLAYLIST, Bundle())
-
-    }
 
     // date
 
@@ -205,12 +193,12 @@ class DatabaseViewModel @Inject constructor(
             if (!check) {
                 repository.insertNewDate(HistoryDate(update, newTime))
                 initialDate = update
-                compareDatesWithPrefAndCLeanIfNeeded(false)
+                compareDatesWithPrefAndCLeanIfNeeded()
             }
         }
 
         repository.insertStationDateCrossRef(StationDateCrossRef(stationID, update))
-
+        updateHistory.postValue(true)
     }
 
 
@@ -219,7 +207,7 @@ class DatabaseViewModel @Inject constructor(
 
     private suspend fun getStationsInDate(limit: Int, offset: Int): List<StationWithDateModel> {
 
-        val response = repository.getStationsInDate(limit, offset)
+        val response = radioSource.getStationsInDate(limit, offset, initialDate)
 
         val date = response.date.date
 
@@ -236,7 +224,7 @@ class DatabaseViewModel @Inject constructor(
         return stationsWithDate
     }
 
-    val updateHistory : MutableLiveData<Boolean> = MutableLiveData()
+    private val updateHistory : MutableLiveData<Boolean> = MutableLiveData(true)
 
     val historyFlow = updateHistory.asFlow()
         .flatMapLatest {
@@ -281,7 +269,6 @@ class DatabaseViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             removeUnusedStationsOnStart()
-
         }
     }
 
@@ -304,7 +291,7 @@ class DatabaseViewModel @Inject constructor(
     }
 
 
-    fun compareDatesWithPrefAndCLeanIfNeeded(isRefreshNeed : Boolean)
+    fun compareDatesWithPrefAndCLeanIfNeeded()
             = viewModelScope.launch {
 
         val pref = getHistoryOptionsPref()
@@ -326,10 +313,8 @@ class DatabaseViewModel @Inject constructor(
                 repository.deleteDate(it)
             }
         }
-
-        if(isRefreshNeed){
             updateHistory.postValue(true)
-        }
+
     }
 
 

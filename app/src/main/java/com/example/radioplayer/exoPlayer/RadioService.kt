@@ -23,6 +23,7 @@ import com.example.radioplayer.utils.Constants.NETWORK_ERROR
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -112,27 +113,37 @@ class RadioService : MediaBrowserServiceCompat() {
 
             currentStation = itemToPlay
 
-            if(flag == SEARCH_FROM_FAVOURITES){
-                preparePlayer(
-                    radioSource.stationsFavoured,
-                    itemToPlay,
-                    true
-                )
-            } else if(flag == SEARCH_FROM_API) {
-                preparePlayer(
-                    radioSource.stations,
-                    itemToPlay,
-                    true
-                )
-            } else {
-                preparePlayer(
-                    radioSource.stationsFromPlaylist,
-                    itemToPlay,
-                    true
-                )
+            when (flag) {
+                SEARCH_FROM_FAVOURITES -> {
+                    preparePlayer(
+                        radioSource.stationsFavoured,
+                        itemToPlay,
+                        true
+                    )
+                }
+                SEARCH_FROM_API -> {
+                    preparePlayer(
+                        radioSource.stations,
+                        itemToPlay,
+                        true
+                    )
+                }
+                SEARCH_FROM_HISTORY -> {
+                    preparePlayer(
+                        radioSource.stationsFromHistory,
+                        itemToPlay,
+                        true
+                    )
+                }
+                else -> {
+                    preparePlayer(
+                        radioSource.stationsFromPlaylist,
+                        itemToPlay,
+                        true
+                    )
 
+                }
             }
-
 
 
         }, {
@@ -145,12 +156,6 @@ class RadioService : MediaBrowserServiceCompat() {
                    val isNewSearch = extras?.getBoolean("IS_NEW_SEARCH") ?: false
 
                     searchRadioStations(isNewSearch)
-
-                }
-
-                COMMAND_LOAD_FROM_PLAYLIST -> {
-
-                    radioSource.createMediaItemsFromPlaylist()
 
                 }
             }

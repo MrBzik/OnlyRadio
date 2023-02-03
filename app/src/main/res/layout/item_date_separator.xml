@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.cardview.widget.CardView
-        android:layout_width="100dp"
+        android:layout_width="wrap_content"
         android:layout_height="40dp"
         app:cardCornerRadius="8dp"
         android:layout_gravity="center_vertical"
@@ -17,7 +17,8 @@
             android:id="@+id/tvDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="31.01.2022"
+            android:text="2 of October, 2022"
+            android:layout_marginHorizontal="10dp"
             android:textSize="14sp"
             android:textStyle="bold|italic"
             android:layout_gravity="center"

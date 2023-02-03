@@ -27,7 +27,7 @@ object Constants {
     const val SEARCH_FROM_API = 0
     const val SEARCH_FROM_FAVOURITES = 1
     const val SEARCH_FROM_PLAYLIST = 2
-
+    const val SEARCH_FROM_HISTORY = 3
 
 
     const val DATE_FORMAT = "dd.MM.yyyy"

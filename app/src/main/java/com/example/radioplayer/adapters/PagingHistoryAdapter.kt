@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.adapters.models.StationWithDateModel
+import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.ItemDateSeparatorBinding
 import com.example.radioplayer.databinding.ItemDateSeparatorEnclosingBinding
 import com.example.radioplayer.databinding.RadioItemBinding
@@ -86,8 +87,22 @@ class PagingHistoryAdapter @Inject constructor(
                 tvPrimary.text = item.radioStation.name
                 tvSecondary.text = item.radioStation.country
                 glide.load(item.radioStation.favicon).into(ivItemImage)
+
+                ivItemImage.setOnClickListener {
+
+                    onItemClickListener?.let { click ->
+                        click(item.radioStation)
+                    }
+                }
             }
         }
+    }
+
+
+    private var onItemClickListener : ((RadioStation) -> Unit)? = null
+
+    fun setOnClickListener(listener : (RadioStation) -> Unit){
+        onItemClickListener = listener
     }
 
 

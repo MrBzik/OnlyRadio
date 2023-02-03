@@ -5,6 +5,7 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.entities.RadioStation
+import com.example.radioplayer.data.local.relations.DateWithStations
 import com.example.radioplayer.data.remote.RadioApi
 import com.example.radioplayer.data.remote.entities.*
 import com.example.radioplayer.exoPlayer.State.*
@@ -16,7 +17,6 @@ class RadioSource @Inject constructor(
     private val radioDAO: RadioDAO
 
 ) {
-
     var stations = mutableListOf<MediaMetadataCompat>()
     private var _stations : RadioStations? = RadioStations()
 
@@ -24,18 +24,35 @@ class RadioSource @Inject constructor(
     var stationsFavoured = mutableListOf<MediaMetadataCompat>()
 
     var stationsFromPlaylist = mutableListOf<MediaMetadataCompat>()
-    private var _stationsFromPlaylist : List<RadioStation> = emptyList()
 
     var stationsFromHistory = mutableListOf<MediaMetadataCompat>()
-    private var _stationsFromHistory : MutableList<RadioStation> = mutableListOf()
 
+
+    suspend fun getStationsInDate(limit: Int, offset: Int, initialDate : String) : DateWithStations{
+        val response = radioDAO.getStationsInDate(limit, offset)
+        val date = response.date.date
+        if(date == initialDate){
+            stationsFromHistory = response.radioStations.map { station ->
+                stationToMediaMetadataCompat(station)
+            }.toMutableList()
+        } else {
+            response.radioStations.map { station ->
+                stationsFromHistory.add(
+                    stationToMediaMetadataCompat(station)
+                )
+            }
+        }
+        return response
+    }
 
 
     suspend fun getStationsInPlaylist(playlistName : String) : List<RadioStation> {
 
         val response = radioDAO.getStationsInPlaylist(playlistName).first().radioStations
 
-        _stationsFromPlaylist = response
+        stationsFromPlaylist = response.map { station ->
+            stationToMediaMetadataCompat(station)
+        }.toMutableList()
 
         return response
     }
@@ -60,13 +77,6 @@ class RadioSource @Inject constructor(
         return response.body()
     }
 
-
-    fun createMediaItemsFromPlaylist(){
-
-        stationsFromPlaylist = _stationsFromPlaylist.map{ station ->
-            stationToMediaMetadataCompat(station)
-        }.toMutableList()
-    }
 
 
     fun createMediaItemsFromDB(listOfStations : List<RadioStation>){

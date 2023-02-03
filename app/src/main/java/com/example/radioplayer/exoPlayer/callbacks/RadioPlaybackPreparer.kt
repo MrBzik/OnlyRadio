@@ -8,6 +8,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
@@ -50,9 +51,12 @@ class RadioPlaybackPreparer (
                         SEARCH_FROM_API -> radioSource.stations.find {
                             it.description.mediaId == mediaId
                         }
-                         SEARCH_FROM_FAVOURITES -> radioSource.stationsFavoured.find{
+                         SEARCH_FROM_FAVOURITES -> radioSource.stationsFavoured.find {
                              it.description.mediaId == mediaId
                          }
+                          SEARCH_FROM_HISTORY -> radioSource.stationsFromHistory.find{
+                              it.description.mediaId == mediaId
+                          }
                          else -> radioSource.stationsFromPlaylist.find {
                              it.description.mediaId == mediaId
                          }

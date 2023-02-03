@@ -228,7 +228,7 @@ class FavStationsFragment : Fragment() {
             mainViewModel.playOrToggleStation(it, searchFlag)
             mainViewModel.newRadioStation.postValue(it)
             databaseViewModel.isStationInDB.postValue(true)
-
+            databaseViewModel.checkDateAndUpdateHistory(it.stationuuid)
         }
     }
 

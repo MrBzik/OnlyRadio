@@ -16,6 +16,8 @@ import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.dialogs.HistorySettingsDialog
 import com.example.radioplayer.ui.dialogs.HistoryWarningDialog
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
+import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Utils.fromDateToString
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,6 +33,8 @@ class HistoryFragment : Fragment() {
     lateinit var bind : FragmentHistoryBinding
 
     lateinit var databaseViewModel: DatabaseViewModel
+
+    lateinit var mainViewModel : MainViewModel
 
     @Inject
     lateinit var historyAdapter : PagingHistoryAdapter
@@ -52,10 +56,13 @@ class HistoryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         databaseViewModel = (activity as MainActivity).databaseViewModel
+        mainViewModel = (activity as MainActivity).mainViewModel
 
         updateCurrentDate()
 
         setupRecyclerView()
+
+        setupAdapterClickListener()
 
         showSelectedHistoryOption()
 
@@ -64,8 +71,6 @@ class HistoryFragment : Fragment() {
         historySettingsClickListener()
 
         setOnSaveOptionsClickListener()
-
-        databaseViewModel.updateHistory.postValue(true)
 
     }
 
@@ -93,7 +98,7 @@ class HistoryFragment : Fragment() {
              } else {
                 HistoryWarningDialog(requireContext()){
                     saveNewOption(newOption)
-                        databaseViewModel.compareDatesWithPrefAndCLeanIfNeeded(true)
+                        databaseViewModel.compareDatesWithPrefAndCLeanIfNeeded()
 
                 }.show()
              }
@@ -159,6 +164,17 @@ class HistoryFragment : Fragment() {
         }
 
         setAdapterLoadStateListener()
+    }
+
+    private fun setupAdapterClickListener(){
+
+        historyAdapter.setOnClickListener {
+
+            mainViewModel.playOrToggleStation(it, SEARCH_FROM_HISTORY)
+            mainViewModel.newRadioStation.postValue(it)
+            databaseViewModel.isStationInDB.postValue(true)
+
+        }
     }
 
 
