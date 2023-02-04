@@ -1,8 +1,14 @@
 package com.example.radioplayer.adapters
 
+import android.content.ClipData
+import android.content.ClipDescription
+import android.content.Context
+import android.graphics.Point
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -13,19 +19,18 @@ import com.example.radioplayer.databinding.RadioItemBinding
 import javax.inject.Inject
 
 class RadioDatabaseAdapter @Inject constructor(
-    private val glide : RequestManager
+    private val glide : RequestManager,
 ) : RecyclerView.Adapter<RadioDatabaseAdapter.RadioItemHolder>() {
 
-    class RadioItemHolder (itemView : View) : RecyclerView.ViewHolder(itemView)  {
-        var bind : RadioItemBinding
-        init {
-            bind = RadioItemBinding.bind(itemView)
-        }
-    }
+
+
+    class RadioItemHolder (val bind : RadioItemBinding) : RecyclerView.ViewHolder(bind.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RadioItemHolder {
        return RadioItemHolder(
-           LayoutInflater.from(parent.context).inflate(R.layout.radio_item, parent, false)
+            RadioItemBinding.inflate(
+                LayoutInflater.from(parent.context), parent, false
+            )
        )
     }
 
@@ -47,6 +52,22 @@ class RadioDatabaseAdapter @Inject constructor(
 
             }
         }
+
+        holder.itemView.setOnLongClickListener{
+
+                val clipText = station.stationuuid
+                val item = ClipData.Item(clipText)
+                val mimeTypes = arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN)
+                val data = ClipData("STATION_ID", mimeTypes, item)
+
+            val dragShadowBuilder = View.DragShadowBuilder(it)
+
+                it.startDragAndDrop(data, dragShadowBuilder, it, 0)
+
+            true
+
+        }
+
     }
 
     private var onItemClickListener : ((RadioStation) -> Unit)? = null
@@ -82,3 +103,4 @@ class RadioDatabaseAdapter @Inject constructor(
 
 
 }
+

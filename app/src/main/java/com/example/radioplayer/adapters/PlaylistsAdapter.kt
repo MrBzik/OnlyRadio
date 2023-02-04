@@ -1,8 +1,13 @@
 package com.example.radioplayer.adapters
 
+import android.content.ClipDescription
+import android.util.Log
+import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
@@ -19,7 +24,7 @@ private const val FOOTER_ADD_PLAYLIST = 1
 
 
 class PlaylistsAdapter @Inject constructor(
-    private val glide : RequestManager
+    private val glide : RequestManager,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
@@ -56,7 +61,7 @@ class PlaylistsAdapter @Inject constructor(
             val playlist = PlaylistHolder(view)
             playlist.itemView.setOnClickListener {
                 playlistClickListener?.let { click ->
-                    click(differ.currentList[playlist.absoluteAdapterPosition])
+                    click(differ.currentList[playlist.absoluteAdapterPosition], playlist.bind.ivPlaylistCover)
                 }
             }
             return playlist
@@ -68,6 +73,44 @@ class PlaylistsAdapter @Inject constructor(
             val playlist = differ.currentList[position]
             holder.bind.tvPlaylistName.text = playlist.playlistName
             glide.load(playlist.coverURI).into(holder.bind.ivPlaylistCover)
+
+            holder.itemView.setOnDragListener { view, event ->
+
+                when(event.action){
+
+                    DragEvent.ACTION_DRAG_STARTED ->{
+                        event.clipDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)
+                    }
+                    DragEvent.ACTION_DRAG_ENTERED ->{
+                        view.invalidate()
+                        true
+                    }
+                    DragEvent.ACTION_DRAG_LOCATION -> true
+                    DragEvent.ACTION_DRAG_EXITED -> {
+                        view.invalidate()
+                        true
+                    }
+                    DragEvent.ACTION_DROP ->{
+
+                        val item = event.clipData.getItemAt(0)
+                        val data = item.text
+
+                        handleDragAndDrop?.let {
+                            it(data.toString(), holder.bind.tvPlaylistName.text.toString())
+                        }
+
+                        view.invalidate()
+                        true
+                    } DragEvent.ACTION_DRAG_ENDED -> {
+                        view.invalidate()
+                        true
+                    }
+                    else -> false
+
+                }
+
+            }
+
         }
     }
 
@@ -111,13 +154,17 @@ class PlaylistsAdapter @Inject constructor(
 
 
 
-    private var playlistClickListener : ((Playlist) -> Unit)? = null
+    private var playlistClickListener : ((Playlist, cover : ImageView) -> Unit)? = null
 
-    fun setPlaylistClickListener (listener : (Playlist) -> Unit){
+    fun setPlaylistClickListener (listener : (Playlist, cover : ImageView) -> Unit){
 
         playlistClickListener = listener
 
     }
+
+    var handleDragAndDrop : ((stationID: String, playlistName : String) -> Unit)? = null
+
+
 
 
 }

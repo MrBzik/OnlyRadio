@@ -1,11 +1,10 @@
 package com.example.radioplayer.ui.fragments
 
+
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,9 +18,9 @@ import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.databinding.FragmentFavStationsBinding
 import com.example.radioplayer.ui.dialogs.CreatePlaylistDialog
 import com.example.radioplayer.ui.MainActivity
+import com.example.radioplayer.ui.animations.slideAnim
+import com.example.radioplayer.ui.dialogs.EditPlaylistDialog
 import com.example.radioplayer.ui.dialogs.RemovePlaylistDialog
-import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
-import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
@@ -30,11 +29,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class FavStationsFragment : Fragment() {
+class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
+    FragmentFavStationsBinding::inflate
+) {
 
-    lateinit var bind : FragmentFavStationsBinding
-    lateinit var databaseViewModel : DatabaseViewModel
-    lateinit var mainViewModel: MainViewModel
+
     private var currentPlaylistName : String = ""
     private lateinit var listOfPlaylists : List<Playlist>
     lateinit var pixabayViewModel: PixabayViewModel
@@ -54,23 +53,12 @@ class FavStationsFragment : Fragment() {
     @Inject
     lateinit var glide : RequestManager
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-
-        bind = FragmentFavStationsBinding.inflate(inflater, container, false)
-
-        return bind.root
-    }
+    lateinit var currentPlaylistCover : ImageView
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        databaseViewModel = (activity as MainActivity).databaseViewModel
-        mainViewModel = (activity as MainActivity).mainViewModel
         pixabayViewModel = ViewModelProvider(requireActivity())[PixabayViewModel::class.java]
 
 
@@ -91,22 +79,27 @@ class FavStationsFragment : Fragment() {
 
         observePlaylistsVisibilityState()
 
-        deletePlaylistClickListener()
+        editPlaylistClickListener()
 
     }
 
-    private fun deletePlaylistClickListener(){
 
-        bind.tvPlaylistDelete.setOnClickListener {
 
-            RemovePlaylistDialog(requireContext(), currentPlaylistName){
+    private fun editPlaylistClickListener(){
+
+        bind.tvPlaylistEdit.setOnClickListener {
+
+            EditPlaylistDialog (
+                requireContext(), listOfPlaylists,
+                currentPlaylistName, currentPlaylistCover,
+                databaseViewModel, pixabayViewModel, glide
+            ){
 
                val stations = mainAdapter.listOfStations
 
                 databaseViewModel.deletePlaylistAndContent(currentPlaylistName, stations)
 
                 databaseViewModel.getAllFavouredStations()
-
 
             }.show()
 
@@ -117,13 +110,19 @@ class FavStationsFragment : Fragment() {
     private fun observePlaylistsVisibilityState(){
 
         pixabayViewModel.togglePlaylistsVisibility.observe(viewLifecycleOwner){
-            bind.rvPlaylists.isVisible = it
+
             isPlaylistsVisible = it
+
+            bind.rvPlaylists.isVisible = it
+
             bind.ivArrowPlaylistsShrink.isVisible = it
             bind.ivArrowPlaylistsExpand.isVisible = !it
             bind.ivArrowBackToFav.isVisible = it && !isInFavouriteTab
+
         }
     }
+
+
 
 
     private fun setOnPlaylistsExpandClickListener(){
@@ -132,7 +131,14 @@ class FavStationsFragment : Fragment() {
                !isPlaylistsVisible
            )
 
+            if(!isPlaylistsVisible) {
+                bind.rvPlaylists.slideAnim(800, 100, R.anim.slide_from_above_anim)
+
+            } else {
+                bind.rvPlaylists.slideAnim(500, 0, R.anim.slide_up_away_anim)
+            }
         }
+
     }
 
 
@@ -147,16 +153,37 @@ class FavStationsFragment : Fragment() {
 
     private fun setPlaylistAdapterClickListeners(){
 
-        playlistAdapter.setAddPlaylistClickListener {
-           CreatePlaylistDialog(
-                requireContext(), listOfPlaylists, databaseViewModel, pixabayViewModel, glide).show()
+        playlistAdapter.apply {
 
-        }
+            setAddPlaylistClickListener {
+                CreatePlaylistDialog(
+                    requireContext(), listOfPlaylists, databaseViewModel, pixabayViewModel, glide
+                ).show()
+            }
 
-        playlistAdapter.setPlaylistClickListener {
+            setPlaylistClickListener { playlist, cover ->
+                databaseViewModel.getStationsInPlaylist(playlist.playlistName)
+                currentPlaylistCover = cover
 
-            databaseViewModel.getStationsInPlaylist(it.playlistName)
+            }
 
+            handleDragAndDrop = { stationID, playlistName ->
+
+                if(isInFavouriteTab){
+
+                    databaseViewModel.updateIsFavouredState(0, stationID)
+
+                }
+                    else {
+                    databaseViewModel.deleteStationPlaylistCrossRef(StationPlaylistCrossRef(
+                        stationID, currentPlaylistName
+                    ))
+
+                    }
+
+                insertStationInPlaylist(stationID, playlistName)
+
+            }
         }
 
 
@@ -189,8 +216,8 @@ class FavStationsFragment : Fragment() {
 
             bind.ivArrowBackToFav.isVisible = !it && isPlaylistsVisible
 
-            bind.tvPlaylistDelete.isVisible = !it
-            bind.tvPlaylistDelete.text = "Delete : $currentPlaylistName"
+            bind.tvPlaylistEdit.isVisible = !it
+
 
             isInFavouriteTab = it
 
@@ -240,7 +267,6 @@ class FavStationsFragment : Fragment() {
             adapter = mainAdapter
 
             ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this)
-
         }
     }
 
@@ -315,6 +341,25 @@ class FavStationsFragment : Fragment() {
                 databaseViewModel.getStationsInPlaylist(currentPlaylistName, true)
             }
         }.show()
+    }
+
+
+    private fun insertStationInPlaylist(stationID: String, playlistName : String){
+
+            databaseViewModel.checkIfInPlaylistOrIncrement(playlistName, stationID)
+
+            databaseViewModel.insertStationPlaylistCrossRef(
+                StationPlaylistCrossRef(
+                    stationID, playlistName
+                )
+            )
+
+            databaseViewModel.getStationsInPlaylist(currentPlaylistName, true)
+
+            Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
+                "Station was moved to $playlistName",
+                Snackbar.LENGTH_SHORT).show()
+
     }
 
 }

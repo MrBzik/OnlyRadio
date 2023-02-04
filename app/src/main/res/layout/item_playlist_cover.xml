@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:scaleType="centerCrop"
+        android:padding="5dp"
         android:src="@drawable/ic_radio_default"/>
     <TextView
         android:id="@+id/tvPlaylistName"

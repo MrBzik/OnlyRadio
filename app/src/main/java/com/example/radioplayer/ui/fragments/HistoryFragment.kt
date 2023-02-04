@@ -28,35 +28,19 @@ import java.util.Calendar
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class HistoryFragment : Fragment() {
+class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
+    FragmentHistoryBinding::inflate
+) {
 
-    lateinit var bind : FragmentHistoryBinding
-
-    lateinit var databaseViewModel: DatabaseViewModel
-
-    lateinit var mainViewModel : MainViewModel
 
     @Inject
     lateinit var historyAdapter : PagingHistoryAdapter
 
     lateinit var currentDate : String
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-
-        bind = FragmentHistoryBinding.inflate(inflater, container, false)
-
-        return bind.root
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        databaseViewModel = (activity as MainActivity).databaseViewModel
-        mainViewModel = (activity as MainActivity).mainViewModel
 
         updateCurrentDate()
 

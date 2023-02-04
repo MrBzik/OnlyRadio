@@ -1,6 +1,7 @@
 package com.example.radioplayer.repositories
 
 
+import androidx.room.Query
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.entities.HistoryDate
 import com.example.radioplayer.data.local.entities.Playlist
@@ -58,6 +59,20 @@ class DatabaseRepository @Inject constructor(
     suspend fun deleteAllCrossRefOfPlaylist(playlistName: String)
             = radioDAO.deleteAllCrossRefOfPlaylist(playlistName)
 
+
+    // For editing playlist
+
+
+    suspend fun editPlaylistCover(playlistName : String, newCover : String)
+        = radioDAO.editPlaylistCover(playlistName, newCover)
+
+
+    suspend fun editPlaylistName(oldName : String, newName : String)
+        = radioDAO.editPlaylistName(oldName, newName)
+
+
+    suspend fun editOldCrossRefWithPlaylist(oldName : String, newName : String)
+        = radioDAO.editOldCrossRefWithPlaylist(oldName, newName)
 
 
 

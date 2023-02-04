@@ -30,12 +30,9 @@ import javax.inject.Inject
 @FlowPreview
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class RadioSearchFragment : Fragment() {
-
-    lateinit var bind : FragmentRadioSearchBinding
-
-    lateinit var mainViewModel : MainViewModel
-    lateinit var databaseViewModel : DatabaseViewModel
+class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
+    FragmentRadioSearchBinding::inflate
+) {
 
     private var selectedCountry = ""
 
@@ -68,9 +65,6 @@ class RadioSearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        mainViewModel = (activity as MainActivity).mainViewModel
-        databaseViewModel = (activity as MainActivity).databaseViewModel
 
         setSearchParamsObservers()
 

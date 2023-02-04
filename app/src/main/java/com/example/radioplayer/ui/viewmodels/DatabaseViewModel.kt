@@ -172,6 +172,27 @@ class DatabaseViewModel @Inject constructor(
 
 
 
+    // For editing playlist
+
+     fun editPlaylistCover(playlistName : String, newCover : String) = viewModelScope.launch {
+
+         repository.editPlaylistCover(playlistName, newCover)
+     }
+
+     fun editPlaylistName(oldName : String, newName : String) = viewModelScope.launch {
+
+         repository.editPlaylistName(oldName, newName)
+     }
+
+     fun editOldCrossRefWithPlaylist(oldName : String, newName : String) = viewModelScope.launch {
+
+         repository.editOldCrossRefWithPlaylist(oldName, newName)
+     }
+
+
+
+
+
     // date
 
 

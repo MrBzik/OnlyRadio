@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="100dp"
-    android:layout_height="120dp"
-    android:orientation="vertical"
+    android:layout_height="100dp"
     >
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:src="@drawable/ic_add_new_playlist"
-        />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:textColor="@color/EXPANDtext"
-        android:text="NEW ALBUM"
-        android:textAlignment="center"
-        />
+    <FrameLayout
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_gravity="center"
+        android:background="@drawable/footer_add_playlist_background">
+
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/interactive_text_color"
+            android:textSize="18sp"
+            android:text="Create new playlist"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            />
+
+    </FrameLayout>
 
 
-</LinearLayout>
+
+
+</FrameLayout>

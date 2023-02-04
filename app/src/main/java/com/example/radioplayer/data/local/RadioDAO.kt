@@ -74,6 +74,16 @@ interface  RadioDAO {
     suspend fun deleteAllCrossRefOfPlaylist(playlistName: String)
 
 
+    // For editing playlist
+
+    @Query("UPDATE Playlist SET coverURI =:newCover WHERE playlistName =:playlistName")
+    suspend fun editPlaylistCover(playlistName : String, newCover : String)
+
+    @Query("UPDATE Playlist SET playlistName =:newName WHERE playlistName =:oldName")
+    suspend fun editPlaylistName(oldName : String, newName : String)
+
+    @Query("UPDATE StationPlaylistCrossRef SET playlistName =:newName WHERE playlistName =:oldName")
+    suspend fun editOldCrossRefWithPlaylist(oldName : String, newName : String)
 
 
     // Date

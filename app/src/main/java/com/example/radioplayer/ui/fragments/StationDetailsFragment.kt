@@ -27,12 +27,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class StationDetailsFragment : Fragment()
+class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
+    FragmentStationDetailsBinding::inflate
+)
 {
-    lateinit var bind : FragmentStationDetailsBinding
 
-    lateinit var mainViewModel: MainViewModel
-    lateinit var databaseViewModel: DatabaseViewModel
     lateinit var pixabayViewModel: PixabayViewModel
 
     private var homepageUrl : String? = null
@@ -59,23 +58,10 @@ class StationDetailsFragment : Fragment()
     }
 
 
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-
-        bind = FragmentStationDetailsBinding.inflate(inflater, container, false)
-        return bind.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
 
-        mainViewModel = (activity as MainActivity).mainViewModel
-        databaseViewModel = (activity as MainActivity).databaseViewModel
         pixabayViewModel = ViewModelProvider(requireActivity())[PixabayViewModel::class.java]
 
         subscribeToObservers()
@@ -83,7 +69,6 @@ class StationDetailsFragment : Fragment()
         setAddToPlaylistClickListener()
 
         setFabStationHomePageClickListener()
-
 
     }
 
