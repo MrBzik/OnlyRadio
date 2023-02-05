@@ -12,7 +12,7 @@
       android:id="@+id/flFragment"
       android:layout_width="match_parent"
       android:layout_height="0dp"
-      app:layout_constraintBottom_toTopOf="@id/ivCurrentSongImage"
+      app:layout_constraintBottom_toTopOf="@id/ivCurrentStationImage"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintHorizontal_bias="0.5"
       app:layout_constraintStart_toStartOf="parent"
@@ -30,7 +30,7 @@
   </FrameLayout>
 
   <ImageView
-      android:id="@+id/ivCurrentSongImage"
+      android:id="@+id/ivCurrentStationImage"
       android:layout_width="60dp"
       android:layout_height="60dp"
       android:src="@drawable/ic_radio_default"
@@ -46,8 +46,8 @@
       android:paddingHorizontal="8dp"
       android:paddingTop = "8dp"
       app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
-      app:layout_constraintStart_toEndOf="@+id/ivCurrentSongImage"
-      app:layout_constraintEnd_toStartOf="@+id/ivTogglePlayCurrentSong"/>
+      app:layout_constraintStart_toEndOf="@+id/ivCurrentStationImage"
+      app:layout_constraintEnd_toStartOf="@+id/ivTogglePlayCurrentStation"/>
 
   <TextView
       android:id="@+id/tvExpandHideText"
@@ -62,7 +62,7 @@
       app:layout_constraintEnd_toEndOf="@+id/tvStationTitle" />
 
   <ImageView
-     android:id="@+id/ivTogglePlayCurrentSong"
+     android:id="@+id/ivTogglePlayCurrentStation"
      android:layout_width="60dp"
      android:layout_height="60dp"
      android:src="@drawable/ic_play_pause"

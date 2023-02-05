@@ -15,27 +15,27 @@
     <fragment
         android:id="@+id/stationDetailsFragment"
         android:name="com.example.radioplayer.ui.fragments.StationDetailsFragment"
-        android:label="StationDetailsFragment" >
-
-        <action
-            android:id="@+id/action_stationDetailsFragment_to_radioSearchFragment2"
-            app:destination="@id/radioSearchFragment" />
-    </fragment>
-
-    <action
-        android:id="@+id/expandToStationDetails"
-        app:destination="@+id/stationDetailsFragment"
-        app:popUpTo="@+id/nav_graph"
-        app:popUpToInclusive="true"
-        />
-
-    <action
-        android:id="@+id/action_DetailsFrag_to_Fav_frag"
-        app:destination="@+id/favStationsFragment"/>
+        android:label="StationDetailsFragment" />
     <fragment
         android:id="@+id/historyFragment"
         android:name="com.example.radioplayer.ui.fragments.HistoryFragment"
         android:label="HistoryFragment" />
+
+    <action
+        android:id="@+id/expandToStationDetails"
+        app:destination="@+id/stationDetailsFragment"
+        />
+
+
+    <action
+        android:id="@+id/action_navigate_to_search_frag"
+        app:destination="@+id/radioSearchFragment"/>
+    <action
+        android:id="@+id/action_navigate_to_fav_frag"
+        app:destination="@+id/favStationsFragment"/>
+    <action
+        android:id="@+id/action_navigate_to_history_frag"
+        app:destination="@+id/historyFragment"/>
 
 
 </navigation>

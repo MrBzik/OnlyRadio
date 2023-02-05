@@ -44,20 +44,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     private var currentRadioStation : RadioStation? = null
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        activity?.onBackPressedDispatcher?.addCallback(
-            this, object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    findNavController().navigate(R.id.action_stationDetailsFragment_to_radioSearchFragment2)
-                    (activity as MainActivity).fabAddToFav.visibility = View.GONE
-                    (activity as MainActivity).tvExpandHide.setText(R.string.Expand)
-                }
-            })
-    }
-
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
