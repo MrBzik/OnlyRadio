@@ -51,17 +51,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         isOnCreateCalled = true
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-
-
-        bind = FragmentRadioSearchBinding.inflate(inflater, container, false)
-
-        return bind.root
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

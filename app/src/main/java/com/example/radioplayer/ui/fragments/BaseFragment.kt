@@ -1,6 +1,7 @@
 package com.example.radioplayer.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +16,10 @@ abstract class BaseFragment<VB: ViewBinding>(
 )
     : Fragment() {
 
-    lateinit var bind : VB
+     private var _bind : VB? = null
+
+     val bind : VB
+     get() = _bind as VB
 
     lateinit var databaseViewModel : DatabaseViewModel
     lateinit var mainViewModel: MainViewModel
@@ -26,7 +30,7 @@ abstract class BaseFragment<VB: ViewBinding>(
         savedInstanceState: Bundle?
     ): View? {
 
-        bind = bindingInflater(inflater)
+        _bind = bindingInflater(inflater)
         return bind.root
     }
 
@@ -35,6 +39,11 @@ abstract class BaseFragment<VB: ViewBinding>(
 
         databaseViewModel = (activity as MainActivity).databaseViewModel
         mainViewModel = (activity as MainActivity).mainViewModel
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _bind = null
     }
 
 }

@@ -13,6 +13,7 @@ import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
@@ -73,7 +74,10 @@ class CreatePlaylistDialog (
         setAdapterItemClickListener()
 
         bind.tvBack.setOnClickListener {
+       
             dismiss()
+
+
         }
     }
 

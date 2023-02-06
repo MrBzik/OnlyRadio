@@ -2,6 +2,7 @@ package com.example.radioplayer.ui.dialogs
 
 import android.content.Context
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialog
 import com.example.radioplayer.databinding.DialogHistoryWarningBinding
 
@@ -15,6 +16,8 @@ class HistoryWarningDialog (
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, 300)
 
         bind = DialogHistoryWarningBinding.inflate(layoutInflater)
 

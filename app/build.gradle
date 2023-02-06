@@ -98,4 +98,7 @@ dependencies {
 
     // Card view
     implementation("androidx.cardview:cardview:1.0.0")
+
+    // Memory leaks
+//    debugImplementation "com.squareup.leakcanary:leakcanary-android:2.10"
 }

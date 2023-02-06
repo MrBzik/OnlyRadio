@@ -2,6 +2,7 @@ package com.example.radioplayer.ui.dialogs
 
 import android.content.Context
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDialog
 import com.example.radioplayer.databinding.DialogPickNameBinding
@@ -17,6 +18,8 @@ class NameDialog (
     lateinit var bind : DialogPickNameBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, 300)
 
         bind = DialogPickNameBinding.inflate(layoutInflater)
 

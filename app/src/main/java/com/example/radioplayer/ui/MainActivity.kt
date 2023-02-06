@@ -86,6 +86,8 @@ class MainActivity : AppCompatActivity() {
 
         setOnBottomNavClickListener()
 
+        setOnBottomNavItemReselect()
+
     }
 
 
@@ -107,9 +109,15 @@ class MainActivity : AppCompatActivity() {
                 }
                 else -> false
             }
-
         }
+    }
 
+    private fun setOnBottomNavItemReselect(){
+        bind.bottomNavigationView.setOnItemReselectedListener {
+            if(bind.tvExpandHideText.text == "HIDE"){
+                handleNavigationToFragments()
+            }
+        }
     }
 
     private fun observeIfNewStationExistsInDB(){

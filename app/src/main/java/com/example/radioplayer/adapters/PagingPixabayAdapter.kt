@@ -6,7 +6,9 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.request.RequestOptions
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.remote.pixabay.Hit
@@ -37,7 +39,9 @@ class PagingPixabayAdapter @Inject constructor(
 
         val currentImage = getItem(position)!!
 
-        glide.load(currentImage.previewURL).into(holder.bind.ivPixabayImage)
+        glide.load(currentImage.previewURL)
+            .apply(object : RequestOptions(){}.override(100, 100))
+            .into(holder.bind.ivPixabayImage)
 
         holder.itemView.setOnClickListener {
 
@@ -69,6 +73,11 @@ class PagingPixabayAdapter @Inject constructor(
         }
     }
 
-
+    override fun onViewRecycled(holder: ImageHolder) {
+        holder.bind.ivPixabayImage.apply {
+            glide.clear(this)
+        }
+        super.onViewRecycled(holder)
+    }
 
 }
