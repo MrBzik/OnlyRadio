@@ -33,24 +33,17 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 ) {
 
 
-    @Inject
-    lateinit var historyAdapter : PagingHistoryAdapter
-
     lateinit var currentDate : String
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        updateCurrentDate()
-
         setupRecyclerView()
 
         setupAdapterClickListener()
 
         showSelectedHistoryOption()
-
-        subscribeToHistory()
 
         historySettingsClickListener()
 
@@ -115,35 +108,13 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         }
     }
 
-    private fun subscribeToHistory(){
 
-        viewLifecycleOwner.lifecycleScope.launch{
-
-                databaseViewModel.historyFlow.collectLatest {
-
-                    historyAdapter.currentDate = currentDate
-                    historyAdapter.submitData(it)
-
-                }
-            }
-
-    }
-
-    private fun updateCurrentDate(){
-
-       val time = System.currentTimeMillis()
-       val calendar = Calendar.getInstance()
-       calendar.time = Date(time)
-        val parsedDate = fromDateToString(calendar)
-       currentDate =  parsedDate
-
-    }
 
     private fun setupRecyclerView (){
 
         bind.rvHistory.apply {
 
-            adapter = historyAdapter
+            adapter = databaseViewModel.historyAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
 
@@ -152,7 +123,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private fun setupAdapterClickListener(){
 
-        historyAdapter.setOnClickListener {
+        databaseViewModel.historyAdapter.setOnClickListener {
 
             mainViewModel.playOrToggleStation(it, SEARCH_FROM_HISTORY)
             mainViewModel.newRadioStation.postValue(it)
@@ -164,7 +135,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private fun setAdapterLoadStateListener(){
 
-        historyAdapter.addLoadStateListener {
+        databaseViewModel.historyAdapter.addLoadStateListener {
 
             if (it.refresh is LoadState.Loading ||
                 it.append is LoadState.Loading)
@@ -177,5 +148,10 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         }
     }
 
+
+    override fun onDestroyView() {
+        bind.rvHistory.adapter = null
+        super.onDestroyView()
+    }
 
 }

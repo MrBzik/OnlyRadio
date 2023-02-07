@@ -4,12 +4,14 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.bumptech.glide.RequestManager
@@ -18,6 +20,10 @@ import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.ActivityMainBinding
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
+import com.example.radioplayer.ui.fragments.FavStationsFragment
+import com.example.radioplayer.ui.fragments.HistoryFragment
+import com.example.radioplayer.ui.fragments.RadioSearchFragment
+import com.example.radioplayer.ui.fragments.StationDetailsFragment
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -37,20 +43,23 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var glide : RequestManager
 
-    lateinit var navController: NavController
 
     private val colorGray = Color.DKGRAY
     private val colorRed = Color.RED
     private var currentStation : RadioStation? = null
     private var isFavoured = false
 
+    private lateinit var radioSearchFragment : RadioSearchFragment
+    private lateinit var favStationsFragment : FavStationsFragment
+    private lateinit var historyFragment : HistoryFragment
+    private lateinit var stationDetailsFragment : StationDetailsFragment
 
     override fun onBackPressed() {
 
         if(bind.tvExpandHideText.text == "EXPAND") {
             this.moveTaskToBack(true)
         } else {
-            handleNavigationToFragments()
+            handleNavigationToFragments(null)
         }
     }
 
@@ -62,15 +71,10 @@ class MainActivity : AppCompatActivity() {
 
         window.navigationBarColor = colorGray
 
-        val navHostFragment = supportFragmentManager
-                .findFragmentById(R.id.navHostFragment) as NavHostFragment
-         navController = navHostFragment.navController
 
-
+        setupInitialNavigation()
 
         clickListenerToHandleNavigationWithDetailsFragment()
-
-        destinationListenerToHandleDetailsUI()
 
         observeNewStation()
 
@@ -88,34 +92,39 @@ class MainActivity : AppCompatActivity() {
 
         setOnBottomNavItemReselect()
 
+
+
+    }
+
+    private fun setupInitialNavigation(){
+
+        radioSearchFragment = RadioSearchFragment()
+        favStationsFragment = FavStationsFragment()
+        historyFragment = HistoryFragment()
+        stationDetailsFragment = StationDetailsFragment()
+
+
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.flFragment, radioSearchFragment)
+            addToBackStack(null)
+            commit()
+        }
+
     }
 
 
     private fun setOnBottomNavClickListener(){
 
         bind.bottomNavigationView.setOnItemSelectedListener {
-            when(it.itemId) {
-                R.id.mi_radioSearchFragment -> {
-                    navController.navigate(R.id.action_navigate_to_search_frag)
-                    true
-                }
-                R.id.mi_favStationsFragment -> {
-                    navController.navigate(R.id.action_navigate_to_fav_frag)
-                    true
-                }
-                R.id.mi_historyFragment -> {
-                    navController.navigate(R.id.action_navigate_to_history_frag)
-                    true
-                }
-                else -> false
-            }
+           handleNavigationToFragments(it)
+
         }
     }
 
     private fun setOnBottomNavItemReselect(){
         bind.bottomNavigationView.setOnItemReselectedListener {
             if(bind.tvExpandHideText.text == "HIDE"){
-                handleNavigationToFragments()
+                handleNavigationToFragments(it)
             }
         }
     }
@@ -166,51 +175,89 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun destinationListenerToHandleDetailsUI(){
-        navController.addOnDestinationChangedListener{ _, destination, _ ->
-
-            if(bind.tvExpandHideText.text == "HIDE") {
-                bind.tvExpandHideText.setText(R.string.Expand)
-
-            }
-
-            bind.fabAddToFav.visibility = View.GONE
-
-        }
-    }
 
     private fun clickListenerToHandleNavigationWithDetailsFragment(){
 
         bind.tvStationTitle.setOnClickListener{
 
             if(bind.tvExpandHideText.text == "EXPAND") {
-                navController.navigate(R.id.expandToStationDetails)
+
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.flFragment, stationDetailsFragment)
+                    addToBackStack(null)
+                    commit()
+                }
+
+
                 bind.tvExpandHideText.setText(R.string.Hide)
                 bind.fabAddToFav.isVisible = true
 
             }
 
             else {
-                handleNavigationToFragments()
+                handleNavigationToFragments(null)
             }
         }
 
     }
 
-    private fun handleNavigationToFragments(){
-        val item = bind.bottomNavigationView.selectedItemId
+    private fun handleNavigationToFragments(item : MenuItem?) : Boolean {
 
-        if(item == R.id.mi_radioSearchFragment) {
-            navController.navigate(R.id.action_navigate_to_search_frag)
-        }
-        else if (item == R.id.mi_favStationsFragment) {
-            navController.navigate(R.id.action_navigate_to_fav_frag)
-        } else {
-            navController.navigate(R.id.action_navigate_to_history_frag)
-        }
+        val menuItem = bind.bottomNavigationView.selectedItemId
 
         bind.tvExpandHideText.setText(R.string.Expand)
         bind.fabAddToFav.visibility = View.GONE
+
+        when(item?.itemId ?: menuItem) {
+            R.id.mi_radioSearchFragment -> {
+
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.flFragment, radioSearchFragment)
+                    addToBackStack(null)
+                    commit()
+                    if(bind.tvExpandHideText.text == "HIDE") {
+                        bind.tvExpandHideText.setText(R.string.Expand)
+
+                    }
+
+                    bind.fabAddToFav.visibility = View.GONE
+
+                }
+
+                return true
+            }
+            R.id.mi_favStationsFragment -> {
+
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.flFragment, favStationsFragment)
+                    addToBackStack(null)
+                    commit()
+                    if(bind.tvExpandHideText.text == "HIDE") {
+                        bind.tvExpandHideText.setText(R.string.Expand)
+
+                    }
+
+                    bind.fabAddToFav.visibility = View.GONE
+                }
+
+                return true
+            }
+            R.id.mi_historyFragment -> {
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.flFragment, historyFragment)
+                    addToBackStack(null)
+                    commit()
+                    if(bind.tvExpandHideText.text == "HIDE") {
+                        bind.tvExpandHideText.setText(R.string.Expand)
+
+                    }
+
+                    bind.fabAddToFav.visibility = View.GONE
+                }
+                return true
+            }
+            else -> return false
+        }
     }
 
     private fun addToFavClickListener(){

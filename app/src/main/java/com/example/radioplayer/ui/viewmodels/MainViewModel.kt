@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
+import com.example.radioplayer.adapters.PagingRadioAdapter
 import com.example.radioplayer.adapters.datasources.RadioStationsDataSource
 import com.example.radioplayer.adapters.datasources.StationsPageLoader
 import com.example.radioplayer.data.local.entities.RadioStation
@@ -20,6 +21,7 @@ import com.hbb20.countrypicker.view.prepareCustomCountryPickerView
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
 import javax.inject.Inject
 
@@ -29,6 +31,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
        private val radioServiceConnection: RadioServiceConnection,
        private val radioSource: RadioSource,
+       val pagingRadioAdapter : PagingRadioAdapter
 ) : ViewModel() {
 
        val isConnected = radioServiceConnection.isConnected
@@ -134,7 +137,6 @@ class MainViewModel @Inject constructor(
 
 
 
-
     private val searchBy = MutableLiveData(bundleOf(Pair("SEARCH_TOP", true)))
 
     val stationsFlow = searchBy.asFlow()
@@ -142,6 +144,23 @@ class MainViewModel @Inject constructor(
             searchStationsPaging(it)
         }
         .cachedIn(viewModelScope)
+
+    init {
+
+        viewModelScope.launch {
+
+            stationsFlow.collectLatest {
+
+                pagingRadioAdapter.submitData(it)
+
+            }
+
+        }
+    }
+
+
+
+
 
     fun setSearchBy(value : Bundle){
 

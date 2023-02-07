@@ -9,6 +9,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.example.radioplayer.adapters.PagingHistoryAdapter
 import com.example.radioplayer.adapters.datasources.HistoryDataSource
 import com.example.radioplayer.adapters.datasources.HistoryDateLoader
 import com.example.radioplayer.adapters.models.StationWithDateModel
@@ -30,6 +31,7 @@ import com.example.radioplayer.utils.Constants.HISTORY_OPTIONS
 import com.example.radioplayer.utils.Utils.fromDateToString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import java.sql.Date
@@ -40,7 +42,8 @@ import javax.inject.Inject
 class DatabaseViewModel @Inject constructor(
         app : Application,
         private val repository: DatabaseRepository,
-        private val radioSource: RadioSource
+        private val radioSource: RadioSource,
+        val historyAdapter: PagingHistoryAdapter
 ) : AndroidViewModel(app) {
 
 
@@ -198,7 +201,7 @@ class DatabaseViewModel @Inject constructor(
 
 
 
-    private var initialDate: String = ""
+     var initialDate: String = ""
     private val calendar = Calendar.getInstance()
 
 
@@ -251,6 +254,19 @@ class DatabaseViewModel @Inject constructor(
         .flatMapLatest {
             stationsHistoryFlow()
         }.cachedIn(viewModelScope)
+
+    init {
+
+        viewModelScope.launch {
+
+            historyFlow.collectLatest {
+                historyAdapter.currentDate = initialDate
+                historyAdapter.submitData(it)
+            }
+        }
+
+    }
+
 
 
 

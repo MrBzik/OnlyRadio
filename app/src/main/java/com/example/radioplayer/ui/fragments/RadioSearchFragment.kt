@@ -7,6 +7,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.adapters.PagingRadioAdapter
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
@@ -40,8 +41,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     lateinit var  cpViewHelper : CPViewHelper
 
-    @Inject
-    lateinit var pagingRadioAdapter : PagingRadioAdapter
 
     private var isOnCreateCalled = false
 
@@ -65,8 +64,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         setAdapterOnClickListener()
 
-        observeStationsForAdapter()
-
         setOnRefreshSearch()
 
         listenSearchButton()
@@ -76,7 +73,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private fun setAdapterOnClickListener(){
 
-        pagingRadioAdapter.setOnClickListener {
+        mainViewModel.pagingRadioAdapter.setOnClickListener {
 
             mainViewModel.playOrToggleStation(it, SEARCH_FROM_API)
             mainViewModel.newRadioStation.postValue(it)
@@ -92,7 +89,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         bind.rvSearchStations.apply {
 
-            adapter = pagingRadioAdapter
+            adapter = mainViewModel.pagingRadioAdapter
             layoutManager = LinearLayoutManager(requireContext())
 
         }
@@ -100,7 +97,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private fun setAdapterLoadStateListener(){
 
-        pagingRadioAdapter.addLoadStateListener {
+        mainViewModel.pagingRadioAdapter.addLoadStateListener {
 
             if (it.refresh is LoadState.Loading ||
                 it.append is LoadState.Loading)
@@ -116,13 +113,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     }
 
 
-    private fun observeStationsForAdapter(){
-        viewLifecycleOwner.lifecycleScope.launch{
-            mainViewModel.stationsFlow.collectLatest {
-                pagingRadioAdapter.submitData(it)
-            }
-        }
-    }
 
 
     private fun setupCountryPicker() {
@@ -246,9 +236,10 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         }
     }
 
-
-
-
+    override fun onDestroyView() {
+        bind.rvSearchStations.adapter = null
+        super.onDestroyView()
+    }
 
 }
 
