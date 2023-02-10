@@ -13,6 +13,7 @@ import com.example.radioplayer.adapters.datasources.StationsPageLoader
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.remote.entities.RadioTagsItem
 import com.example.radioplayer.exoPlayer.*
+import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
 import com.hbb20.countrypicker.models.CPCountry
@@ -29,9 +30,9 @@ import javax.inject.Inject
 @FlowPreview
 @HiltViewModel
 class MainViewModel @Inject constructor(
-       private val radioServiceConnection: RadioServiceConnection,
-       private val radioSource: RadioSource,
-       val pagingRadioAdapter : PagingRadioAdapter
+    private val radioServiceConnection: RadioServiceConnection,
+    private val radioSource: RadioSource,
+    private val repository: DatabaseRepository
 ) : ViewModel() {
 
        val isConnected = radioServiceConnection.isConnected
@@ -47,7 +48,21 @@ class MainViewModel @Inject constructor(
        val searchParamName : MutableLiveData<String> = MutableLiveData()
        val searchParamCountry : MutableLiveData<String> = MutableLiveData()
 
+        init {
 
+            currentRadioStation.value?.let {
+
+                viewModelScope.launch {
+                  val currentStation = repository.getCurrentRadioStation(
+                      it.getString(METADATA_KEY_MEDIA_ID)
+                  )
+                    newRadioStation.postValue(currentStation)
+
+                }
+
+            }
+
+        }
 
        private suspend fun searchWithNewParams(
             limit : Int, offset : Int, bundle: Bundle
@@ -145,18 +160,6 @@ class MainViewModel @Inject constructor(
         }
         .cachedIn(viewModelScope)
 
-    init {
-
-        viewModelScope.launch {
-
-            stationsFlow.collectLatest {
-
-                pagingRadioAdapter.submitData(it)
-
-            }
-
-        }
-    }
 
 
 

@@ -21,8 +21,7 @@ import com.google.android.exoplayer2.ui.PlayerNotificationManager.NotificationLi
 class RadioNotificationManager (
     private val context : Context,
    sessionToken : MediaSessionCompat.Token,
-   notificationListener: NotificationListener,
-    private val newStationCallback : () -> Unit
+   notificationListener: NotificationListener
     ) {
 
         private val notificationManager : PlayerNotificationManager
@@ -49,6 +48,10 @@ class RadioNotificationManager (
     fun showNotification(player : Player){
 
         notificationManager.setPlayer(player)
+    }
+
+    fun removeNotification () {
+        notificationManager.setPlayer(null)
     }
 
 

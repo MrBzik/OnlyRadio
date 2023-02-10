@@ -74,7 +74,8 @@ class CreatePlaylistDialog (
         setAdapterItemClickListener()
 
         bind.tvBack.setOnClickListener {
-       
+
+            bind.rvImages.adapter = null
             dismiss()
 
 
@@ -152,6 +153,7 @@ class CreatePlaylistDialog (
 
                 databaseViewModel.insertNewPlayList(Playlist(nameField, imageSelected))
             bind.etPlaylistName.text?.clear()
+            bind.rvImages.adapter = null
             dismiss()
         }
 

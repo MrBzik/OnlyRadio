@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingHistoryAdapter
 import com.example.radioplayer.databinding.FragmentHistoryBinding
@@ -33,21 +34,30 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 ) {
 
 
-    lateinit var currentDate : String
+    private var currentDate = ""
 
+    @Inject
+    lateinit var glide : RequestManager
+
+    var historyAdapter: PagingHistoryAdapter? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        updateCurrentDate()
+
         setupRecyclerView()
 
         setupAdapterClickListener()
+
+        subscribeToHistory()
 
         showSelectedHistoryOption()
 
         historySettingsClickListener()
 
         setOnSaveOptionsClickListener()
+
 
     }
 
@@ -75,7 +85,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
              } else {
                 HistoryWarningDialog(requireContext()){
                     saveNewOption(newOption)
-                        databaseViewModel.compareDatesWithPrefAndCLeanIfNeeded()
+                        databaseViewModel.compareDatesWithPrefAndCLeanIfNeeded(null)
 
                 }.show()
              }
@@ -112,18 +122,34 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private fun setupRecyclerView (){
 
+        historyAdapter = PagingHistoryAdapter(glide)
+
         bind.rvHistory.apply {
 
-            adapter = databaseViewModel.historyAdapter
+            adapter = historyAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
 
         setAdapterLoadStateListener()
     }
 
+    private fun subscribeToHistory(){
+
+        viewLifecycleOwner.lifecycleScope.launch{
+
+            databaseViewModel.historyFlow.collectLatest {
+
+                historyAdapter?.currentDate = currentDate
+                historyAdapter?.submitData(it)
+
+            }
+        }
+
+    }
+
     private fun setupAdapterClickListener(){
 
-        databaseViewModel.historyAdapter.setOnClickListener {
+        historyAdapter?.setOnClickListener {
 
             mainViewModel.playOrToggleStation(it, SEARCH_FROM_HISTORY)
             mainViewModel.newRadioStation.postValue(it)
@@ -133,9 +159,10 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     }
 
 
+
     private fun setAdapterLoadStateListener(){
 
-        databaseViewModel.historyAdapter.addLoadStateListener {
+        historyAdapter?.addLoadStateListener {
 
             if (it.refresh is LoadState.Loading ||
                 it.append is LoadState.Loading)
@@ -149,8 +176,19 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     }
 
 
+    private fun updateCurrentDate(){
+
+        val time = System.currentTimeMillis()
+        val calendar = Calendar.getInstance()
+        calendar.time = Date(time)
+        val parsedDate = fromDateToString(calendar)
+        currentDate =  parsedDate
+
+    }
+
     override fun onDestroyView() {
         bind.rvHistory.adapter = null
+        historyAdapter = null
         super.onDestroyView()
     }
 

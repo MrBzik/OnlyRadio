@@ -82,6 +82,7 @@ class EditPlaylistDialog (
         setOnDeleteClickListener()
 
         bind.tvBack.setOnClickListener {
+            bind.rvImages.adapter = null
             dismiss()
         }
     }
@@ -92,6 +93,7 @@ class EditPlaylistDialog (
             RemovePlaylistDialog(requireContext, currentPlaylistName){
                 deletePlaylist()
             }.show()
+            bind.rvImages.adapter = null
             dismiss()
         }
     }
@@ -179,7 +181,7 @@ class EditPlaylistDialog (
                     databaseViewModel.editPlaylistName(currentPlaylistName, nameField)
                     databaseViewModel.currentPlaylistName.postValue(nameField)
                 }
-
+                bind.rvImages.adapter = null
                 dismiss()
 
             }

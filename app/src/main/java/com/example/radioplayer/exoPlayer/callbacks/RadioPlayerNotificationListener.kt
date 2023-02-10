@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.Service.STOP_FOREGROUND_REMOVE
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.utils.Constants.NOTIFICATION_ID
@@ -18,11 +19,9 @@ class RadioPlayerNotificationListener (
 
         radioService.apply {
 
-            if(Build.VERSION.SDK_INT>=24) {
-                stopForeground(STOP_FOREGROUND_REMOVE)
-            } else {
-                stopForeground(true)
-            }
+
+            stopForeground(STOP_FOREGROUND_REMOVE)
+
             isForegroundService = false
             stopSelf()
         }
@@ -36,6 +35,7 @@ class RadioPlayerNotificationListener (
     ) {
         super.onNotificationPosted(notificationId, notification, ongoing)
 
+
         radioService.apply {
 
             if(ongoing && !isForegroundService){
@@ -46,6 +46,7 @@ class RadioPlayerNotificationListener (
 
                 startForeground(NOTIFICATION_ID, notification)
                 isForegroundService = true
+
             }
         }
     }

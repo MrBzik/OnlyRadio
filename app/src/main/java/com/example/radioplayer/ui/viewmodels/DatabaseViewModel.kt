@@ -3,6 +3,7 @@ package com.example.radioplayer.ui.viewmodels
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
+import android.provider.MediaStore.Audio.Radio
 import android.util.Log
 import androidx.lifecycle.*
 import androidx.paging.Pager
@@ -42,8 +43,7 @@ import javax.inject.Inject
 class DatabaseViewModel @Inject constructor(
         app : Application,
         private val repository: DatabaseRepository,
-        private val radioSource: RadioSource,
-        val historyAdapter: PagingHistoryAdapter
+        private val radioSource: RadioSource
 ) : AndroidViewModel(app) {
 
 
@@ -52,6 +52,8 @@ class DatabaseViewModel @Inject constructor(
     val isStationFavoured: MutableLiveData<Boolean> = MutableLiveData()
 
     var currentPlaylistName: MutableLiveData<String> = MutableLiveData()
+
+    var isCleanUpNeeded = false
 
 
     fun ifStationAlreadyInDatabase(stationID: String) = viewModelScope.launch {
@@ -194,10 +196,7 @@ class DatabaseViewModel @Inject constructor(
 
 
 
-
-
     // date
-
 
 
 
@@ -215,9 +214,8 @@ class DatabaseViewModel @Inject constructor(
         } else {
             val check = repository.checkLastDateRecordInDB(update)
             if (!check) {
-                repository.insertNewDate(HistoryDate(update, newTime))
                 initialDate = update
-                compareDatesWithPrefAndCLeanIfNeeded()
+                compareDatesWithPrefAndCLeanIfNeeded(HistoryDate(update, newTime))
             }
         }
 
@@ -255,17 +253,6 @@ class DatabaseViewModel @Inject constructor(
             stationsHistoryFlow()
         }.cachedIn(viewModelScope)
 
-    init {
-
-        viewModelScope.launch {
-
-            historyFlow.collectLatest {
-                historyAdapter.currentDate = initialDate
-                historyAdapter.submitData(it)
-            }
-        }
-
-    }
 
 
 
@@ -286,28 +273,8 @@ class DatabaseViewModel @Inject constructor(
         ).flow
     }
 
-        // Cleaning up database
 
-    private suspend fun removeUnusedStationsOnStart(){
 
-        val stations = repository.gatherStationsForCleaning()
-
-        stations.forEach {
-
-          val check = repository.checkIfRadioStationInHistory(it.stationuuid)
-
-            if(!check){
-
-                repository.deleteRadioStation(it)
-            }
-        }
-    }
-
-    init {
-        viewModelScope.launch {
-            removeUnusedStationsOnStart()
-        }
-    }
 
 
     // Handle history options and cleaning history
@@ -328,8 +295,12 @@ class DatabaseViewModel @Inject constructor(
     }
 
 
-    fun compareDatesWithPrefAndCLeanIfNeeded()
+    fun compareDatesWithPrefAndCLeanIfNeeded(newDate: HistoryDate?)
             = viewModelScope.launch {
+
+        newDate?.let {
+            repository.insertNewDate(newDate)
+        }
 
         val pref = getHistoryOptionsPref()
 
@@ -341,7 +312,7 @@ class DatabaseViewModel @Inject constructor(
 
         if(prefValue >= numberOfDatesInDB) return@launch
         else {
-
+            isCleanUpNeeded = true
             val numberOfDatesToDelete = numberOfDatesInDB - prefValue
             val deleteList = repository.getDatesToDelete(numberOfDatesToDelete)
 
@@ -367,4 +338,26 @@ class DatabaseViewModel @Inject constructor(
 
     }
 
+
+    // Cleaning up database
+
+    fun removeUnusedStations() = viewModelScope.launch {
+
+        if(isCleanUpNeeded){
+
+            val stations = repository.gatherStationsForCleaning()
+
+            stations.forEach {
+
+                    val check = repository.checkIfRadioStationInHistory(it.stationuuid)
+
+                    if(!check){
+
+                        repository.deleteRadioStation(it)
+                    }
+                }
+
+            isCleanUpNeeded = false
+        }
+    }
 }

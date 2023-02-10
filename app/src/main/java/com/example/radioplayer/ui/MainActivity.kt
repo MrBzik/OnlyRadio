@@ -4,6 +4,8 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Debug
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
@@ -63,11 +65,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+
+
+        setTheme(R.style.Theme_RadioPlayer)
+
         bind = ActivityMainBinding.inflate(layoutInflater)
         setContentView(bind.root)
 
+        Debug.stopMethodTracing()
 
         window.navigationBarColor = colorGray
 
@@ -91,7 +102,6 @@ class MainActivity : AppCompatActivity() {
         setOnBottomNavClickListener()
 
         setOnBottomNavItemReselect()
-
 
 
     }
@@ -341,6 +351,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    override fun onPause() {
+        this.cacheDir.deleteRecursively()
+        databaseViewModel.removeUnusedStations()
+        super.onPause()
     }
 
 }

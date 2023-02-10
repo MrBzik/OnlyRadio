@@ -19,7 +19,7 @@ abstract class BaseFragment<VB: ViewBinding>(
      private var _bind : VB? = null
 
      val bind : VB
-     get() = _bind as VB
+     get() = _bind!!
 
     lateinit var databaseViewModel : DatabaseViewModel
     lateinit var mainViewModel: MainViewModel
@@ -31,6 +31,7 @@ abstract class BaseFragment<VB: ViewBinding>(
     ): View? {
 
         _bind = bindingInflater(inflater)
+
         return bind.root
     }
 
@@ -41,9 +42,6 @@ abstract class BaseFragment<VB: ViewBinding>(
         mainViewModel = (activity as MainActivity).mainViewModel
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _bind = null
-    }
+
 
 }

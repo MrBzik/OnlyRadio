@@ -1,7 +1,9 @@
 package com.example.radioplayer.exoPlayer
 
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
@@ -9,6 +11,7 @@ import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_URI
 import android.support.v4.media.session.MediaSessionCompat
+import android.util.Log
 import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import androidx.media.MediaBrowserServiceCompat
@@ -105,9 +108,7 @@ class RadioService : MediaBrowserServiceCompat() {
             this,
             mediaSession.sessionToken,
             RadioPlayerNotificationListener(this)
-            ) {
-            // song duration
-        }
+            )
 
         val radioPlaybackPreparer = RadioPlaybackPreparer(radioSource, { itemToPlay, flag ->
 
@@ -171,6 +172,7 @@ class RadioService : MediaBrowserServiceCompat() {
         radioPlayerEventListener = RadioPlayerEventListener(this)
 
         exoPlayer.addListener(radioPlayerEventListener)
+
         radioNotificationManager.showNotification(exoPlayer)
 
 
@@ -228,7 +230,14 @@ class RadioService : MediaBrowserServiceCompat() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
 
-        exoPlayer.stop()
+        if(!exoPlayer.isPlaying){
+            stopForeground(STOP_FOREGROUND_REMOVE)
+
+            isForegroundService = false
+            stopSelf()
+
+            radioNotificationManager.removeNotification()
+        }
     }
 
 
@@ -239,6 +248,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
         exoPlayer.removeListener(radioPlayerEventListener)
         exoPlayer.release()
+
     }
 
 

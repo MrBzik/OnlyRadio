@@ -31,7 +31,8 @@ interface  RadioDAO {
     @Query("UPDATE RadioStation SET isFavoured =:value WHERE stationuuid =:stationID")
     suspend fun updateIsFavouredState(value : Int, stationID: String)
 
-
+    @Query("SELECT * FROM RadioStation WHERE stationuuid =:stationID LIMIT 1")
+    suspend fun getCurrentRadioStation(stationID: String) : RadioStation
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
