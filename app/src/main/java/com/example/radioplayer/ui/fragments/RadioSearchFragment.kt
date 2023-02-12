@@ -1,28 +1,24 @@
 package com.example.radioplayer.ui.fragments
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.*
 import android.widget.TextView
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import androidx.paging.LoadState
-import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.RequestManager
+import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
-import com.example.radioplayer.ui.dialogs.DialogPicker
-import com.example.radioplayer.ui.MainActivity
+import com.example.radioplayer.ui.animations.slideAnim
+import com.example.radioplayer.ui.dialogs.TagPickerDialog
+import com.example.radioplayer.ui.dialogs.CountryPickerDialog
 import com.example.radioplayer.ui.dialogs.NameDialog
-import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
-import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.listOfTags
-import com.hbb20.countrypicker.models.CPCountry
-import com.hbb20.countrypicker.view.CPViewHelper
-import com.hbb20.countrypicker.view.prepareCustomCountryPickerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -37,23 +33,15 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     FragmentRadioSearchBinding::inflate
 ) {
 
-    private var selectedCountry = ""
 
     private val allTags = listOfTags
 
-    lateinit var  cpViewHelper : CPViewHelper
 
     @Inject
     lateinit var glide : RequestManager
     var pagingRadioAdapter : PagingRadioAdapter? = null
 
-    private var isOnCreateCalled = false
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        isOnCreateCalled = true
-    }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -100,6 +88,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             adapter = pagingRadioAdapter
             layoutManager = LinearLayoutManager(requireContext())
+            setHasFixedSize(true)
 
         }
     }
@@ -134,51 +123,31 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     }
 
-    private fun setupCountryPicker() {
 
-         cpViewHelper = requireContext().prepareCustomCountryPickerView(
-            containerViewGroup = bind.llCountryViewGroup,
-            tvSelectedCountryInfo = bind.tvSelectedCountry,
-            allowClearSelection = true,
-            selectedCountryInfoTextGenerator = {cpCountry: CPCountry ->  cpCountry.alpha2 }
-
-        )
-
-
-        mainViewModel.searchParamCountry.value?.let { code ->
-            cpViewHelper.setCountryForAlphaCode(code)
-        }
-
-            cpViewHelper.selectedCountry.observe(viewLifecycleOwner){
-
-                    it?.let { country ->
-                        mainViewModel.searchParamCountry.postValue(country.alpha2)
-                        isOnCreateCalled = false
-                    } ?: run {
-                        if (isOnCreateCalled) {
-                            isOnCreateCalled = false
-                        } else {
-                            mainViewModel.searchParamCountry.postValue("")
-                        }
-                    }
-            }
-
-
-    }
 
     private fun setSearchToolbar() {
 
 
         bind.tvTag.setOnClickListener {
 
-            DialogPicker(requireContext(), allTags, mainViewModel).show()
+          TagPickerDialog(requireContext(), allTags, mainViewModel).apply {
+              show()
+
+
+
+          }
         }
 
-        setupCountryPicker()
 
         bind.tvName.setOnClickListener {
 
             NameDialog(requireContext(), it as TextView, mainViewModel).show()
+
+        }
+
+        bind.tvSelectedCountry.setOnClickListener {
+
+            CountryPickerDialog(requireContext(), mainViewModel).show()
 
         }
 
@@ -210,6 +179,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         val tag = bind.tvTag.text.toString()
 
+        val country = bind.tvSelectedCountry.text.toString()
+
         val bundle = Bundle().apply {
 
 
@@ -219,7 +190,11 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                 putString("TAG", tag)
             }
 
-            putString("COUNTRY", selectedCountry)
+           if(country == "Country"){
+               putString("COUNTRY", "")
+           } else {
+               putString("COUNTRY", country)
+           }
 
             if(name == "Name"){
                 putString("NAME", "")
@@ -251,7 +226,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         mainViewModel.searchParamCountry.observe(viewLifecycleOwner){
 
-          selectedCountry = it
+           bind.tvSelectedCountry.text = it
         }
     }
 

@@ -28,6 +28,11 @@ class RadioSource @Inject constructor(
     var stationsFromHistory = mutableListOf<MediaMetadataCompat>()
 
 
+    suspend fun getAllCountries() = radioApi.getAllCountries()
+
+
+
+
     suspend fun getStationsInDate(limit: Int, offset: Int, initialDate : String) : DateWithStations{
         val response = radioDAO.getStationsInDate(limit, offset)
         val date = response.date.date

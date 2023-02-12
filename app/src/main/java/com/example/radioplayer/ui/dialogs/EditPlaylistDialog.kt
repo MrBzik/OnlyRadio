@@ -142,7 +142,7 @@ class EditPlaylistDialog (
                 ){
                     bind.etPlaylistName.setTextColor(Color.RED)
                 } else{
-                    bind.etPlaylistName.setTextColor(requireContext.getColor(R.color.EXPANDtext))
+                    bind.etPlaylistName.setTextColor(requireContext.getColor(R.color.color_non_interactive))
                 }
 
             }

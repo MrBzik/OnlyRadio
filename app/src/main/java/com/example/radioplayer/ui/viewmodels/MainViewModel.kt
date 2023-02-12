@@ -1,6 +1,7 @@
 package com.example.radioplayer.ui.viewmodels
 
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
 import android.util.Log
@@ -16,6 +17,7 @@ import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
+import com.example.radioplayer.utils.Country
 import com.hbb20.countrypicker.models.CPCountry
 import com.hbb20.countrypicker.view.CPViewHelper
 import com.hbb20.countrypicker.view.prepareCustomCountryPickerView
@@ -24,6 +26,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
+import java.io.*
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -202,5 +205,62 @@ class MainViewModel @Inject constructor(
         }
 
 
+    private fun getCountries() = viewModelScope.launch {
+
+        val response = radioSource.getAllCountries().body()
+
+        var count = 0
+
+        val listOfCountries = mutableListOf<Country>()
+
+        val builder = StringBuilder()
+        val builder2 = StringBuilder()
+        val builder3 = StringBuilder()
+        val builder4 = StringBuilder()
+        val builder5 = StringBuilder()
+
+
+        response?.forEach {
+
+            if(count < 45) {
+                count++
+                builder.append(
+                    "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
+                )
+            } else if(count < 90) {
+            count++
+            builder2.append(
+                "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
+            )
+        } else if(count < 135) {
+                count++
+                builder3.append(
+                    "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
+                )
+            } else if(count < 175) {
+                count++
+                builder4.append(
+                    "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
+                )
+            } else {
+                count++
+                builder5.append(
+                    "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
+                )
+            }
+
+        }
+
+        Log.d("CHECKTAGS", builder.toString())
+        Log.d("CHECKTAGS", builder2.toString())
+        Log.d("CHECKTAGS", builder3.toString())
+        Log.d("CHECKTAGS", builder4.toString())
+        Log.d("CHECKTAGS", builder5.toString())
+
+    }
+
+//    init {
+//        getCountries()
+//    }
 }
 

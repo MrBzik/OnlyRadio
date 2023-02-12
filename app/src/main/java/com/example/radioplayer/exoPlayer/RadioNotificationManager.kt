@@ -113,14 +113,17 @@ class RadioNotificationManager (
 
 
         private suspend fun resolveUriAsBitmap(uri: Uri): Bitmap? {
-            return withContext(Dispatchers.IO) {
-                // Block on downloading artwork.
-                Glide.with(context).applyDefaultRequestOptions(glideOptions)
-                    .asBitmap()
-                    .load(uri)
-                    .submit(NOTIFICATION_LARGE_ICON_SIZE, NOTIFICATION_LARGE_ICON_SIZE)
-                    .get()
-            }
+            return try {
+                withContext(Dispatchers.IO) {
+                    // Block on downloading artwork.
+                    Glide.with(context).applyDefaultRequestOptions(glideOptions)
+                        .asBitmap()
+                        .load(uri)
+                        .submit(NOTIFICATION_LARGE_ICON_SIZE, NOTIFICATION_LARGE_ICON_SIZE)
+                        .get()
+                }
+            } catch (e : Exception) { null}
+
         }
     }
 }

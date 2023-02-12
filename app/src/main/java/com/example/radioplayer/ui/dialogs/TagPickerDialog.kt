@@ -1,16 +1,23 @@
 package com.example.radioplayer.ui.dialogs
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ArrayAdapter
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatDialog
+import com.example.radioplayer.R
 import com.example.radioplayer.databinding.DialogPickTagBinding
+import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 
-class DialogPicker (
+class TagPickerDialog (
     private val requireContext : Context,
     private val listOfItems : List<String>,
     private val mainViewModel: MainViewModel
@@ -25,6 +32,10 @@ class DialogPicker (
 
         super.onCreate(savedInstanceState)
         setContentView(bind.root)
+
+
+        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
+
 
         val arrayAdapter = ArrayAdapter(requireContext, android.R.layout.simple_list_item_1, listOfItems)
 
@@ -50,6 +61,7 @@ class DialogPicker (
 
             dismiss()
 
+
         }
 
         bind.tvClearSelection.setOnClickListener{
@@ -57,12 +69,15 @@ class DialogPicker (
             mainViewModel.searchParamTag.postValue("Tag")
 
             dismiss()
+
+        }
+
+        bind.tvBack.setOnClickListener {
+
+            dismiss()
+
         }
 
 
     }
-
-
-
-
 }

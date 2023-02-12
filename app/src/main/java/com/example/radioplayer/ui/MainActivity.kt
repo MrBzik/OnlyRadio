@@ -16,7 +16,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import com.bumptech.glide.Registry
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.engine.GlideException
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.ActivityMainBinding
@@ -28,8 +30,8 @@ import com.example.radioplayer.ui.fragments.RadioSearchFragment
 import com.example.radioplayer.ui.fragments.StationDetailsFragment
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.example.radioplayer.utils.listOfCountries
+
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -80,7 +82,7 @@ class MainActivity : AppCompatActivity() {
 
         Debug.stopMethodTracing()
 
-        window.navigationBarColor = colorGray
+        window.navigationBarColor = Color.BLACK
 
 
         setupInitialNavigation()
@@ -318,7 +320,11 @@ class MainActivity : AppCompatActivity() {
         val newImage = station.favicon?.toUri()
 
         newImage?.let { uri ->
-            glide.load(uri).into(bind.ivCurrentStationImage)
+
+            try {
+                glide.load(uri).into(bind.ivCurrentStationImage)
+            } catch (e: Exception)
+                {}
         } ?: run {
             bind.ivCurrentStationImage.setImageResource(R.drawable.ic_radio_default)
         }

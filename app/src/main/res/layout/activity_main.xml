@@ -5,39 +5,72 @@
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@color/black"
     tools:context=".ui.MainActivity">
+
+  <View
+      android:id="@+id/view"
+      android:layout_width="2dp"
+      android:layout_height="match_parent"
+      android:layout_marginStart="5dp"
+      android:background="@drawable/gradient_for_separators"
+      android:translationZ="10dp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintVertical_bias="0.5" />
 
   <FrameLayout
       android:id="@+id/flFragment"
       android:layout_width="match_parent"
       android:layout_height="0dp"
+      android:layout_marginStart="10dp"
+      android:layout_marginTop="5dp"
+      android:layout_marginEnd="10dp"
+      android:layout_marginBottom="5dp"
       app:layout_constraintBottom_toTopOf="@id/ivCurrentStationImage"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintHorizontal_bias="0.5"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintVertical_bias="0.5"/>
+      app:layout_constraintVertical_bias="0.5"
+      />
+
+
+  <View
+      android:layout_width="2dp"
+      android:layout_height="match_parent"
+      android:layout_marginEnd="5dp"
+      android:background="@drawable/gradient_for_separators"
+      android:translationZ="10dp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintVertical_bias="0.5" />
+
 
   <ImageView
       android:id="@+id/ivCurrentStationImage"
       android:layout_width="60dp"
       android:layout_height="60dp"
+      android:layout_marginStart="10dp"
+      android:layout_marginBottom="5dp"
       android:src="@drawable/ic_radio_default"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"/>
+      app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+      app:layout_constraintStart_toStartOf="parent" />
 
   <TextView
       android:id="@+id/tvStationTitle"
       android:layout_width="0dp"
       android:layout_height="60dp"
+      android:layout_marginBottom="5dp"
+      android:paddingHorizontal="8dp"
+      android:paddingTop="8dp"
       android:text="STATION NAME"
       android:textSize="14sp"
-      android:paddingHorizontal="8dp"
-      android:paddingTop = "8dp"
       app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
-      app:layout_constraintStart_toEndOf="@+id/ivCurrentStationImage"
-      app:layout_constraintEnd_toStartOf="@+id/ivTogglePlayCurrentStation"/>
+      app:layout_constraintEnd_toStartOf="@+id/ivTogglePlayCurrentStation"
+      app:layout_constraintStart_toEndOf="@+id/ivCurrentStationImage" />
 
   <TextView
       android:id="@+id/tvExpandHideText"
@@ -52,33 +85,49 @@
       app:layout_constraintEnd_toEndOf="@+id/tvStationTitle" />
 
   <ImageView
-     android:id="@+id/ivTogglePlayCurrentStation"
-     android:layout_width="60dp"
-     android:layout_height="60dp"
-     android:src="@drawable/ic_play_pause"
-     app:layout_constraintEnd_toEndOf="parent"
-     app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"/>
+      android:id="@+id/ivTogglePlayCurrentStation"
+      android:layout_width="60dp"
+      android:layout_height="60dp"
+      android:layout_marginBottom="5dp"
+      android:src="@drawable/ic_play_pause"
+      app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+      app:layout_constraintEnd_toEndOf="parent" />
 
   <com.google.android.material.floatingactionbutton.FloatingActionButton
       android:id="@+id/fabAddToFav"
-      android:visibility="gone"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginEnd="30dp"
       android:layout_marginBottom="50dp"
       android:src="@drawable/ic_add_to_fav"
+      android:visibility="gone"
       app:layout_constraintBottom_toBottomOf="@+id/flFragment"
       app:layout_constraintEnd_toEndOf="parent" />
 
+  <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@drawable/gradient_for_separators"
+      android:translationZ="10dp"
+      app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView" />
 
   <com.google.android.material.bottomnavigation.BottomNavigationView
       android:id="@+id/bottomNavigationView"
       android:layout_width="match_parent"
-      android:layout_height="50dp"
+      android:layout_height="60dp"
+      android:background="@color/black"
+      android:padding="5dp"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintHorizontal_bias="0.5"
       app:layout_constraintStart_toStartOf="parent"
       app:menu="@menu/bottom_nav_menu" />
+
+  <View
+      android:layout_width="match_parent"
+      android:layout_height="2dp"
+      android:background="@drawable/gradient_for_separators"
+      android:translationZ="10dp"
+      app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

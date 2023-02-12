@@ -3,7 +3,7 @@
       <shape>
        <gradient
          android:centerX="-10.0"
-         android:startColor="@color/EXPANDtext"
+         android:startColor="@color/color_non_interactive"
          android:endColor="@color/black"
          android:type="sweep" />
        </shape>

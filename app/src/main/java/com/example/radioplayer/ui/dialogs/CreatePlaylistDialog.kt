@@ -13,7 +13,6 @@ import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
-import androidx.paging.PagingData
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
@@ -23,10 +22,8 @@ import com.example.radioplayer.databinding.DialogCreatePlaylistBinding
 
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
-import javax.inject.Inject
 
 
 @ExperimentalCoroutinesApi
@@ -118,7 +115,7 @@ class CreatePlaylistDialog (
                 if(listOfPlaylistNames.contains(bind.etPlaylistName.text.toString())){
                     bind.etPlaylistName.setTextColor(Color.RED)
                 } else{
-                    bind.etPlaylistName.setTextColor(requireContext.getColor(R.color.EXPANDtext))
+                    bind.etPlaylistName.setTextColor(requireContext.getColor(R.color.color_non_interactive))
                 }
 
             }

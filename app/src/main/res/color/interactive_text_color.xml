@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/textChangeColor" android:state_pressed="true"
+    <item android:color="@color/color_changed_on_interaction" android:state_pressed="true"
         />
-    <item android:color="@color/EXPANDtext"/>
+    <item android:color="@color/color_interactive"/>
 </selector>

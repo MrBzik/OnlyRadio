@@ -17,6 +17,7 @@ import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.BASE_RADIO_URL
+import com.example.radioplayer.utils.Constants.BASE_RADIO_URL3
 import com.example.radioplayer.utils.Constants.DATABASE_NAME
 import com.example.radioplayer.utils.Constants.PIXABAY_BASE_URL
 import dagger.Module
@@ -77,7 +78,7 @@ object AppModule {
 
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl(Constants.BASE_RADIO_URL2)
+            .baseUrl(BASE_RADIO_URL3)
             .build()
             .create(RadioApi::class.java)
     }
