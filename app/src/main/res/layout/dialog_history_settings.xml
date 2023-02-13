@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:minHeight="450dp"
-    android:minWidth="300dp"
-    android:padding="16dp">
+    android:minHeight="400dp"
+    android:padding="16dp"
+    android:background="@drawable/gradient_for_background"
+    >
 
     <TextView
         android:id="@+id/tvTitle"
@@ -14,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="Keep history of :"
-        android:textColor="@color/white"
+        android:textColor="@color/Separator"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -36,11 +37,14 @@
         android:id="@+id/tvBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
         android:layout_marginBottom="20dp"
         android:text="BACK"
-        android:textColor="@color/purple_200"
+        android:textSize="18sp"
+        android:textColor="@color/interactive_text_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 
 
 

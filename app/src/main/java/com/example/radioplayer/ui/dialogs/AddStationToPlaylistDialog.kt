@@ -1,17 +1,17 @@
 package com.example.radioplayer.ui.dialogs
 
-import android.R
 import android.content.Context
 import android.os.Bundle
-import android.widget.ArrayAdapter
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialog
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.RequestManager
+import com.example.radioplayer.adapters.PlaylistsAdapter
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.databinding.DialogAddStationToPlaylistBinding
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
-import javax.inject.Inject
 
 class AddStationToPlaylistDialog(
     private val requireContext : Context,
@@ -25,11 +25,7 @@ class AddStationToPlaylistDialog(
     ) : AppCompatDialog(requireContext) {
 
     private lateinit var bind : DialogAddStationToPlaylistBinding
-
-    private lateinit var listOfNamesOfPlaylists : List<String>
-
-    private lateinit var  arrayAdapter : ArrayAdapter<String>
-
+    private var playlistsAdapter = PlaylistsAdapter(glide, false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -38,27 +34,33 @@ class AddStationToPlaylistDialog(
         super.onCreate(savedInstanceState)
         setContentView(bind.root)
 
+        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
+
         if(listOfPlaylists.isEmpty()){
             bind.tvMessageNoPlaylists.isVisible = true
+        }
 
-        } else{
 
-            listOfNamesOfPlaylists = listOfPlaylists.map {
-                it.playlistName
+
+            bind.rvPlaylists.apply {
+
+                adapter = playlistsAdapter
+                layoutManager = GridLayoutManager(requireContext, 3)
+                setHasFixedSize(true)
             }
 
-            arrayAdapter = ArrayAdapter(requireContext, R.layout.simple_list_item_1, listOfNamesOfPlaylists)
 
-            bind.listView.adapter = arrayAdapter
 
-            bind.listView.setOnItemClickListener { parent, view, position, id ->
 
-                val playlist = parent.getItemAtPosition(position) as String
-                insertStationInPlaylist(playlist)
+            playlistsAdapter.differ.submitList(listOfPlaylists)
+
+            playlistsAdapter.setPlaylistClickListener { playlist, _ ->
+
+                insertStationInPlaylist(playlist.playlistName)
                 dismiss()
             }
 
-        }
+
 
         bind.tvBack.setOnClickListener {
             dismiss()
@@ -66,7 +68,13 @@ class AddStationToPlaylistDialog(
 
         bind.tvCreateNewPlaylist.setOnClickListener {
 
-            CreatePlaylistDialog(requireContext, listOfPlaylists, databaseViewModel, pixabayViewModel, glide).show()
+            CreatePlaylistDialog(requireContext,
+                listOfPlaylists,
+                databaseViewModel,
+                pixabayViewModel, glide) {
+                insertStationInPlaylist(it)
+            }
+                .show()
             dismiss()
         }
     }

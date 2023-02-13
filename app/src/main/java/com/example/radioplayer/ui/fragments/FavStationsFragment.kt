@@ -47,7 +47,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     @Inject
     lateinit var mainAdapter: RadioDatabaseAdapter
 
-    @Inject
+
     lateinit var playlistAdapter : PlaylistsAdapter
 
     @Inject
@@ -159,7 +159,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             setAddPlaylistClickListener {
                 CreatePlaylistDialog(
-                    requireContext(), listOfPlaylists, databaseViewModel, pixabayViewModel, glide
+                    requireContext(), listOfPlaylists, databaseViewModel, pixabayViewModel, glide, null
                 ).show()
             }
 
@@ -273,6 +273,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     }
 
     private fun setupPlaylistRecycleView(){
+
+        playlistAdapter = PlaylistsAdapter(glide, true)
 
         bind.rvPlaylists.apply {
             adapter = playlistAdapter

@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="8dp">
+    android:padding="8dp"
+    android:background="@drawable/gradient_for_background"
+    >
 
     <TextView
         android:id="@+id/tvTitle"
@@ -16,7 +18,7 @@
         android:maxLines="2"
         android:ellipsize="end"
         android:text="Edit playlist"
-        android:textColor="@color/white"
+        android:textColor="@color/Separator"
         android:textSize="20sp"
         app:layout_constraintEnd_toStartOf="@+id/tvDelete"
         app:layout_constraintStart_toStartOf="parent"
@@ -29,7 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="16dp"
-        android:text="Delete playlist"
+        android:text="Delete"
         android:textColor="@color/interactive_text_color"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -42,6 +44,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:hint="New playlist name..."
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:endIconMode="clear_text"
         app:layout_constraintEnd_toStartOf="@+id/ivSelectedImage"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -51,7 +55,7 @@
             android:id="@+id/etPlaylistName"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:minHeight="48dp" />
+             />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -62,6 +66,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:hint="Search images..."
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:endIconMode="clear_text"
         app:layout_constraintEnd_toStartOf="@+id/ivSelectedImage"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -71,7 +77,7 @@
             android:id="@+id/etSearchQuery"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:minHeight="48dp" />
+            />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -90,7 +96,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp"
+        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toTopOf="@+id/tvBack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -113,11 +119,11 @@
         android:id="@+id/tvEdit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="28dp"
+        android:layout_marginBottom="28dp"
         android:text="ACCEPT"
-        android:textColor="@color/purple_200"
-        android:textSize="20sp"
+        android:textColor="@color/interactive_text_color"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -125,11 +131,11 @@
         android:id="@+id/tvBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginBottom="28dp"
         android:text="BACK"
-        android:textColor="@color/purple_200"
-        android:textSize="20sp"
+        android:textColor="@color/interactive_text_color"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

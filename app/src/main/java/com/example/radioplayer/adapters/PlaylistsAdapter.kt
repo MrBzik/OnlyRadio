@@ -25,6 +25,7 @@ private const val FOOTER_ADD_PLAYLIST = 1
 
 class PlaylistsAdapter @Inject constructor(
     private val glide : RequestManager,
+    private val isFooterNeeded : Boolean
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
@@ -116,7 +117,8 @@ class PlaylistsAdapter @Inject constructor(
 
     override fun getItemCount(): Int {
 
-       return differ.currentList.size +1
+       return if(isFooterNeeded) differ.currentList.size +1
+       else differ.currentList.size
     }
 
 
@@ -125,7 +127,6 @@ class PlaylistsAdapter @Inject constructor(
         if(position == differ.currentList.size){
             return FOOTER_ADD_PLAYLIST
         }
-
 
         return super.getItemViewType(position)
     }

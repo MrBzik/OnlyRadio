@@ -4,24 +4,16 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Debug
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
-import androidx.fragment.app.FragmentManager
-import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
-import com.bumptech.glide.Registry
 import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.engine.GlideException
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.ActivityMainBinding
+import com.example.radioplayer.databinding.StubPlayerActivityMainBinding
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.fragments.FavStationsFragment
@@ -30,7 +22,6 @@ import com.example.radioplayer.ui.fragments.RadioSearchFragment
 import com.example.radioplayer.ui.fragments.StationDetailsFragment
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
-import com.example.radioplayer.utils.listOfCountries
 
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,6 +35,10 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var bind : ActivityMainBinding
 
+    lateinit var bindPlayer : StubPlayerActivityMainBinding
+
+    private var isStubPlayerBindInflated = false
+
     @Inject
     lateinit var glide : RequestManager
 
@@ -53,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     private var currentStation : RadioStation? = null
     private var isFavoured = false
 
+
     private lateinit var radioSearchFragment : RadioSearchFragment
     private lateinit var favStationsFragment : FavStationsFragment
     private lateinit var historyFragment : HistoryFragment
@@ -60,46 +56,33 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
 
-        if(bind.tvExpandHideText.text == "EXPAND") {
+        if(!isStubPlayerBindInflated) {
+            this.moveTaskToBack(true)
+        } else if (bindPlayer.tvExpandHideText.text == "EXPAND") {
             this.moveTaskToBack(true)
         } else {
             handleNavigationToFragments(null)
         }
     }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
-
 
         setTheme(R.style.Theme_RadioPlayer)
 
         bind = ActivityMainBinding.inflate(layoutInflater)
         setContentView(bind.root)
 
-        Debug.stopMethodTracing()
+        bind.stubPlayer.setOnInflateListener{ _, inflated ->
+                bindPlayer = StubPlayerActivityMainBinding.bind(inflated)
+        }
+
 
         window.navigationBarColor = Color.BLACK
 
-
         setupInitialNavigation()
 
-        clickListenerToHandleNavigationWithDetailsFragment()
-
         observeNewStation()
-
-        observeIfNewStationExistsInDB()
-
-        observeIfNewStationFavoured()
-
-        onClickListenerForTogglePlay()
-
-        observePlaybackStateToChangeIcons()
-
-        addToFavClickListener()
 
         setOnBottomNavClickListener()
 
@@ -124,6 +107,36 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun observeNewStation(){
+
+        mainViewModel.newRadioStation.observe(this){ station ->
+
+            if(!isStubPlayerBindInflated) {
+                inflatePlayerStubAndCallRelatedMethods()
+            }
+
+            currentStation = station
+
+            checkIfStationFavoured(station)
+
+            updateImageAndTitle(station)
+
+        }
+    }
+
+    private fun inflatePlayerStubAndCallRelatedMethods (){
+        isStubPlayerBindInflated = true
+        bind.stubPlayer.visibility = View.VISIBLE
+
+        clickListenerToHandleNavigationWithDetailsFragment()
+        observeIfNewStationExistsInDB()
+        observeIfNewStationFavoured()
+        addToFavClickListener()
+        onClickListenerForTogglePlay()
+        observePlaybackStateToChangeIcons()
+    }
+
+
 
     private fun setOnBottomNavClickListener(){
 
@@ -135,8 +148,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun setOnBottomNavItemReselect(){
         bind.bottomNavigationView.setOnItemReselectedListener {
-            if(bind.tvExpandHideText.text == "HIDE"){
-                handleNavigationToFragments(it)
+
+            if(isStubPlayerBindInflated){
+                if(bindPlayer.tvExpandHideText.text == "HIDE"){
+                    handleNavigationToFragments(it)
+                }
             }
         }
     }
@@ -146,9 +162,7 @@ class MainActivity : AppCompatActivity() {
         databaseViewModel.isStationInDB.observe(this){
 
             addNewStationToHistory(it)
-
         }
-
     }
 
     private fun observeIfNewStationFavoured(){
@@ -190,9 +204,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun clickListenerToHandleNavigationWithDetailsFragment(){
 
-        bind.tvStationTitle.setOnClickListener{
+        bindPlayer.tvStationTitle.setOnClickListener{
 
-            if(bind.tvExpandHideText.text == "EXPAND") {
+            if(bindPlayer.tvExpandHideText.text == "EXPAND") {
 
                 supportFragmentManager.beginTransaction().apply {
                     replace(R.id.flFragment, stationDetailsFragment)
@@ -201,7 +215,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
 
-                bind.tvExpandHideText.setText(R.string.Hide)
+                bindPlayer.tvExpandHideText.setText(R.string.Hide)
                 bind.fabAddToFav.isVisible = true
 
             }
@@ -217,8 +231,10 @@ class MainActivity : AppCompatActivity() {
 
         val menuItem = bind.bottomNavigationView.selectedItemId
 
-        bind.tvExpandHideText.setText(R.string.Expand)
-        bind.fabAddToFav.visibility = View.GONE
+        if(isStubPlayerBindInflated){
+            bindPlayer.tvExpandHideText.setText(R.string.Expand)
+            bind.fabAddToFav.visibility = View.GONE
+        }
 
         when(item?.itemId ?: menuItem) {
             R.id.mi_radioSearchFragment -> {
@@ -227,10 +243,9 @@ class MainActivity : AppCompatActivity() {
                     replace(R.id.flFragment, radioSearchFragment)
                     addToBackStack(null)
                     commit()
-                    if(bind.tvExpandHideText.text == "HIDE") {
-                        bind.tvExpandHideText.setText(R.string.Expand)
-
-                    }
+//                    if(bindPlayer.tvExpandHideText.text == "HIDE") {
+//                        bindPlayer.tvExpandHideText.setText(R.string.Expand)
+//                    }
 
                     bind.fabAddToFav.visibility = View.GONE
 
@@ -244,10 +259,10 @@ class MainActivity : AppCompatActivity() {
                     replace(R.id.flFragment, favStationsFragment)
                     addToBackStack(null)
                     commit()
-                    if(bind.tvExpandHideText.text == "HIDE") {
-                        bind.tvExpandHideText.setText(R.string.Expand)
-
-                    }
+//                    if(bindPlayer.tvExpandHideText.text == "HIDE") {
+//                        bindPlayer.tvExpandHideText.setText(R.string.Expand)
+//
+//                    }
 
                     bind.fabAddToFav.visibility = View.GONE
                 }
@@ -259,10 +274,10 @@ class MainActivity : AppCompatActivity() {
                     replace(R.id.flFragment, historyFragment)
                     addToBackStack(null)
                     commit()
-                    if(bind.tvExpandHideText.text == "HIDE") {
-                        bind.tvExpandHideText.setText(R.string.Expand)
-
-                    }
+//                    if(bindPlayer.tvExpandHideText.text == "HIDE") {
+//                        bindPlayer.tvExpandHideText.setText(R.string.Expand)
+//
+//                    }
 
                     bind.fabAddToFav.visibility = View.GONE
                 }
@@ -297,18 +312,8 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun observeNewStation(){
 
-        mainViewModel.newRadioStation.observe(this){ station ->
 
-            currentStation = station
-
-            checkIfStationFavoured(station)
-
-            updateImageAndTitle(station)
-
-        }
-    }
 
     private fun checkIfStationFavoured(station: RadioStation){
         databaseViewModel.checkIfStationIsFavoured(station.stationuuid)
@@ -322,20 +327,20 @@ class MainActivity : AppCompatActivity() {
         newImage?.let { uri ->
 
             try {
-                glide.load(uri).into(bind.ivCurrentStationImage)
+                glide.load(uri).into(bindPlayer.ivCurrentStationImage)
             } catch (e: Exception)
                 {}
         } ?: run {
-            bind.ivCurrentStationImage.setImageResource(R.drawable.ic_radio_default)
+            bindPlayer.ivCurrentStationImage.setImageResource(R.drawable.ic_radio_default)
         }
 
-        bind.tvStationTitle.text = station.name
+        bindPlayer.tvStationTitle.text = station.name
 
     }
 
     private fun onClickListenerForTogglePlay(){
 
-        bind.ivTogglePlayCurrentStation.setOnClickListener {
+        bindPlayer.ivTogglePlayCurrentStation.setOnClickListener {
 
             currentStation?.let {
 
@@ -351,12 +356,11 @@ class MainActivity : AppCompatActivity() {
 
             it?.let {
                 when{
-                    it.isPlaying -> bind.ivTogglePlayCurrentStation.setImageResource(R.drawable.ic_pause_play)
-                    it.isPlayEnabled -> bind.ivTogglePlayCurrentStation.setImageResource(R.drawable.ic_play_pause)
+                    it.isPlaying -> bindPlayer.ivTogglePlayCurrentStation.setImageResource(R.drawable.ic_pause_play)
+                    it.isPlayEnabled -> bindPlayer.ivTogglePlayCurrentStation.setImageResource(R.drawable.ic_play_pause)
                 }
             }
         }
-
     }
 
     override fun onPause() {

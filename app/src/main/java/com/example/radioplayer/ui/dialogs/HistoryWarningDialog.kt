@@ -17,13 +17,12 @@ class HistoryWarningDialog (
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, 300)
-
         bind = DialogHistoryWarningBinding.inflate(layoutInflater)
 
         super.onCreate(savedInstanceState)
         setContentView(bind.root)
 
+        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
 
         bind.tvAccept.setOnClickListener {
 

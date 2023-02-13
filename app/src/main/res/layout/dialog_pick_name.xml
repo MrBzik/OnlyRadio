@@ -4,11 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:minWidth="300dp"
+    android:background="@drawable/gradient_for_background"
     android:minHeight="200dp"
-    android:padding="16dp"
-
-    >
+    android:padding="16dp">
 
 
     <TextView
@@ -19,35 +17,44 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:text="Name of radiostation"
-        android:textColor="@color/white"
+        android:textColor="@color/Separator"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <EditText
-        android:id="@+id/etNewName"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Type name"
-        android:minHeight="48dp"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="@+id/tvTitle"
-        app:layout_constraintStart_toStartOf="@+id/tvTitle"
-        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+        android:layout_margin="20dp"
+        android:hint="Type new name"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:endIconMode="clear_text"
+        app:layout_constraintBottom_toTopOf="@+id/tvClearName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etNewName"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="18sp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
 
     <TextView
         android:id="@+id/tvClearName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
+        android:layout_marginStart="20dp"
         android:layout_marginBottom="20dp"
-        android:text="CLEAR"
-        android:textColor="@color/purple_200"
+        android:text="CLEAR SELECTION"
+        android:textSize="18sp"
+        android:textColor="@color/interactive_text_color"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/tvAccept"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
 
@@ -55,14 +62,13 @@
         android:id="@+id/tvAccept"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
         android:text="ACCEPT"
-        android:textColor="@color/purple_200"
+        android:textSize="18sp"
+        android:textColor="@color/interactive_text_color"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/tvClearName" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

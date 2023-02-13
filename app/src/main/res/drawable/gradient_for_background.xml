@@ -16,19 +16,11 @@
                 android:centerColor="@color/transparent"
                 android:startColor="#14AA4D06"
                 android:endColor="@color/black"
-                android:angle="45"/>
+                android:angle="90"/>
         </shape>
     </item>
 
-    <item>
-        <shape>
-            <gradient
-                android:centerColor="@color/transparent"
-                android:startColor="#14AA4D06"
-                android:endColor="@color/black"
-                android:angle="135"/>
-        </shape>
-    </item>
+
 
 </layer-list>
 

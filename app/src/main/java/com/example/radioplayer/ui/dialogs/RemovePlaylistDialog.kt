@@ -3,6 +3,7 @@ package com.example.radioplayer.ui.dialogs
 import android.R
 import android.content.Context
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatDialog
 import androidx.core.view.isVisible
@@ -30,6 +31,8 @@ class RemovePlaylistDialog(
 
         super.onCreate(savedInstanceState)
         setContentView(bind.root)
+
+        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
 
         bind.tvTitle.text = "Delete playlist $currentPlaylist and its content?"
 

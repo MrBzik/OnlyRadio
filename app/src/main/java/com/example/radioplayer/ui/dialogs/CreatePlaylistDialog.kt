@@ -33,7 +33,8 @@ class CreatePlaylistDialog (
    var listOfPlaylists : List<Playlist>,
    private val databaseViewModel: DatabaseViewModel,
    private val pixabayViewModel: PixabayViewModel,
-   private val glide : RequestManager
+   private val glide : RequestManager,
+   private val insertStationInPlaylist : ((String) -> Unit)?
 
 ) : AppCompatDialog(requireContext) {
 
@@ -149,6 +150,10 @@ class CreatePlaylistDialog (
             else
 
                 databaseViewModel.insertNewPlayList(Playlist(nameField, imageSelected))
+                insertStationInPlaylist?.let {
+                    it(nameField)
+                }
+
             bind.etPlaylistName.text?.clear()
             bind.rvImages.adapter = null
             dismiss()
@@ -165,6 +170,7 @@ class CreatePlaylistDialog (
 
             adapter = imageAdapter
             layoutManager = GridLayoutManager(requireContext, 3)
+            setHasFixedSize(true)
 
         }
 

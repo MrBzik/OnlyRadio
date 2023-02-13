@@ -3,6 +3,7 @@ package com.example.radioplayer.ui.dialogs
 import android.content.Context
 import android.os.Bundle
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDialog
 import com.example.radioplayer.databinding.DialogPickNameBinding
@@ -19,17 +20,22 @@ class NameDialog (
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, 300)
+
 
         bind = DialogPickNameBinding.inflate(layoutInflater)
 
         super.onCreate(savedInstanceState)
         setContentView(bind.root)
 
+        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
 
         bind.tvTitle.text = if(textView.text == "Name") "Name of radiostation"
-                            else "Name of radiostation (${textView.text})"
+                            else "Name of radiostation \n(${textView.text})"
 
+
+        bind.etNewName.requestFocus()
+
+        window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
 
 
         bind.tvClearName.setOnClickListener {

@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDialog
@@ -34,6 +35,9 @@ class HistorySettingsDialog (
 
         super.onCreate(savedInstanceState)
         setContentView(bind.root)
+
+        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+
 
         val arrayAdapter = ArrayAdapter(requireContext, android.R.layout.simple_list_item_1, listOfOptions)
 
