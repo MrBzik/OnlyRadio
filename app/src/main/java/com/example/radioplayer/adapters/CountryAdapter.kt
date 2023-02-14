@@ -41,15 +41,12 @@ class CountryAdapter (
                     "file:///android_asset/flags/${differ.currentList[position].countryCode.lowercase()}.png"))
                 .into(ivCountryFlag)
 
+            root.setOnClickListener {
+                onItemClickListener?.let { click ->
 
-        }
+                    click(differ.currentList[position].countryCode)
 
-        holder.itemView.setOnClickListener {
-
-            onItemClickListener?.let { click ->
-
-                click(differ.currentList[position].countryCode)
-
+                }
             }
         }
     }

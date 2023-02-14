@@ -46,9 +46,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:text="Tag"
-            android:textColor="@color/interactive_text_color"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textAppearance="@style/mainTextButtons" />
 
         <ImageView
             android:id="@+id/imageView2"
@@ -77,9 +75,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:text="Name"
-            android:textColor="@color/interactive_text_color"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textAppearance="@style/mainTextButtons"  />
 
         <ImageView
             android:id="@+id/imageView"
@@ -96,9 +92,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="Country"
-        android:textColor="@color/interactive_text_color"
-        android:textSize="18sp"
-        android:textStyle="bold"
+        android:textAppearance="@style/mainTextButtons"
         app:layout_constraintEnd_toStartOf="@+id/ivArrowCountry"
         app:layout_constraintTop_toTopOf="parent" />
 

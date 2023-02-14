@@ -100,7 +100,7 @@ class EditPlaylistDialog (
 
     private fun setTitleAndEditTextField(){
 
-        bind.tvTitle.text = "Edit playlist $currentPlaylistName"
+        bind.tvNameOfPlaylist.text = "\"$currentPlaylistName\""
         bind.etPlaylistName.setText(currentPlaylistName)
     }
 

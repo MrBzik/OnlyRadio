@@ -128,6 +128,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             adapter = historyAdapter
             layoutManager = LinearLayoutManager(requireContext())
+            setHasFixedSize(true)
         }
 
         setAdapterLoadStateListener()

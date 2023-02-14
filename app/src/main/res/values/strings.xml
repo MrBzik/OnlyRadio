@@ -6,5 +6,9 @@
     <string name="close">Close</string>
     <string name="Expand">EXPAND</string>
     <string name="Hide">HIDE</string>
+    <string name="dialog_back_button">Back</string>
+    <string name="dialog_create_playlist">New playlist</string>
+    <string name="dialog_accept_button">Accept</string>
+    <string name="dialog_clear_selection">Clear selection</string>
 
 </resources>

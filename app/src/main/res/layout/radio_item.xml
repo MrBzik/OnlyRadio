@@ -26,11 +26,12 @@
             android:id="@+id/tvPrimary"
             android:layout_width="match_parent"
             android:layout_height="55dp"
-            android:textSize="20sp"
-            android:text="dwarwa"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-smallcaps"
             android:gravity="center|start"
             android:maxLines="2"
-            android:ellipsize="end" />
+            android:text="dwarwa"
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/tvSecondary"

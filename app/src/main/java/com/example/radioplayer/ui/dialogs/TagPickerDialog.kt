@@ -66,7 +66,7 @@ class TagPickerDialog (
 
         bind.tvClearSelection.setOnClickListener{
 
-            mainViewModel.searchParamTag.postValue("Tag")
+            mainViewModel.searchParamTag.postValue("")
 
             dismiss()
 

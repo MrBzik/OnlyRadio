@@ -9,6 +9,7 @@ import android.net.Uri
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
@@ -26,7 +27,8 @@ import kotlinx.coroutines.*
 class RadioNotificationManager (
     private val context : Context,
    sessionToken : MediaSessionCompat.Token,
-   notificationListener: NotificationListener
+   notificationListener: NotificationListener,
+    private val glide : RequestManager
     ) {
 
     private val serviceJob = SupervisorJob()
@@ -116,20 +118,17 @@ class RadioNotificationManager (
             return try {
                 withContext(Dispatchers.IO) {
                     // Block on downloading artwork.
-                    Glide.with(context).applyDefaultRequestOptions(glideOptions)
+                    glide
                         .asBitmap()
                         .load(uri)
                         .submit(NOTIFICATION_LARGE_ICON_SIZE, NOTIFICATION_LARGE_ICON_SIZE)
                         .get()
+
                 }
-            } catch (e : Exception) { null}
+            } catch (e:Exception){null}
 
         }
     }
 }
 
 const val NOTIFICATION_LARGE_ICON_SIZE = 144 // px
-
-private val glideOptions = RequestOptions()
-    .fallback(R.drawable.ic_radio_default)
-    .diskCacheStrategy(DiskCacheStrategy.DATA)

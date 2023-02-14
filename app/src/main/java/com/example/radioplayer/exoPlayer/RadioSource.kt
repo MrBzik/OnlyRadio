@@ -1,6 +1,7 @@
 package com.example.radioplayer.exoPlayer
 
 
+import android.content.SharedPreferences
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
 import com.example.radioplayer.data.local.RadioDAO
@@ -9,6 +10,10 @@ import com.example.radioplayer.data.local.relations.DateWithStations
 import com.example.radioplayer.data.remote.RadioApi
 import com.example.radioplayer.data.remote.entities.*
 import com.example.radioplayer.exoPlayer.State.*
+import com.example.radioplayer.utils.Constants.BASE_RADIO_URL
+import com.example.radioplayer.utils.Constants.BASE_RADIO_URL1
+import com.example.radioplayer.utils.Constants.listOfUrls
+import retrofit2.Response
 
 import javax.inject.Inject
 
@@ -18,7 +23,7 @@ class RadioSource @Inject constructor(
 
 ) {
     var stations = mutableListOf<MediaMetadataCompat>()
-    private var _stations : RadioStations? = RadioStations()
+    private var _stations: RadioStations? = RadioStations()
 
     val subscribeToFavouredStations = radioDAO.getAllFavouredStations()
     var stationsFavoured = mutableListOf<MediaMetadataCompat>()
@@ -31,12 +36,10 @@ class RadioSource @Inject constructor(
     suspend fun getAllCountries() = radioApi.getAllCountries()
 
 
-
-
-    suspend fun getStationsInDate(limit: Int, offset: Int, initialDate : String) : DateWithStations{
+    suspend fun getStationsInDate(limit: Int, offset: Int, initialDate: String): DateWithStations {
         val response = radioDAO.getStationsInDate(limit, offset)
         val date = response.date.date
-        if(date == initialDate){
+        if (date == initialDate) {
             stationsFromHistory = response.radioStations.map { station ->
                 stationToMediaMetadataCompat(station)
             }.toMutableList()
@@ -51,7 +54,7 @@ class RadioSource @Inject constructor(
     }
 
 
-    suspend fun getStationsInPlaylist(playlistName : String) : List<RadioStation> {
+    suspend fun getStationsInPlaylist(playlistName: String): List<RadioStation> {
 
         val response = radioDAO.getStationsInPlaylist(playlistName).first().radioStations
 
@@ -63,11 +66,12 @@ class RadioSource @Inject constructor(
     }
 
 
-    suspend fun getRadioStationsSource (isTopSearch : Boolean,
-           country : String = "", tag : String = "", name : String = "", offset : Int = 0, pageSize : Int
-    ) : RadioStations? {
 
-        val response = if(isTopSearch){
+    suspend fun getRadioStationsSource(
+        country: String = "", tag: String = "", name: String = "", offset: Int = 0, pageSize: Int
+    ): RadioStations? {
+
+        val response = if(tag == "" && name == "" && country == ""){
             radioApi.getTopVotedStations(offset = offset, limit = pageSize)
         } else {
             if(country != "") {
@@ -75,12 +79,12 @@ class RadioSource @Inject constructor(
             } else {
                 radioApi.searchRadioWithoutCountry(tag = tag, name = name, offset = offset, limit = pageSize)
             }
+        }
+
+            _stations = response.body()
+        return response.body()
 
         }
-        _stations = response.body()
-
-        return response.body()
-    }
 
 
 

@@ -13,10 +13,20 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="Select playlist or create new"
-        android:textColor="@color/Separator"
-        android:textSize="20sp"
+        android:textAppearance="@style/dialogTitleText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvHint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="(Hint : in playlists You can DragAndDrop)*"
+        android:textColor="@color/Separator"
+        android:textStyle="italic"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
 
     <TextView
         android:id="@+id/tvMessageNoPlaylists"
@@ -35,13 +45,13 @@
         android:id="@+id/rvPlaylists"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toTopOf="@+id/tvBack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/tvHint" />
 
 
     <TextView
@@ -50,9 +60,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="28dp"
         android:layout_marginBottom="28dp"
-        android:text="BACK"
-        android:textColor="@color/interactive_text_color"
-        android:textSize="18sp"
+        android:text="@string/dialog_back_button"
+        android:textAppearance="@style/dialogTextButtons"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -62,9 +71,8 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="28dp"
         android:layout_marginBottom="28dp"
-        android:text="CREATE PLAYLIST"
-        android:textColor="@color/interactive_text_color"
-        android:textSize="18sp"
+        android:text="@string/dialog_create_playlist"
+        android:textAppearance="@style/dialogTextButtons"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

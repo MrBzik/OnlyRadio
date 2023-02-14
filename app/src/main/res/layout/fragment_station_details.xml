@@ -14,10 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="Add to playlist"
-        android:textColor="@color/interactive_text_color"
-        android:textSize="18sp"
-
-        android:textStyle="bold"
+        android:textAppearance="@style/mainTextButtons"
         app:layout_constraintEnd_toStartOf="@+id/ivArrowAddToPlaylist"
         app:layout_constraintTop_toTopOf="parent" />
 

@@ -14,8 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Select a country"
-        android:textColor="@color/Separator"
-        android:textSize="20sp"
+        android:textAppearance="@style/dialogTitleText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -50,9 +49,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginBottom="20dp"
-        android:text="BACK"
-        android:textSize="18sp"
-        android:textColor="@color/interactive_text_color"
+        android:text="@string/dialog_back_button"
+        android:textAppearance="@style/dialogTextButtons"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -62,9 +60,8 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
-        android:text="CLEAR SELECTION"
-        android:textSize="18sp"
-        android:textColor="@color/interactive_text_color"
+        android:text="@string/dialog_clear_selection"
+        android:textAppearance="@style/dialogTextButtons"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

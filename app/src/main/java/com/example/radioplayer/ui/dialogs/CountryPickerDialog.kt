@@ -8,6 +8,7 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.adapters.CountryAdapter
+import com.example.radioplayer.adapters.FilterListAdapter
 import com.example.radioplayer.databinding.DialogPickCountryBinding
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.utils.listOfCountries
@@ -23,7 +24,7 @@ class CountryPickerDialog(
 
     lateinit var bind : DialogPickCountryBinding
 
-    lateinit var countryAdapter : CountryAdapter
+    lateinit var countryAdapter : FilterListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -40,7 +41,8 @@ class CountryPickerDialog(
 
         setOnAdapterClickListener()
 
-        countryAdapter.differ.submitList(counties)
+        countryAdapter.submitList(counties)
+
 
         filterCountriesOnEditTextListener()
 
@@ -54,14 +56,13 @@ class CountryPickerDialog(
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val newList = counties.filter { country ->
-
-                    country.countryName.contains(s.toString(), ignoreCase = true)
-                }
-                countryAdapter.differ.submitList(newList)
+                countryAdapter.filter.filter(s)
             }
 
             override fun afterTextChanged(s: Editable?) {
+
+
+
             }
         })
 
@@ -84,7 +85,7 @@ class CountryPickerDialog(
 
     private fun setupRecyclerView(){
 
-        countryAdapter = CountryAdapter()
+        countryAdapter = FilterListAdapter()
 
         bind.rvCountries.apply {
 
@@ -103,7 +104,7 @@ class CountryPickerDialog(
 
         bind.tvClearSelection.setOnClickListener{
 
-            mainViewModel.searchParamCountry.postValue("Country")
+            mainViewModel.searchParamCountry.postValue("")
 
             bind.rvCountries.adapter = null
             dismiss()

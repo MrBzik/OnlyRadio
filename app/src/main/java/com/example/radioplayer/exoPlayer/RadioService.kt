@@ -15,6 +15,7 @@ import android.util.Log
 import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import androidx.media.MediaBrowserServiceCompat
+import com.bumptech.glide.RequestManager
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlaybackPreparer
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
@@ -54,6 +55,9 @@ class RadioService : MediaBrowserServiceCompat() {
 
     @Inject
     lateinit var radioSource: RadioSource
+
+    @Inject
+    lateinit var glide : RequestManager
 
     private val serviceJob = Job()
 
@@ -107,7 +111,8 @@ class RadioService : MediaBrowserServiceCompat() {
         radioNotificationManager = RadioNotificationManager(
             this,
             mediaSession.sessionToken,
-            RadioPlayerNotificationListener(this)
+            RadioPlayerNotificationListener(this),
+            glide
             )
 
         val radioPlaybackPreparer = RadioPlaybackPreparer(radioSource, { itemToPlay, flag ->
@@ -230,6 +235,7 @@ class RadioService : MediaBrowserServiceCompat() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
 
+
         if(!exoPlayer.isPlaying){
             stopForeground(STOP_FOREGROUND_REMOVE)
 
@@ -242,12 +248,19 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
     override fun onDestroy() {
-        super.onDestroy()
+
+
+
         serviceScope.cancel()
         radioSource.subscribeToFavouredStations.removeObserver(observerForDatabase)
 
         exoPlayer.removeListener(radioPlayerEventListener)
         exoPlayer.release()
+
+        mediaSession.apply {
+            isActive = false
+            release()
+        }
 
     }
 

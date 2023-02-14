@@ -2,6 +2,7 @@ package com.example.radioplayer.dagger
 
 import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Room
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
@@ -17,6 +18,7 @@ import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.BASE_RADIO_URL
+import com.example.radioplayer.utils.Constants.BASE_RADIO_URL1
 import com.example.radioplayer.utils.Constants.BASE_RADIO_URL3
 import com.example.radioplayer.utils.Constants.DATABASE_NAME
 import com.example.radioplayer.utils.Constants.PIXABAY_BASE_URL
@@ -60,6 +62,7 @@ object AppModule {
 
         return Glide.with(app).setDefaultRequestOptions(
             RequestOptions()
+                .fallback(R.drawable.ic_radio_default)
                 .placeholder(R.drawable.ic_radio_default)
                 .error(R.drawable.ic_radio_default)
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
@@ -72,10 +75,21 @@ object AppModule {
         @ApplicationContext app : Context
     ) = RadioServiceConnection(app)
 
+
+//    @Provides
+//    @Singleton
+//    fun providesValidUrlPrefs(
+//        @ApplicationContext app : Context
+//    ) : SharedPreferences {
+//      return app.getSharedPreferences("valid url preferences", Context.MODE_PRIVATE)
+//    }
+
+
     @Provides
     @Singleton
-    fun providesRadioApi () : RadioApi {
+    fun providesRadioApi (
 
+    ) : RadioApi {
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(BASE_RADIO_URL3)
@@ -85,7 +99,10 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRadioSource (radioApi: RadioApi, radioDAO: RadioDAO) : RadioSource
+    fun provideRadioSource (
+        radioApi: RadioApi,
+        radioDAO: RadioDAO
+    ) : RadioSource
             = RadioSource(radioApi, radioDAO)
 
 

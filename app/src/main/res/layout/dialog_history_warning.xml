@@ -14,8 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="Saving this option may result in cleaning history"
-        android:textColor="@color/color_changed_on_interaction"
-        android:textSize="20sp"
+        android:textAppearance="@style/dialogWarningTitleText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -27,9 +26,8 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
-        android:text="ACCEPT"
-        android:textSize="18sp"
-        android:textColor="@color/interactive_text_color"
+        android:text="@string/dialog_accept_button"
+        android:textAppearance="@style/dialogTextButtons"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -40,9 +38,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginBottom="20dp"
-        android:text="BACK"
-        android:textSize="18sp"
-        android:textColor="@color/interactive_text_color"
+        android:text="@string/dialog_back_button"
+        android:textAppearance="@style/dialogTextButtons"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

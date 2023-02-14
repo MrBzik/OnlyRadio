@@ -6,6 +6,7 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDialog
+import androidx.core.view.isVisible
 import com.example.radioplayer.databinding.DialogPickNameBinding
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 
@@ -29,8 +30,12 @@ class NameDialog (
 
         window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
 
-        bind.tvTitle.text = if(textView.text == "Name") "Name of radiostation"
-                            else "Name of radiostation \n(${textView.text})"
+        bind.tvNameOfRadioStation.apply {
+            if(textView.text != "Name") {
+                isVisible = true
+                text = "\"${textView.text}\""
+            }
+        }
 
 
         bind.etNewName.requestFocus()
@@ -40,7 +45,7 @@ class NameDialog (
 
         bind.tvClearName.setOnClickListener {
 
-            mainViewModel.searchParamName.postValue("Name")
+            mainViewModel.searchParamName.postValue("")
 
             dismiss()
         }

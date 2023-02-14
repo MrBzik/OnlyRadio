@@ -15,8 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="Keep history of :"
-        android:textColor="@color/Separator"
-        android:textSize="20sp"
+        android:textAppearance="@style/dialogTitleText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -39,9 +38,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginBottom="20dp"
-        android:text="BACK"
-        android:textSize="18sp"
-        android:textColor="@color/interactive_text_color"
+        android:text="@string/dialog_back_button"
+        android:textAppearance="@style/dialogTextButtons"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

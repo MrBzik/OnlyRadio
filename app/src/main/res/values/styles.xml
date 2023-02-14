@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="mainTextButtons" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/interactive_text_color</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">@font/skranji</item>
+    </style>
+
+    <style name="mainTextTitle" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/color_non_interactive</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">@font/skranji</item>
+    </style>
+
+    <style name="dialogTextButtons" parent="android:Widget.TextView">
+        <item name="android:fontFamily">sans-serif-smallcaps</item>
+        <item name="android:textColor">@color/interactive_text_color</item>
+        <item name="android:textSize">18sp</item>
+        <item name ="android:letterSpacing">0.1</item>
+        <item name ="android:textStyle">bold</item>
+    </style>
+
+    <style name="dialogTitleText" parent="android:Widget.TextView">
+        <item name="android:textSize">20sp</item>
+        <item name ="android:textStyle">bold</item>
+        <item name="android:textColor">@color/Separator</item>
+        <item name="android:fontFamily">serif-monospace</item>
+    </style>
+
+    <style name="dialogWarningTitleText" parent="android:Widget.TextView">
+        <item name="android:textSize">20sp</item>
+        <item name ="android:textStyle">bold</item>
+        <item name="android:textColor">@color/color_changed_on_interaction</item>
+        <item name="android:fontFamily">serif-monospace</item>
+    </style>
+
+    <style name="dialogCurrentValue" parent="android:Widget.TextView">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/regular_text_color</item>
+       <item name="android:fontFamily">@font/skranji</item>
+    </style>
+
+
+</resources>

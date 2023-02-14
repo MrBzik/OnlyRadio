@@ -22,9 +22,9 @@ class RadioPlayerEventListener (
 
             if(Build.VERSION.SDK_INT > 24) { radioService.stopForeground(STOP_FOREGROUND_DETACH)}
             else {radioService.stopForeground(false)}
-
-
+            radioService.isForegroundService = false
         }
+
     }
 
 

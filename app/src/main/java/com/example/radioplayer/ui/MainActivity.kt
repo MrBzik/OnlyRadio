@@ -16,12 +16,13 @@ import com.example.radioplayer.databinding.ActivityMainBinding
 import com.example.radioplayer.databinding.StubPlayerActivityMainBinding
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
-import com.example.radioplayer.ui.fragments.FavStationsFragment
-import com.example.radioplayer.ui.fragments.HistoryFragment
-import com.example.radioplayer.ui.fragments.RadioSearchFragment
-import com.example.radioplayer.ui.fragments.StationDetailsFragment
+import com.example.radioplayer.ui.animations.slideAnim
+import com.example.radioplayer.ui.fragments.*
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
+import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
+import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
 
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,10 +50,10 @@ class MainActivity : AppCompatActivity() {
     private var isFavoured = false
 
 
-    private lateinit var radioSearchFragment : RadioSearchFragment
-    private lateinit var favStationsFragment : FavStationsFragment
-    private lateinit var historyFragment : HistoryFragment
-    private lateinit var stationDetailsFragment : StationDetailsFragment
+    private  val radioSearchFragment : RadioSearchFragment by lazy { RadioSearchFragment() }
+    private  val favStationsFragment : FavStationsFragment by lazy { FavStationsFragment() }
+    private  val historyFragment : HistoryFragment by lazy { HistoryFragment() }
+    private  val stationDetailsFragment : StationDetailsFragment by lazy { StationDetailsFragment() }
 
     override fun onBackPressed() {
 
@@ -93,11 +94,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupInitialNavigation(){
 
-        radioSearchFragment = RadioSearchFragment()
-        favStationsFragment = FavStationsFragment()
-        historyFragment = HistoryFragment()
-        stationDetailsFragment = StationDetailsFragment()
-
 
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.flFragment, radioSearchFragment)
@@ -111,11 +107,11 @@ class MainActivity : AppCompatActivity() {
 
         mainViewModel.newRadioStation.observe(this){ station ->
 
+            currentStation = station
+
             if(!isStubPlayerBindInflated) {
                 inflatePlayerStubAndCallRelatedMethods()
             }
-
-            currentStation = station
 
             checkIfStationFavoured(station)
 
@@ -125,8 +121,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun inflatePlayerStubAndCallRelatedMethods (){
+
+
         isStubPlayerBindInflated = true
         bind.stubPlayer.visibility = View.VISIBLE
+
+        bindPlayer.root.slideAnim(500, 0, R.anim.fade_in_anim)
 
         clickListenerToHandleNavigationWithDetailsFragment()
         observeIfNewStationExistsInDB()
@@ -326,10 +326,9 @@ class MainActivity : AppCompatActivity() {
 
         newImage?.let { uri ->
 
-            try {
+
                 glide.load(uri).into(bindPlayer.ivCurrentStationImage)
-            } catch (e: Exception)
-                {}
+
         } ?: run {
             bindPlayer.ivCurrentStationImage.setImageResource(R.drawable.ic_radio_default)
         }
@@ -366,6 +365,13 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         this.cacheDir.deleteRecursively()
         databaseViewModel.removeUnusedStations()
+
+        mainViewModel.searchPreferences.edit().apply {
+            putString(SEARCH_PREF_TAG, mainViewModel.searchParamTag.value)
+            putString(SEARCH_PREF_NAME, mainViewModel.searchParamName.value)
+            putString(SEARCH_PREF_COUNTRY, mainViewModel.searchParamCountry.value)
+        }.apply()
+
         super.onPause()
     }
 

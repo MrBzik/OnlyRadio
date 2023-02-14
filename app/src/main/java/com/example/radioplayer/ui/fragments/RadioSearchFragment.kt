@@ -202,8 +202,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                 putString("NAME", name)
             }
 
-            putBoolean("SEARCH_TOP", false)
-
         }
         mainViewModel.isNewSearch = true
         mainViewModel.setSearchBy(bundle)
@@ -217,16 +215,18 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     private fun setSearchParamsObservers(){
 
         mainViewModel.searchParamTag.observe(viewLifecycleOwner){
-            bind.tvTag.text = it
+
+             bind.tvTag.text = if (it == "") "Tag" else it
+
         }
 
         mainViewModel.searchParamName.observe(viewLifecycleOwner){
-            bind.tvName.text = it
+            bind.tvName.text = if (it == "") "Name" else it
         }
 
         mainViewModel.searchParamCountry.observe(viewLifecycleOwner){
 
-           bind.tvSelectedCountry.text = it
+           bind.tvSelectedCountry.text = if (it == "") "Country" else it
         }
     }
 

@@ -34,7 +34,7 @@ class RemovePlaylistDialog(
 
         window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
 
-        bind.tvTitle.text = "Delete playlist $currentPlaylist and its content?"
+        bind.tvNameOfPlaylist.text = "\"$currentPlaylist\""
 
 
         bind.tvBack.setOnClickListener {

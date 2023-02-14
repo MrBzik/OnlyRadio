@@ -1,42 +1,40 @@
 package com.example.radioplayer.ui.viewmodels
 
+import android.app.Application
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
 import android.util.Log
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
-import com.example.radioplayer.adapters.PagingRadioAdapter
 import com.example.radioplayer.adapters.datasources.RadioStationsDataSource
 import com.example.radioplayer.adapters.datasources.StationsPageLoader
 import com.example.radioplayer.data.local.entities.RadioStation
-import com.example.radioplayer.data.remote.entities.RadioTagsItem
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.repositories.DatabaseRepository
+import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
+import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
+import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
+import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
 import com.example.radioplayer.utils.Country
-import com.hbb20.countrypicker.models.CPCountry
-import com.hbb20.countrypicker.view.CPViewHelper
-import com.hbb20.countrypicker.view.prepareCustomCountryPickerView
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
-import java.io.*
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 @FlowPreview
 @HiltViewModel
 class MainViewModel @Inject constructor(
+    app : Application,
     private val radioServiceConnection: RadioServiceConnection,
     private val radioSource: RadioSource,
     private val repository: DatabaseRepository
-) : ViewModel() {
+) : AndroidViewModel(app) {
 
        val isConnected = radioServiceConnection.isConnected
        val currentRadioStation = radioServiceConnection.currentRadioStation
@@ -50,6 +48,10 @@ class MainViewModel @Inject constructor(
        val searchParamTag : MutableLiveData<String> = MutableLiveData()
        val searchParamName : MutableLiveData<String> = MutableLiveData()
        val searchParamCountry : MutableLiveData<String> = MutableLiveData()
+
+       val searchPreferences = app.getSharedPreferences("SearchPref", Context.MODE_PRIVATE)
+
+
 
         init {
 
@@ -80,14 +82,12 @@ class MainViewModel @Inject constructor(
                    val tag = getString("TAG") ?: ""
                    val name = getString("NAME") ?: ""
                    val country = getString("COUNTRY") ?: ""
-                   val isTopSearch = getBoolean("SEARCH_TOP")
 
                    this.putInt("OFFSET", calcOffset)
 
                    val response = radioSource.getRadioStationsSource(
                        offset = calcOffset,
                        pageSize = limit,
-                       isTopSearch = isTopSearch,
                        country = country,
                        tag = tag,
                        name = name
@@ -155,7 +155,24 @@ class MainViewModel @Inject constructor(
 
 
 
-    private val searchBy = MutableLiveData(bundleOf(Pair("SEARCH_TOP", true)))
+    private val initialSearchBundle = Bundle().apply {
+
+        val tag = searchPreferences.getString(SEARCH_PREF_TAG, "")
+        val name = searchPreferences.getString(SEARCH_PREF_NAME, "")
+        val country = searchPreferences.getString(SEARCH_PREF_COUNTRY, "")
+
+        searchParamTag.postValue(tag ?: "")
+        searchParamName.postValue(name ?: "")
+        searchParamCountry.postValue(country ?: "")
+
+        putString("TAG", tag)
+        putString("NAME", name)
+        putString("COUNTRY", country)
+
+    }
+
+
+    private val searchBy = MutableLiveData(initialSearchBundle)
 
     val stationsFlow = searchBy.asFlow()
         .flatMapLatest {
@@ -164,19 +181,14 @@ class MainViewModel @Inject constructor(
         .cachedIn(viewModelScope)
 
 
-
-
-
-
     fun setSearchBy(value : Bundle){
 
         searchBy.value?.let {
         if(it.getString("TAG") == value.getString("TAG")
             && it.getString("NAME") == value.getString("NAME")
             && it.getString("COUNTRY") == value.getString("COUNTRY")
-            && it.getBoolean("SEARCH_TOP") == value.getBoolean("SEARCH_TOP")
-        )  return
 
+        )  return
                 searchBy.value = value
         }
 
@@ -259,8 +271,5 @@ class MainViewModel @Inject constructor(
 
     }
 
-//    init {
-//        getCountries()
-//    }
 }
 

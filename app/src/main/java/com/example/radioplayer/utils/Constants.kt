@@ -2,11 +2,16 @@ package com.example.radioplayer.utils
 
 object Constants {
 
-    const val BASE_RADIO_URL = "https://de1.api.radio-browser.info"
+    const val BASE_RADIO_URL1 = "https://de1.api.radio-browser.info"
 
     const val BASE_RADIO_URL2 = "https://nl1.api.radio-browser.info/"
 
     const val BASE_RADIO_URL3 = "https://at1.api.radio-browser.info/"
+
+    var BASE_RADIO_URL = "base radio url"
+
+
+    val listOfUrls = listOf(BASE_RADIO_URL1, BASE_RADIO_URL2, BASE_RADIO_URL3)
 
     const val PIXABAY_BASE_URL = "https://pixabay.com"
 
@@ -43,4 +48,7 @@ object Constants {
     const val HISTORY_NEVER_CLEAN = "never clean"
 
 
+    const val SEARCH_PREF_TAG = "search preferences tag"
+    const val SEARCH_PREF_NAME = "search preferences name"
+    const val SEARCH_PREF_COUNTRY = "search preferences country"
 }
