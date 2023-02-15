@@ -2,6 +2,7 @@ package com.example.radioplayer.ui.dialogs
 
 import android.content.Context
 import android.os.Bundle
+import android.view.Gravity
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
@@ -29,11 +30,12 @@ class NameDialog (
         setContentView(bind.root)
 
         window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        window?.setGravity(Gravity.TOP)
 
         bind.tvNameOfRadioStation.apply {
             if(textView.text != "Name") {
                 isVisible = true
-                text = "\"${textView.text}\""
+                text = textView.text
             }
         }
 

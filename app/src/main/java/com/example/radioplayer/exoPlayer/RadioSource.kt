@@ -14,9 +14,7 @@ import com.example.radioplayer.exoPlayer.State.*
 import com.example.radioplayer.utils.Constants.API_RADIO_SEARCH_URL
 import com.example.radioplayer.utils.Constants.API_RADIO_TOP_VOTE_SEARCH_URL
 import com.example.radioplayer.utils.Constants.BASE_RADIO_URL
-
 import com.example.radioplayer.utils.Constants.BASE_RADIO_URL3
-import com.example.radioplayer.utils.Constants.BASE_RADIO_URLTEST
 import com.example.radioplayer.utils.Constants.listOfUrls
 
 import javax.inject.Inject
@@ -61,13 +59,16 @@ class RadioSource @Inject constructor(
 
     suspend fun getStationsInPlaylist(playlistName: String): List<RadioStation> {
 
-        val response = radioDAO.getStationsInPlaylist(playlistName).first().radioStations
+        val response = radioDAO.getStationsInPlaylist(playlistName)
 
-        stationsFromPlaylist = response.map { station ->
+       val list = if(response.isEmpty()) emptyList()
+            else{response.first().radioStations}
+
+        stationsFromPlaylist = list.map { station ->
             stationToMediaMetadataCompat(station)
         }.toMutableList()
 
-        return response
+        return list
     }
 
 

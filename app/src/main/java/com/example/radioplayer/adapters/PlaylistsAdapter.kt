@@ -61,8 +61,11 @@ class PlaylistsAdapter @Inject constructor(
                  .inflate(R.layout.item_playlist_cover, parent, false)
             val playlist = PlaylistHolder(view)
             playlist.itemView.setOnClickListener {
+
                 playlistClickListener?.let { click ->
-                    click(differ.currentList[playlist.absoluteAdapterPosition], playlist.bind.ivPlaylistCover)
+                    click(differ.currentList[playlist.absoluteAdapterPosition],
+                            playlist.absoluteAdapterPosition
+                        )
                 }
             }
             return playlist
@@ -155,9 +158,9 @@ class PlaylistsAdapter @Inject constructor(
 
 
 
-    private var playlistClickListener : ((Playlist, cover : ImageView) -> Unit)? = null
+    private var playlistClickListener : ((Playlist, position : Int) -> Unit)? = null
 
-    fun setPlaylistClickListener (listener : (Playlist, cover : ImageView) -> Unit){
+    fun setPlaylistClickListener (listener : (Playlist, position : Int) -> Unit){
 
         playlistClickListener = listener
 

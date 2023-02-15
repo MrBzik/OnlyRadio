@@ -1,7 +1,6 @@
 package com.example.radioplayer.ui.fragments
 
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -21,6 +20,7 @@ import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.CreatePlaylistDialog
 import com.example.radioplayer.ui.dialogs.EditPlaylistDialog
+import com.example.radioplayer.ui.dialogs.RemovePlaylistDialog
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
@@ -47,14 +47,12 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     @Inject
     lateinit var mainAdapter: RadioDatabaseAdapter
 
-
     lateinit var playlistAdapter : PlaylistsAdapter
 
     @Inject
     lateinit var glide : RequestManager
 
-    lateinit var currentPlaylistCover : ImageView
-
+    private var currentPlaylistPosition = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -91,23 +89,52 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         bind.tvPlaylistEdit.setOnClickListener {
 
-            EditPlaylistDialog (
+            var isDeletePlaylistCalled = false
+            var isCoverUpdateNeeded = false
+            var newImageUrl = ""
+
+            val dialog =  EditPlaylistDialog (
                 requireContext(), listOfPlaylists,
-                currentPlaylistName, currentPlaylistCover,
-                databaseViewModel, pixabayViewModel, glide
-            ){
+                currentPlaylistName,
+                currentPlaylistPosition,
+                databaseViewModel, pixabayViewModel, glide,
+             {
+                isDeletePlaylistCalled = it
+            }, { checkCoverUpdate, imageUrl ->
+                isCoverUpdateNeeded = checkCoverUpdate
+                newImageUrl = imageUrl
+                })
 
-               val stations = mainAdapter.listOfStations
+            dialog.show()
 
-                databaseViewModel.deletePlaylistAndContent(currentPlaylistName, stations)
+            dialog.setOnDismissListener {
 
-                databaseViewModel.getAllFavouredStations()
+                if(isCoverUpdateNeeded){
 
-            }.show()
+                    val view = bind.rvPlaylists
+                        .findViewHolderForAdapterPosition(currentPlaylistPosition)?.itemView?.
+                        findViewById<ImageView>(R.id.ivPlaylistCover)
 
+                    view?.let {
+                        glide.load(newImageUrl).into(it)
+                    }
+                }
+
+                if(isDeletePlaylistCalled){
+
+                    RemovePlaylistDialog(requireContext(), currentPlaylistName){
+                        val stations = mainAdapter.listOfStations
+
+                        databaseViewModel.deletePlaylistAndContent(currentPlaylistName, stations)
+
+                        databaseViewModel.getAllFavouredStations()
+
+                    }.show()
+                }
+            }
         }
-
     }
+
 
     private fun observePlaylistsVisibilityState(){
 
@@ -163,10 +190,9 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 ).show()
             }
 
-            setPlaylistClickListener { playlist, cover ->
+            setPlaylistClickListener { playlist, position ->
                 databaseViewModel.getStationsInPlaylist(playlist.playlistName)
-                currentPlaylistCover = cover
-
+                currentPlaylistPosition = position
             }
 
             handleDragAndDrop = { stationID, playlistName ->
@@ -178,8 +204,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 }
                     else {
                     databaseViewModel.deleteStationPlaylistCrossRef(StationPlaylistCrossRef(
-                        stationID, currentPlaylistName
-                    ))
+                        stationID, currentPlaylistName))
 
                     }
 
@@ -225,7 +250,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
 
             if(it){
-                bind.tvPlaylistName.text = "Favoured stations"
+                bind.tvPlaylistName.text = getString(R.string.Favoured)
                 searchFlag = SEARCH_FROM_FAVOURITES
 
             } else{
@@ -337,12 +362,12 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         ).apply {
             setAction("UNDO"){
 
-                databaseViewModel.insertStationPlaylistCrossRef(
-                    StationPlaylistCrossRef(stationID, currentPlaylistName)
+                databaseViewModel.insertStationPlaylistCrossRefAndUpdate(
+                    StationPlaylistCrossRef(stationID, currentPlaylistName),
+                    currentPlaylistName
                 )
                 databaseViewModel.incrementRadioStationPlaylist(stationID)
 
-                databaseViewModel.getStationsInPlaylist(currentPlaylistName, true)
             }
         }.show()
     }
@@ -352,13 +377,12 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             databaseViewModel.checkIfInPlaylistOrIncrement(playlistName, stationID)
 
-            databaseViewModel.insertStationPlaylistCrossRef(
+            databaseViewModel.insertStationPlaylistCrossRefAndUpdate(
                 StationPlaylistCrossRef(
                     stationID, playlistName
-                )
+                ), currentPlaylistName
             )
 
-            databaseViewModel.getStationsInPlaylist(currentPlaylistName, true)
 
             Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
                 "Station was moved to $playlistName",

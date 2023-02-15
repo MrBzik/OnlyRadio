@@ -19,15 +19,12 @@ import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingPixabayAdapter
 import com.example.radioplayer.data.local.entities.Playlist
-import com.example.radioplayer.databinding.DialogCreatePlaylistBinding
 import com.example.radioplayer.databinding.DialogEditPlaylistBinding
 
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
-import javax.inject.Inject
 
 
 @ExperimentalCoroutinesApi
@@ -36,11 +33,13 @@ class EditPlaylistDialog (
     private val requireContext : Context,
     var listOfPlaylists : List<Playlist>,
     private var currentPlaylistName : String,
-    private var currentPlaylistCover : ImageView,
+    private var currentPlaylistPosition : Int,
     private val databaseViewModel: DatabaseViewModel,
     private val pixabayViewModel: PixabayViewModel,
     private val glide : RequestManager,
-    private val deletePlaylist : () -> Unit
+    private val deletePlaylist : (Boolean) -> Unit,
+    private val updateCover : (Boolean, String) -> Unit
+
 
 ) : AppCompatDialog(requireContext) {
 
@@ -49,6 +48,8 @@ class EditPlaylistDialog (
     lateinit var imageAdapter : PagingPixabayAdapter
 
     private var imageSelected = ""
+
+    lateinit var currentPlaylist : Playlist
 
     lateinit var listOfPlaylistNames : List<String>
 
@@ -69,7 +70,7 @@ class EditPlaylistDialog (
 
         setupRecycleView()
 
-        nameTextChangeTextListener()
+        editTextChangeTextListener()
 
         acceptButtonClickListener()
 
@@ -90,18 +91,22 @@ class EditPlaylistDialog (
     private fun setOnDeleteClickListener(){
 
         bind.tvDelete.setOnClickListener {
-            RemovePlaylistDialog(requireContext, currentPlaylistName){
-                deletePlaylist()
-            }.show()
+
+            deletePlaylist(true)
             bind.rvImages.adapter = null
             dismiss()
+
         }
     }
 
     private fun setTitleAndEditTextField(){
 
-        bind.tvNameOfPlaylist.text = "\"$currentPlaylistName\""
+        bind.tvNameOfPlaylist.text = currentPlaylistName
         bind.etPlaylistName.setText(currentPlaylistName)
+
+        currentPlaylist = listOfPlaylists[currentPlaylistPosition]
+        glide.load(currentPlaylist.coverURI).into(bind.ivSelectedImage)
+        imageSelected = currentPlaylist.coverURI
     }
 
 
@@ -128,7 +133,7 @@ class EditPlaylistDialog (
 
 
 
-    private fun nameTextChangeTextListener(){
+    private fun editTextChangeTextListener(){
 
         bind.etPlaylistName.addTextChangedListener(object : TextWatcher{
 
@@ -170,11 +175,14 @@ class EditPlaylistDialog (
 
             else {
 
-                if (imageSelected.isEmpty()){ /*DO NOTHING*/ } else {
+                if (imageSelected == currentPlaylist.coverURI){ /*DO NOTHING*/ }
+                else {
                     databaseViewModel.editPlaylistCover(currentPlaylistName, imageSelected)
                 }
                 if (nameField == currentPlaylistName || nameField.isEmpty()) {
-                   glide.load(imageSelected).into(currentPlaylistCover)
+
+                    updateCover(true, imageSelected)
+
 
                 } else {
                     databaseViewModel.editOldCrossRefWithPlaylist(currentPlaylistName, nameField)

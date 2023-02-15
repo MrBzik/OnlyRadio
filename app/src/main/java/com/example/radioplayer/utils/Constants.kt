@@ -8,7 +8,7 @@ object Constants {
 
     const val BASE_RADIO_URL3 = "https://at1.api.radio-browser.info"
 
-    const val BASE_RADIO_URLTEST = "https://ts1.api.radio-browser.info"
+//    const val BASE_RADIO_URLTEST = "https://ts1.api.radio-browser.info"
 
     const val API_RADIO_SEARCH_URL = "/json/stations/search"
     const val API_RADIO_TOP_VOTE_SEARCH_URL = "/json/stations/topvote"
@@ -16,7 +16,7 @@ object Constants {
     const val BASE_RADIO_URL = "radio base url"
 
 
-    val listOfUrls = listOf(BASE_RADIO_URL1, BASE_RADIO_URL2, BASE_RADIO_URL3, BASE_RADIO_URLTEST)
+    val listOfUrls = listOf(BASE_RADIO_URL1, BASE_RADIO_URL2, BASE_RADIO_URL3)
 
     const val PIXABAY_BASE_URL = "https://pixabay.com"
 

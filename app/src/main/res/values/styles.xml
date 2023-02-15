@@ -4,14 +4,26 @@
     <style name="mainTextButtons" parent="android:Widget.TextView">
         <item name="android:textColor">@color/interactive_text_color</item>
         <item name="android:textSize">18sp</item>
-        <item name="android:fontFamily">@font/skranji</item>
+        <item name="android:fontFamily">@font/aldrich</item>
     </style>
 
     <style name="mainTextTitle" parent="android:Widget.TextView">
         <item name="android:textColor">@color/color_non_interactive</item>
         <item name="android:textSize">18sp</item>
-        <item name="android:fontFamily">@font/skranji</item>
+        <item name="android:fontFamily">@font/aldrich</item>
     </style>
+
+    <style name="bottomNavTextActive" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/color_non_interactive</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">sans-serif-smallcaps</item>
+    </style>
+    <style name="bottomNavTextInactive" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/regular_text_color</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">sans-serif-smallcaps</item>
+    </style>
+
 
     <style name="dialogTextButtons" parent="android:Widget.TextView">
         <item name="android:fontFamily">sans-serif-smallcaps</item>
@@ -38,8 +50,20 @@
     <style name="dialogCurrentValue" parent="android:Widget.TextView">
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@color/regular_text_color</item>
-       <item name="android:fontFamily">@font/skranji</item>
+       <item name="android:fontFamily">@font/aldrich</item>
     </style>
 
+    <style name="dialogItemText" parent="android:Widget.TextView">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/regular_text_color</item>
+        <item name="android:fontFamily">@font/aldrich</item>
+    </style>
+
+
+    <style name="detailsTextExtras" parent="android:Widget.TextView">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/regular_text_color</item>
+        <item name="android:fontFamily">@font/aldrich</item>
+    </style>
 
 </resources>

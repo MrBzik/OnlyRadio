@@ -27,6 +27,7 @@ import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlin.math.absoluteValue
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -45,7 +46,6 @@ class MainActivity : AppCompatActivity() {
 
 
     private val colorGray = Color.DKGRAY
-    private val colorRed = Color.RED
     private var currentStation : RadioStation? = null
     private var isFavoured = false
 
@@ -77,6 +77,8 @@ class MainActivity : AppCompatActivity() {
         bind.stubPlayer.setOnInflateListener{ _, inflated ->
                 bindPlayer = StubPlayerActivityMainBinding.bind(inflated)
         }
+
+
 
 
         window.navigationBarColor = Color.BLACK
@@ -195,7 +197,7 @@ class MainActivity : AppCompatActivity() {
             bind.fabAddToFav.backgroundTintList = ColorStateList.valueOf(colorGray)
 
         } else {
-            bind.fabAddToFav.backgroundTintList = ColorStateList.valueOf(colorRed)
+            bind.fabAddToFav.backgroundTintList = ColorStateList.valueOf(Color.rgb(168, 22, 12))
 
         }
     }
@@ -217,7 +219,7 @@ class MainActivity : AppCompatActivity() {
 
                 bindPlayer.tvExpandHideText.setText(R.string.Hide)
                 bind.fabAddToFav.isVisible = true
-
+          
             }
 
             else {

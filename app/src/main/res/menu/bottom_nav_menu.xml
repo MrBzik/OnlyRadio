@@ -5,18 +5,18 @@
     <item
         android:id="@+id/mi_radioSearchFragment"
         android:title="Search"
-        android:icon="@drawable/ic_radio_search"
+
         />
 
     <item
         android:id="@+id/mi_favStationsFragment"
         android:title="Playlists"
-        android:icon="@drawable/ic_radio_favourite"/>
+       />
 
     <item
         android:id="@+id/mi_historyFragment"
         android:title="History"
-        android:icon="@drawable/ic_history_tab"/>
+       />
 
 
 </menu>

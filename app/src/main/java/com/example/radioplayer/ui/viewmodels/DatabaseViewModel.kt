@@ -2,15 +2,11 @@ package com.example.radioplayer.ui.viewmodels
 
 import android.app.Application
 import android.content.Context
-import android.os.Bundle
-import android.provider.MediaStore.Audio.Radio
-import android.util.Log
 import androidx.lifecycle.*
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.example.radioplayer.adapters.PagingHistoryAdapter
 import com.example.radioplayer.adapters.datasources.HistoryDataSource
 import com.example.radioplayer.adapters.datasources.HistoryDateLoader
 import com.example.radioplayer.adapters.models.StationWithDateModel
@@ -19,10 +15,8 @@ import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.relations.StationDateCrossRef
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
-import com.example.radioplayer.exoPlayer.RadioServiceConnection
 import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.repositories.DatabaseRepository
-import com.example.radioplayer.utils.Constants.COMMAND_LOAD_FROM_PLAYLIST
 import com.example.radioplayer.utils.Constants.HISTORY_30_DATES
 import com.example.radioplayer.utils.Constants.HISTORY_3_DATES
 import com.example.radioplayer.utils.Constants.HISTORY_7_DATES
@@ -32,7 +26,6 @@ import com.example.radioplayer.utils.Constants.HISTORY_OPTIONS
 import com.example.radioplayer.utils.Utils.fromDateToString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import java.sql.Date
@@ -89,8 +82,12 @@ class DatabaseViewModel @Inject constructor(
             }
         }
 
-    fun insertStationPlaylistCrossRef(crossRef: StationPlaylistCrossRef) = viewModelScope.launch {
+    fun insertStationPlaylistCrossRefAndUpdate(
+                    crossRef: StationPlaylistCrossRef,
+                    playlistName : String
+                    ) = viewModelScope.launch {
         repository.insertStationPlaylistCrossRef(crossRef)
+        getStationsInPlaylist(playlistName, true)
 
     }
 
@@ -123,13 +120,13 @@ class DatabaseViewModel @Inject constructor(
 
         observableListOfStations.addSource(stationInFavoured) { favStations ->
             if (isInFavouriteTab.value!!) {
-                observableListOfStations.value = favStations
+                observableListOfStations.value = favStations.reversed()
 
             }
         }
         observableListOfStations.addSource(stationsInPlaylist) { playlistStations ->
             if (!isInFavouriteTab.value!!) {
-                observableListOfStations.value = playlistStations
+                observableListOfStations.value = playlistStations.reversed()
 
             }
         }

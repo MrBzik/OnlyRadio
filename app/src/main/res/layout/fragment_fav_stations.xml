@@ -15,7 +15,6 @@
         android:layout_marginTop="16dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="Favoured stations"
         android:textAppearance="@style/mainTextTitle"
         app:layout_constraintEnd_toStartOf="@id/tvPlaylistEdit"
         app:layout_constraintStart_toStartOf="parent"
@@ -102,7 +101,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPlaylists"
         android:layout_width="0dp"
-        android:layout_height="120dp"
+        android:layout_height="130dp"
         android:layout_gravity="bottom"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"

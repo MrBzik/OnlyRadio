@@ -3,6 +3,7 @@ package com.example.radioplayer.ui.dialogs
 import android.R
 import android.content.Context
 import android.os.Bundle
+import android.view.Gravity
 import android.view.WindowManager
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatDialog
@@ -33,8 +34,9 @@ class RemovePlaylistDialog(
         setContentView(bind.root)
 
         window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        window?.setGravity(Gravity.TOP)
 
-        bind.tvNameOfPlaylist.text = "\"$currentPlaylist\""
+        bind.tvNameOfPlaylist.text = currentPlaylist
 
 
         bind.tvBack.setOnClickListener {

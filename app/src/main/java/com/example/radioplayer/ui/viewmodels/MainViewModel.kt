@@ -271,5 +271,15 @@ class MainViewModel @Inject constructor(
 //
 //    }
 
+
+//    init {
+//
+//        viewModelScope.launch {
+//           val list = repository.getAllStations()
+//            Log.d("CHECKTAGS", list.toString())
+//        }
+//
+//    }
+
 }
 

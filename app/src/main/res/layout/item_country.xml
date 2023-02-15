@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
+    android:layout_height="60dp"
 
     >
 
@@ -9,17 +9,20 @@
         android:id="@+id/ivCountryFlag"
         android:layout_width="30dp"
         android:layout_height="20dp"
-        android:layout_margin="15dp"
+        android:layout_marginVertical="20dp"
+        android:layout_marginHorizontal="15dp"
 
         />
 
     <TextView
         android:id="@+id/tvCountryName"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="country"
-        android:textColor="@color/white"
+        android:layout_height="60dp"
+        android:text=""
+        android:maxLines="3"
+        android:ellipsize="end"
         android:gravity="center_vertical"
+        android:textAppearance="@style/dialogItemText"
         />
 
 

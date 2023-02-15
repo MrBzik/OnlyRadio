@@ -10,5 +10,6 @@
     <string name="dialog_create_playlist">New playlist</string>
     <string name="dialog_accept_button">Accept</string>
     <string name="dialog_clear_selection">Clear selection</string>
+    <string name="Favoured">Favoured</string>
 
 </resources>

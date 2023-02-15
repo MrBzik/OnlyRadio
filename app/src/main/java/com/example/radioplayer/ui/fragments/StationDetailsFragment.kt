@@ -3,14 +3,9 @@ package com.example.radioplayer.ui.fragments
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
-import androidx.fragment.app.Fragment
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Playlist
@@ -19,8 +14,6 @@ import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.databinding.FragmentStationDetailsBinding
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.dialogs.AddStationToPlaylistDialog
-import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
-import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -75,16 +68,22 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             currentRadioStation = it
 
             bind.tvName.text = it.name
-            bind.tvCountry.text = it.country
-
             glide.load(it.favicon).into(bind.ivIcon)
-
             homepageUrl = it.homepage
+            if(!it.country.isNullOrBlank()){
+                bind.tvCountry.isVisible = true
+                bind.tvCountry.text = it.country
+            }
 
-            val tags = it.tags?.replace(",", ", ")
-            bind.tvTags.text = "Tags : $tags"
-
-            bind.tvLanguage.text = "Languages : ${it.language}"
+            if(!it.language.isNullOrBlank()){
+                bind.tvLanguage.isVisible = true
+                bind.tvLanguage.text = "Languages : ${it.language}"
+            }
+            if(!it.tags.isNullOrBlank()){
+                bind.tvTags.isVisible = true
+                val tags = it.tags.replace(",", ", ")
+                bind.tvTags.text = "Tags : $tags"
+            }
         }
     }
 
@@ -131,13 +130,11 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
             databaseViewModel.checkIfInPlaylistOrIncrement(playlistName, station.stationuuid)
 
-            databaseViewModel.insertStationPlaylistCrossRef(
+            databaseViewModel.insertStationPlaylistCrossRefAndUpdate(
                 StationPlaylistCrossRef(
                     station.stationuuid, playlistName
-                )
+                ), playlistName
             )
-
-            databaseViewModel.getStationsInPlaylist(playlistName, true)
 
             Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
                 "Station was added to $playlistName",

@@ -117,4 +117,6 @@ class DatabaseRepository @Inject constructor(
 
     suspend fun deleteDate(date : HistoryDate) = radioDAO.deleteDate(date)
 
+    suspend fun getAllStations() = radioDAO.getAllStations()
+
 }

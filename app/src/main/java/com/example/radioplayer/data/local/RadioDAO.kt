@@ -131,4 +131,8 @@ interface  RadioDAO {
     @Delete
     suspend fun deleteDate(date : HistoryDate)
 
+    //test
+    @Query("SELECT COUNT(stationuuid) FROM RadioStation")
+    suspend fun getAllStations() : Int
+
 }

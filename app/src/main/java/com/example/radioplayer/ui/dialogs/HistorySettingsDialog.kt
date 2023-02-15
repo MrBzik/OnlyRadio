@@ -4,10 +4,12 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.Gravity
 import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDialog
+import com.example.radioplayer.R
 import com.example.radioplayer.databinding.DialogHistorySettingsBinding
 import com.example.radioplayer.databinding.DialogPickTagBinding
 import com.example.radioplayer.ui.viewmodels.MainViewModel
@@ -38,8 +40,9 @@ class HistorySettingsDialog (
 
         window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
 
+        window?.setGravity(Gravity.TOP)
 
-        val arrayAdapter = ArrayAdapter(requireContext, android.R.layout.simple_list_item_1, listOfOptions)
+        val arrayAdapter = ArrayAdapter(requireContext, R.layout.item_text, listOfOptions)
 
         bind.listViewOptions.adapter = arrayAdapter
 

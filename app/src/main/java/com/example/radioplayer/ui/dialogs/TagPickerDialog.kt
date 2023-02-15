@@ -37,7 +37,7 @@ class TagPickerDialog (
         window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
 
 
-        val arrayAdapter = ArrayAdapter(requireContext, android.R.layout.simple_list_item_1, listOfItems)
+        val arrayAdapter = ArrayAdapter(requireContext, R.layout.item_text, listOfItems)
 
         bind.listView.adapter = arrayAdapter
 

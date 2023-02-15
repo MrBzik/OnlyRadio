@@ -25,7 +25,7 @@
         android:id="@+id/tvNameOfPlaylist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:text="playlist name"
         android:textAppearance="@style/dialogCurrentValue"
         app:layout_constraintEnd_toEndOf="parent"
@@ -38,23 +38,25 @@
         android:id="@+id/tvDeletePlaylist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
         android:text="Delete playlist"
         android:textAppearance="@style/dialogTextButtons"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvNameOfPlaylist" />
 
     <TextView
         android:id="@+id/tvBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
+        android:layout_marginTop="30dp"
         android:layout_marginBottom="20dp"
         android:text="@string/dialog_back_button"
         android:textAppearance="@style/dialogTextButtons"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvNameOfPlaylist" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
