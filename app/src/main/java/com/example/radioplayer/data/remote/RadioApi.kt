@@ -4,14 +4,20 @@ import com.example.radioplayer.data.remote.entities.Countries
 import com.example.radioplayer.data.remote.entities.RadioStations
 import com.example.radioplayer.data.remote.entities.RadioTags
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
+import org.json.JSONObject
 import retrofit2.Response
+import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
+import retrofit2.http.Url
+
 
 interface RadioApi {
 
-        @POST("/json/stations/search")
+        @POST()
         suspend fun searchRadio(
+
+            @Url url : String,
 
             @Query("countrycode")
             country : String,
@@ -36,8 +42,10 @@ interface RadioApi {
 
         ) : Response<RadioStations>
 
-    @POST("/json/stations/search")
+    @POST()
     suspend fun searchRadioWithoutCountry(
+
+        @Url url : String,
 
         @Query("tag")
         tag : String,
@@ -60,10 +68,11 @@ interface RadioApi {
     ) : Response<RadioStations>
 
 
-
-
-        @POST("/json/stations/topvote")
+        @POST()
         suspend fun getTopVotedStations(
+
+            @Url url: String,
+
             @Query("limit")
             limit : Int = PAGE_SIZE,
 
@@ -73,6 +82,9 @@ interface RadioApi {
             @Query("hidebroken")
             hidebroken : Boolean = true
         ) : Response<RadioStations>
+
+
+
 
         @POST("/json/tags")
         suspend fun getAllTags() : Response<RadioTags>

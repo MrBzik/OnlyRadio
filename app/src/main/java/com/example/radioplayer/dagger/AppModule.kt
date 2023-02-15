@@ -16,9 +16,6 @@ import com.example.radioplayer.data.remote.RadioApi
 import com.example.radioplayer.exoPlayer.RadioServiceConnection
 import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.repositories.DatabaseRepository
-import com.example.radioplayer.utils.Constants
-import com.example.radioplayer.utils.Constants.BASE_RADIO_URL
-import com.example.radioplayer.utils.Constants.BASE_RADIO_URL1
 import com.example.radioplayer.utils.Constants.BASE_RADIO_URL3
 import com.example.radioplayer.utils.Constants.DATABASE_NAME
 import com.example.radioplayer.utils.Constants.PIXABAY_BASE_URL
@@ -76,20 +73,18 @@ object AppModule {
     ) = RadioServiceConnection(app)
 
 
-//    @Provides
-//    @Singleton
-//    fun providesValidUrlPrefs(
-//        @ApplicationContext app : Context
-//    ) : SharedPreferences {
-//      return app.getSharedPreferences("valid url preferences", Context.MODE_PRIVATE)
-//    }
+    @Provides
+    @Singleton
+    fun providesValidUrlPrefs(
+        @ApplicationContext app : Context
+    ) : SharedPreferences {
+      return app.getSharedPreferences("valid url preferences", Context.MODE_PRIVATE)
+    }
 
 
     @Provides
     @Singleton
-    fun providesRadioApi (
-
-    ) : RadioApi {
+    fun providesRadioApi () : RadioApi {
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(BASE_RADIO_URL3)
@@ -101,9 +96,10 @@ object AppModule {
     @Singleton
     fun provideRadioSource (
         radioApi: RadioApi,
-        radioDAO: RadioDAO
+        radioDAO: RadioDAO,
+        sharedPref : SharedPreferences
     ) : RadioSource
-            = RadioSource(radioApi, radioDAO)
+            = RadioSource(radioApi, radioDAO, sharedPref)
 
 
 

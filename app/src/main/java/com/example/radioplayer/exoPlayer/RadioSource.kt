@@ -4,22 +4,27 @@ package com.example.radioplayer.exoPlayer
 import android.content.SharedPreferences
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
+import android.util.Log
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.relations.DateWithStations
 import com.example.radioplayer.data.remote.RadioApi
 import com.example.radioplayer.data.remote.entities.*
 import com.example.radioplayer.exoPlayer.State.*
+import com.example.radioplayer.utils.Constants.API_RADIO_SEARCH_URL
+import com.example.radioplayer.utils.Constants.API_RADIO_TOP_VOTE_SEARCH_URL
 import com.example.radioplayer.utils.Constants.BASE_RADIO_URL
-import com.example.radioplayer.utils.Constants.BASE_RADIO_URL1
+
+import com.example.radioplayer.utils.Constants.BASE_RADIO_URL3
+import com.example.radioplayer.utils.Constants.BASE_RADIO_URLTEST
 import com.example.radioplayer.utils.Constants.listOfUrls
-import retrofit2.Response
 
 import javax.inject.Inject
 
 class RadioSource @Inject constructor(
     private val radioApi: RadioApi,
-    private val radioDAO: RadioDAO
+    private val radioDAO: RadioDAO,
+    private val validBaseUrlPref : SharedPreferences
 
 ) {
     var stations = mutableListOf<MediaMetadataCompat>()
@@ -67,22 +72,60 @@ class RadioSource @Inject constructor(
 
 
 
+    private var validBaseUrl = validBaseUrlPref.getString(BASE_RADIO_URL, BASE_RADIO_URL3)
+
+//    private var validBaseUrl = BASE_RADIO_URLTEST
+
+    private var initialBaseUrlIndex = listOfUrls.indexOf(validBaseUrl)
+
+    private var currentUrlIndex = 0
+
     suspend fun getRadioStationsSource(
         country: String = "", tag: String = "", name: String = "", offset: Int = 0, pageSize: Int
     ): RadioStations? {
 
-        val response = if(tag == "" && name == "" && country == ""){
-            radioApi.getTopVotedStations(offset = offset, limit = pageSize)
-        } else {
-            if(country != "") {
-                radioApi.searchRadio(country, tag, name, offset = offset, limit = pageSize)
-            } else {
-                radioApi.searchRadioWithoutCountry(tag = tag, name = name, offset = offset, limit = pageSize)
-            }
-        }
+        val response = try {
 
-            _stations = response.body()
-        return response.body()
+            if(tag == "" && name == "" && country == ""){
+                radioApi.getTopVotedStations(offset = offset, limit = pageSize,
+                    url =  "${validBaseUrl}$API_RADIO_TOP_VOTE_SEARCH_URL"
+                )
+            } else {
+                if(country != "") {
+                    radioApi.searchRadio(country = country, tag = tag, name = name, offset = offset, limit = pageSize,
+                        url = "${validBaseUrl}$API_RADIO_SEARCH_URL"
+                    )
+                } else {
+                    radioApi.searchRadioWithoutCountry(tag = tag, name = name, offset = offset, limit = pageSize,
+                        url = "${validBaseUrl}$API_RADIO_SEARCH_URL"
+                    )
+                }
+            }
+        } catch (e : Exception){
+            null
+        }
+                if(response == null) {
+
+                    for(i in currentUrlIndex until listOfUrls.size){
+
+                        if(i == initialBaseUrlIndex) {
+                            currentUrlIndex++
+                        }
+                        else {
+                            currentUrlIndex ++
+                            validBaseUrl = listOfUrls[i]
+                            return getRadioStationsSource(country, tag, name, offset, pageSize)
+                        }
+                    }
+                }
+
+                if(currentUrlIndex > 0){
+                    validBaseUrlPref.edit().putString(BASE_RADIO_URL, listOfUrls[currentUrlIndex-1]).apply()
+                    currentUrlIndex = 0
+                }
+
+            _stations = response?.body()
+        return response?.body()
 
         }
 

@@ -217,59 +217,59 @@ class MainViewModel @Inject constructor(
         }
 
 
-    private fun getCountries() = viewModelScope.launch {
-
-        val response = radioSource.getAllCountries().body()
-
-        var count = 0
-
-        val listOfCountries = mutableListOf<Country>()
-
-        val builder = StringBuilder()
-        val builder2 = StringBuilder()
-        val builder3 = StringBuilder()
-        val builder4 = StringBuilder()
-        val builder5 = StringBuilder()
-
-
-        response?.forEach {
-
-            if(count < 45) {
-                count++
-                builder.append(
-                    "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
-                )
-            } else if(count < 90) {
-            count++
-            builder2.append(
-                "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
-            )
-        } else if(count < 135) {
-                count++
-                builder3.append(
-                    "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
-                )
-            } else if(count < 175) {
-                count++
-                builder4.append(
-                    "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
-                )
-            } else {
-                count++
-                builder5.append(
-                    "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
-                )
-            }
-
-        }
-
-        Log.d("CHECKTAGS", builder.toString())
-        Log.d("CHECKTAGS", builder2.toString())
-        Log.d("CHECKTAGS", builder3.toString())
-        Log.d("CHECKTAGS", builder4.toString())
-        Log.d("CHECKTAGS", builder5.toString())
-
-    }
+//    private fun getCountries() = viewModelScope.launch {
+//
+//        val response = radioSource.getAllCountries()
+//
+//        var count = 0
+//
+//        val listOfCountries = mutableListOf<Country>()
+//
+//        val builder = StringBuilder()
+//        val builder2 = StringBuilder()
+//        val builder3 = StringBuilder()
+//        val builder4 = StringBuilder()
+//        val builder5 = StringBuilder()
+//
+//
+//        response.forEach {
+//
+//            if(count < 45) {
+//                count++
+//                builder.append(
+//                    "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
+//                )
+//            } else if(count < 90) {
+//            count++
+//            builder2.append(
+//                "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
+//            )
+//        } else if(count < 135) {
+//                count++
+//                builder3.append(
+//                    "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
+//                )
+//            } else if(count < 175) {
+//                count++
+//                builder4.append(
+//                    "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
+//                )
+//            } else {
+//                count++
+//                builder5.append(
+//                    "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
+//                )
+//            }
+//
+//        }
+//
+//        Log.d("CHECKTAGS", builder.toString())
+//        Log.d("CHECKTAGS", builder2.toString())
+//        Log.d("CHECKTAGS", builder3.toString())
+//        Log.d("CHECKTAGS", builder4.toString())
+//        Log.d("CHECKTAGS", builder5.toString())
+//
+//    }
 
 }
 
