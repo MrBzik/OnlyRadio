@@ -4,8 +4,8 @@
     <string name="notification_channel_description">Shows the currently playing station</string>
     <string name="open">Open</string>
     <string name="close">Close</string>
-    <string name="Expand">EXPAND</string>
-    <string name="Hide">HIDE</string>
+    <string name="Expand">Details</string>
+    <string name="Hide">Hide</string>
     <string name="dialog_back_button">Back</string>
     <string name="dialog_create_playlist">New playlist</string>
     <string name="dialog_accept_button">Accept</string>

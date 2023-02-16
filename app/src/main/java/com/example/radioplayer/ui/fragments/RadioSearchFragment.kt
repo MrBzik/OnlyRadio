@@ -73,9 +73,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             mainViewModel.playOrToggleStation(it, SEARCH_FROM_API)
             mainViewModel.newRadioStation.postValue(it)
-            Log.d("CHECKTAGS", "before insertion")
             databaseViewModel.insertRadioStation(it)
-            Log.d("CHECKTAGS", "after insertion")
             databaseViewModel.checkDateAndUpdateHistory(it.stationuuid)
 
         }

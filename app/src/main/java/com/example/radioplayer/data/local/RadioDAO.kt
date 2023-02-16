@@ -19,7 +19,7 @@ import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 @Dao
 interface  RadioDAO {
 
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertRadioStation(station : RadioStation)
 
     @Query("SELECT * FROM RadioStation WHERE stationuuid =:stationID LIMIT 1")
@@ -31,7 +31,7 @@ interface  RadioDAO {
     @Query("SELECT EXISTS(SELECT * FROM RadioStation WHERE stationuuid =:stationID AND favouredAt > 0)")
     suspend fun checkIfStationIsFavoured(stationID : String) : Boolean
 
-    @Query("SELECT * FROM RadioStation WHERE favouredAt > 0 ORDER BY favouredAt DESC")
+    @Query("SELECT * FROM RadioStation WHERE favouredAt > 0 ORDER BY favouredAt")
     fun getAllFavouredStations() : LiveData<List<RadioStation>>
 
     @Query("UPDATE RadioStation SET favouredAt =:value WHERE stationuuid =:stationID")

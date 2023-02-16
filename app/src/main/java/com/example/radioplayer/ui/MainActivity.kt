@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
 
         if(!isStubPlayerBindInflated) {
             this.moveTaskToBack(true)
-        } else if (bindPlayer.tvExpandHideText.text == "EXPAND") {
+        } else if (bindPlayer.tvExpandHideText.text == resources.getString(R.string.Expand)) {
             this.moveTaskToBack(true)
         } else {
             handleNavigationToFragments(null)
@@ -182,7 +182,7 @@ class MainActivity : AppCompatActivity() {
         bind.bottomNavigationView.setOnItemReselectedListener {
 
             if(isStubPlayerBindInflated){
-                if(bindPlayer.tvExpandHideText.text == "HIDE"){
+                if(bindPlayer.tvExpandHideText.text == resources.getString(R.string.Hide)){
                     handleNavigationToFragments(it)
                 }
             }
@@ -219,7 +219,7 @@ class MainActivity : AppCompatActivity() {
 
         bindPlayer.tvStationTitle.setOnClickListener{
 
-            if(bindPlayer.tvExpandHideText.text == "EXPAND") {
+            if(bindPlayer.tvExpandHideText.text == resources.getString(R.string.Expand)) {
 
                 supportFragmentManager.beginTransaction().apply {
                     replace(R.id.flFragment, stationDetailsFragment)

@@ -9,6 +9,7 @@
     <item>
         <shape>
             <gradient
+
                 android:startColor="@color/black"
                 android:centerColor="@color/transparent"
                 android:endColor="@color/black"

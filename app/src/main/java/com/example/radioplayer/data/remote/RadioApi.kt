@@ -38,7 +38,10 @@ interface RadioApi {
             hidebroken : Boolean = true,
 
             @Query("order")
-            sortBy : String = "votes"
+            sortBy : String = "votes",
+
+            @Query("reverse")
+            isReversed : Boolean = true
 
         ) : Response<RadioStations>
 
@@ -63,7 +66,10 @@ interface RadioApi {
         hidebroken : Boolean = true,
 
         @Query("order")
-        sortBy : String = "votes"
+        sortBy : String = "votes",
+
+        @Query("reverse")
+        isReversed : Boolean = true
 
     ) : Response<RadioStations>
 
