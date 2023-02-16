@@ -37,7 +37,7 @@ object AppModule {
     @Singleton
     fun providesRadioDB(
         @ApplicationContext app : Context
-    ) : RadioDB = Room.databaseBuilder(app, RadioDB::class.java, DATABASE_NAME).fallbackToDestructiveMigration().build()
+    ) : RadioDB = Room.databaseBuilder(app, RadioDB::class.java, DATABASE_NAME).build()
 
     @Provides
     @Singleton

@@ -4,13 +4,18 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
+import com.example.radioplayer.connectivityObserver.ConnectivityObserver
+import com.example.radioplayer.connectivityObserver.NetworkConnectivityObserver
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.ActivityMainBinding
 import com.example.radioplayer.databinding.StubPlayerActivityMainBinding
@@ -26,6 +31,8 @@ import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
 
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 import kotlin.math.absoluteValue
 
@@ -36,6 +43,8 @@ class MainActivity : AppCompatActivity() {
     val databaseViewModel : DatabaseViewModel by viewModels()
 
     lateinit var bind : ActivityMainBinding
+
+    lateinit var connectivityObserver: ConnectivityObserver
 
     lateinit var bindPlayer : StubPlayerActivityMainBinding
 
@@ -48,7 +57,6 @@ class MainActivity : AppCompatActivity() {
     private val colorGray = Color.DKGRAY
     private var currentStation : RadioStation? = null
     private var isFavoured = false
-
 
     private  val radioSearchFragment : RadioSearchFragment by lazy { RadioSearchFragment() }
     private  val favStationsFragment : FavStationsFragment by lazy { FavStationsFragment() }
@@ -91,6 +99,31 @@ class MainActivity : AppCompatActivity() {
 
         setOnBottomNavItemReselect()
 
+        setConnectivityObserver()
+
+    }
+
+    private fun setConnectivityObserver() {
+
+        connectivityObserver = NetworkConnectivityObserver(applicationContext)
+
+        connectivityObserver.observe().onEach {
+
+            Log.d("CHECKTAGS", "something")
+
+            when (it) {
+                ConnectivityObserver.Status.Available -> {
+                    bind.rootLayout.setBackgroundResource(R.color.black)
+                }
+                ConnectivityObserver.Status.Unavailable -> {
+                    bind.rootLayout.setBackgroundResource(R.drawable.no_internet_background)
+                }
+                ConnectivityObserver.Status.Lost -> {
+                    bind.rootLayout.setBackgroundResource(R.drawable.no_internet_background)
+                }
+                else -> {}
+            }
+        }.launchIn(lifecycleScope)
 
     }
 
@@ -364,7 +397,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onPause() {
+
+    override fun onStop() {
+        super.onStop()
         this.cacheDir.deleteRecursively()
         databaseViewModel.removeUnusedStations()
 
@@ -373,8 +408,6 @@ class MainActivity : AppCompatActivity() {
             putString(SEARCH_PREF_NAME, mainViewModel.searchParamName.value)
             putString(SEARCH_PREF_COUNTRY, mainViewModel.searchParamCountry.value)
         }.apply()
-
-        super.onPause()
     }
 
 }
