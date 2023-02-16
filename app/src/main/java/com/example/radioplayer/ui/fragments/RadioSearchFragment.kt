@@ -3,6 +3,7 @@ package com.example.radioplayer.ui.fragments
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.TextView
 import androidx.core.view.isVisible
@@ -72,7 +73,9 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             mainViewModel.playOrToggleStation(it, SEARCH_FROM_API)
             mainViewModel.newRadioStation.postValue(it)
-            databaseViewModel.ifStationAlreadyInDatabase(it.stationuuid)
+            Log.d("CHECKTAGS", "before insertion")
+            databaseViewModel.insertRadioStation(it)
+            Log.d("CHECKTAGS", "after insertion")
             databaseViewModel.checkDateAndUpdateHistory(it.stationuuid)
 
         }

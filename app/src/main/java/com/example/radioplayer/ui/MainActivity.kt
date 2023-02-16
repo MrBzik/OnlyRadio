@@ -109,8 +109,6 @@ class MainActivity : AppCompatActivity() {
 
         connectivityObserver.observe().onEach {
 
-            Log.d("CHECKTAGS", "something")
-
             when (it) {
                 ConnectivityObserver.Status.Available -> {
                     bind.rootLayout.setBackgroundResource(R.color.black)
@@ -164,7 +162,6 @@ class MainActivity : AppCompatActivity() {
         bindPlayer.root.slideAnim(500, 0, R.anim.fade_in_anim)
 
         clickListenerToHandleNavigationWithDetailsFragment()
-        observeIfNewStationExistsInDB()
         observeIfNewStationFavoured()
         addToFavClickListener()
         onClickListenerForTogglePlay()
@@ -192,14 +189,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun observeIfNewStationExistsInDB(){
-
-        databaseViewModel.isStationInDB.observe(this){
-
-            addNewStationToHistory(it)
-        }
-    }
-
     private fun observeIfNewStationFavoured(){
 
         databaseViewModel.isStationFavoured.observe(this){
@@ -212,17 +201,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun addNewStationToHistory(isInDB: Boolean){
-
-        if(isInDB) {/*DO NOTHING*/}
-        else {
-            currentStation?.let {
-                databaseViewModel.insertRadioStation(it)
-            }
-
-        }
-
-    }
 
 
     private fun paintButtonAddToFav(isInDB : Boolean){
@@ -337,7 +315,7 @@ class MainActivity : AppCompatActivity() {
 
             } else {
                 currentStation?.let {
-                    databaseViewModel.updateIsFavouredState(1, it.stationuuid)
+                    databaseViewModel.updateIsFavouredState(System.currentTimeMillis(), it.stationuuid)
                     Snackbar.make(findViewById(R.id.rootLayout),
                         "Station saved to favs", Snackbar.LENGTH_SHORT).show()
                     databaseViewModel.isStationFavoured.postValue(true)

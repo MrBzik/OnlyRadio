@@ -1,5 +1,6 @@
 package com.example.radioplayer.data.local.entities
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -16,6 +17,12 @@ data class RadioStation (
     val homepage : String?,
     val tags : String?,
     val language : String?,
-    val inPlaylists : Int,
-    val isFavoured : Boolean
+    @ColumnInfo(name = "favouredAt", defaultValue = "0")
+    val favouredAt : Long
         )
+
+/*  version 9 - 10 :
+        val inPlaylists : Int - deleted;
+        val isFavoured : Boolean - deleted;
+        val favouredAt : Long - added
+               */

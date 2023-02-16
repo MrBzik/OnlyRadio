@@ -128,8 +128,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         currentRadioStation?.let { station ->
 
-            databaseViewModel.checkIfInPlaylistOrIncrement(playlistName, station.stationuuid)
-
             databaseViewModel.insertStationPlaylistCrossRefAndUpdate(
                 StationPlaylistCrossRef(
                     station.stationuuid, playlistName

@@ -56,15 +56,12 @@ class MainViewModel @Inject constructor(
         init {
 
             currentRadioStation.value?.let {
-
                 viewModelScope.launch {
                   val currentStation = repository.getCurrentRadioStation(
                       it.getString(METADATA_KEY_MEDIA_ID)
                   )
                     newRadioStation.postValue(currentStation)
-
                 }
-
             }
 
         }
@@ -106,8 +103,7 @@ class MainViewModel @Inject constructor(
                                homepage = station.homepage,
                                tags = station.tags,
                                language = station.language,
-                               inPlaylists = 0,
-                               isFavoured = false
+                               favouredAt = 0
                            )
                        }
                    }

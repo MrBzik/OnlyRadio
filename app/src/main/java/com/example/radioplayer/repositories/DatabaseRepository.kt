@@ -1,14 +1,12 @@
 package com.example.radioplayer.repositories
 
 
-import androidx.room.Query
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.entities.HistoryDate
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.relations.StationDateCrossRef
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
-import java.sql.Date
 import javax.inject.Inject
 
 class DatabaseRepository @Inject constructor(
@@ -18,11 +16,9 @@ class DatabaseRepository @Inject constructor(
 
     suspend fun insertRadioStation (station : RadioStation) = radioDAO.insertRadioStation(station)
 
-    suspend fun checkIfRadioStationInDB (id : String) = radioDAO.checkIfRadioStationInDB(id)
-
     suspend fun checkIfStationIsFavoured (stationID: String) = radioDAO.checkIfStationIsFavoured(stationID)
 
-    suspend fun updateIsFavouredState (value : Int, stationID: String)
+    suspend fun updateIsFavouredState (value : Long, stationID: String)
             = radioDAO.updateIsFavouredState(value, stationID)
 
     suspend fun getCurrentRadioStation(stationID: String) : RadioStation
@@ -32,8 +28,8 @@ class DatabaseRepository @Inject constructor(
 
     suspend fun deletePlaylist (playlistName: String) = radioDAO.deletePlaylist(playlistName)
 
-    suspend fun checkIfInPlaylist (playlistName : String, stationID : String)
-            = radioDAO.checkIfInPlaylist(playlistName, stationID)
+    suspend fun checkIfInPlaylists (stationID : String)
+            = radioDAO.checkIfInPlaylists(stationID)
 
     suspend fun insertStationPlaylistCrossRef (crossRef: StationPlaylistCrossRef)
             = radioDAO.insertStationPlaylistCrossRef(crossRef)
@@ -41,11 +37,6 @@ class DatabaseRepository @Inject constructor(
     suspend fun deleteStationPlaylistCrossRef (crossRef: StationPlaylistCrossRef)
             = radioDAO.deleteStationPlaylistCrossRef(crossRef)
 
-    suspend fun incrementRadioStationPlaylist (stationID : String)
-            = radioDAO.incrementRadioStationPlaylist(stationID)
-
-    suspend fun decrementRadioStationPlaylist (stationID : String)
-            = radioDAO.decrementRadioStationPlaylist(stationID)
 
     suspend fun checkIfPlaylistExists (playlistName: String)
             = radioDAO.checkIfPlaylistExists(playlistName)
@@ -109,7 +100,7 @@ class DatabaseRepository @Inject constructor(
 
     // Cleaning dates
 
-    suspend fun getNumberOfDates() : Int = radioDAO.getNumberDates()
+    suspend fun getNumberOfDates() : Int = radioDAO.getNumberOfDates()
 
     suspend fun getDatesToDelete(limit: Int) : List<HistoryDate> = radioDAO.getDatesToDelete(limit)
 

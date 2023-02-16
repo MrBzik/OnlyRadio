@@ -19,21 +19,27 @@ import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 @Dao
 interface  RadioDAO {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertRadioStation(station : RadioStation)
-
-    @Query("SELECT EXISTS(SELECT * FROM RadioStation WHERE stationuuid =:id) ")
-    suspend fun checkIfRadioStationInDB (id : String) : Boolean
-
-    @Query("SELECT EXISTS(SELECT * FROM RadioStation WHERE stationuuid =:stationID AND isFavoured = 1)")
-    suspend fun checkIfStationIsFavoured(stationID : String) : Boolean
-
-    @Query("UPDATE RadioStation SET isFavoured =:value WHERE stationuuid =:stationID")
-    suspend fun updateIsFavouredState(value : Int, stationID: String)
 
     @Query("SELECT * FROM RadioStation WHERE stationuuid =:stationID LIMIT 1")
     suspend fun getCurrentRadioStation(stationID: String) : RadioStation
 
+
+    // For favoured stations
+
+    @Query("SELECT EXISTS(SELECT * FROM RadioStation WHERE stationuuid =:stationID AND favouredAt > 0)")
+    suspend fun checkIfStationIsFavoured(stationID : String) : Boolean
+
+    @Query("SELECT * FROM RadioStation WHERE favouredAt > 0 ORDER BY favouredAt DESC")
+    fun getAllFavouredStations() : LiveData<List<RadioStation>>
+
+    @Query("UPDATE RadioStation SET favouredAt =:value WHERE stationuuid =:stationID")
+    suspend fun updateIsFavouredState(value : Long, stationID: String)
+
+
+
+    // PLAYLISTS
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNewPlaylist (playlist : Playlist)
@@ -53,23 +59,10 @@ interface  RadioDAO {
     @Delete
     suspend fun deleteStationPlaylistCrossRef(stationPlaylistCrossRef: StationPlaylistCrossRef)
 
-    @Query("SELECT EXISTS(SELECT * FROM StationPlaylistCrossRef WHERE playlistName =:playlistName AND stationuuid =:stationID)")
-    suspend fun checkIfInPlaylist(playlistName : String, stationID : String) : Boolean
-
-    @Query("UPDATE RadioStation SET inPlaylists = inPlaylists+1 WHERE stationuuid =:stationID")
-    suspend fun incrementRadioStationPlaylist(stationID : String)
-
-    @Query("UPDATE RadioStation SET inPlaylists = inPlaylists-1 WHERE stationuuid =:stationID")
-    suspend fun decrementRadioStationPlaylist(stationID : String)
-
-
-
     @Transaction
     @Query("SELECT * FROM Playlist WHERE playlistName =:playlistName")
     suspend fun getStationsInPlaylist(playlistName : String) : List<PlaylistWithStations>
 
-    @Query("SELECT * FROM RadioStation WHERE isFavoured = 1")
-    fun getAllFavouredStations() : LiveData<List<RadioStation>>
 
     @Query("DELETE FROM StationPlaylistCrossRef WHERE playlistName =:playlistName")
     suspend fun deleteAllCrossRefOfPlaylist(playlistName: String)
@@ -105,11 +98,13 @@ interface  RadioDAO {
     suspend fun getStationsInDate(limit: Int, offset : Int) : DateWithStations
 
 
-
     // For database RadioStations cleaning
 
-    @Query("SELECT * FROM RadioStation WHERE isFavoured = 0 AND inPlaylists = 0")
+    @Query("SELECT * FROM RadioStation WHERE favouredAt = 0")
     suspend fun gatherStationsForCleaning() : List<RadioStation>
+
+    @Query("SELECT EXISTS(SELECT * FROM StationPlaylistCrossRef WHERE stationuuid =:stationID)")
+    suspend fun checkIfInPlaylists(stationID : String) : Boolean
 
     @Query("SELECT EXISTS(SELECT * FROM StationDateCrossRef WHERE stationuuid =:stationID)")
     suspend fun checkIfRadioStationInHistory(stationID : String) : Boolean
@@ -120,7 +115,7 @@ interface  RadioDAO {
     // For Dates cleaning
 
     @Query("SELECT COUNT(date) FROM HistoryDate")
-    suspend fun getNumberDates() : Int
+    suspend fun getNumberOfDates() : Int
 
     @Query("SELECT * FROM HistoryDate ORDER BY time LIMIT :limit")
     suspend fun getDatesToDelete(limit: Int) : List<HistoryDate>

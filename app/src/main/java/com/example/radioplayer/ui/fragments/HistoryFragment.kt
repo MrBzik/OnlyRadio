@@ -154,7 +154,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             mainViewModel.playOrToggleStation(it, SEARCH_FROM_HISTORY)
             mainViewModel.newRadioStation.postValue(it)
-            databaseViewModel.isStationInDB.postValue(true)
 
         }
     }

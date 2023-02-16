@@ -40,7 +40,6 @@ class DatabaseViewModel @Inject constructor(
 ) : AndroidViewModel(app) {
 
 
-    val isStationInDB: MutableLiveData<Boolean> = MutableLiveData()
 
     val isStationFavoured: MutableLiveData<Boolean> = MutableLiveData()
 
@@ -49,17 +48,13 @@ class DatabaseViewModel @Inject constructor(
     var isCleanUpNeeded = false
 
 
-    fun ifStationAlreadyInDatabase(stationID: String) = viewModelScope.launch {
-        val check = repository.checkIfRadioStationInDB(stationID)
-        isStationInDB.postValue(check)
-    }
 
     fun checkIfStationIsFavoured(stationID: String) = viewModelScope.launch {
         val check = repository.checkIfStationIsFavoured(stationID)
         isStationFavoured.postValue(check)
     }
 
-    fun updateIsFavouredState(value: Int, stationID: String) = viewModelScope.launch {
+    fun updateIsFavouredState(value: Long, stationID: String) = viewModelScope.launch {
         repository.updateIsFavouredState(value, stationID)
     }
 
@@ -74,14 +69,6 @@ class DatabaseViewModel @Inject constructor(
     }
 
 
-    fun checkIfInPlaylistOrIncrement(playlistName: String, stationID: String) =
-        viewModelScope.launch {
-            val check = repository.checkIfInPlaylist(playlistName, stationID)
-            if (!check) {
-                incrementRadioStationPlaylist(stationID)
-            }
-        }
-
     fun insertStationPlaylistCrossRefAndUpdate(
                     crossRef: StationPlaylistCrossRef,
                     playlistName : String
@@ -95,13 +82,6 @@ class DatabaseViewModel @Inject constructor(
         repository.deleteStationPlaylistCrossRef(crossRef)
     }
 
-    fun incrementRadioStationPlaylist(stationID: String) = viewModelScope.launch {
-        repository.incrementRadioStationPlaylist(stationID)
-    }
-
-    fun decrementRadioStationPlaylist(stationID: String) = viewModelScope.launch {
-        repository.decrementRadioStationPlaylist(stationID)
-    }
 
     val listOfAllPlaylists = repository.getAllPlaylists()
 
@@ -160,12 +140,9 @@ class DatabaseViewModel @Inject constructor(
     }
 
 
-    fun deletePlaylistAndContent(playlistName: String, stations: List<RadioStation>) =
+    fun deletePlaylistAndContent(playlistName: String) =
         viewModelScope.launch {
 
-            stations.forEach {
-                repository.decrementRadioStationPlaylist(it.stationuuid)
-            }
             repository.deleteAllCrossRefOfPlaylist(playlistName)
 
             repository.deletePlaylist(playlistName)
@@ -346,11 +323,16 @@ class DatabaseViewModel @Inject constructor(
 
             stations.forEach {
 
-                    val check = repository.checkIfRadioStationInHistory(it.stationuuid)
+                    val checkIfInPlaylists = repository.checkIfInPlaylists(it.stationuuid)
 
-                    if(!check){
+                    if(!checkIfInPlaylists) {
 
-                        repository.deleteRadioStation(it)
+                        val checkIfInHistory =  repository.checkIfRadioStationInHistory(it.stationuuid)
+
+                        if(!checkIfInHistory){
+
+                            repository.deleteRadioStation(it)
+                        }
                     }
                 }
 

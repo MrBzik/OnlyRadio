@@ -30,6 +30,6 @@ class RadioPlayerEventListener (
 
     override fun onPlayerError(error: PlaybackException) {
         super.onPlayerError(error)
-        Toast.makeText(radioService, "Error occurred", Toast.LENGTH_SHORT).show()
+        Toast.makeText(radioService, "Radio station does not respond", Toast.LENGTH_SHORT).show()
     }
 }

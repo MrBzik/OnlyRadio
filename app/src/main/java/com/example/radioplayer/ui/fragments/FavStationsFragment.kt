@@ -123,9 +123,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 if(isDeletePlaylistCalled){
 
                     RemovePlaylistDialog(requireContext(), currentPlaylistName){
-                        val stations = mainAdapter.listOfStations
 
-                        databaseViewModel.deletePlaylistAndContent(currentPlaylistName, stations)
+                        databaseViewModel.deletePlaylistAndContent(currentPlaylistName)
 
                         databaseViewModel.getAllFavouredStations()
 
@@ -281,7 +280,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             mainViewModel.playOrToggleStation(it, searchFlag)
             mainViewModel.newRadioStation.postValue(it)
-            databaseViewModel.isStationInDB.postValue(true)
             databaseViewModel.checkDateAndUpdateHistory(it.stationuuid)
         }
     }
@@ -341,7 +339,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 "Station removed from favs", Snackbar.LENGTH_LONG
             ).apply {
                 setAction("UNDO"){
-                    databaseViewModel.updateIsFavouredState(1, stationID)
+                    databaseViewModel.updateIsFavouredState(System.currentTimeMillis(), stationID)
                 }
             }.show()
         }
@@ -352,7 +350,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         databaseViewModel.deleteStationPlaylistCrossRef(
             StationPlaylistCrossRef(stationID, currentPlaylistName)
         )
-        databaseViewModel.decrementRadioStationPlaylist(stationID)
 
         databaseViewModel.getStationsInPlaylist(currentPlaylistName, true)
 
@@ -366,8 +363,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                     StationPlaylistCrossRef(stationID, currentPlaylistName),
                     currentPlaylistName
                 )
-                databaseViewModel.incrementRadioStationPlaylist(stationID)
-
             }
         }.show()
     }
@@ -375,7 +370,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     private fun insertStationInPlaylist(stationID: String, playlistName : String){
 
-            databaseViewModel.checkIfInPlaylistOrIncrement(playlistName, stationID)
 
             databaseViewModel.insertStationPlaylistCrossRefAndUpdate(
                 StationPlaylistCrossRef(
