@@ -1,6 +1,7 @@
 package com.example.radioplayer.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -57,7 +58,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         historySettingsClickListener()
 
         setOnSaveOptionsClickListener()
-
+        Log.d("CHECKTAGS", "history")
 
     }
 
@@ -187,9 +188,10 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     }
 
     override fun onDestroyView() {
+        super.onDestroyView()
         bind.rvHistory.adapter = null
         historyAdapter = null
-        super.onDestroyView()
+        _bind = null
     }
 
 }

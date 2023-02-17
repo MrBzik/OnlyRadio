@@ -39,11 +39,10 @@ class EditPlaylistDialog (
     private val glide : RequestManager,
     private val deletePlaylist : (Boolean) -> Unit,
     private val updateCover : (Boolean, String) -> Unit
-
-
 ) : AppCompatDialog(requireContext) {
 
-    lateinit var bind : DialogEditPlaylistBinding
+    private var _bind : DialogEditPlaylistBinding? = null
+    private val bind get() = _bind!!
 
     lateinit var imageAdapter : PagingPixabayAdapter
 
@@ -55,7 +54,7 @@ class EditPlaylistDialog (
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        bind = DialogEditPlaylistBinding.inflate(layoutInflater)
+        _bind = DialogEditPlaylistBinding.inflate(layoutInflater)
 
         super.onCreate(savedInstanceState)
         setContentView(bind.root)
@@ -83,8 +82,7 @@ class EditPlaylistDialog (
         setOnDeleteClickListener()
 
         bind.tvBack.setOnClickListener {
-            bind.rvImages.adapter = null
-            dismiss()
+            cleanAndCLose()
         }
     }
 
@@ -93,9 +91,8 @@ class EditPlaylistDialog (
         bind.tvDelete.setOnClickListener {
 
             deletePlaylist(true)
-            bind.rvImages.adapter = null
-            dismiss()
 
+           cleanAndCLose()
         }
     }
 
@@ -189,8 +186,8 @@ class EditPlaylistDialog (
                     databaseViewModel.editPlaylistName(currentPlaylistName, nameField)
                     databaseViewModel.currentPlaylistName.postValue(nameField)
                 }
-                bind.rvImages.adapter = null
-                dismiss()
+
+                cleanAndCLose()
 
             }
         }
@@ -235,8 +232,12 @@ class EditPlaylistDialog (
             imageSelected = it.previewURL
 
         }
+    }
 
-
+    private fun cleanAndCLose(){
+        bind.rvImages.adapter = null
+        _bind = null
+        dismiss()
     }
 
 }

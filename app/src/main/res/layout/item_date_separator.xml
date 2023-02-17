@@ -12,7 +12,7 @@
             android:text="2 of October, 2022"
             android:layout_marginHorizontal="10dp"
             android:textSize="14sp"
-            android:textStyle="bold|italic"
+            android:fontFamily="@font/aldrich"
             android:layout_gravity="center_vertical"
             android:textColor="@color/color_non_interactive"
             />

@@ -12,7 +12,7 @@ import com.bumptech.glide.Glide
 import com.example.radioplayer.databinding.ItemCountryBinding
 import com.example.radioplayer.utils.Country
 
-class FilterListAdapter(): ListAdapter<Country, FilterListAdapter.CountryHolder>(DIFF_CALLBACK),
+class FilterCountriesAdapter(): ListAdapter<Country, FilterCountriesAdapter.CountryHolder>(DIFF_CALLBACK),
     Filterable {
 
     var originalList: List<Country> = currentList.toList()

@@ -140,7 +140,10 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         }
     }
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _bind = null
+    }
 
 
 }

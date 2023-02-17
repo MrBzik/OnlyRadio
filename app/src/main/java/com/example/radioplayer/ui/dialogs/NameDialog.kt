@@ -18,13 +18,13 @@ class NameDialog (
 
 ) : AppCompatDialog(requireContext) {
 
-    lateinit var bind : DialogPickNameBinding
+
+    private var _bind : DialogPickNameBinding? = null
+    private val bind get() = _bind!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-
-
-        bind = DialogPickNameBinding.inflate(layoutInflater)
+        _bind = DialogPickNameBinding.inflate(layoutInflater)
 
         super.onCreate(savedInstanceState)
         setContentView(bind.root)
@@ -49,6 +49,7 @@ class NameDialog (
 
             mainViewModel.searchParamName.postValue("")
 
+            _bind = null
             dismiss()
         }
 
@@ -56,11 +57,12 @@ class NameDialog (
         bind.tvAccept.setOnClickListener {
 
             val newName = bind.etNewName.text.toString()
-            if(newName == "") {dismiss()}
-            else {
+
+            if(newName.isNotBlank()){
                 mainViewModel.searchParamName.postValue(newName)
-                dismiss()
             }
+                _bind = null
+                dismiss()
         }
 
 

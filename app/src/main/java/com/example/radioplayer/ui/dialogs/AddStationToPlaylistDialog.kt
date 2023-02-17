@@ -20,16 +20,16 @@ class AddStationToPlaylistDialog(
     private val pixabayViewModel: PixabayViewModel,
     private  val glide : RequestManager,
     private val insertStationInPlaylist : (String) -> Unit
-
-
     ) : AppCompatDialog(requireContext) {
 
-    private lateinit var bind : DialogAddStationToPlaylistBinding
+    private var _bind : DialogAddStationToPlaylistBinding? = null
+    private val bind get() = _bind!!
+
     private var playlistsAdapter = PlaylistsAdapter(glide, false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        bind = DialogAddStationToPlaylistBinding.inflate(layoutInflater)
+        _bind = DialogAddStationToPlaylistBinding.inflate(layoutInflater)
 
         super.onCreate(savedInstanceState)
         setContentView(bind.root)
@@ -55,15 +55,15 @@ class AddStationToPlaylistDialog(
             playlistsAdapter.differ.submitList(listOfPlaylists)
 
             playlistsAdapter.setPlaylistClickListener { playlist, _ ->
-
                 insertStationInPlaylist(playlist.playlistName)
-                dismiss()
+
+                cleanAndClose()
             }
 
 
 
         bind.tvBack.setOnClickListener {
-            dismiss()
+            cleanAndClose()
         }
 
         bind.tvCreateNewPlaylist.setOnClickListener {
@@ -75,9 +75,15 @@ class AddStationToPlaylistDialog(
                 insertStationInPlaylist(it)
             }
                 .show()
-            dismiss()
+
+            cleanAndClose()
         }
     }
 
+    private fun cleanAndClose(){
+        bind.rvPlaylists.adapter = null
+        _bind = null
+        dismiss()
+    }
 
 }

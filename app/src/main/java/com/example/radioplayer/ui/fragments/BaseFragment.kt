@@ -16,7 +16,7 @@ abstract class BaseFragment<VB: ViewBinding>(
 )
     : Fragment() {
 
-     private var _bind : VB? = null
+     var _bind : VB? = null
 
      val bind : VB
      get() = _bind!!

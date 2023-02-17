@@ -232,9 +232,10 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     }
 
     override fun onDestroyView() {
+        super.onDestroyView()
         bind.rvSearchStations.adapter = null
         pagingRadioAdapter = null
-        super.onDestroyView()
+        _bind = null
     }
 
 }

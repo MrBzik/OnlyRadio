@@ -19,7 +19,6 @@ import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingPixabayAdapter
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.databinding.DialogCreatePlaylistBinding
-
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
 import kotlinx.coroutines.*
@@ -38,7 +37,8 @@ class CreatePlaylistDialog (
 
 ) : AppCompatDialog(requireContext) {
 
-    lateinit var bind : DialogCreatePlaylistBinding
+    private var _bind : DialogCreatePlaylistBinding? = null
+    private val bind get() = _bind!!
 
     lateinit var imageAdapter : PagingPixabayAdapter
 
@@ -48,7 +48,7 @@ class CreatePlaylistDialog (
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        bind = DialogCreatePlaylistBinding.inflate(layoutInflater)
+        _bind = DialogCreatePlaylistBinding.inflate(layoutInflater)
 
         super.onCreate(savedInstanceState)
         setContentView(bind.root)
@@ -73,10 +73,7 @@ class CreatePlaylistDialog (
 
         bind.tvBack.setOnClickListener {
 
-            bind.rvImages.adapter = null
-            dismiss()
-
-
+            cleanAndClose()
         }
     }
 
@@ -153,10 +150,9 @@ class CreatePlaylistDialog (
                 insertStationInPlaylist?.let {
                     it(nameField)
                 }
-
             bind.etPlaylistName.text?.clear()
-            bind.rvImages.adapter = null
-            dismiss()
+
+            cleanAndClose()
         }
 
 
@@ -201,8 +197,13 @@ class CreatePlaylistDialog (
             imageSelected = it.previewURL
 
         }
+    }
 
+    private fun cleanAndClose(){
 
+        bind.rvImages.adapter = null
+        _bind = null
+        dismiss()
     }
 
 }

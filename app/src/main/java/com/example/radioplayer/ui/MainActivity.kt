@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity() {
     val mainViewModel : MainViewModel by viewModels()
     val databaseViewModel : DatabaseViewModel by viewModels()
 
+
     lateinit var bind : ActivityMainBinding
 
     lateinit var connectivityObserver: ConnectivityObserver
@@ -53,8 +54,6 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var glide : RequestManager
 
-
-    private val colorGray = Color.DKGRAY
     private var currentStation : RadioStation? = null
     private var isFavoured = false
 
@@ -85,7 +84,6 @@ class MainActivity : AppCompatActivity() {
         bind.stubPlayer.setOnInflateListener{ _, inflated ->
                 bindPlayer = StubPlayerActivityMainBinding.bind(inflated)
         }
-
 
 
 
@@ -205,10 +203,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun paintButtonAddToFav(isInDB : Boolean){
         if(!isInDB){
-            bind.fabAddToFav.backgroundTintList = ColorStateList.valueOf(colorGray)
+            bind.fabAddToFav.setImageResource(R.drawable.ic_add_to_fav)
 
         } else {
-            bind.fabAddToFav.backgroundTintList = ColorStateList.valueOf(Color.rgb(168, 22, 12))
+            bind.fabAddToFav.setImageResource(R.drawable.ic_added_to_fav)
 
         }
     }
@@ -244,11 +242,6 @@ class MainActivity : AppCompatActivity() {
 
         val menuItem = bind.bottomNavigationView.selectedItemId
 
-        if(isStubPlayerBindInflated){
-            bindPlayer.tvExpandHideText.setText(R.string.Expand)
-            bind.fabAddToFav.visibility = View.GONE
-        }
-
         when(item?.itemId ?: menuItem) {
             R.id.mi_radioSearchFragment -> {
 
@@ -256,15 +249,7 @@ class MainActivity : AppCompatActivity() {
                     replace(R.id.flFragment, radioSearchFragment)
                     addToBackStack(null)
                     commit()
-//                    if(bindPlayer.tvExpandHideText.text == "HIDE") {
-//                        bindPlayer.tvExpandHideText.setText(R.string.Expand)
-//                    }
-
-                    bind.fabAddToFav.visibility = View.GONE
-
                 }
-
-                return true
             }
             R.id.mi_favStationsFragment -> {
 
@@ -272,32 +257,23 @@ class MainActivity : AppCompatActivity() {
                     replace(R.id.flFragment, favStationsFragment)
                     addToBackStack(null)
                     commit()
-//                    if(bindPlayer.tvExpandHideText.text == "HIDE") {
-//                        bindPlayer.tvExpandHideText.setText(R.string.Expand)
-//
-//                    }
-
-                    bind.fabAddToFav.visibility = View.GONE
                 }
-
-                return true
             }
             R.id.mi_historyFragment -> {
                 supportFragmentManager.beginTransaction().apply {
                     replace(R.id.flFragment, historyFragment)
                     addToBackStack(null)
                     commit()
-//                    if(bindPlayer.tvExpandHideText.text == "HIDE") {
-//                        bindPlayer.tvExpandHideText.setText(R.string.Expand)
-//
-//                    }
-
-                    bind.fabAddToFav.visibility = View.GONE
                 }
-                return true
             }
-            else -> return false
         }
+
+        if(isStubPlayerBindInflated){
+            bindPlayer.tvExpandHideText.setText(R.string.Expand)
+            bind.fabAddToFav.visibility = View.GONE
+        }
+
+        return true
     }
 
     private fun addToFavClickListener(){
@@ -374,6 +350,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+
 
 
     override fun onStop() {

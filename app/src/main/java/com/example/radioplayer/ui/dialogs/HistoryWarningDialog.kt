@@ -13,12 +13,13 @@ class HistoryWarningDialog (
     )
     : AppCompatDialog(requireContext) {
 
-    lateinit var bind : DialogHistoryWarningBinding
+    private var _bind : DialogHistoryWarningBinding? = null
+    private val bind get() = _bind!!
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        bind = DialogHistoryWarningBinding.inflate(layoutInflater)
+        _bind = DialogHistoryWarningBinding.inflate(layoutInflater)
 
         super.onCreate(savedInstanceState)
         setContentView(bind.root)
@@ -29,12 +30,13 @@ class HistoryWarningDialog (
         bind.tvAccept.setOnClickListener {
 
             handleAccept()
+            _bind = null
             dismiss()
         }
 
 
         bind.tvBack.setOnClickListener {
-
+            _bind = null
             dismiss()
         }
 

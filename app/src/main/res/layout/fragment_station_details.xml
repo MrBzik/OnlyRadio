@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
+        android:background="@color/black"
    >
 
 
@@ -100,7 +100,7 @@
         android:layout_marginStart="30dp"
         android:layout_marginBottom="50dp"
         android:src="@drawable/ic_station_home_page"
-        android:backgroundTint="@color/interactive_text_color"
+        app:backgroundTint="@color/background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

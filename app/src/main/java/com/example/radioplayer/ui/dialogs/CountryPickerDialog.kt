@@ -7,8 +7,7 @@ import android.text.TextWatcher
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialog
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.radioplayer.adapters.CountryAdapter
-import com.example.radioplayer.adapters.FilterListAdapter
+import com.example.radioplayer.adapters.FilterCountriesAdapter
 import com.example.radioplayer.databinding.DialogPickCountryBinding
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.utils.listOfCountries
@@ -20,15 +19,16 @@ class CountryPickerDialog(
    )
     : AppCompatDialog(requireContext) {
 
-    private val counties = listOfCountries
+    private val countries = listOfCountries
 
-    lateinit var bind : DialogPickCountryBinding
+    private var _bind : DialogPickCountryBinding? = null
+    private val bind get() = _bind!!
 
-    lateinit var countryAdapter : FilterListAdapter
+    lateinit var countryAdapter : FilterCountriesAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        bind = DialogPickCountryBinding.inflate(layoutInflater)
+        _bind = DialogPickCountryBinding.inflate(layoutInflater)
 
         super.onCreate(savedInstanceState)
         setContentView(bind.root)
@@ -41,7 +41,7 @@ class CountryPickerDialog(
 
         setOnAdapterClickListener()
 
-        countryAdapter.submitList(counties)
+
 
 
         filterCountriesOnEditTextListener()
@@ -60,12 +60,8 @@ class CountryPickerDialog(
             }
 
             override fun afterTextChanged(s: Editable?) {
-
-
-
             }
         })
-
 
     }
 
@@ -76,16 +72,15 @@ class CountryPickerDialog(
 
             mainViewModel.searchParamCountry.postValue(it)
 
-            bind.rvCountries.adapter = null
-
-            dismiss()
+            cleanAndClose()
         }
 
     }
 
     private fun setupRecyclerView(){
 
-        countryAdapter = FilterListAdapter()
+        countryAdapter = FilterCountriesAdapter()
+        countryAdapter.submitList(countries)
 
         bind.rvCountries.apply {
 
@@ -98,17 +93,21 @@ class CountryPickerDialog(
 
         bind.tvBack.setOnClickListener {
 
-            bind.rvCountries.adapter = null
-            dismiss()
+            cleanAndClose()
         }
 
         bind.tvClearSelection.setOnClickListener{
 
             mainViewModel.searchParamCountry.postValue("")
 
-            bind.rvCountries.adapter = null
-            dismiss()
+            cleanAndClose()
         }
+    }
+
+    private fun cleanAndClose(){
+        bind.rvCountries.adapter = null
+        _bind = null
+        dismiss()
     }
 
 }

@@ -21,14 +21,15 @@ class RemovePlaylistDialog(
 
     ) : AppCompatDialog(requireContext) {
 
-    private lateinit var bind : DialogDeletePlaylistBinding
+    private var _bind : DialogDeletePlaylistBinding? = null
+    private val bind get() = _bind!!
 
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        bind = DialogDeletePlaylistBinding.inflate(layoutInflater)
+        _bind = DialogDeletePlaylistBinding.inflate(layoutInflater)
 
         super.onCreate(savedInstanceState)
         setContentView(bind.root)
@@ -40,6 +41,7 @@ class RemovePlaylistDialog(
 
 
         bind.tvBack.setOnClickListener {
+            _bind = null
             dismiss()
         }
 
@@ -47,6 +49,7 @@ class RemovePlaylistDialog(
 
             deletePlaylist()
 
+            _bind = null
             dismiss()
 
         }

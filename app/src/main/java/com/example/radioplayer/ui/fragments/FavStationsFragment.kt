@@ -385,9 +385,10 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     }
 
     override fun onDestroyView() {
+        super.onDestroyView()
         bind.rvFavStations.adapter = null
         bind.rvPlaylists.adapter = null
-        super.onDestroyView()
+        _bind = null
     }
 
 }

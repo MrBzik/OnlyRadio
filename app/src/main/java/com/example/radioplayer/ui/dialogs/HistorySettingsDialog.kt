@@ -25,7 +25,8 @@ class HistorySettingsDialog (
     )
     : AppCompatDialog(requireContext) {
 
-    lateinit var bind : DialogHistorySettingsBinding
+    private var _bind : DialogHistorySettingsBinding? = null
+    private val bind get() = _bind!!
 
     private val listOfOptions = listOf(
         HISTORY_ONE_DAY, HISTORY_3_DATES, HISTORY_7_DATES, HISTORY_30_DATES, HISTORY_NEVER_CLEAN
@@ -33,7 +34,7 @@ class HistorySettingsDialog (
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        bind = DialogHistorySettingsBinding.inflate(layoutInflater)
+        _bind = DialogHistorySettingsBinding.inflate(layoutInflater)
 
         super.onCreate(savedInstanceState)
         setContentView(bind.root)
@@ -53,19 +54,23 @@ class HistorySettingsDialog (
 
             handleChoice(newValue)
 
-            dismiss()
+            cleanAndClose()
 
         }
 
         bind.tvBack.setOnClickListener {
 
-            dismiss()
+            cleanAndClose()
         }
 
 
     }
 
-
+    private fun cleanAndClose(){
+        bind.listViewOptions.adapter = null
+        _bind = null
+        dismiss()
+    }
 
 
 }

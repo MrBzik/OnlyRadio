@@ -16,8 +16,8 @@
       android:layout_height="wrap_content"
       android:layout_marginEnd="30dp"
       android:layout_marginBottom="50dp"
-      android:src="@drawable/ic_add_to_fav"
-      android:visibility="gone"
+      app:backgroundTint="@color/background"
+     android:visibility="gone"
       app:layout_constraintBottom_toBottomOf="@+id/flFragment"
       app:layout_constraintEnd_toEndOf="parent" />
 
@@ -64,18 +64,19 @@
   <ViewStub
       android:id="@+id/stubPlayer"
       android:layout_width="match_parent"
-      android:layout_height="60dp"
+      android:layout_height="62dp"
       android:layout="@layout/stub_player_activity_main"
       android:inflatedId="@+id/stubPlayer"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintBottom_toTopOf="@id/separatorSecond" />
+      app:layout_constraintBottom_toTopOf="@id/bottomNavigationView" />
 
 
   <View
       android:id="@+id/separatorSecond"
       android:layout_width="match_parent"
       android:layout_height="2dp"
+      android:layout_marginBottom="-1dp"
       android:background="@drawable/gradient_for_separators"
       android:translationZ="10dp"
       app:layout_constraintBottom_toTopOf="@id/bottomNavigationView" />
