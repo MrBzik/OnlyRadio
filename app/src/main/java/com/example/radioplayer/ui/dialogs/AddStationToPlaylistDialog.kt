@@ -57,13 +57,13 @@ class AddStationToPlaylistDialog(
             playlistsAdapter.setPlaylistClickListener { playlist, _ ->
                 insertStationInPlaylist(playlist.playlistName)
 
-                cleanAndClose()
+                dismiss()
             }
 
 
 
         bind.tvBack.setOnClickListener {
-            cleanAndClose()
+            dismiss()
         }
 
         bind.tvCreateNewPlaylist.setOnClickListener {
@@ -76,14 +76,15 @@ class AddStationToPlaylistDialog(
             }
                 .show()
 
-            cleanAndClose()
+            dismiss()
         }
     }
 
-    private fun cleanAndClose(){
+
+    override fun onStop() {
+        super.onStop()
         bind.rvPlaylists.adapter = null
         _bind = null
-        dismiss()
     }
 
 }

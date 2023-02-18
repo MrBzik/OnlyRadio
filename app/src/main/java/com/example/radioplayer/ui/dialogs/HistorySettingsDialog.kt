@@ -54,23 +54,24 @@ class HistorySettingsDialog (
 
             handleChoice(newValue)
 
-            cleanAndClose()
+            dismiss()
 
         }
 
         bind.tvBack.setOnClickListener {
 
-            cleanAndClose()
+            dismiss()
         }
 
 
     }
 
-    private fun cleanAndClose(){
+
+
+    override fun onStop() {
+        super.onStop()
         bind.listViewOptions.adapter = null
         _bind = null
-        dismiss()
     }
-
 
 }

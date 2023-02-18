@@ -49,7 +49,7 @@ class NameDialog (
 
             mainViewModel.searchParamName.postValue("")
 
-            _bind = null
+
             dismiss()
         }
 
@@ -61,12 +61,18 @@ class NameDialog (
             if(newName.isNotBlank()){
                 mainViewModel.searchParamName.postValue(newName)
             }
-                _bind = null
+
                 dismiss()
         }
 
 
     }
 
+
+    override fun onStop() {
+        super.onStop()
+        _bind = null
+
+    }
 
 }

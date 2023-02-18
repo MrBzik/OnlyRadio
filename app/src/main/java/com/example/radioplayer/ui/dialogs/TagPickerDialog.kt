@@ -1,15 +1,20 @@
 package com.example.radioplayer.ui.dialogs
 
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.WindowManager
+import android.util.Log
+import android.view.*
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.adapters.FilterTagsAdapter
 import com.example.radioplayer.databinding.DialogPickTagBinding
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.utils.KeyboardEditText
+import java.security.Key
 
 class TagPickerDialog (
     private val requireContext : Context,
@@ -37,13 +42,35 @@ class TagPickerDialog (
         setupAdapterClickListener()
         setEditTextAdapterFilter()
 
+
+
+
+//        bind.editText.setOnFocusChangeListener { v, hasFocus ->
+//            if(hasFocus){
+//                bind.tvBack.visibility = View.GONE
+//                bind.tvClearSelection.visibility = View.GONE
+//            }
+//        }
+//
+//        bind.editText.setOnClickListener {
+//
+//                bind.tvBack.visibility = View.GONE
+//                bind.tvClearSelection.visibility = View.GONE
+//
+//        }
+//
+//        bind.editText.listener = object : KeyboardEditText.Listener{
+//            override fun onImeBack(editText: KeyboardEditText) {
+//                bind.tvBack.visibility = View.VISIBLE
+//                bind.tvClearSelection.visibility = View.VISIBLE
+//            }
+//        }
+
+
+
+
     }
 
-    private fun cleanAndClose(){
-        bind.recyclerView.adapter = null
-        _bind = null
-        dismiss()
-    }
 
 
     private fun setupRecyclerView(){
@@ -78,7 +105,7 @@ class TagPickerDialog (
 
             mainViewModel.searchParamTag.postValue(tag)
 
-            cleanAndClose()
+           dismiss()
 
         }
 
@@ -89,15 +116,26 @@ class TagPickerDialog (
 
             mainViewModel.searchParamTag.postValue("")
 
-            cleanAndClose()
+            dismiss()
 
         }
 
         bind.tvBack.setOnClickListener {
 
-            cleanAndClose()
+           dismiss()
 
         }
     }
+
+
+
+    override fun onStop() {
+        super.onStop()
+        bind.recyclerView.adapter = null
+        _bind = null
+
+    }
+
+
 
 }

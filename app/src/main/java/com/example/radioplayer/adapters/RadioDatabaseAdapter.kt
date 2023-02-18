@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.RadioItemBinding
@@ -41,7 +42,10 @@ class RadioDatabaseAdapter @Inject constructor(
 
             tvPrimary.text = station.name
             tvSecondary.text = station.country
-            glide.load(station.favicon).into(ivItemImage)
+            glide
+                .load(station.favicon)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(ivItemImage)
         }
 
         holder.bind.ivItemImage.setOnClickListener {

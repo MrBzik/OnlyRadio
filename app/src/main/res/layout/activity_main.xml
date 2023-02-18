@@ -5,7 +5,7 @@
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
+    android:background="@color/main_background"
     tools:context=".ui.MainActivity"
 
     >
@@ -16,7 +16,7 @@
       android:layout_height="wrap_content"
       android:layout_marginEnd="30dp"
       android:layout_marginBottom="50dp"
-      app:backgroundTint="@color/background"
+      app:backgroundTint="@color/floating_buttons"
      android:visibility="gone"
       app:layout_constraintBottom_toBottomOf="@+id/flFragment"
       app:layout_constraintEnd_toEndOf="parent" />

@@ -30,13 +30,11 @@ class HistoryWarningDialog (
         bind.tvAccept.setOnClickListener {
 
             handleAccept()
-            _bind = null
             dismiss()
         }
 
 
         bind.tvBack.setOnClickListener {
-            _bind = null
             dismiss()
         }
 
@@ -44,6 +42,10 @@ class HistoryWarningDialog (
     }
 
 
+    override fun onStop() {
+        super.onStop()
+        _bind = null
+    }
 
 
 }

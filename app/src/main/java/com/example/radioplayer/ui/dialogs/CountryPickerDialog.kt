@@ -72,7 +72,7 @@ class CountryPickerDialog(
 
             mainViewModel.searchParamCountry.postValue(it)
 
-            cleanAndClose()
+            dismiss()
         }
 
     }
@@ -93,21 +93,22 @@ class CountryPickerDialog(
 
         bind.tvBack.setOnClickListener {
 
-            cleanAndClose()
+            dismiss()
         }
 
         bind.tvClearSelection.setOnClickListener{
 
             mainViewModel.searchParamCountry.postValue("")
 
-            cleanAndClose()
+            dismiss()
         }
     }
 
-    private fun cleanAndClose(){
+
+    override fun onStop() {
+        super.onStop()
         bind.rvCountries.adapter = null
         _bind = null
-        dismiss()
     }
 
 }

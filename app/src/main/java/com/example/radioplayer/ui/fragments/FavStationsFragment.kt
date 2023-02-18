@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PlaylistsAdapter
 import com.example.radioplayer.adapters.RadioDatabaseAdapter
@@ -116,7 +117,10 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                         findViewById<ImageView>(R.id.ivPlaylistCover)
 
                     view?.let {
-                        glide.load(newImageUrl).into(it)
+                        glide
+                            .load(newImageUrl)
+                            .transition(DrawableTransitionOptions.withCrossFade())
+                            .into(it)
                     }
                 }
 

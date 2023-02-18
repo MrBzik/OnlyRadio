@@ -100,7 +100,7 @@
         android:layout_marginStart="30dp"
         android:layout_marginBottom="50dp"
         android:src="@drawable/ic_station_home_page"
-        app:backgroundTint="@color/background"
+        app:backgroundTint="@color/floating_buttons"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

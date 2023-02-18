@@ -40,7 +40,9 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     @Inject
     lateinit var glide : RequestManager
-    var pagingRadioAdapter : PagingRadioAdapter? = null
+
+    @Inject
+    lateinit var pagingRadioAdapter : PagingRadioAdapter
 
 
 
@@ -69,7 +71,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private fun setAdapterOnClickListener(){
 
-        pagingRadioAdapter?.setOnClickListener {
+        pagingRadioAdapter.setOnClickListener {
 
             mainViewModel.playOrToggleStation(it, SEARCH_FROM_API)
             mainViewModel.newRadioStation.postValue(it)
@@ -83,8 +85,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private fun setRecycleView(){
 
-        pagingRadioAdapter = PagingRadioAdapter(glide)
-
         bind.rvSearchStations.apply {
 
             adapter = pagingRadioAdapter
@@ -96,7 +96,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private fun setAdapterLoadStateListener(){
 
-        pagingRadioAdapter?.addLoadStateListener {
+        pagingRadioAdapter.addLoadStateListener {
 
             if (it.refresh is LoadState.Loading ||
                 it.append is LoadState.Loading)
@@ -118,7 +118,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             mainViewModel.stationsFlow.collectLatest {
 
-                pagingRadioAdapter?.submitData(it)
+                pagingRadioAdapter.submitData(it)
             }
         }
 
@@ -162,6 +162,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             initiateNewSearch()
 
             bind.swipeRefresh.isRefreshing = false
+
         }
     }
 
@@ -234,7 +235,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     override fun onDestroyView() {
         super.onDestroyView()
         bind.rvSearchStations.adapter = null
-        pagingRadioAdapter = null
         _bind = null
     }
 

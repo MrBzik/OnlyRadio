@@ -24,6 +24,10 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etPlaylistName"
+            android:textAppearance="@style/dialogSearchText"
+            android:textColor="@color/search_text_color"
+            android:maxLines="1"
+            android:inputType="text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
              />
@@ -46,6 +50,9 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etSearchQuery"
+            android:textAppearance="@style/dialogSearchText"
+            android:textColor="@color/search_text_color"
+            android:inputType="text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:minHeight="48dp" />

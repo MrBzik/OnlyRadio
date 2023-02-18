@@ -27,6 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:ellipsize="end"
+            android:text="some name"
             android:fontFamily="sans-serif-smallcaps"
             android:gravity="center|start"
             android:maxLines="2"
@@ -38,6 +39,8 @@
             android:layout_height="20dp"
             android:ellipsize="end"
             android:fontFamily="@font/aldrich"
+            android:textColor="@color/regular_text_color"
+            android:text="country"
             android:maxLines="1"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent" />

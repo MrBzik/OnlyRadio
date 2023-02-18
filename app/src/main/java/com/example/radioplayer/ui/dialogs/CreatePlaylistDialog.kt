@@ -15,12 +15,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingPixabayAdapter
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.databinding.DialogCreatePlaylistBinding
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
+import com.example.radioplayer.utils.KeyboardEditText
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 
@@ -71,11 +73,61 @@ class CreatePlaylistDialog (
 
         setAdapterItemClickListener()
 
+//        toggleButtonsVisibility()
+
         bind.tvBack.setOnClickListener {
 
-            cleanAndClose()
+            dismiss()
         }
     }
+
+//    private fun toggleButtonsVisibility(){
+//
+//                bind.etPlaylistName.setOnClickListener {
+//                    bind.tvBack.visibility = View.GONE
+//                    bind.tvAccept.visibility = View.GONE
+//
+//                }
+//
+//        bind.etPlaylistName.setOnFocusChangeListener { v, hasFocus ->
+//            if(hasFocus){
+//                bind.tvBack.visibility = View.GONE
+//                bind.tvAccept.visibility = View.GONE
+//            }
+//        }
+//
+//
+//
+//        bind.etPlaylistName.listener = object : KeyboardEditText.Listener{
+//            override fun onImeBack(editText: KeyboardEditText) {
+//                bind.tvBack.visibility = View.VISIBLE
+//                bind.tvAccept.visibility = View.VISIBLE
+//            }
+//        }
+//
+//
+//        bind.etSearchQuery.setOnClickListener {
+//            bind.tvBack.visibility = View.GONE
+//            bind.tvAccept.visibility = View.GONE
+//
+//        }
+//
+//        bind.etSearchQuery.setOnFocusChangeListener { v, hasFocus ->
+//            if(hasFocus){
+//                bind.tvBack.visibility = View.GONE
+//                bind.tvAccept.visibility = View.GONE
+//            }
+//        }
+//
+//
+//        bind.etSearchQuery.listener = object : KeyboardEditText.Listener{
+//            override fun onImeBack(editText: KeyboardEditText) {
+//                bind.tvBack.visibility = View.VISIBLE
+//                bind.tvAccept.visibility = View.VISIBLE
+//            }
+//        }
+//    }
+
 
 
     private fun observeImagesForAdapter(){
@@ -111,9 +163,9 @@ class CreatePlaylistDialog (
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
 
                 if(listOfPlaylistNames.contains(bind.etPlaylistName.text.toString())){
-                    bind.etPlaylistName.setTextColor(Color.RED)
+                    bind.etPlaylistName.setTextColor(requireContext.getColor(R.color.color_changed_on_interaction))
                 } else{
-                    bind.etPlaylistName.setTextColor(requireContext.getColor(R.color.color_non_interactive))
+                    bind.etPlaylistName.setTextColor(requireContext.getColor(R.color.search_text_color))
                 }
 
             }
@@ -152,7 +204,7 @@ class CreatePlaylistDialog (
                 }
             bind.etPlaylistName.text?.clear()
 
-            cleanAndClose()
+            dismiss()
         }
 
 
@@ -192,18 +244,22 @@ class CreatePlaylistDialog (
 
         imageAdapter.setOnClickListener {
 
-            glide.load(it.previewURL).into(bind.ivSelectedImage)
+            glide
+                .load(it.previewURL)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(bind.ivSelectedImage)
 
             imageSelected = it.previewURL
 
         }
     }
 
-    private fun cleanAndClose(){
 
+    override fun onStop() {
+        super.onStop()
         bind.rvImages.adapter = null
         _bind = null
-        dismiss()
+
     }
 
 }

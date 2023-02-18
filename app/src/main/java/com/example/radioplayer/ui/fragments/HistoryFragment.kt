@@ -58,7 +58,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         historySettingsClickListener()
 
         setOnSaveOptionsClickListener()
-        Log.d("CHECKTAGS", "history")
+
 
     }
 

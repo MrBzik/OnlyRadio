@@ -59,11 +59,21 @@
         <item name="android:fontFamily">@font/aldrich</item>
     </style>
 
+    <style name="dialogSearchText" parent="Widget.AppCompat.EditText">
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">@font/aldrich</item>
+        <item name="android:inputType">text|textNoSuggestions</item>
+    </style>
+
 
     <style name="detailsTextExtras" parent="android:Widget.TextView">
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/regular_text_color</item>
         <item name="android:fontFamily">@font/aldrich</item>
     </style>
+
+
+
+
 
 </resources>

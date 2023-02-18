@@ -22,7 +22,12 @@
         android:id="@+id/editText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Search..."
+        android:hint="Search tag..."
+        android:textAppearance="@style/dialogSearchText"
+        android:backgroundTint="@color/Separator"
+        android:textColor="@color/search_text_color"
+        android:textCursorDrawable="@drawable/cursor_color"
+        android:inputType="text|textNoSuggestions"
         android:paddingTop="10dp"
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -35,11 +40,13 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="20dp"
+        android:isScrollContainer="false"
         app:layout_constraintBottom_toTopOf="@+id/tvClearSelection"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText" />
+        app:layout_constraintTop_toBottomOf="@+id/editText"
+        />
 
     <TextView
         android:id="@+id/tvBack"

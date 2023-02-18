@@ -8,6 +8,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.RadioDB
@@ -60,11 +61,12 @@ object AppModule {
         return Glide.with(app).setDefaultRequestOptions(
             RequestOptions()
                 .fallback(R.drawable.ic_radio_default)
-                .placeholder(R.drawable.ic_radio_default)
+                .placeholder(R.drawable.glide_placeholder)
                 .error(R.drawable.ic_radio_default)
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
         )
     }
+
 
     @Provides
     @Singleton

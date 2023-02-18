@@ -13,6 +13,7 @@ import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.R
 import com.example.radioplayer.connectivityObserver.ConnectivityObserver
 import com.example.radioplayer.connectivityObserver.NetworkConnectivityObserver
@@ -316,7 +317,10 @@ class MainActivity : AppCompatActivity() {
         newImage?.let { uri ->
 
 
-                glide.load(uri).into(bindPlayer.ivCurrentStationImage)
+                glide
+                    .load(uri)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(bindPlayer.ivCurrentStationImage)
 
         } ?: run {
             bindPlayer.ivCurrentStationImage.setImageResource(R.drawable.ic_radio_default)
@@ -350,7 +354,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 
 
 

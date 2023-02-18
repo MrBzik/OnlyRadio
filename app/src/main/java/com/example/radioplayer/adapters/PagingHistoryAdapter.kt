@@ -6,6 +6,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.adapters.models.StationWithDateModel
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.ItemDateSeparatorBinding
@@ -86,7 +87,10 @@ class PagingHistoryAdapter @Inject constructor(
             (holder as StationViewHolder).bind.apply {
                 tvPrimary.text = item.radioStation.name
                 tvSecondary.text = item.radioStation.country
-                glide.load(item.radioStation.favicon).into(ivItemImage)
+                glide
+                    .load(item.radioStation.favicon)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(ivItemImage)
 
                 ivItemImage.setOnClickListener {
 

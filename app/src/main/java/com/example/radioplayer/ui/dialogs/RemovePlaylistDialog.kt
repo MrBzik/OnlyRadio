@@ -41,7 +41,6 @@ class RemovePlaylistDialog(
 
 
         bind.tvBack.setOnClickListener {
-            _bind = null
             dismiss()
         }
 
@@ -49,12 +48,16 @@ class RemovePlaylistDialog(
 
             deletePlaylist()
 
-            _bind = null
             dismiss()
 
         }
 
     }
 
+
+    override fun onStop() {
+        super.onStop()
+        _bind = null
+    }
 
 }

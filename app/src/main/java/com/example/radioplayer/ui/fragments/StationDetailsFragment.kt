@@ -7,6 +7,7 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
@@ -68,7 +69,10 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             currentRadioStation = it
 
             bind.tvName.text = it.name
-            glide.load(it.favicon).into(bind.ivIcon)
+            glide
+                .load(it.favicon)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(bind.ivIcon)
             homepageUrl = it.homepage
             if(!it.country.isNullOrBlank()){
                 bind.tvCountry.isVisible = true

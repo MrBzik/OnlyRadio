@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.databinding.ItemPlaylistCoverBinding
@@ -76,7 +77,10 @@ class PlaylistsAdapter @Inject constructor(
         if(holder is PlaylistHolder) {
             val playlist = differ.currentList[position]
             holder.bind.tvPlaylistName.text = playlist.playlistName
-            glide.load(playlist.coverURI).into(holder.bind.ivPlaylistCover)
+            glide
+                .load(playlist.coverURI)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(holder.bind.ivPlaylistCover)
 
             holder.itemView.setOnDragListener { view, event ->
 
