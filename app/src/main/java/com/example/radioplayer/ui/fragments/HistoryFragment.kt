@@ -15,6 +15,7 @@ import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingHistoryAdapter
 import com.example.radioplayer.databinding.FragmentHistoryBinding
 import com.example.radioplayer.ui.MainActivity
+import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
 import com.example.radioplayer.ui.dialogs.HistorySettingsDialog
 import com.example.radioplayer.ui.dialogs.HistoryWarningDialog
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
@@ -40,7 +41,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     @Inject
     lateinit var glide : RequestManager
 
-    var historyAdapter: PagingHistoryAdapter? = null
+    @Inject
+    lateinit var historyAdapter: PagingHistoryAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -123,12 +125,12 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private fun setupRecyclerView (){
 
-        historyAdapter = PagingHistoryAdapter(glide)
 
         bind.rvHistory.apply {
 
             adapter = historyAdapter
             layoutManager = LinearLayoutManager(requireContext())
+            edgeEffectFactory = BounceEdgeEffectFactory()
             setHasFixedSize(true)
         }
 
@@ -151,7 +153,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private fun setupAdapterClickListener(){
 
-        historyAdapter?.setOnClickListener {
+        historyAdapter.setOnClickListener {
 
             mainViewModel.playOrToggleStation(it, SEARCH_FROM_HISTORY)
             mainViewModel.newRadioStation.postValue(it)
@@ -163,7 +165,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private fun setAdapterLoadStateListener(){
 
-        historyAdapter?.addLoadStateListener {
+        historyAdapter.addLoadStateListener {
 
             if (it.refresh is LoadState.Loading ||
                 it.append is LoadState.Loading)
@@ -190,7 +192,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     override fun onDestroyView() {
         super.onDestroyView()
         bind.rvHistory.adapter = null
-        historyAdapter = null
         _bind = null
     }
 

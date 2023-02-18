@@ -14,6 +14,7 @@ import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
+import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.TagPickerDialog
 import com.example.radioplayer.ui.dialogs.CountryPickerDialog
@@ -36,10 +37,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
 
     private val allTags = listOfTags
-
-
-    @Inject
-    lateinit var glide : RequestManager
 
     @Inject
     lateinit var pagingRadioAdapter : PagingRadioAdapter

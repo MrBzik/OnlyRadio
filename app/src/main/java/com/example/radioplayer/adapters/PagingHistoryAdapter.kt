@@ -7,6 +7,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
+import com.example.radioplayer.R
 import com.example.radioplayer.adapters.models.StationWithDateModel
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.ItemDateSeparatorBinding
@@ -21,7 +24,8 @@ private const val TYPE_DATE_SEPARATOR_ENCLOSING = 2
 
 
 class PagingHistoryAdapter @Inject constructor(
-    private val glide : RequestManager
+    private val glide : RequestManager,
+    private val glideFactory : DrawableCrossFadeFactory
 
 ) : PagingDataAdapter<StationWithDateModel, RecyclerView.ViewHolder>(StationsComparator) {
 
@@ -89,7 +93,8 @@ class PagingHistoryAdapter @Inject constructor(
                 tvSecondary.text = item.radioStation.country
                 glide
                     .load(item.radioStation.favicon)
-                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .placeholder(R.drawable.ic_radio_default)
+                    .transition(withCrossFade(glideFactory))
                     .into(ivItemImage)
 
                 ivItemImage.setOnClickListener {

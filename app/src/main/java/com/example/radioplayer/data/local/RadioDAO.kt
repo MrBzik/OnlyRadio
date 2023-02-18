@@ -31,7 +31,7 @@ interface  RadioDAO {
     @Query("SELECT EXISTS(SELECT * FROM RadioStation WHERE stationuuid =:stationID AND favouredAt > 0)")
     suspend fun checkIfStationIsFavoured(stationID : String) : Boolean
 
-    @Query("SELECT * FROM RadioStation WHERE favouredAt > 0 ORDER BY favouredAt")
+    @Query("SELECT * FROM RadioStation WHERE favouredAt > 0 ORDER BY favouredAt DESC")
     fun getAllFavouredStations() : LiveData<List<RadioStation>>
 
     @Query("UPDATE RadioStation SET favouredAt =:value WHERE stationuuid =:stationID")
@@ -50,9 +50,6 @@ interface  RadioDAO {
     @Query("SELECT * FROM Playlist")
     fun getAllPlaylists() : LiveData<List<Playlist>>
 
-    @Query("SELECT EXISTS(SELECT * FROM Playlist WHERE playlistName =:playlistName)")
-    suspend fun checkIfPlaylistExists (playlistName : String) : Boolean
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStationPlaylistCrossRef(stationPlaylistCrossRef: StationPlaylistCrossRef)
 
@@ -60,8 +57,12 @@ interface  RadioDAO {
     suspend fun deleteStationPlaylistCrossRef(stationPlaylistCrossRef: StationPlaylistCrossRef)
 
     @Transaction
-    @Query("SELECT * FROM Playlist WHERE playlistName =:playlistName")
-    suspend fun getStationsInPlaylist(playlistName : String) : List<PlaylistWithStations>
+    @Query("SELECT * FROM Playlist WHERE playlistName =:playlistName LIMIT 1")
+    suspend fun getStationsInPlaylist(playlistName : String) : PlaylistWithStations?
+
+    @Transaction
+    @Query("SELECT * FROM Playlist WHERE playlistName =:playlistName LIMIT 1")
+    fun subscribeToStationsInPlaylist(playlistName : String) : LiveData<PlaylistWithStations?>
 
 
     @Query("DELETE FROM StationPlaylistCrossRef WHERE playlistName =:playlistName")

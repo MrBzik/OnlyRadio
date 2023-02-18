@@ -18,6 +18,7 @@ import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.databinding.FragmentFavStationsBinding
 import com.example.radioplayer.ui.MainActivity
+import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.CreatePlaylistDialog
 import com.example.radioplayer.ui.dialogs.EditPlaylistDialog
@@ -194,7 +195,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             }
 
             setPlaylistClickListener { playlist, position ->
-                databaseViewModel.getStationsInPlaylist(playlist.playlistName)
+                databaseViewModel.subscribeToStationsInPlaylist(playlist.playlistName)
                 currentPlaylistPosition = position
             }
 
@@ -294,7 +295,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             layoutManager = LinearLayoutManager(requireContext())
             adapter = mainAdapter
-
+            edgeEffectFactory = BounceEdgeEffectFactory()
+            setHasFixedSize(true)
             ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this)
         }
     }
@@ -306,7 +308,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         bind.rvPlaylists.apply {
             adapter = playlistAdapter
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
-
+            setHasFixedSize(true)
         }
     }
 
@@ -355,7 +357,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             StationPlaylistCrossRef(stationID, currentPlaylistName)
         )
 
-        databaseViewModel.getStationsInPlaylist(currentPlaylistName, true)
+//        databaseViewModel.getStationsInPlaylist(currentPlaylistName, true)
 
         Snackbar.make(
             requireActivity().findViewById(R.id.rootLayout),

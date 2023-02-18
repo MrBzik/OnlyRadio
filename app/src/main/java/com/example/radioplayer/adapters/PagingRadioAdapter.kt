@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
@@ -19,7 +20,8 @@ import com.example.radioplayer.databinding.RadioItemBinding
 import javax.inject.Inject
 
 class PagingRadioAdapter @Inject constructor(
-    private val glide : RequestManager
+    private val glide : RequestManager,
+    private val glideFactory: DrawableCrossFadeFactory
 
 ) : PagingDataAdapter<RadioStation, PagingRadioAdapter.RadioItemHolder>(StationsComparator) {
 
@@ -46,7 +48,8 @@ class PagingRadioAdapter @Inject constructor(
             tvSecondary.text = station.country
             glide
                 .load(station.favicon)
-                .transition(DrawableTransitionOptions.withCrossFade())
+                .placeholder(R.drawable.ic_radio_default)
+                .transition(withCrossFade(glideFactory))
                 .into(ivItemImage)
         }
 

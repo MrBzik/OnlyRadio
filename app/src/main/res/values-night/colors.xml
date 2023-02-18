@@ -5,18 +5,18 @@
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#AA4D06</color>
     <color name="teal_700">#AA4D06</color>
-    <color name="black">#757575</color>
+    <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="ChosenGreen">#004D40</color>
     <color name="color_non_interactive">#FD7F20</color>
     <color name="Separator">#AA4D06</color>
     <color name="grayColor">#635D5D</color>
-    <color name="floating_buttons">#DADADA</color>
+    <color name="floating_buttons">#121111</color>
     <color name="color_interactive">#FDB750</color>
     <color name="color_changed_on_interaction">#FC2E20</color>
     <color name="transparent">#00000000</color>
-    <color name="regular_text_color">#0C0C0C</color>
-    <color name="search_text_color">#000000</color>
-    <color name= "main_background">#979797</color>
+    <color name="regular_text_color">#808080</color>
+    <color name="search_text_color">#989696</color>
+    <color name= "main_background">#FF000000</color>
 
 </resources>

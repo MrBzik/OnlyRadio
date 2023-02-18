@@ -61,11 +61,16 @@ object AppModule {
         return Glide.with(app).setDefaultRequestOptions(
             RequestOptions()
                 .fallback(R.drawable.ic_radio_default)
-                .placeholder(R.drawable.glide_placeholder)
                 .error(R.drawable.ic_radio_default)
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
         )
     }
+
+    @Provides
+    @Singleton
+    fun providesDrawableCrossFadeFactory()
+                = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
+
 
 
     @Provides

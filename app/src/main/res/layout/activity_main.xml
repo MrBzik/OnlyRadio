@@ -87,6 +87,7 @@
       android:layout_width="match_parent"
       android:layout_height="50dp"
       android:padding="5dp"
+      android:background="@color/main_background"
       app:itemPaddingBottom="15dp"
       app:itemTextAppearanceActive="@style/bottomNavTextActive"
       app:itemTextAppearanceInactive="@style/bottomNavTextInactive"

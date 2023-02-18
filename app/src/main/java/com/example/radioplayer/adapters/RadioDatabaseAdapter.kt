@@ -7,13 +7,13 @@ import android.graphics.Point
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.core.view.isVisible
+
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.RadioItemBinding
@@ -21,6 +21,7 @@ import javax.inject.Inject
 
 class RadioDatabaseAdapter @Inject constructor(
     private val glide : RequestManager,
+    private val glideFactory : DrawableCrossFadeFactory
 ) : RecyclerView.Adapter<RadioDatabaseAdapter.RadioItemHolder>() {
 
 
@@ -44,7 +45,8 @@ class RadioDatabaseAdapter @Inject constructor(
             tvSecondary.text = station.country
             glide
                 .load(station.favicon)
-                .transition(DrawableTransitionOptions.withCrossFade())
+                .placeholder(R.drawable.ic_radio_default)
+                .transition(withCrossFade(glideFactory))
                 .into(ivItemImage)
         }
 

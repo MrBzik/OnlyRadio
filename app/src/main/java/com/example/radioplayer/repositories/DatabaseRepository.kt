@@ -38,14 +38,14 @@ class DatabaseRepository @Inject constructor(
             = radioDAO.deleteStationPlaylistCrossRef(crossRef)
 
 
-    suspend fun checkIfPlaylistExists (playlistName: String)
-            = radioDAO.checkIfPlaylistExists(playlistName)
-
     fun getAllPlaylists () = radioDAO.getAllPlaylists()
 
 
 
-     fun getAllFavouredStations() = radioDAO.getAllFavouredStations()
+    fun getAllFavouredStations() = radioDAO.getAllFavouredStations()
+
+
+    fun subscribeToStationsInPlaylist(playlistName: String) = radioDAO.subscribeToStationsInPlaylist(playlistName)
 
 
     suspend fun deleteAllCrossRefOfPlaylist(playlistName: String)

@@ -9,11 +9,13 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.example.radioplayer.R
 import com.example.radioplayer.connectivityObserver.ConnectivityObserver
 import com.example.radioplayer.connectivityObserver.NetworkConnectivityObserver
@@ -88,7 +90,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        window.navigationBarColor = Color.BLACK
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.main_background)
 
         setupInitialNavigation()
 
@@ -110,7 +112,7 @@ class MainActivity : AppCompatActivity() {
 
             when (it) {
                 ConnectivityObserver.Status.Available -> {
-                    bind.rootLayout.setBackgroundResource(R.color.black)
+                    bind.rootLayout.setBackgroundResource(R.color.main_background)
                 }
                 ConnectivityObserver.Status.Unavailable -> {
                     bind.rootLayout.setBackgroundResource(R.drawable.no_internet_background)

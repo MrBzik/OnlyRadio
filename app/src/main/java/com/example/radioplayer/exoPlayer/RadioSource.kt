@@ -57,18 +57,16 @@ class RadioSource @Inject constructor(
     }
 
 
-    suspend fun getStationsInPlaylist(playlistName: String): List<RadioStation> {
+    suspend fun getStationsInPlaylist(playlistName: String) {
 
         val response = radioDAO.getStationsInPlaylist(playlistName)
 
-       val list = if(response.isEmpty()) emptyList()
-            else{response.first().radioStations}
+       val list = response?.radioStations ?: emptyList()
 
         stationsFromPlaylist = list.map { station ->
             stationToMediaMetadataCompat(station)
         }.toMutableList()
 
-        return list
     }
 
 

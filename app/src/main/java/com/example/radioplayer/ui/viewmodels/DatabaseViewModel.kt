@@ -14,6 +14,7 @@ import com.example.radioplayer.adapters.models.StationWithDateModel
 import com.example.radioplayer.data.local.entities.HistoryDate
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
+import com.example.radioplayer.data.local.relations.PlaylistWithStations
 import com.example.radioplayer.data.local.relations.StationDateCrossRef
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.exoPlayer.RadioSource
@@ -44,7 +45,7 @@ class DatabaseViewModel @Inject constructor(
 
     val isStationFavoured: MutableLiveData<Boolean> = MutableLiveData()
 
-    var currentPlaylistName: MutableLiveData<String> = MutableLiveData()
+    var currentPlaylistName: MutableLiveData<String> = MutableLiveData("")
 
     var isCleanUpNeeded = false
 
@@ -75,7 +76,7 @@ class DatabaseViewModel @Inject constructor(
                     playlistName : String
                     ) = viewModelScope.launch {
         repository.insertStationPlaylistCrossRef(crossRef)
-        getStationsInPlaylist(playlistName, true)
+//        getStationsInPlaylist(playlistName, true)
 
     }
 
@@ -87,9 +88,18 @@ class DatabaseViewModel @Inject constructor(
     val listOfAllPlaylists = repository.getAllPlaylists()
 
 
-    private val stationsInPlaylist: MutableLiveData<List<RadioStation>> = MutableLiveData()
+//    private val stationsInPlaylist: MutableLiveData<List<RadioStation>> = MutableLiveData()
+
 
     private val stationInFavoured = repository.getAllFavouredStations()
+
+
+    private var stationsInPlaylist = Transformations.switchMap(
+        currentPlaylistName) { v ->
+                repository.subscribeToStationsInPlaylist(v)
+        }
+
+
 
     var isInFavouriteTab: MutableLiveData<Boolean> = MutableLiveData(true)
 
@@ -101,13 +111,13 @@ class DatabaseViewModel @Inject constructor(
 
         observableListOfStations.addSource(stationInFavoured) { favStations ->
             if (isInFavouriteTab.value!!) {
-                observableListOfStations.value = favStations.reversed()
+                observableListOfStations.value = favStations
 
             }
         }
         observableListOfStations.addSource(stationsInPlaylist) { playlistStations ->
             if (!isInFavouriteTab.value!!) {
-                observableListOfStations.value = playlistStations.reversed()
+                observableListOfStations.value = playlistStations?.radioStations?.reversed()
 
             }
         }
@@ -115,21 +125,33 @@ class DatabaseViewModel @Inject constructor(
     }
 
 
-    fun getStationsInPlaylist(playlistName: String, isForUpdate: Boolean = false) =
-        viewModelScope.launch {
+    fun subscribeToStationsInPlaylist(playlistName: String)
+            = viewModelScope.launch {
 
-            if (!isForUpdate) {
+            currentPlaylistName.postValue(playlistName)
+            isInFavouriteTab.postValue(false)
 
-                currentPlaylistName.postValue(playlistName)
-                isInFavouriteTab.postValue(false)
-            }
-
-            val playlist = radioSource.getStationsInPlaylist(playlistName)
-
-            stationsInPlaylist.postValue(playlist)
+            // to update service
+            radioSource.getStationsInPlaylist(playlistName)
+    }
 
 
-        }
+
+//    fun getStationsInPlaylist(playlistName: String, isForUpdate: Boolean = false) =
+//        viewModelScope.launch {
+//
+//            if (!isForUpdate) {
+//
+//                currentPlaylistName.postValue(playlistName)
+//                isInFavouriteTab.postValue(false)
+//            }
+//
+//            val playlist = radioSource.getStationsInPlaylist(playlistName)
+//
+//            stationsInPlaylist.postValue(playlist)
+//
+//
+//        }
 
 
     fun getAllFavouredStations() = viewModelScope.launch {
