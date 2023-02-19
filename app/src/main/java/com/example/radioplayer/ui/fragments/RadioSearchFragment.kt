@@ -1,31 +1,22 @@
 package com.example.radioplayer.ui.fragments
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.RequestManager
-import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
-import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
-import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.TagPickerDialog
 import com.example.radioplayer.ui.dialogs.CountryPickerDialog
 import com.example.radioplayer.ui.dialogs.NameDialog
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.listOfTags
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @FlowPreview
@@ -41,7 +32,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     @Inject
     lateinit var pagingRadioAdapter : PagingRadioAdapter
 
-
+    private var checkInitialLaunch = true
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -63,7 +54,11 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         subscribeToStationsFlow()
 
+
+
     }
+
+
 
 
     private fun setAdapterOnClickListener(){
@@ -95,6 +90,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         pagingRadioAdapter.addLoadStateListener {
 
+
             if (it.refresh is LoadState.Loading ||
                 it.append is LoadState.Loading)
                 bind.loadStationsProgressBar.isVisible = true
@@ -102,11 +98,23 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             else {
                 bind.loadStationsProgressBar.visibility = View.GONE
+                if(isNewSearch){
+                 handleScrollUpOnNewSearch()
+                 isNewSearch = false
+                }
             }
-
         }
-
     }
+
+    private fun handleScrollUpOnNewSearch() = viewLifecycleOwner.lifecycleScope.launch {
+
+
+        delay(100)
+        bind.rvSearchStations.smoothScrollToPosition(0)
+    }
+
+
+    private var isNewSearch = false
 
 
     private fun subscribeToStationsFlow(){
@@ -115,12 +123,17 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             mainViewModel.stationsFlow.collectLatest {
 
+                    if(checkInitialLaunch){
+                        checkInitialLaunch = false
+                    } else {
+                        isNewSearch = true
+                    }
+
                 pagingRadioAdapter.submitData(it)
+
             }
         }
-
     }
-
 
 
     private fun setSearchToolbar() {
@@ -130,8 +143,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
           TagPickerDialog(requireContext(), allTags, mainViewModel).apply {
               show()
-
-
 
           }
         }
@@ -205,7 +216,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         mainViewModel.isNewSearch = true
         mainViewModel.setSearchBy(bundle)
 
-        bind.rvSearchStations.smoothScrollToPosition(0)
 
 
     }
@@ -231,6 +241,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     override fun onDestroyView() {
         super.onDestroyView()
+        checkInitialLaunch = true
         bind.rvSearchStations.adapter = null
         _bind = null
     }

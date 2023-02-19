@@ -4,44 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="8dp"
-    android:background="@drawable/gradient_for_background"
+    android:paddingHorizontal="8dp"
+    android:background="@drawable/dialog_gradient_for_background"
+    android:animateLayoutChanges="true"
     >
 
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="20dp"
-        android:ellipsize="end"
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:layout_marginStart="8dp"
+        android:elevation="-1dp"
         android:text="Edit playlist"
         android:textAppearance="@style/dialogTitleText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <TextView
-        android:id="@+id/tvNameOfPlaylist"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="10dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="playlist name"
-        android:textAppearance="@style/dialogCurrentValue"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
-
 
     <TextView
         android:id="@+id/tvDelete"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_height="65dp"
+        android:gravity="center_vertical"
         android:layout_marginEnd="16dp"
         android:fontFamily="@font/carrois_gothic_sc"
+        android:elevation="-1dp"
         android:text="Delete"
         android:textAppearance="@style/dialogTextButtons"
         app:layout_constraintEnd_toEndOf="parent"
@@ -53,43 +42,46 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginHorizontal="8dp"
+        android:elevation="1dp"
         android:hint="New playlist name..."
-        app:layout_constraintEnd_toStartOf="@+id/ivSelectedImage"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvNameOfPlaylist">
+        app:layout_constraintEnd_toStartOf="@+id/ivSelectedImage"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etPlaylistName"
-            android:maxLines="1"
-            android:inputType="text"
-            android:textAppearance="@style/dialogSearchText"
-            android:textColor="@color/search_text_color"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:inputType="text|textNoSuggestions"
+            android:elevation="1dp"
+            android:maxLines="1"
+            android:textAppearance="@style/dialogSearchText"
+            android:textColor="@color/search_text_color" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout2"
+        android:id="@+id/textInputLayoutSearchPix"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginTop="8dp"
+        android:elevation="1dp"
         android:hint="Search images..."
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         app:endIconMode="clear_text"
         app:layout_constraintEnd_toStartOf="@+id/ivSelectedImage"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etSearchQuery"
             android:textAppearance="@style/dialogSearchText"
+            android:elevation="1dp"
             android:textColor="@color/search_text_color"
-            android:inputType="text"
+            android:inputType="text|textNoSuggestions"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             />
@@ -101,7 +93,8 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="@+id/textInputLayout2"
+        android:src="@drawable/pixabay_logo_square"
+        app:layout_constraintBottom_toBottomOf="@+id/textInputLayoutSearchPix"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/textInputLayout" />
 
@@ -111,12 +104,13 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="15dp"
-        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toTopOf="@+id/tvBack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayoutSearchPix"
+        android:paddingBottom="4dp"
+        />
 
 
     <ProgressBar
@@ -133,9 +127,10 @@
     <TextView
         android:id="@+id/tvAccept"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="66dp"
         android:layout_marginEnd="28dp"
-        android:layout_marginBottom="28dp"
+        android:gravity="center_vertical"
+        android:elevation="-1dp"
         android:text="@string/dialog_accept_button"
         android:textAppearance="@style/dialogTextButtons"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -144,9 +139,10 @@
     <TextView
         android:id="@+id/tvBack"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginBottom="28dp"
+        android:layout_height="66dp"
+        android:layout_marginStart="20dp"
+        android:gravity="center_vertical"
+        android:elevation="-1dp"
         android:text="@string/dialog_back_button"
         android:textAppearance="@style/dialogTextButtons"
         app:layout_constraintBottom_toBottomOf="parent"

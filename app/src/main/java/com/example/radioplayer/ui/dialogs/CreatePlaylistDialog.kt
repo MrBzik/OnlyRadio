@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.WindowManager.LayoutParams
 import android.widget.Toast
@@ -23,9 +24,12 @@ import com.example.radioplayer.databinding.DialogCreatePlaylistBinding
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
 import com.example.radioplayer.utils.KeyboardEditText
+import com.example.radioplayer.utils.KeyboardObserver
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 
+
+const val NO_IMAGE = "no image"
 
 @ExperimentalCoroutinesApi
 @FlowPreview
@@ -44,9 +48,10 @@ class CreatePlaylistDialog (
 
     lateinit var imageAdapter : PagingPixabayAdapter
 
-    lateinit var imageSelected : String
+    private var imageSelected : String = NO_IMAGE
 
     lateinit var listOfPlaylistNames : List<String>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -65,6 +70,9 @@ class CreatePlaylistDialog (
 
         nameTextChangeTextListener()
 
+        handleKeyboardToggle()
+//        setEditTextsFocusChangeListeners()
+
         acceptButtonClickListener()
 
         searchImagesTextChangeListener()
@@ -73,7 +81,8 @@ class CreatePlaylistDialog (
 
         setAdapterItemClickListener()
 
-//        toggleButtonsVisibility()
+
+
 
         bind.tvBack.setOnClickListener {
 
@@ -81,54 +90,22 @@ class CreatePlaylistDialog (
         }
     }
 
-//    private fun toggleButtonsVisibility(){
-//
-//                bind.etPlaylistName.setOnClickListener {
-//                    bind.tvBack.visibility = View.GONE
-//                    bind.tvAccept.visibility = View.GONE
-//
-//                }
-//
-//        bind.etPlaylistName.setOnFocusChangeListener { v, hasFocus ->
-//            if(hasFocus){
-//                bind.tvBack.visibility = View.GONE
-//                bind.tvAccept.visibility = View.GONE
-//            }
-//        }
-//
-//
-//
-//        bind.etPlaylistName.listener = object : KeyboardEditText.Listener{
-//            override fun onImeBack(editText: KeyboardEditText) {
-//                bind.tvBack.visibility = View.VISIBLE
-//                bind.tvAccept.visibility = View.VISIBLE
-//            }
-//        }
-//
-//
-//        bind.etSearchQuery.setOnClickListener {
-//            bind.tvBack.visibility = View.GONE
-//            bind.tvAccept.visibility = View.GONE
-//
-//        }
-//
-//        bind.etSearchQuery.setOnFocusChangeListener { v, hasFocus ->
-//            if(hasFocus){
-//                bind.tvBack.visibility = View.GONE
-//                bind.tvAccept.visibility = View.GONE
-//            }
-//        }
-//
-//
-//        bind.etSearchQuery.listener = object : KeyboardEditText.Listener{
-//            override fun onImeBack(editText: KeyboardEditText) {
-//                bind.tvBack.visibility = View.VISIBLE
-//                bind.tvAccept.visibility = View.VISIBLE
-//            }
-//        }
-//    }
 
 
+    private fun handleKeyboardToggle(){
+
+        KeyboardObserver.observeKeyboardState(bind.root, lifecycleScope, {
+            bind.tvTitle.visibility = View.GONE
+            bind.tvAccept.visibility = View.GONE
+            bind.tvBack.visibility = View.GONE
+        },{
+            bind.tvTitle.visibility = View.VISIBLE
+            bind.tvAccept.visibility = View.VISIBLE
+            bind.tvBack.visibility = View.VISIBLE
+            bind.etSearchQuery.clearFocus()
+            bind.etPlaylistName.clearFocus()
+        }, {})
+    }
 
     private fun observeImagesForAdapter(){
 
@@ -183,7 +160,7 @@ class CreatePlaylistDialog (
 
             val nameField = bind.etPlaylistName.text.toString()
 
-            if(nameField.isEmpty()) {
+            if(nameField.isBlank()) {
                 Toast.makeText(requireContext, "Name is empty", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -191,12 +168,11 @@ class CreatePlaylistDialog (
                 Toast.makeText(requireContext, "Name already taken", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            else if (bind.ivSelectedImage.drawable == null){
+            else if (imageSelected == NO_IMAGE){
                 Toast.makeText(requireContext, "No image selected", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            else
 
                 databaseViewModel.insertNewPlayList(Playlist(nameField, imageSelected))
                 insertStationInPlaylist?.let {
@@ -218,7 +194,6 @@ class CreatePlaylistDialog (
 
             adapter = imageAdapter
             layoutManager = GridLayoutManager(requireContext, 3)
-            setHasFixedSize(true)
 
         }
 

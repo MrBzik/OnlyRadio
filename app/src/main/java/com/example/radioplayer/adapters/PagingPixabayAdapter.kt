@@ -40,9 +40,11 @@ class PagingPixabayAdapter @Inject constructor(
 
         val currentImage = getItem(position)!!
 
+
+
         glide.load(currentImage.previewURL)
             .transition(DrawableTransitionOptions.withCrossFade())
-            .apply(object : RequestOptions(){}.override(100, 100))
+            .error(R.drawable.pixabay_logo_square)
             .into(holder.bind.ivPixabayImage)
 
         holder.itemView.setOnClickListener {

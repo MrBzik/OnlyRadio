@@ -357,8 +357,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             StationPlaylistCrossRef(stationID, currentPlaylistName)
         )
 
-//        databaseViewModel.getStationsInPlaylist(currentPlaylistName, true)
-
         Snackbar.make(
             requireActivity().findViewById(R.id.rootLayout),
             "Station removed from $currentPlaylistName", Snackbar.LENGTH_LONG
@@ -376,13 +374,11 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     private fun insertStationInPlaylist(stationID: String, playlistName : String){
 
-
             databaseViewModel.insertStationPlaylistCrossRefAndUpdate(
                 StationPlaylistCrossRef(
                     stationID, playlistName
                 ), currentPlaylistName
             )
-
 
             Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
                 "Station was moved to $playlistName",

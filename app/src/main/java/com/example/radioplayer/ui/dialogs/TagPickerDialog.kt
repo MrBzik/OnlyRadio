@@ -1,20 +1,18 @@
 package com.example.radioplayer.ui.dialogs
 
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.*
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatDialog
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.adapters.FilterTagsAdapter
 import com.example.radioplayer.databinding.DialogPickTagBinding
 import com.example.radioplayer.ui.viewmodels.MainViewModel
-import com.example.radioplayer.utils.KeyboardEditText
-import java.security.Key
+import com.example.radioplayer.utils.KeyboardObserver.observeKeyboardState
 
 class TagPickerDialog (
     private val requireContext : Context,
@@ -27,6 +25,7 @@ class TagPickerDialog (
     private val bind get() = _bind!!
 
     private lateinit var tagAdapter : FilterTagsAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -41,36 +40,28 @@ class TagPickerDialog (
         setupButtons()
         setupAdapterClickListener()
         setEditTextAdapterFilter()
+        handleKeyboardToggle()
 
-
-
-
-//        bind.editText.setOnFocusChangeListener { v, hasFocus ->
-//            if(hasFocus){
-//                bind.tvBack.visibility = View.GONE
-//                bind.tvClearSelection.visibility = View.GONE
-//            }
-//        }
-//
-//        bind.editText.setOnClickListener {
-//
-//                bind.tvBack.visibility = View.GONE
-//                bind.tvClearSelection.visibility = View.GONE
-//
-//        }
-//
-//        bind.editText.listener = object : KeyboardEditText.Listener{
-//            override fun onImeBack(editText: KeyboardEditText) {
-//                bind.tvBack.visibility = View.VISIBLE
-//                bind.tvClearSelection.visibility = View.VISIBLE
-//            }
-//        }
 
 
 
 
     }
 
+    private fun handleKeyboardToggle (){
+        observeKeyboardState(bind.root, lifecycleScope, {
+
+            bind.tvBack.visibility = View.GONE
+            bind.tvClearSelection.visibility = View.GONE
+            bind.tvTitle.visibility = View.GONE
+
+        }, {
+            bind.tvBack.visibility = View.VISIBLE
+            bind.tvClearSelection.visibility = View.VISIBLE
+            bind.tvTitle.visibility = View.VISIBLE
+
+        }, { bind.editText.requestFocus()})
+    }
 
 
     private fun setupRecyclerView(){
@@ -129,12 +120,18 @@ class TagPickerDialog (
 
 
 
+
     override fun onStop() {
         super.onStop()
         bind.recyclerView.adapter = null
         _bind = null
 
     }
+
+
+    private var isOpen : MutableLiveData<Boolean> = MutableLiveData()
+
+
 
 
 
