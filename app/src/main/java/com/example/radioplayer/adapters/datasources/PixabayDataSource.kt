@@ -22,7 +22,7 @@ class PixabayDataSource (
             LoadResult.Page(
                 data = images,
                 prevKey = if (pageIndex == 1) null else pageIndex - 1,
-                nextKey = pageIndex +1
+                nextKey = if (images.size == params.loadSize) pageIndex + 1 else null
             )
 
         } catch (e: Exception) {

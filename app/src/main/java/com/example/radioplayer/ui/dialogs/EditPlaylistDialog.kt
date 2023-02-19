@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.WindowManager.LayoutParams
 import android.widget.ImageView
@@ -25,6 +26,7 @@ import com.example.radioplayer.databinding.DialogEditPlaylistBinding
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
 import com.example.radioplayer.utils.KeyboardEditText
+import com.example.radioplayer.utils.KeyboardObserver
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 
@@ -54,6 +56,9 @@ class EditPlaylistDialog (
 
     lateinit var listOfPlaylistNames : List<String>
 
+//    private var isFocusHandlingNeeded = true
+//    private var isFocusRequested = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         _bind = DialogEditPlaylistBinding.inflate(layoutInflater)
@@ -71,6 +76,9 @@ class EditPlaylistDialog (
 
         setupRecycleView()
 
+        handleKeyboardToggle()
+//        setEditTextsFocusChangeListeners()
+
         editTextChangeTextListener()
 
         acceptButtonClickListener()
@@ -83,12 +91,61 @@ class EditPlaylistDialog (
 
         setOnDeleteClickListener()
 
-//        toggleButtonsVisibility()
 
         bind.tvBack.setOnClickListener {
             dismiss()
         }
     }
+
+
+
+//    private fun setEditTextsFocusChangeListeners(){
+//
+//        bind.etSearchQuery.setOnFocusChangeListener { v, hasFocus ->
+//            if(hasFocus && isFocusHandlingNeeded){
+//
+//                isFocusRequested = true
+//
+//            }
+//            else if(!hasFocus && isFocusRequested){
+//
+//                v.requestFocus()
+//                isFocusRequested = false
+//
+//            }
+//        }
+//
+//        bind.etPlaylistName.setOnFocusChangeListener { v, hasFocus ->
+//            if(hasFocus && isFocusHandlingNeeded){
+//                isFocusRequested = true
+//            }
+//            else if(!hasFocus && isFocusRequested){
+//                v.requestFocus()
+//                isFocusRequested = false
+//            }
+//        }
+//
+//    }
+
+    private fun handleKeyboardToggle(){
+
+        KeyboardObserver.observeKeyboardState(bind.root, lifecycleScope, {
+            bind.tvTitle.visibility = View.GONE
+            bind.tvDelete.visibility = View.GONE
+            bind.tvAccept.visibility = View.GONE
+            bind.tvBack.visibility = View.GONE
+//            isFocusHandlingNeeded = false
+        },{
+            bind.tvTitle.visibility = View.VISIBLE
+            bind.tvDelete.visibility = View.VISIBLE
+            bind.tvAccept.visibility = View.VISIBLE
+            bind.tvBack.visibility = View.VISIBLE
+//            isFocusHandlingNeeded = true
+            bind.etSearchQuery.clearFocus()
+            bind.etPlaylistName.clearFocus()
+        }, {})
+    }
+
 
     private fun setOnDeleteClickListener(){
 
@@ -102,7 +159,7 @@ class EditPlaylistDialog (
 
     private fun setTitleAndEditTextField(){
 
-        bind.tvNameOfPlaylist.text = currentPlaylistName
+
         bind.etPlaylistName.setText(currentPlaylistName)
 
         currentPlaylist = listOfPlaylists[currentPlaylistPosition]
@@ -208,7 +265,6 @@ class EditPlaylistDialog (
 
             adapter = imageAdapter
             layoutManager = GridLayoutManager(requireContext, 3)
-            setHasFixedSize(true)
 
         }
 
@@ -252,52 +308,5 @@ class EditPlaylistDialog (
 
     }
 
-//    private fun toggleButtonsVisibility(){
-//
-//        bind.etPlaylistName.setOnClickListener {
-//            bind.tvBack.visibility = View.GONE
-//            bind.tvAccept
-//                .visibility = View.GONE
-//
-//        }
-//
-//        bind.etPlaylistName.setOnFocusChangeListener { v, hasFocus ->
-//            if(hasFocus){
-//                bind.tvBack.visibility = View.GONE
-//                bind.tvAccept.visibility = View.GONE
-//            }
-//        }
-//
-//
-//
-//        bind.etPlaylistName.listener = object : KeyboardEditText.Listener{
-//            override fun onImeBack(editText: KeyboardEditText) {
-//                bind.tvBack.visibility = View.VISIBLE
-//                bind.tvAccept.visibility = View.VISIBLE
-//            }
-//        }
-//
-//
-//        bind.etSearchQuery.setOnClickListener {
-//            bind.tvBack.visibility = View.GONE
-//            bind.tvAccept.visibility = View.GONE
-//
-//        }
-//
-//        bind.etSearchQuery.setOnFocusChangeListener { v, hasFocus ->
-//            if(hasFocus){
-//                bind.tvBack.visibility = View.GONE
-//                bind.tvAccept.visibility = View.GONE
-//            }
-//        }
-//
-//
-//        bind.etSearchQuery.listener = object : KeyboardEditText.Listener{
-//            override fun onImeBack(editText: KeyboardEditText) {
-//                bind.tvBack.visibility = View.VISIBLE
-//                bind.tvAccept.visibility = View.VISIBLE
-//            }
-//        }
-//    }
 
 }

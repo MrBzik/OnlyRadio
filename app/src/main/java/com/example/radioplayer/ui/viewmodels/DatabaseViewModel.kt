@@ -76,7 +76,6 @@ class DatabaseViewModel @Inject constructor(
                     playlistName : String
                     ) = viewModelScope.launch {
         repository.insertStationPlaylistCrossRef(crossRef)
-//        getStationsInPlaylist(playlistName, true)
 
     }
 
@@ -87,8 +86,6 @@ class DatabaseViewModel @Inject constructor(
 
     val listOfAllPlaylists = repository.getAllPlaylists()
 
-
-//    private val stationsInPlaylist: MutableLiveData<List<RadioStation>> = MutableLiveData()
 
 
     private val stationInFavoured = repository.getAllFavouredStations()
@@ -136,22 +133,6 @@ class DatabaseViewModel @Inject constructor(
     }
 
 
-
-//    fun getStationsInPlaylist(playlistName: String, isForUpdate: Boolean = false) =
-//        viewModelScope.launch {
-//
-//            if (!isForUpdate) {
-//
-//                currentPlaylistName.postValue(playlistName)
-//                isInFavouriteTab.postValue(false)
-//            }
-//
-//            val playlist = radioSource.getStationsInPlaylist(playlistName)
-//
-//            stationsInPlaylist.postValue(playlist)
-//
-//
-//        }
 
 
     fun getAllFavouredStations() = viewModelScope.launch {

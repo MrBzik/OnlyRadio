@@ -61,7 +61,7 @@ class PixabayViewModel @Inject constructor(
                 config = PagingConfig(
                 pageSize = 20,
                 enablePlaceholders = false,
-                initialLoadSize = 1
+                initialLoadSize = 20
             ),
             pagingSourceFactory = {
                 PixabayDataSource(loader)

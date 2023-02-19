@@ -4,12 +4,15 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialog
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.adapters.FilterCountriesAdapter
 import com.example.radioplayer.databinding.DialogPickCountryBinding
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.utils.KeyboardObserver
 import com.example.radioplayer.utils.listOfCountries
 
 
@@ -41,13 +44,31 @@ class CountryPickerDialog(
 
         setOnAdapterClickListener()
 
-
+        handleKeyboardToggle()
 
 
         filterCountriesOnEditTextListener()
 
 
+
+
     }
+
+    private fun handleKeyboardToggle (){
+        KeyboardObserver.observeKeyboardState(bind.root, lifecycleScope, {
+
+            bind.tvBack.visibility = View.GONE
+            bind.tvClearSelection.visibility = View.GONE
+            bind.tvTitle.visibility = View.GONE
+
+        }, {
+            bind.tvBack.visibility = View.VISIBLE
+            bind.tvClearSelection.visibility = View.VISIBLE
+            bind.tvTitle.visibility = View.VISIBLE
+
+        }, { bind.editText.requestFocus() })
+    }
+
 
     private fun filterCountriesOnEditTextListener(){
 
