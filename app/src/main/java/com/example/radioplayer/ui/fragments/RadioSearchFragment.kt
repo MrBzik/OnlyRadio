@@ -1,9 +1,14 @@
 package com.example.radioplayer.ui.fragments
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import androidx.core.view.marginLeft
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,6 +17,9 @@ import com.example.radioplayer.databinding.FragmentRadioSearchBinding
 import com.example.radioplayer.ui.dialogs.TagPickerDialog
 import com.example.radioplayer.ui.dialogs.CountryPickerDialog
 import com.example.radioplayer.ui.dialogs.NameDialog
+import com.example.radioplayer.utils.Constants
+import com.example.radioplayer.utils.Constants.FAB_POSITION_X
+import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.listOfTags
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,6 +46,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         setSearchParamsObservers()
 
         setSearchToolbar()
@@ -54,11 +63,52 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         subscribeToStationsFlow()
 
+        setDragListenerForLayout()
+        setDragListenerForButton()
 
-
+        bind.fabInitiateSearch.post{
+            if (mainViewModel.isFabMoved) {
+                bind.fabInitiateSearch.x = mainViewModel.fabX
+                bind.fabInitiateSearch.y = mainViewModel.fabY
+            }
+             bind.fabInitiateSearch.isVisible = true
+        }
     }
 
 
+
+
+    private fun setDragListenerForLayout(){
+            var tempX = 0f
+            var tempY = 0f
+
+        bind.root.setOnDragListener { v, event ->
+            when(event.action){
+                DragEvent.ACTION_DRAG_LOCATION -> {
+                   tempX = event.x
+                   tempY = event.y
+                }
+                DragEvent.ACTION_DRAG_ENDED ->{
+
+                    bind.fabInitiateSearch.x = tempX - bind.fabInitiateSearch.width/2
+                    bind.fabInitiateSearch.y = tempY - bind.fabInitiateSearch.height/2
+
+                    mainViewModel.fabX = bind.fabInitiateSearch.x
+                    mainViewModel.fabY = bind.fabInitiateSearch.y
+                    mainViewModel.isFabUpdated = true
+                }
+            }
+            true
+        }
+    }
+
+    private fun setDragListenerForButton(){
+        bind.fabInitiateSearch.setOnLongClickListener { view ->
+            val shadow = View.DragShadowBuilder(bind.fabInitiateSearch)
+            view.startDragAndDrop(null, shadow, view, 0)
+            true
+        }
+    }
 
 
     private fun setAdapterOnClickListener(){
@@ -176,7 +226,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private fun listenSearchButton(){
 
-        bind.ivInitiateSearch.setOnClickListener {
+        bind.fabInitiateSearch.setOnClickListener {
             initiateNewSearch()
         }
 

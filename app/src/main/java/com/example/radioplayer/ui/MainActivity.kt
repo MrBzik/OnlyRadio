@@ -28,6 +28,10 @@ import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.fragments.*
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.utils.Constants
+import com.example.radioplayer.utils.Constants.FAB_POSITION_X
+import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
+import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
@@ -93,22 +97,26 @@ class MainActivity : AppCompatActivity() {
         window.navigationBarColor = ContextCompat.getColor(this, R.color.main_background)
 
         setupInitialNavigation()
-
+        setConnectivityObserver()
         observeNewStation()
 
         setOnBottomNavClickListener()
 
         setOnBottomNavItemReselect()
 
-        setConnectivityObserver()
+
 
     }
 
     private fun setConnectivityObserver() {
 
+        var isStatusRecieved = false
+
         connectivityObserver = NetworkConnectivityObserver(applicationContext)
 
         connectivityObserver.observe().onEach {
+
+            isStatusRecieved = true
 
             when (it) {
                 ConnectivityObserver.Status.Available -> {
@@ -123,6 +131,10 @@ class MainActivity : AppCompatActivity() {
                 else -> {}
             }
         }.launchIn(lifecycleScope)
+
+        if(!isStatusRecieved){
+            bind.rootLayout.setBackgroundResource(R.drawable.no_internet_background)
+        }
 
     }
 
@@ -369,6 +381,15 @@ class MainActivity : AppCompatActivity() {
             putString(SEARCH_PREF_NAME, mainViewModel.searchParamName.value)
             putString(SEARCH_PREF_COUNTRY, mainViewModel.searchParamCountry.value)
         }.apply()
+
+        if(mainViewModel.isFabUpdated){
+            mainViewModel.fabPref.edit().apply {
+                putFloat(FAB_POSITION_X, mainViewModel.fabX)
+                putFloat(FAB_POSITION_Y, mainViewModel.fabY)
+                putBoolean(IS_FAB_UPDATED, true)
+            }.apply()
+        }
+
     }
 
 }

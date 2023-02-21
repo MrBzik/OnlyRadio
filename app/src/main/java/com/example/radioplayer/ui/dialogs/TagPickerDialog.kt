@@ -6,6 +6,8 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.*
 import androidx.appcompat.app.AppCompatDialog
+import androidx.core.view.doOnLayout
+import androidx.core.view.doOnNextLayout
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -42,15 +44,10 @@ class TagPickerDialog (
         setEditTextAdapterFilter()
         handleKeyboardToggle()
 
-
-
-
-
     }
 
     private fun handleKeyboardToggle (){
-        observeKeyboardState(bind.root, lifecycleScope, {
-
+        observeKeyboardState(bind.root, {
             bind.tvBack.visibility = View.GONE
             bind.tvClearSelection.visibility = View.GONE
             bind.tvTitle.visibility = View.GONE
@@ -59,8 +56,12 @@ class TagPickerDialog (
             bind.tvBack.visibility = View.VISIBLE
             bind.tvClearSelection.visibility = View.VISIBLE
             bind.tvTitle.visibility = View.VISIBLE
+            bind.editText.clearFocus()
 
-        }, { bind.editText.requestFocus()})
+        }, {
+            bind.editText.requestFocus()
+
+        })
     }
 
 

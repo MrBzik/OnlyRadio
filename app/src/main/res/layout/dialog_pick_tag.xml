@@ -30,7 +30,6 @@
         android:textColor="@color/search_text_color"
         android:textCursorDrawable="@drawable/cursor_color"
         android:inputType="text|textNoSuggestions"
-        android:paddingTop="10dp"
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

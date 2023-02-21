@@ -2,6 +2,7 @@ package com.example.radioplayer.ui.viewmodels
 
 import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
 import android.util.Log
@@ -15,6 +16,9 @@ import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
+import com.example.radioplayer.utils.Constants.FAB_POSITION_X
+import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
+import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
@@ -51,6 +55,19 @@ class MainViewModel @Inject constructor(
 
        val searchPreferences = app.getSharedPreferences("SearchPref", Context.MODE_PRIVATE)
 
+
+       var fabX = 0f
+       var fabY = 0f
+
+       var fabPref: SharedPreferences = app.getSharedPreferences("FabPref", Context.MODE_PRIVATE)
+       var isFabMoved = fabPref.getBoolean(IS_FAB_UPDATED, false)
+       var isFabUpdated = false
+       init {
+            if(isFabMoved){
+                fabX = fabPref.getFloat(FAB_POSITION_X, 0f)
+                fabY = fabPref.getFloat(FAB_POSITION_Y, 0f)
+            }
+        }
 
 
         init {

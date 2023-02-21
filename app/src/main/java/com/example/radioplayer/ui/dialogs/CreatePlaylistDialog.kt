@@ -1,11 +1,9 @@
 package com.example.radioplayer.ui.dialogs
 
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.view.WindowManager.LayoutParams
 import android.widget.Toast
@@ -23,7 +21,6 @@ import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.databinding.DialogCreatePlaylistBinding
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
-import com.example.radioplayer.utils.KeyboardEditText
 import com.example.radioplayer.utils.KeyboardObserver
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
@@ -94,7 +91,7 @@ class CreatePlaylistDialog (
 
     private fun handleKeyboardToggle(){
 
-        KeyboardObserver.observeKeyboardState(bind.root, lifecycleScope, {
+        KeyboardObserver.observeKeyboardState(bind.root, {
             bind.tvTitle.visibility = View.GONE
             bind.tvAccept.visibility = View.GONE
             bind.tvBack.visibility = View.GONE

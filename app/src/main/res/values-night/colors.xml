@@ -18,5 +18,6 @@
     <color name="regular_text_color">#808080</color>
     <color name="search_text_color">#989696</color>
     <color name= "main_background">#FF000000</color>
+    <color name="text_interactive_shadow">#FF0000</color>
 
 </resources>

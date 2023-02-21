@@ -55,7 +55,7 @@ class CountryPickerDialog(
     }
 
     private fun handleKeyboardToggle (){
-        KeyboardObserver.observeKeyboardState(bind.root, lifecycleScope, {
+        KeyboardObserver.observeKeyboardState(bind.root, {
 
             bind.tvBack.visibility = View.GONE
             bind.tvClearSelection.visibility = View.GONE
@@ -65,6 +65,7 @@ class CountryPickerDialog(
             bind.tvBack.visibility = View.VISIBLE
             bind.tvClearSelection.visibility = View.VISIBLE
             bind.tvTitle.visibility = View.VISIBLE
+            bind.editText.clearFocus()
 
         }, { bind.editText.requestFocus() })
     }
