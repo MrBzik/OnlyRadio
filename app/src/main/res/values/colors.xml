@@ -8,16 +8,18 @@
     <color name="black">#000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="ChosenGreen">#004D40</color>
-    <color name="color_non_interactive">#FD7F20</color>
-    <color name="Separator">#AA4D06</color>
+    <color name="color_non_interactive">#FFFFFFFF</color>
+    <color name="Separator">#F3E5F5</color>
     <color name="grayColor">#635D5D</color>
     <color name="floating_buttons">#DADADA</color>
-    <color name="color_interactive">#FDB750</color>
+    <color name="color_interactive">#FFFFFFFF</color>
     <color name="color_changed_on_interaction">#FC2E20</color>
     <color name="transparent">#00000000</color>
     <color name="regular_text_color">#0C0C0C</color>
     <color name="search_text_color">#000000</color>
-    <color name= "main_background">#FFFFFFFF</color>
+    <color name= "main_background">#F3E5F5</color>
     <color name="text_interactive_shadow">#000000</color>
-
+    <color name="arrows_for_text_buttons">#FFFDE7</color>
+    <color name="toolbar">#FF80AB</color>
+    <color name="selected_station_end_gradient">#FF80AB</color>
 </resources>

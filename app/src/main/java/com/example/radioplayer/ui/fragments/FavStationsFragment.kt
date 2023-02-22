@@ -113,6 +113,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
                 if(isCoverUpdateNeeded){
 
+
                     val view = bind.rvPlaylists
                         .findViewHolderForAdapterPosition(currentPlaylistPosition)?.itemView?.
                         findViewById<ImageView>(R.id.ivPlaylistCover)
@@ -284,7 +285,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         mainAdapter.setOnClickListener {
 
             mainViewModel.playOrToggleStation(it, searchFlag)
-            mainViewModel.newRadioStation.postValue(it)
             databaseViewModel.checkDateAndUpdateHistory(it.stationuuid)
         }
     }

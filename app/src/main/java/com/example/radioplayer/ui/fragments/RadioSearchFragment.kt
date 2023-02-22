@@ -65,18 +65,20 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         setDragListenerForLayout()
         setDragListenerForButton()
+        getFabSearchPositionIfNeeded()
 
+    }
+
+
+    private fun getFabSearchPositionIfNeeded(){
         bind.fabInitiateSearch.post{
             if (mainViewModel.isFabMoved) {
                 bind.fabInitiateSearch.x = mainViewModel.fabX
                 bind.fabInitiateSearch.y = mainViewModel.fabY
             }
-             bind.fabInitiateSearch.isVisible = true
+            bind.fabInitiateSearch.isVisible = true
         }
     }
-
-
-
 
     private fun setDragListenerForLayout(){
             var tempX = 0f
@@ -116,7 +118,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         pagingRadioAdapter.setOnClickListener {
 
             mainViewModel.playOrToggleStation(it, SEARCH_FROM_API)
-            mainViewModel.newRadioStation.postValue(it)
             databaseViewModel.insertRadioStation(it)
             databaseViewModel.checkDateAndUpdateHistory(it.stationuuid)
 

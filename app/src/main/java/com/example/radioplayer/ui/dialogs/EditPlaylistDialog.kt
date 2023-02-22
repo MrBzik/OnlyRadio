@@ -261,7 +261,7 @@ class EditPlaylistDialog (
 
             adapter = imageAdapter
             layoutManager = GridLayoutManager(requireContext, 3)
-
+            setHasFixedSize(true)
         }
 
         setAdapterLoadStateListener()

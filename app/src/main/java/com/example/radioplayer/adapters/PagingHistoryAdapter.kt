@@ -1,7 +1,14 @@
 package com.example.radioplayer.adapters
 
+import android.graphics.Color
+import android.graphics.drawable.Drawable
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -30,6 +37,7 @@ class PagingHistoryAdapter @Inject constructor(
 ) : PagingDataAdapter<StationWithDateModel, RecyclerView.ViewHolder>(StationsComparator) {
 
 
+
     class StationViewHolder (val bind: RadioItemBinding)
         : RecyclerView.ViewHolder(bind.root)
 
@@ -48,7 +56,9 @@ class PagingHistoryAdapter @Inject constructor(
                 val view = RadioItemBinding.inflate(
                     LayoutInflater.from(parent.context),  parent, false
                 )
-                StationViewHolder(view)
+
+                return StationViewHolder(view)
+
             }
             TYPE_DATE_SEPARATOR ->
                 DateSeparatorViewHolder(
@@ -89,6 +99,7 @@ class PagingHistoryAdapter @Inject constructor(
 
         else if (item is StationWithDateModel.Station){
             (holder as StationViewHolder).bind.apply {
+
                 tvPrimary.text = item.radioStation.name
                 tvSecondary.text = item.radioStation.country
                 glide
@@ -100,12 +111,41 @@ class PagingHistoryAdapter @Inject constructor(
                 ivItemImage.setOnClickListener {
 
                     onItemClickListener?.let { click ->
+
                         click(item.radioStation)
+
+                        if(holder.absoluteAdapterPosition == selectedItemPosition){/*DO NOTHING*/}
+                        else {
+                            checkForInitialSelection = false
+                            currentRadioStationID = item.radioStation.stationuuid
+                            selectedItemPosition = holder.absoluteAdapterPosition
+                            previousItemHolder?.setBackgroundResource(R.color.main_background)
+                            radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
+                            previousItemHolder = radioItemRootLayout
+                        }
                     }
                 }
+
+                if(item.radioStation.stationuuid == currentRadioStationID
+                    && checkForInitialSelection  ){
+                    checkForInitialSelection = false
+                    radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
+                    selectedItemPosition = holder.absoluteAdapterPosition
+                    previousItemHolder = radioItemRootLayout
+
+                } else if(holder.absoluteAdapterPosition == selectedItemPosition){
+                    radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
+                    previousItemHolder = radioItemRootLayout
+                }
+                else radioItemRootLayout.setBackgroundResource(R.color.main_background)
             }
         }
     }
+
+    var currentRadioStationID : String = ""
+    private var selectedItemPosition = -1
+    private var checkForInitialSelection = true
+    private var previousItemHolder : LinearLayout? = null
 
 
     private var onItemClickListener : ((RadioStation) -> Unit)? = null
@@ -125,7 +165,7 @@ class PagingHistoryAdapter @Inject constructor(
     }
 
 
-    object StationsComparator : DiffUtil.ItemCallback<StationWithDateModel>(){
+   object StationsComparator : DiffUtil.ItemCallback<StationWithDateModel>(){
 
         override fun areItemsTheSame(
             oldItem: StationWithDateModel, newItem: StationWithDateModel
@@ -147,6 +187,8 @@ class PagingHistoryAdapter @Inject constructor(
 
 
         }
+
+
 
         override fun areContentsTheSame(
             oldItem: StationWithDateModel, newItem: StationWithDateModel

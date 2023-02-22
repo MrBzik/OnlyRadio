@@ -1,15 +1,21 @@
 package com.example.radioplayer.ui.fragments
 
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingHistoryAdapter
@@ -132,6 +138,14 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             layoutManager = LinearLayoutManager(requireContext())
             edgeEffectFactory = BounceEdgeEffectFactory()
             setHasFixedSize(true)
+
+            mainViewModel.newRadioStation.value?.let {
+
+            historyAdapter.currentRadioStationID = it.stationuuid
+
+            }
+
+
         }
 
         setAdapterLoadStateListener()
@@ -143,8 +157,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             databaseViewModel.historyFlow.collectLatest {
 
-                historyAdapter?.currentDate = currentDate
-                historyAdapter?.submitData(it)
+                historyAdapter.currentDate = currentDate
+                historyAdapter.submitData(it)
 
             }
         }
@@ -156,7 +170,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         historyAdapter.setOnClickListener {
 
             mainViewModel.playOrToggleStation(it, SEARCH_FROM_HISTORY)
-            mainViewModel.newRadioStation.postValue(it)
 
         }
     }

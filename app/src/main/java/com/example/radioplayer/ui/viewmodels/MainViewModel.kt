@@ -7,10 +7,13 @@ import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
 import android.util.Log
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.example.radioplayer.adapters.datasources.RadioStationsDataSource
 import com.example.radioplayer.adapters.datasources.StationsPageLoader
+import com.example.radioplayer.connectivityObserver.ConnectivityObserver
+import com.example.radioplayer.connectivityObserver.NetworkConnectivityObserver
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.repositories.DatabaseRepository
@@ -28,6 +31,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -48,6 +53,53 @@ class MainViewModel @Inject constructor(
        var isNewSearch = true
        var isDelayNeededForServiceConnection = true
        val newRadioStation : MutableLiveData<RadioStation> = MutableLiveData()
+
+    init {
+
+        currentRadioStation.value?.let {
+            viewModelScope.launch {
+                val currentStation = repository.getCurrentRadioStation(
+                    it.getString(METADATA_KEY_MEDIA_ID)
+                )
+                newRadioStation.postValue(currentStation)
+            }
+        }
+
+    }
+
+
+    var hasInternetConnection : MutableLiveData<Boolean> = MutableLiveData(false)
+
+    private fun setConnectivityObserver() {
+
+       val connectivityObserver = NetworkConnectivityObserver(getApplication())
+
+        connectivityObserver.observe().onEach {
+
+            when (it) {
+                ConnectivityObserver.Status.Available -> {
+                    hasInternetConnection.postValue(true)
+                    if(wasSearchInterrupted){
+                        wasSearchInterrupted = false
+                        searchBy.postValue(lastSearchBundle)
+                    }
+                }
+                ConnectivityObserver.Status.Unavailable -> {
+                    hasInternetConnection.postValue(false)
+                }
+                ConnectivityObserver.Status.Lost -> {
+                    hasInternetConnection.postValue(false)
+                }
+                else -> {}
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    init {
+        setConnectivityObserver()
+    }
+
+
 
        val searchParamTag : MutableLiveData<String> = MutableLiveData()
        val searchParamName : MutableLiveData<String> = MutableLiveData()
@@ -70,18 +122,6 @@ class MainViewModel @Inject constructor(
         }
 
 
-        init {
-
-            currentRadioStation.value?.let {
-                viewModelScope.launch {
-                  val currentStation = repository.getCurrentRadioStation(
-                      it.getString(METADATA_KEY_MEDIA_ID)
-                  )
-                    newRadioStation.postValue(currentStation)
-                }
-            }
-
-        }
 
        private suspend fun searchWithNewParams(
             limit : Int, offset : Int, bundle: Bundle
@@ -183,9 +223,24 @@ class MainViewModel @Inject constructor(
         putString("COUNTRY", country)
 
     }
+    private var lastSearchBundle = Bundle()
+    private var wasSearchInterrupted = false
+
+    private val searchBy : MutableLiveData<Bundle> = MutableLiveData()
+
+    init {
+        searchBy.postValue(initialSearchBundle)
+        viewModelScope.launch {
+            delay(600)
+            if(hasInternetConnection.value == false){
+                lastSearchBundle = initialSearchBundle
+                wasSearchInterrupted = true
+            }
+            this.cancel()
+        }
+    }
 
 
-    private val searchBy = MutableLiveData(initialSearchBundle)
 
     val stationsFlow = searchBy.asFlow()
         .flatMapLatest {
@@ -202,7 +257,12 @@ class MainViewModel @Inject constructor(
             && it.getString("COUNTRY") == value.getString("COUNTRY")
 
         )  return
-                searchBy.value = value
+                if(hasInternetConnection.value == true){
+                    searchBy.postValue(value)
+                } else{
+                    lastSearchBundle = value
+                    wasSearchInterrupted = true
+                }
         }
 
     }
@@ -224,6 +284,7 @@ class MainViewModel @Inject constructor(
                     }
                 }
             } else{
+                newRadioStation.postValue(station)
                 radioServiceConnection.transportControls
                     .playFromMediaId(station.stationuuid, bundleOf(Pair("SEARCH_FLAG", searchFlag)))
             }

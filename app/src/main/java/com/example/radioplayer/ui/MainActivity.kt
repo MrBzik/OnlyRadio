@@ -1,13 +1,11 @@
 package com.example.radioplayer.ui
 
-import android.content.res.ColorStateList
-import android.graphics.Color
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -28,7 +26,6 @@ import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.fragments.*
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
-import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.FAB_POSITION_X
 import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
@@ -41,7 +38,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
-import kotlin.math.absoluteValue
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -52,7 +48,6 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var bind : ActivityMainBinding
 
-    lateinit var connectivityObserver: ConnectivityObserver
 
     lateinit var bindPlayer : StubPlayerActivityMainBinding
 
@@ -68,6 +63,7 @@ class MainActivity : AppCompatActivity() {
     private  val favStationsFragment : FavStationsFragment by lazy { FavStationsFragment() }
     private  val historyFragment : HistoryFragment by lazy { HistoryFragment() }
     private  val stationDetailsFragment : StationDetailsFragment by lazy { StationDetailsFragment() }
+    private var previousImageUri : Uri? = null
 
     override fun onBackPressed() {
 
@@ -92,50 +88,28 @@ class MainActivity : AppCompatActivity() {
                 bindPlayer = StubPlayerActivityMainBinding.bind(inflated)
         }
 
-
-
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.main_background)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.toolbar)
 
         setupInitialNavigation()
-        setConnectivityObserver()
+
+        observeInternetConnection()
+
         observeNewStation()
 
         setOnBottomNavClickListener()
 
         setOnBottomNavItemReselect()
 
+        observeInternetConnection()
 
 
     }
 
-    private fun setConnectivityObserver() {
+    private fun observeInternetConnection() {
 
-        var isStatusRecieved = false
-
-        connectivityObserver = NetworkConnectivityObserver(applicationContext)
-
-        connectivityObserver.observe().onEach {
-
-            isStatusRecieved = true
-
-            when (it) {
-                ConnectivityObserver.Status.Available -> {
-                    bind.rootLayout.setBackgroundResource(R.color.main_background)
-                }
-                ConnectivityObserver.Status.Unavailable -> {
-                    bind.rootLayout.setBackgroundResource(R.drawable.no_internet_background)
-                }
-                ConnectivityObserver.Status.Lost -> {
-                    bind.rootLayout.setBackgroundResource(R.drawable.no_internet_background)
-                }
-                else -> {}
-            }
-        }.launchIn(lifecycleScope)
-
-        if(!isStatusRecieved){
-            bind.rootLayout.setBackgroundResource(R.drawable.no_internet_background)
+        mainViewModel.hasInternetConnection.observe(this){
+            bind.ivNoInternet.isVisible = !it
         }
-
     }
 
     private fun setupInitialNavigation(){
@@ -330,14 +304,14 @@ class MainActivity : AppCompatActivity() {
 
         newImage?.let { uri ->
 
+            if(previousImageUri == uri){/*DO NOTHING*/} else{
 
                 glide
                     .load(uri)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(bindPlayer.ivCurrentStationImage)
-
-        } ?: run {
-            bindPlayer.ivCurrentStationImage.setImageResource(R.drawable.ic_radio_default)
+                previousImageUri = uri
+            }
         }
 
         bindPlayer.tvStationTitle.text = station.name
