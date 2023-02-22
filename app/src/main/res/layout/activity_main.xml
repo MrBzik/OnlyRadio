@@ -37,11 +37,10 @@
 
 
   <View
-      android:id="@+id/view"
+      android:id="@+id/viewSeparatorStart"
       android:layout_width="2dp"
       android:layout_height="match_parent"
       android:layout_marginStart="5dp"
-      android:background="@drawable/gradient_for_separators"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"
@@ -77,10 +76,10 @@
       />
 
   <View
+      android:id="@+id/viewSeparatorEnd"
       android:layout_width="2dp"
       android:layout_height="match_parent"
       android:layout_marginEnd="5dp"
-      android:background="@drawable/gradient_for_separators"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintTop_toTopOf="parent"

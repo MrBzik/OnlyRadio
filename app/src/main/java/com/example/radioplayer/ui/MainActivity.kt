@@ -1,22 +1,19 @@
 package com.example.radioplayer.ui
 
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.example.radioplayer.R
-import com.example.radioplayer.connectivityObserver.ConnectivityObserver
-import com.example.radioplayer.connectivityObserver.NetworkConnectivityObserver
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.ActivityMainBinding
 import com.example.radioplayer.databinding.StubPlayerActivityMainBinding
@@ -35,8 +32,6 @@ import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
 
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -52,6 +47,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var bindPlayer : StubPlayerActivityMainBinding
 
     private var isStubPlayerBindInflated = false
+
+    var sideSeparatorStart : Drawable? = null
+    var sideSeparatorEnd : Drawable? = null
 
     @Inject
     lateinit var glide : RequestManager
@@ -90,6 +88,8 @@ class MainActivity : AppCompatActivity() {
 
         window.navigationBarColor = ContextCompat.getColor(this, R.color.toolbar)
 
+        setupSidesSeparators()
+
         setupInitialNavigation()
 
         observeInternetConnection()
@@ -111,6 +111,17 @@ class MainActivity : AppCompatActivity() {
             bind.ivNoInternet.isVisible = !it
         }
     }
+
+    private fun setupSidesSeparators(){
+
+        sideSeparatorStart = AppCompatResources.getDrawable(this, R.drawable.gradient_for_separators)
+        sideSeparatorEnd =AppCompatResources.getDrawable(this, R.drawable.gradient_for_separators)
+        bind.viewSeparatorStart.background = sideSeparatorStart
+        bind.viewSeparatorEnd.background = sideSeparatorEnd
+
+    }
+
+
 
     private fun setupInitialNavigation(){
 
