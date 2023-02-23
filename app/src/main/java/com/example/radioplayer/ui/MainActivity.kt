@@ -19,6 +19,7 @@ import com.example.radioplayer.databinding.ActivityMainBinding
 import com.example.radioplayer.databinding.StubPlayerActivityMainBinding
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
+import com.example.radioplayer.ui.animations.LoadingAnim
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.fragments.*
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
@@ -51,6 +52,10 @@ class MainActivity : AppCompatActivity() {
     var sideSeparatorStart : Drawable? = null
     var sideSeparatorEnd : Drawable? = null
 
+
+    val separatorLeftAnim : LoadingAnim by lazy { LoadingAnim(sideSeparatorStart, this)  }
+    val separatorRightAnim : LoadingAnim by lazy { LoadingAnim(sideSeparatorEnd, this)  }
+
     @Inject
     lateinit var glide : RequestManager
 
@@ -62,6 +67,7 @@ class MainActivity : AppCompatActivity() {
     private  val historyFragment : HistoryFragment by lazy { HistoryFragment() }
     private  val stationDetailsFragment : StationDetailsFragment by lazy { StationDetailsFragment() }
     private var previousImageUri : Uri? = null
+
 
     override fun onBackPressed() {
 
@@ -114,8 +120,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupSidesSeparators(){
 
-        sideSeparatorStart = AppCompatResources.getDrawable(this, R.drawable.gradient_for_separators)
-        sideSeparatorEnd =AppCompatResources.getDrawable(this, R.drawable.gradient_for_separators)
+        sideSeparatorStart = ContextCompat.getDrawable(this, R.drawable.gradient_for_separators)
+        sideSeparatorEnd =ContextCompat.getDrawable(this, R.drawable.gradient_for_separators)
         bind.viewSeparatorStart.background = sideSeparatorStart
         bind.viewSeparatorEnd.background = sideSeparatorEnd
 
@@ -347,8 +353,16 @@ class MainActivity : AppCompatActivity() {
 
             it?.let {
                 when{
-                    it.isPlaying -> bindPlayer.ivTogglePlayCurrentStation.setImageResource(R.drawable.ic_pause_play)
-                    it.isPlayEnabled -> bindPlayer.ivTogglePlayCurrentStation.setImageResource(R.drawable.ic_play_pause)
+                    it.isPlaying -> {
+                        bindPlayer.ivTogglePlayCurrentStation
+                            .setImageResource(R.drawable.ic_pause_play)
+
+                    }
+                    it.isPlayEnabled -> {
+                        bindPlayer.ivTogglePlayCurrentStation
+                            .setImageResource(R.drawable.ic_play_pause)
+
+                    }
                 }
             }
         }

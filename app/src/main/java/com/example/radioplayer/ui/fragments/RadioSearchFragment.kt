@@ -1,40 +1,28 @@
 package com.example.radioplayer.ui.fragments
 
-import android.content.Context
-import android.content.SharedPreferences
-import android.graphics.Color
-import android.graphics.ColorFilter
-import android.graphics.PorterDuff
 import android.os.Bundle
-import android.util.Log
-import android.view.*
+import android.view.DragEvent
+import android.view.View
 import android.widget.TextView
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.BlendModeColorFilterCompat
-import androidx.core.graphics.BlendModeCompat
 import androidx.core.view.isVisible
-import androidx.core.view.marginLeft
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
 import com.example.radioplayer.ui.MainActivity
-import com.example.radioplayer.ui.animations.animateSeparator
-import com.example.radioplayer.ui.dialogs.TagPickerDialog
+import com.example.radioplayer.ui.animations.LoadingAnim
 import com.example.radioplayer.ui.dialogs.CountryPickerDialog
 import com.example.radioplayer.ui.dialogs.NameDialog
-import com.example.radioplayer.utils.Constants
-import com.example.radioplayer.utils.Constants.FAB_POSITION_X
-import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
+import com.example.radioplayer.ui.dialogs.TagPickerDialog
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.listOfTags
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @FlowPreview
@@ -154,38 +142,19 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             if (it.refresh is LoadState.Loading ||
                 it.append is LoadState.Loading)
-//                bind.loadStationsProgressBar.isVisible = true
-            {
-//
-                (activity as MainActivity).sideSeparatorStart?.
-                setColorFilter(ContextCompat.getColor(
-                    requireContext(), R.color.color_changed_on_interaction
-                ), PorterDuff.Mode.OVERLAY)
 
-                (activity as MainActivity).sideSeparatorEnd?.
-                setColorFilter(ContextCompat.getColor(
-                    requireContext(), R.color.color_changed_on_interaction
-                ), PorterDuff.Mode.OVERLAY)
+            {
+
+            (activity as MainActivity).separatorLeftAnim.startLoadingAnim()
+            (activity as MainActivity).separatorRightAnim.startLoadingAnim()
+
 
             }
 
-
-
             else {
-//                bind.loadStationsProgressBar.visibility = View.GONE
 
-                (activity as MainActivity).sideSeparatorStart?.colorFilter =
-                    BlendModeColorFilterCompat
-                        .createBlendModeColorFilterCompat(ContextCompat.getColor(
-                            requireContext(), R.color.Separator
-                        ), BlendModeCompat.OVERLAY)
-
-                (activity as MainActivity).sideSeparatorEnd?.colorFilter =
-                    BlendModeColorFilterCompat
-                        .createBlendModeColorFilterCompat(ContextCompat.getColor(
-                            requireContext(), R.color.Separator
-                        ), BlendModeCompat.OVERLAY)
-
+                (activity as MainActivity).separatorLeftAnim.endLoadingAnim()
+                (activity as MainActivity).separatorRightAnim.endLoadingAnim()
 
 
                 if(isNewSearch){
@@ -265,6 +234,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     }
 
     private fun listenSearchButton(){
+
 
         bind.fabInitiateSearch.setOnClickListener {
             initiateNewSearch()

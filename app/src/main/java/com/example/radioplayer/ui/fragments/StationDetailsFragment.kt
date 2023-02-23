@@ -51,8 +51,15 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         setFabStationHomePageClickListener()
 
+        endLoadingBarIfNeeded()
+
+
     }
 
+    private fun endLoadingBarIfNeeded(){
+        (activity as MainActivity).separatorLeftAnim.endLoadingAnim()
+        (activity as MainActivity).separatorRightAnim.endLoadingAnim()
+    }
 
     private fun subscribeToObservers(){
 

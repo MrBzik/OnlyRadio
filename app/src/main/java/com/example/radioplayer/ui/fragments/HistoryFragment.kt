@@ -20,6 +20,8 @@ import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingHistoryAdapter
 import com.example.radioplayer.databinding.FragmentHistoryBinding
+import com.example.radioplayer.exoPlayer.isPlayEnabled
+import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
 import com.example.radioplayer.ui.dialogs.HistorySettingsDialog
@@ -57,6 +59,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         setupRecyclerView()
 
+        observePlaybackState()
+
         setupAdapterClickListener()
 
         subscribeToHistory()
@@ -75,6 +79,27 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
        val option = databaseViewModel.getHistoryOptionsPref()
 
         bind.tvCurrentMode.text = option
+    }
+
+    private fun observePlaybackState(){
+        mainViewModel.playbackState.observe(viewLifecycleOwner){
+            it?.let {
+                when{
+                    it.isPlaying -> {
+                        historyAdapter.currentPlaybackState = true
+                        historyAdapter.updateStationPlaybackState()
+
+                    }
+                    it.isPlayEnabled -> {
+                        historyAdapter.currentPlaybackState = false
+                        historyAdapter.updateStationPlaybackState()
+                    }
+                }
+            }
+
+        }
+
+
     }
 
 
@@ -137,6 +162,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             adapter = historyAdapter
             layoutManager = LinearLayoutManager(requireContext())
             edgeEffectFactory = BounceEdgeEffectFactory()
+
             setHasFixedSize(true)
 
             mainViewModel.newRadioStation.value?.let {
@@ -144,8 +170,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             historyAdapter.currentRadioStationID = it.stationuuid
 
             }
-
-
         }
 
         setAdapterLoadStateListener()
@@ -182,11 +206,12 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             if (it.refresh is LoadState.Loading ||
                 it.append is LoadState.Loading)
-                bind.progressBar.isVisible = true
+
 
 
             else {
-                bind.progressBar.visibility = View.GONE
+                (activity as MainActivity).separatorLeftAnim.endLoadingAnim()
+                (activity as MainActivity).separatorRightAnim.endLoadingAnim()
             }
         }
     }

@@ -81,11 +81,16 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         editPlaylistClickListener()
 
+        endLoadingBarIfNeeded()
 
 
     }
 
 
+    private fun endLoadingBarIfNeeded(){
+        (activity as MainActivity).separatorLeftAnim.endLoadingAnim()
+        (activity as MainActivity).separatorRightAnim.endLoadingAnim()
+    }
 
     private fun editPlaylistClickListener(){
 

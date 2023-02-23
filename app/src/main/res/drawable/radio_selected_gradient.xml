@@ -1,10 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
-        <shape android:shape="rectangle">
-            <gradient
-                    android:endColor="@color/selected_station_end_gradient"
-                android:startColor="@color/main_background"/>
+        <shape >
+            <solid android:color="@color/main_background"/>
+            <stroke
+                android:width="2dp"
+                android:color="@color/selected_station_end_gradient"/>
         </shape>
     </item>
-</selector>
+
+
+
+    <item>
+        <shape >
+            <gradient
+                    android:endColor="@color/selected_station_end_gradient"
+                android:startColor="@color/main_background"
+                android:centerColor="@color/transparent"
+                android:centerX="0.7"
+                />
+        </shape>
+    </item>
+</layer-list>

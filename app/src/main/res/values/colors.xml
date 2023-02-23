@@ -22,4 +22,5 @@
     <color name="arrows_for_text_buttons">#FFFDE7</color>
     <color name="toolbar">#FF80AB</color>
     <color name="selected_station_end_gradient">#FF80AB</color>
+    <color name="selected_station_paused">#FFB8D0</color>
 </resources>

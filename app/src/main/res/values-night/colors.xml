@@ -21,5 +21,6 @@
     <color name="text_interactive_shadow">#FC2E20</color>
     <color name="arrows_for_text_buttons">#FDB750</color>
     <color name="toolbar">#FF000000</color>
-    <color name="selected_station_end_gradient">#270000</color>
+    <color name="selected_station_end_gradient">#944305</color>
+    <color name="selected_station_paused">#301502</color>
 </resources>

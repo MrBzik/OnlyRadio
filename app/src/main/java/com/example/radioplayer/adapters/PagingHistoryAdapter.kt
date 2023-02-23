@@ -114,38 +114,77 @@ class PagingHistoryAdapter @Inject constructor(
 
                         click(item.radioStation)
 
-                        if(holder.absoluteAdapterPosition == selectedItemPosition){/*DO NOTHING*/}
-                        else {
-                            checkForInitialSelection = false
-                            currentRadioStationID = item.radioStation.stationuuid
-                            selectedItemPosition = holder.absoluteAdapterPosition
-                            previousItemHolder?.setBackgroundResource(R.color.main_background)
-                            radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
-                            previousItemHolder = radioItemRootLayout
+                        if(item.radioStation.stationuuid == currentRadioStationID){
+//                            currentPlaybackState = !currentPlaybackState
+
+                            if(selectedAdapterPosition != holder.absoluteAdapterPosition){
+                                previousItemHolder?.bind?.radioItemRootLayout?.setBackgroundResource(R.color.main_background)
+                            }
+
+//                            handleStationPlaybackState(radioItemRootLayout)
+
                         }
+                        else {
+//                            currentPlaybackState = true
+                            checkForInitialSelection = false
+                            selectedAdapterPosition = holder.absoluteAdapterPosition
+                            currentRadioStationID = item.radioStation.stationuuid
+                            previousItemHolder?.bind?.radioItemRootLayout?.setBackgroundResource(R.color.main_background)
+
+//                            radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
+
+                        }
+                        selectedAdapterPosition = holder.absoluteAdapterPosition
+                        previousItemHolder = holder
                     }
                 }
 
-                if(item.radioStation.stationuuid == currentRadioStationID
-                    && checkForInitialSelection  ){
-                    checkForInitialSelection = false
-                    radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
-                    selectedItemPosition = holder.absoluteAdapterPosition
-                    previousItemHolder = radioItemRootLayout
 
-                } else if(holder.absoluteAdapterPosition == selectedItemPosition){
-                    radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
-                    previousItemHolder = radioItemRootLayout
-                }
-                else radioItemRootLayout.setBackgroundResource(R.color.main_background)
+                if(item.radioStation.stationuuid == currentRadioStationID){
+
+                        if(checkForInitialSelection) {
+                            selectedAdapterPosition = holder.absoluteAdapterPosition
+                            checkForInitialSelection = false
+                        }
+
+                    if(selectedAdapterPosition == holder.absoluteAdapterPosition) {
+
+                        handleStationPlaybackState(radioItemRootLayout)
+
+                        previousItemHolder = holder
+                    } else {
+                        radioItemRootLayout.setBackgroundResource(R.color.main_background)
+                    }
+                } else
+                    radioItemRootLayout.setBackgroundResource(R.color.main_background)
             }
         }
     }
 
-    var currentRadioStationID : String = ""
-    private var selectedItemPosition = -1
+
+    private fun handleStationPlaybackState(view : View){
+        if(currentPlaybackState){
+            view.setBackgroundResource(R.drawable.radio_selected_gradient)
+        } else {
+            view.setBackgroundResource(R.drawable.radio_selected_paused_gradient)
+        }
+    }
+
+
+    fun updateStationPlaybackState(){
+       previousItemHolder?.let{
+           if(it.absoluteAdapterPosition == selectedAdapterPosition){
+               handleStationPlaybackState(it.bind.radioItemRootLayout)
+           }
+       }
+    }
+
+    var currentRadioStationID = ""
+    var currentPlaybackState = false
+    private var selectedAdapterPosition = -1
     private var checkForInitialSelection = true
-    private var previousItemHolder : LinearLayout? = null
+    private var previousItemHolder : StationViewHolder? = null
+
 
 
     private var onItemClickListener : ((RadioStation) -> Unit)? = null
