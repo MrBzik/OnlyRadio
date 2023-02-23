@@ -209,7 +209,12 @@ class RadioService : MediaBrowserServiceCompat() {
     ){
 
 
-      val uri = stations[stations.indexOf(itemToPlay)].getString(METADATA_KEY_MEDIA_URI)
+      val uri = try {
+          stations[stations.indexOf(itemToPlay)].getString(METADATA_KEY_MEDIA_URI)
+      } catch (e : ArrayIndexOutOfBoundsException){
+          ""
+      }
+
       val mediaItem = MediaItem.fromUri(uri.toUri())
 
       val mediaSource = if(uri.contains("m3u8")) {

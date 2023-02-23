@@ -77,19 +77,29 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvCountry" />
 
-    <TextView
-        android:id="@+id/tvTags"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ScrollView
+        android:id="@+id/svTvTags"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_marginTop="20dp"
-        android:gravity="center"
+        android:layout_marginBottom="10dp"
         android:visibility="gone"
         android:paddingHorizontal="16dp"
-        android:textAppearance="@style/detailsTextExtras"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvLanguage" />
+        app:layout_constraintTop_toBottomOf="@+id/tvLanguage"
+        app:layout_constraintBottom_toTopOf="@id/fabStationHomePage"
+        >
+
+        <TextView
+            android:id="@+id/tvTags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAppearance="@style/detailsTextExtras"
+            />
+    </ScrollView>
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -97,7 +107,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="40dp"
         android:src="@drawable/ic_station_home_page"
         app:backgroundTint="@color/floating_buttons"
         app:layout_constraintBottom_toBottomOf="parent"

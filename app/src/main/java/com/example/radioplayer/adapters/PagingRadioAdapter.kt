@@ -1,22 +1,21 @@
 package com.example.radioplayer.adapters
 
-import android.content.ClipData
-import android.content.ClipDescription
+import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
+import android.widget.TextView
 import androidx.paging.PagingDataAdapter
-import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.RadioItemBinding
+import java.lang.String
 import javax.inject.Inject
 
 class PagingRadioAdapter @Inject constructor(
@@ -56,13 +55,51 @@ class PagingRadioAdapter @Inject constructor(
         holder.bind.ivItemImage.setOnClickListener {
 
             onItemClickListener?.let { click ->
-
                 click(station)
-
             }
+
+            if(station.name == currentRadioStationName){/*DO NOTHING*/}
+            else {
+                currentRadioStationName = station.name!!
+                previousItemHolder?.bind?.tvPrimary?.setTextColor(Color.WHITE)
+            }
+            previousItemHolder = holder
         }
 
+        if(station.name == currentRadioStationName){
+
+            previousItemHolder = holder
+            handleStationPlaybackState(holder.bind.tvPrimary)
+
+        } else
+            holder.bind.tvPrimary.setTextColor(defaultTextColor)
     }
+
+    var defaultTextColor = 0
+
+    private fun handleStationPlaybackState(view : TextView){
+        if(currentPlaybackState){
+            view.setTextColor(Color.YELLOW)
+        } else {
+            view.setTextColor(Color.GREEN)
+        }
+    }
+
+
+    fun updateStationPlaybackState(){
+        previousItemHolder?.let{
+            if(it.bind.tvPrimary.text == currentRadioStationName){
+                handleStationPlaybackState(it.bind.tvPrimary)
+            }
+        }
+    }
+
+    var currentRadioStationName = ""
+    var currentPlaybackState = false
+    private var previousItemHolder : RadioItemHolder? = null
+
+
+
 
     private var onItemClickListener : ((RadioStation) -> Unit)? = null
 

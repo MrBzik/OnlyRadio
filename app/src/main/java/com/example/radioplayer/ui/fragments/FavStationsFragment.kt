@@ -2,6 +2,7 @@ package com.example.radioplayer.ui.fragments
 
 
 import android.os.Bundle
+import android.support.v4.media.MediaMetadataCompat
 import android.view.View
 import android.widget.ImageView
 import androidx.core.view.isVisible
@@ -17,6 +18,8 @@ import com.example.radioplayer.adapters.RadioDatabaseAdapter
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.databinding.FragmentFavStationsBinding
+import com.example.radioplayer.exoPlayer.isPlayEnabled
+import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
 import com.example.radioplayer.ui.animations.slideAnim
@@ -61,11 +64,11 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         pixabayViewModel = ViewModelProvider(requireActivity())[PixabayViewModel::class.java]
 
-
-
         setupMainRecycleView()
 
         setupPlaylistRecycleView()
+
+        observePlaybackState()
 
         subscribeToObservers()
 
@@ -83,9 +86,26 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         endLoadingBarIfNeeded()
 
-
     }
 
+
+    private fun observePlaybackState(){
+        mainViewModel.playbackState.observe(viewLifecycleOwner){
+            it?.let {
+
+                when{
+                    it.isPlaying -> {
+                        mainAdapter.currentPlaybackState = true
+                        mainAdapter.updateStationPlaybackState()
+                    }
+                    it.isPlayEnabled -> {
+                        mainAdapter.currentPlaybackState = false
+                        mainAdapter.updateStationPlaybackState()
+                    }
+                }
+            }
+        }
+    }
 
     private fun endLoadingBarIfNeeded(){
         (activity as MainActivity).separatorLeftAnim.endLoadingAnim()
@@ -303,6 +323,12 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             edgeEffectFactory = BounceEdgeEffectFactory()
             setHasFixedSize(true)
             ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this)
+
+
+            mainViewModel.currentRadioStation.value?.let {
+                val name =  it.getString(MediaMetadataCompat.METADATA_KEY_TITLE)
+                mainAdapter.currentRadioStationName = name
+            }
         }
     }
 

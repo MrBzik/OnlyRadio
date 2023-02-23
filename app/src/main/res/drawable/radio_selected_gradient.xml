@@ -3,9 +3,7 @@
     <item>
         <shape >
             <solid android:color="@color/main_background"/>
-            <stroke
-                android:width="2dp"
-                android:color="@color/selected_station_end_gradient"/>
+
         </shape>
     </item>
 
@@ -14,10 +12,8 @@
     <item>
         <shape >
             <gradient
-                    android:endColor="@color/selected_station_end_gradient"
+                    android:endColor="@color/selected_station_playing"
                 android:startColor="@color/main_background"
-                android:centerColor="@color/transparent"
-                android:centerX="0.7"
                 />
         </shape>
     </item>

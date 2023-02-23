@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.paging.PagingDataAdapter
@@ -115,23 +116,25 @@ class PagingHistoryAdapter @Inject constructor(
                         click(item.radioStation)
 
                         if(item.radioStation.stationuuid == currentRadioStationID){
-//                            currentPlaybackState = !currentPlaybackState
 
                             if(selectedAdapterPosition != holder.absoluteAdapterPosition){
-                                previousItemHolder?.bind?.radioItemRootLayout?.setBackgroundResource(R.color.main_background)
-                            }
 
-//                            handleStationPlaybackState(radioItemRootLayout)
+                                previousItemHolder?.bind?.let {
+                                    restoreState(it.radioItemRootLayout, it.tvPrimary, it.tvSecondary)
+                                }
+
+                            }
 
                         }
                         else {
-//                            currentPlaybackState = true
-                            checkForInitialSelection = false
+
                             selectedAdapterPosition = holder.absoluteAdapterPosition
                             currentRadioStationID = item.radioStation.stationuuid
-                            previousItemHolder?.bind?.radioItemRootLayout?.setBackgroundResource(R.color.main_background)
 
-//                            radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
+                            previousItemHolder?.bind?.let {
+
+                                restoreState(it.radioItemRootLayout, it.tvPrimary, it.tvSecondary)
+                            }
 
                         }
                         selectedAdapterPosition = holder.absoluteAdapterPosition
@@ -142,31 +145,43 @@ class PagingHistoryAdapter @Inject constructor(
 
                 if(item.radioStation.stationuuid == currentRadioStationID){
 
-                        if(checkForInitialSelection) {
-                            selectedAdapterPosition = holder.absoluteAdapterPosition
-                            checkForInitialSelection = false
+                        previousItemHolder?.bind?.let {
+                            restoreState(it.radioItemRootLayout, it.tvPrimary, it.tvSecondary)
                         }
 
-                    if(selectedAdapterPosition == holder.absoluteAdapterPosition) {
-
-                        handleStationPlaybackState(radioItemRootLayout)
-
                         previousItemHolder = holder
-                    } else {
-                        radioItemRootLayout.setBackgroundResource(R.color.main_background)
-                    }
+                        selectedAdapterPosition = holder.absoluteAdapterPosition
+                        handleStationPlaybackState(radioItemRootLayout, tvPrimary, tvSecondary)
+
                 } else
-                    radioItemRootLayout.setBackgroundResource(R.color.main_background)
+
+                    restoreState(radioItemRootLayout, tvPrimary, tvSecondary)
+
             }
         }
     }
 
 
-    private fun handleStationPlaybackState(view : View){
+    var defaultTextColor = 0
+    var selectedTextColor = 0
+
+
+    private fun restoreState(background : View, tvPrimary : TextView, tvSecondary : TextView){
+        background.setBackgroundResource(R.color.main_background)
+        tvPrimary.setTextColor(defaultTextColor)
+        tvSecondary.setTextColor(defaultTextColor)
+
+    }
+
+    private fun handleStationPlaybackState(background : View, tvPrimary : TextView, tvSecondary : TextView){
         if(currentPlaybackState){
-            view.setBackgroundResource(R.drawable.radio_selected_gradient)
+            background.setBackgroundResource(R.drawable.radio_selected_gradient)
+            tvPrimary.setTextColor(selectedTextColor)
+            tvSecondary.setTextColor(selectedTextColor)
         } else {
-            view.setBackgroundResource(R.drawable.radio_selected_paused_gradient)
+            background.setBackgroundResource(R.drawable.radio_selected_paused_gradient)
+            tvPrimary.setTextColor(defaultTextColor)
+            tvSecondary.setTextColor(defaultTextColor)
         }
     }
 
@@ -174,15 +189,14 @@ class PagingHistoryAdapter @Inject constructor(
     fun updateStationPlaybackState(){
        previousItemHolder?.let{
            if(it.absoluteAdapterPosition == selectedAdapterPosition){
-               handleStationPlaybackState(it.bind.radioItemRootLayout)
+               handleStationPlaybackState(it.bind.radioItemRootLayout, it.bind.tvPrimary, it.bind.tvSecondary)
            }
        }
     }
 
     var currentRadioStationID = ""
     var currentPlaybackState = false
-    private var selectedAdapterPosition = -1
-    private var checkForInitialSelection = true
+    private var selectedAdapterPosition = -2
     private var previousItemHolder : StationViewHolder? = null
 
 
@@ -192,6 +206,31 @@ class PagingHistoryAdapter @Inject constructor(
     fun setOnClickListener(listener : (RadioStation) -> Unit){
         onItemClickListener = listener
     }
+
+
+
+//    if(item.radioStation.stationuuid == currentRadioStationID){
+//
+//        if(checkForInitialSelection) {
+//            selectedAdapterPosition = holder.absoluteAdapterPosition
+//            checkForInitialSelection = false
+//        }
+//
+//        if(selectedAdapterPosition == holder.absoluteAdapterPosition
+//            || previousItemHolder?.absoluteAdapterPosition == -1
+//            && !isInitialShiftHandled || previousItemHolder?.absoluteAdapterPosition ==1
+//        ) {
+//            isInitialShiftHandled = true
+//            handleStationPlaybackState(radioItemRootLayout)
+//
+//            previousItemHolder = holder
+//        } else {
+//            radioItemRootLayout.setBackgroundResource(R.color.main_background)
+//        }
+//    } else
+//    radioItemRootLayout.setBackgroundResource(R.color.main_background)
+//    Log.d("CHECKTAGS", previousItemHolder?.absoluteAdapterPosition.toString())
+
 
 
     override fun getItemViewType(position: Int): Int {

@@ -24,8 +24,6 @@ class RadioDatabaseAdapter @Inject constructor(
     private val glideFactory : DrawableCrossFadeFactory
 ) : RecyclerView.Adapter<RadioDatabaseAdapter.RadioItemHolder>() {
 
-
-
     class RadioItemHolder (val bind : RadioItemBinding) : RecyclerView.ViewHolder(bind.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RadioItemHolder {
@@ -50,13 +48,26 @@ class RadioDatabaseAdapter @Inject constructor(
                 .into(ivItemImage)
         }
 
+        if(station.name == currentRadioStationName){
+
+            previousItemHolder = holder
+            handleStationPlaybackState(holder.bind.radioItemRootLayout)
+
+        } else
+            holder.bind.radioItemRootLayout.setBackgroundResource(R.color.main_background)
+
         holder.bind.ivItemImage.setOnClickListener {
 
             onItemClickListener?.let { click ->
-
                 click(station)
-
             }
+
+            if(station.name == currentRadioStationName){/*DO NOTHING*/}
+            else {
+                currentRadioStationName = station.name!!
+                previousItemHolder?.bind?.radioItemRootLayout?.setBackgroundResource(R.color.main_background)
+            }
+            previousItemHolder = holder
         }
 
         holder.itemView.setOnLongClickListener{
@@ -71,17 +82,37 @@ class RadioDatabaseAdapter @Inject constructor(
                 it.startDragAndDrop(data, dragShadowBuilder, it, 0)
 
             true
-
         }
-
     }
+
+
+    var currentRadioStationName = ""
+    var currentPlaybackState = false
+    private var previousItemHolder : RadioItemHolder? = null
+
+    private fun handleStationPlaybackState(view : View){
+        if(currentPlaybackState){
+            view.setBackgroundResource(R.drawable.selected_station_test_with_svg)
+        } else {
+            view.setBackgroundResource(R.drawable.radio_selected_paused_gradient)
+        }
+    }
+
+    fun updateStationPlaybackState(){
+        previousItemHolder?.let{
+            if(it.bind.tvPrimary.text == currentRadioStationName){
+                handleStationPlaybackState(it.bind.radioItemRootLayout)
+            }
+        }
+    }
+
+
 
     private var onItemClickListener : ((RadioStation) -> Unit)? = null
 
     fun setOnClickListener(listener : (RadioStation) -> Unit){
         onItemClickListener = listener
     }
-
 
     override fun getItemCount(): Int {
        return listOfStations.size

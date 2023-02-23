@@ -96,7 +96,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                 bind.tvLanguage.text = "Languages : ${it.language}"
             }
             if(!it.tags.isNullOrBlank()){
-                bind.tvTags.isVisible = true
+                bind.svTvTags.isVisible = true
                 val tags = it.tags.replace(",", ", ")
                 bind.tvTags.text = "Tags : $tags"
             }

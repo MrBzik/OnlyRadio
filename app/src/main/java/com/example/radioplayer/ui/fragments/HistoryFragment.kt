@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.doOnNextLayout
 import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -32,8 +33,11 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Utils.fromDateToString
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.sql.Date
 import java.util.Calendar
 import javax.inject.Inject
@@ -71,8 +75,10 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         setOnSaveOptionsClickListener()
 
-
     }
+
+
+
 
     private fun showSelectedHistoryOption(){
 
@@ -84,22 +90,23 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     private fun observePlaybackState(){
         mainViewModel.playbackState.observe(viewLifecycleOwner){
             it?.let {
+
                 when{
                     it.isPlaying -> {
                         historyAdapter.currentPlaybackState = true
-                        historyAdapter.updateStationPlaybackState()
+
+                            historyAdapter.updateStationPlaybackState()
 
                     }
                     it.isPlayEnabled -> {
                         historyAdapter.currentPlaybackState = false
-                        historyAdapter.updateStationPlaybackState()
+
+                            historyAdapter.updateStationPlaybackState()
+
                     }
                 }
             }
-
         }
-
-
     }
 
 
@@ -164,6 +171,10 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             edgeEffectFactory = BounceEdgeEffectFactory()
 
             setHasFixedSize(true)
+
+            historyAdapter.defaultTextColor = ContextCompat.getColor(requireContext(), R.color.default_text_color)
+            historyAdapter.selectedTextColor = ContextCompat.getColor(requireContext(), R.color.color_interactive)
+
 
             mainViewModel.newRadioStation.value?.let {
 

@@ -1,15 +1,21 @@
 package com.example.radioplayer.ui.fragments
 
 import android.os.Bundle
+import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE
+import android.util.Log
 import android.view.DragEvent
 import android.view.View
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
+import com.example.radioplayer.exoPlayer.isPlayEnabled
+import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.LoadingAnim
 import com.example.radioplayer.ui.dialogs.CountryPickerDialog
@@ -51,6 +57,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         setRecycleView()
 
+        observePlaybackState()
+
         setAdapterLoadStateListener()
 
         setAdapterOnClickListener()
@@ -66,6 +74,30 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         getFabSearchPositionIfNeeded()
 
     }
+
+
+    private fun observePlaybackState(){
+        mainViewModel.playbackState.observe(viewLifecycleOwner){
+            it?.let {
+
+                when{
+                    it.isPlaying -> {
+                        pagingRadioAdapter.currentPlaybackState = true
+
+                        pagingRadioAdapter.updateStationPlaybackState()
+
+                    }
+                    it.isPlayEnabled -> {
+                        pagingRadioAdapter.currentPlaybackState = false
+
+                        pagingRadioAdapter.updateStationPlaybackState()
+
+                    }
+                }
+            }
+        }
+    }
+
 
 
     private fun getFabSearchPositionIfNeeded(){
@@ -131,7 +163,13 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             adapter = pagingRadioAdapter
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
+            pagingRadioAdapter.defaultTextColor =
+                ContextCompat.getColor(requireContext(), R.color.default_text_color)
 
+            mainViewModel.currentRadioStation.value?.let {
+              val name =  it.getString(METADATA_KEY_TITLE)
+                pagingRadioAdapter.currentRadioStationName = name
+            }
         }
     }
 
