@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -23,6 +25,7 @@ class PagingRadioAdapter @Inject constructor(
     private val glideFactory: DrawableCrossFadeFactory
 
 ) : PagingDataAdapter<RadioStation, PagingRadioAdapter.RadioItemHolder>(StationsComparator) {
+
 
     class RadioItemHolder (itemView : View) : RecyclerView.ViewHolder(itemView)  {
         var bind : RadioItemBinding
@@ -61,7 +64,9 @@ class PagingRadioAdapter @Inject constructor(
             if(station.name == currentRadioStationName){/*DO NOTHING*/}
             else {
                 currentRadioStationName = station.name!!
-                previousItemHolder?.bind?.tvPrimary?.setTextColor(Color.WHITE)
+                previousItemHolder?.bind?.let {
+                    restoreState(it)
+                }
             }
             previousItemHolder = holder
         }
@@ -69,27 +74,53 @@ class PagingRadioAdapter @Inject constructor(
         if(station.name == currentRadioStationName){
 
             previousItemHolder = holder
-            handleStationPlaybackState(holder.bind.tvPrimary)
+            handleStationPlaybackState(holder.bind)
 
         } else
-            holder.bind.tvPrimary.setTextColor(defaultTextColor)
+            restoreState(holder.bind)
+
     }
 
     var defaultTextColor = 0
+    var selectedTextColor = 0
 
-    private fun handleStationPlaybackState(view : TextView){
+
+
+
+    private fun restoreState(bind: RadioItemBinding){
+        bind.apply {
+            radioItemRootLayout.setBackgroundResource(R.color.main_background)
+            tvPrimary.setTextColor(defaultTextColor)
+            tvPrimary.alpha = 0.7f
+            tvSecondary.setTextColor(defaultTextColor)
+        }
+    }
+
+    private fun handleStationPlaybackState(bind: RadioItemBinding){
         if(currentPlaybackState){
-            view.setTextColor(Color.YELLOW)
+            bind.apply {
+               radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
+               tvPrimary.setTextColor(selectedTextColor)
+               tvPrimary.alpha = 0.9f
+               tvSecondary.setTextColor(selectedTextColor)
+            }
+
         } else {
-            view.setTextColor(Color.GREEN)
+            bind.apply {
+                radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
+                tvPrimary.setTextColor(defaultTextColor)
+                tvPrimary.alpha = 0.7f
+                tvSecondary.setTextColor(defaultTextColor)
+            }
+
         }
     }
 
 
     fun updateStationPlaybackState(){
-        previousItemHolder?.let{
-            if(it.bind.tvPrimary.text == currentRadioStationName){
-                handleStationPlaybackState(it.bind.tvPrimary)
+        previousItemHolder?.bind?.let{
+            if(it.tvPrimary.text == currentRadioStationName){
+                handleStationPlaybackState(it)
             }
         }
     }
@@ -116,7 +147,7 @@ class PagingRadioAdapter @Inject constructor(
         }
 
         override fun areContentsTheSame(oldItem: RadioStation, newItem: RadioStation): Boolean {
-            return oldItem.hashCode() == newItem.hashCode()
+            return oldItem.stationuuid == newItem.stationuuid
         }
     }
 

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
 import android.view.View
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -324,11 +325,24 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             setHasFixedSize(true)
             ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this)
 
+            mainAdapter.apply {
+                defaultTextColor = ContextCompat.getColor(requireContext(), R.color.default_text_color)
+                selectedTextColor = ContextCompat.getColor(requireContext(), R.color.selected_text_color)
+            }
 
             mainViewModel.currentRadioStation.value?.let {
                 val name =  it.getString(MediaMetadataCompat.METADATA_KEY_TITLE)
                 mainAdapter.currentRadioStationName = name
             }
+
+            if(mainViewModel.isFavouriteAnimationToPlay){
+                post {
+                    scheduleLayoutAnimation()
+                }
+                mainViewModel.isFavouriteAnimationToPlay = false
+            }
+
+
         }
     }
 

@@ -120,7 +120,7 @@ class PagingHistoryAdapter @Inject constructor(
                             if(selectedAdapterPosition != holder.absoluteAdapterPosition){
 
                                 previousItemHolder?.bind?.let {
-                                    restoreState(it.radioItemRootLayout, it.tvPrimary, it.tvSecondary)
+                                    restoreState(it)
                                 }
 
                             }
@@ -133,7 +133,7 @@ class PagingHistoryAdapter @Inject constructor(
 
                             previousItemHolder?.bind?.let {
 
-                                restoreState(it.radioItemRootLayout, it.tvPrimary, it.tvSecondary)
+                                restoreState(it)
                             }
 
                         }
@@ -146,42 +146,51 @@ class PagingHistoryAdapter @Inject constructor(
                 if(item.radioStation.stationuuid == currentRadioStationID){
 
                         previousItemHolder?.bind?.let {
-                            restoreState(it.radioItemRootLayout, it.tvPrimary, it.tvSecondary)
+                            restoreState(it)
                         }
 
                         previousItemHolder = holder
                         selectedAdapterPosition = holder.absoluteAdapterPosition
-                        handleStationPlaybackState(radioItemRootLayout, tvPrimary, tvSecondary)
+                        handleStationPlaybackState(this)
 
                 } else
 
-                    restoreState(radioItemRootLayout, tvPrimary, tvSecondary)
+                    restoreState(this)
 
             }
         }
     }
 
-
     var defaultTextColor = 0
     var selectedTextColor = 0
 
 
-    private fun restoreState(background : View, tvPrimary : TextView, tvSecondary : TextView){
-        background.setBackgroundResource(R.color.main_background)
-        tvPrimary.setTextColor(defaultTextColor)
-        tvSecondary.setTextColor(defaultTextColor)
-
+    private fun restoreState(bind: RadioItemBinding){
+        bind.apply {
+            radioItemRootLayout.setBackgroundResource(R.color.main_background)
+            tvPrimary.setTextColor(defaultTextColor)
+            tvPrimary.alpha = 0.7f
+            tvSecondary.setTextColor(defaultTextColor)
+        }
     }
 
-    private fun handleStationPlaybackState(background : View, tvPrimary : TextView, tvSecondary : TextView){
+    private fun handleStationPlaybackState(bind: RadioItemBinding){
+
         if(currentPlaybackState){
-            background.setBackgroundResource(R.drawable.radio_selected_gradient)
-            tvPrimary.setTextColor(selectedTextColor)
-            tvSecondary.setTextColor(selectedTextColor)
+            bind.apply {
+                radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
+                tvPrimary.setTextColor(selectedTextColor)
+                tvPrimary.alpha = 0.9f
+                tvSecondary.setTextColor(selectedTextColor)
+            }
+
         } else {
-            background.setBackgroundResource(R.drawable.radio_selected_paused_gradient)
-            tvPrimary.setTextColor(defaultTextColor)
-            tvSecondary.setTextColor(defaultTextColor)
+            bind.apply {
+                radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
+                tvPrimary.setTextColor(defaultTextColor)
+                tvPrimary.alpha = 0.7f
+                tvSecondary.setTextColor(defaultTextColor)
+            }
         }
     }
 
@@ -189,7 +198,7 @@ class PagingHistoryAdapter @Inject constructor(
     fun updateStationPlaybackState(){
        previousItemHolder?.let{
            if(it.absoluteAdapterPosition == selectedAdapterPosition){
-               handleStationPlaybackState(it.bind.radioItemRootLayout, it.bind.tvPrimary, it.bind.tvSecondary)
+               handleStationPlaybackState(it.bind)
            }
        }
     }
@@ -266,12 +275,24 @@ class PagingHistoryAdapter @Inject constructor(
 
         }
 
-
-
         override fun areContentsTheSame(
             oldItem: StationWithDateModel, newItem: StationWithDateModel
         ): Boolean {
-            return oldItem == newItem
+
+            val isSameStation = oldItem is StationWithDateModel.Station
+                    && newItem is StationWithDateModel.Station
+                    && oldItem.radioStation.stationuuid == newItem.radioStation.stationuuid
+
+            val isSameSeparator = oldItem is StationWithDateModel.DateSeparator
+                    && newItem is StationWithDateModel.DateSeparator
+                    && oldItem.date == newItem.date
+
+            val isSameSeparatorEnclosing = oldItem is StationWithDateModel.DateSeparatorEnclosing
+                    && newItem is StationWithDateModel.DateSeparatorEnclosing
+                    && oldItem.date == newItem.date
+
+            return isSameStation || isSameSeparator || isSameSeparatorEnclosing
+
         }
     }
 

@@ -24,4 +24,5 @@
     <color name="selected_station_playing">#1E1B1B</color>
     <color name="selected_station_paused">#1E1B1B</color>
     <color name="default_text_color">#FFFFFFFF</color>
+    <color name="selected_text_color">#ff0</color>
 </resources>

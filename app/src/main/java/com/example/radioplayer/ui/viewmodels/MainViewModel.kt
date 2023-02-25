@@ -54,6 +54,10 @@ class MainViewModel @Inject constructor(
        var isDelayNeededForServiceConnection = true
        val newRadioStation : MutableLiveData<RadioStation> = MutableLiveData()
 
+       var isHistoryAnimationToPlay = true
+       var isSearchAnimationToPlay = true
+       var isFavouriteAnimationToPlay = true
+
     init {
 
         currentRadioStation.value?.let {
@@ -249,22 +253,24 @@ class MainViewModel @Inject constructor(
         .cachedIn(viewModelScope)
 
 
-    fun setSearchBy(value : Bundle){
+    fun setSearchBy(value : Bundle) : Boolean {
 
         searchBy.value?.let {
         if(it.getString("TAG") == value.getString("TAG")
             && it.getString("NAME") == value.getString("NAME")
             && it.getString("COUNTRY") == value.getString("COUNTRY")
 
-        )  return
+        )  return false
+
                 if(hasInternetConnection.value == true){
                     searchBy.postValue(value)
-                } else{
+                    return true
+                } else {
                     lastSearchBundle = value
                     wasSearchInterrupted = true
                 }
         }
-
+            return false
     }
 
 

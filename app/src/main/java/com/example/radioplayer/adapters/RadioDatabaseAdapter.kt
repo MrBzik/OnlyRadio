@@ -51,12 +51,13 @@ class RadioDatabaseAdapter @Inject constructor(
         if(station.name == currentRadioStationName){
 
             previousItemHolder = holder
-            handleStationPlaybackState(holder.bind.radioItemRootLayout)
+            handleStationPlaybackState(holder.bind)
 
         } else
-            holder.bind.radioItemRootLayout.setBackgroundResource(R.color.main_background)
+            restoreState(holder.bind)
 
-        holder.bind.ivItemImage.setOnClickListener {
+
+            holder.bind.ivItemImage.setOnClickListener {
 
             onItemClickListener?.let { click ->
                 click(station)
@@ -65,43 +66,63 @@ class RadioDatabaseAdapter @Inject constructor(
             if(station.name == currentRadioStationName){/*DO NOTHING*/}
             else {
                 currentRadioStationName = station.name!!
-                previousItemHolder?.bind?.radioItemRootLayout?.setBackgroundResource(R.color.main_background)
+                previousItemHolder?.bind?.let {
+                    restoreState(it)
+                }
             }
             previousItemHolder = holder
         }
 
         holder.itemView.setOnLongClickListener{
-
                 val clipText = station.stationuuid
                 val item = ClipData.Item(clipText)
                 val mimeTypes = arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN)
                 val data = ClipData("STATION_ID", mimeTypes, item)
-
-            val dragShadowBuilder = View.DragShadowBuilder(it)
-
+                val dragShadowBuilder = View.DragShadowBuilder(it)
                 it.startDragAndDrop(data, dragShadowBuilder, it, 0)
-
             true
         }
     }
 
-
+    var defaultTextColor = 0
+    var selectedTextColor = 0
     var currentRadioStationName = ""
     var currentPlaybackState = false
     private var previousItemHolder : RadioItemHolder? = null
 
-    private fun handleStationPlaybackState(view : View){
+    private fun restoreState(bind: RadioItemBinding){
+        bind.apply {
+            radioItemRootLayout.setBackgroundResource(R.color.main_background)
+            tvPrimary.setTextColor(defaultTextColor)
+            tvPrimary.alpha = 0.7f
+            tvSecondary.setTextColor(defaultTextColor)
+        }
+    }
+
+    private fun handleStationPlaybackState(bind: RadioItemBinding){
         if(currentPlaybackState){
-            view.setBackgroundResource(R.drawable.selected_station_test_with_svg)
+            bind.apply {
+                radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
+                tvPrimary.setTextColor(selectedTextColor)
+                tvPrimary.alpha = 0.9f
+                tvSecondary.setTextColor(selectedTextColor)
+            }
+
         } else {
-            view.setBackgroundResource(R.drawable.radio_selected_paused_gradient)
+            bind.apply {
+                radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
+                tvPrimary.setTextColor(defaultTextColor)
+                tvPrimary.alpha = 0.7f
+                tvSecondary.setTextColor(defaultTextColor)
+            }
+
         }
     }
 
     fun updateStationPlaybackState(){
-        previousItemHolder?.let{
-            if(it.bind.tvPrimary.text == currentRadioStationName){
-                handleStationPlaybackState(it.bind.radioItemRootLayout)
+        previousItemHolder?.bind?.let{
+            if(it.tvPrimary.text == currentRadioStationName){
+                handleStationPlaybackState(it)
             }
         }
     }
@@ -128,7 +149,7 @@ class RadioDatabaseAdapter @Inject constructor(
         }
 
         override fun areContentsTheSame(oldItem: RadioStation, newItem: RadioStation): Boolean {
-            return oldItem == newItem
+            return oldItem.stationuuid == newItem.stationuuid
         }
     }
 

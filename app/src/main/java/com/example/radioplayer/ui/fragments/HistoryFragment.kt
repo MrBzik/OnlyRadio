@@ -6,6 +6,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
+import android.view.animation.LayoutAnimationController
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -75,9 +77,37 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         setOnSaveOptionsClickListener()
 
+//        setLayoutAnimationController()
+//
+//        setRecyclerChildrenAttachListener()
     }
 
+    private fun setLayoutAnimationController (){
 
+        bind.rvHistory.layoutAnimation = (activity as MainActivity).layoutAnimationController
+
+    }
+
+    private fun setRecyclerChildrenAttachListener(){
+
+        bind.rvHistory.addOnChildAttachStateChangeListener(object :RecyclerView.OnChildAttachStateChangeListener{
+            var check = true
+            override fun onChildViewAttachedToWindow(view: View) {
+                if(check){
+                    bind.rvHistory.apply {
+                        post{
+                            startLayoutAnimation()
+                        }
+                    }
+                }
+                check = false
+            }
+            override fun onChildViewDetachedFromWindow(view: View) {
+
+            }
+        })
+
+    }
 
 
     private fun showSelectedHistoryOption(){
@@ -172,15 +202,27 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             setHasFixedSize(true)
 
-            historyAdapter.defaultTextColor = ContextCompat.getColor(requireContext(), R.color.default_text_color)
-            historyAdapter.selectedTextColor = ContextCompat.getColor(requireContext(), R.color.color_interactive)
-
-
-            mainViewModel.newRadioStation.value?.let {
-
-            historyAdapter.currentRadioStationID = it.stationuuid
-
+            historyAdapter.apply {
+                defaultTextColor = ContextCompat.getColor(requireContext(), R.color.default_text_color)
+                selectedTextColor = ContextCompat.getColor(requireContext(), R.color.selected_text_color)
+                mainViewModel.newRadioStation.value?.let { currentRadioStationID = it.stationuuid}
             }
+
+
+
+//            if(mainViewModel.isHistoryAnimationToPlay){
+//                post {
+//                    startLayoutAnimation()
+//                }
+//
+//                mainViewModel.isHistoryAnimationToPlay = false
+//
+//            } else {
+//                layoutAnimation = null
+//            }
+
+
+
         }
 
         setAdapterLoadStateListener()

@@ -5,19 +5,23 @@ import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE
 import android.util.Log
 import android.view.DragEvent
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.view.animation.LayoutAnimationController
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
-import com.example.radioplayer.ui.animations.LoadingAnim
+import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.CountryPickerDialog
 import com.example.radioplayer.ui.dialogs.NameDialog
 import com.example.radioplayer.ui.dialogs.TagPickerDialog
@@ -45,6 +49,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     lateinit var pagingRadioAdapter : PagingRadioAdapter
 
     private var checkInitialLaunch = true
+    private var isNewSearch = false
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -72,6 +77,72 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         setDragListenerForLayout()
         setDragListenerForButton()
         getFabSearchPositionIfNeeded()
+
+//        setLayoutAnimationController()
+//
+//        setRecyclerChildrenAttachListener()
+
+
+//
+        observeRecyclerAnimations()
+    }
+
+    private fun setLayoutAnimationController (){
+
+        bind.rvSearchStations.layoutAnimation = (activity as MainActivity).layoutAnimationController
+
+    }
+
+    private var isNewSearchForAnimations = true
+
+    private fun setRecyclerChildrenAttachListener(){
+
+        bind.rvSearchStations.addOnChildAttachStateChangeListener(object :RecyclerView.OnChildAttachStateChangeListener{
+
+            override fun onChildViewAttachedToWindow(view: View) {
+
+                if(isNewSearchForAnimations){
+
+                    bind.rvSearchStations.apply {
+
+                    Log.d("CHECKTAGS", "onChil: ${System.currentTimeMillis()}")
+                        post {
+                            Log.d("CHECKTAGS", "onPost: ${System.currentTimeMillis()}")
+                            startLayoutAnimation()
+                            scrollToPosition(0)
+
+                        }
+                    }
+
+                }
+
+                isNewSearchForAnimations = false
+                    mainViewModel.isSearchAnimationToPlay = false
+            }
+
+            override fun onChildViewDetachedFromWindow(view: View) {
+
+            }
+        })
+
+    }
+
+    private fun observeRecyclerAnimations(){
+
+        bind.rvSearchStations.layoutAnimationListener = object: Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {
+                    Log.d("CHECKTAGS", "animSt: ${System.currentTimeMillis()}")
+            }
+
+            override fun onAnimationEnd(animation: Animation?) {
+
+                Log.d("CHECKTAGS", "animEd: ${System.currentTimeMillis()}")
+            }
+
+            override fun onAnimationRepeat(animation: Animation?) {
+
+            }
+        }
 
     }
 
@@ -163,8 +234,12 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             adapter = pagingRadioAdapter
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
-            pagingRadioAdapter.defaultTextColor =
-                ContextCompat.getColor(requireContext(), R.color.default_text_color)
+            pagingRadioAdapter.apply {
+                defaultTextColor = ContextCompat.getColor(requireContext(), R.color.default_text_color)
+                selectedTextColor = ContextCompat.getColor(requireContext(), R.color.selected_text_color)
+            }
+
+            itemAnimator = null
 
             mainViewModel.currentRadioStation.value?.let {
               val name =  it.getString(METADATA_KEY_TITLE)
@@ -196,7 +271,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
 
                 if(isNewSearch){
-                 handleScrollUpOnNewSearch()
+//                 handleScrollUpOnNewSearch()
                  isNewSearch = false
                 }
             }
@@ -211,8 +286,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     }
 
 
-    private var isNewSearch = false
-
 
     private fun subscribeToStationsFlow(){
 
@@ -220,12 +293,15 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             mainViewModel.stationsFlow.collectLatest {
 
+                isNewSearchForAnimations = true
+
                     if(checkInitialLaunch){
                         checkInitialLaunch = false
                     } else {
                         isNewSearch = true
                     }
 
+                Log.d("CHECKTAGS", "onSubm: ${System.currentTimeMillis()}")
                 pagingRadioAdapter.submitData(it)
 
             }
@@ -312,11 +388,25 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         }
         mainViewModel.isNewSearch = true
-        mainViewModel.setSearchBy(bundle)
+       val check = mainViewModel.setSearchBy(bundle)
 
+//
+//        launchRecyclerOutAnim(check)
 
 
     }
+
+//    private fun launchRecyclerOutAnim(isValid : Boolean){
+//        if(isValid){
+//            bind.rvSearchStations.apply {
+//                layoutAnimation = layoutAnimationControllerOut
+//                startLayoutAnimation()
+//
+//            }
+//        }
+//
+//
+//    }
 
 
     private fun setSearchParamsObservers(){

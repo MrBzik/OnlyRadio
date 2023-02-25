@@ -4,13 +4,19 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.view.animation.LayoutAnimationController
 import androidx.activity.viewModels
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import androidx.transition.Fade
+import androidx.transition.Slide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.R
@@ -56,16 +62,43 @@ class MainActivity : AppCompatActivity() {
     val separatorLeftAnim : LoadingAnim by lazy { LoadingAnim(sideSeparatorStart, this)  }
     val separatorRightAnim : LoadingAnim by lazy { LoadingAnim(sideSeparatorEnd, this)  }
 
+    val animationIn : Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.scale_up) }
+    val layoutAnimationController : LayoutAnimationController by lazy {
+        LayoutAnimationController(animationIn).apply {
+            delay = 0.15f
+            order = LayoutAnimationController.ORDER_NORMAL
+        }
+    }
+
+
     @Inject
     lateinit var glide : RequestManager
 
     private var currentStation : RadioStation? = null
     private var isFavoured = false
 
-    private  val radioSearchFragment : RadioSearchFragment by lazy { RadioSearchFragment() }
-    private  val favStationsFragment : FavStationsFragment by lazy { FavStationsFragment() }
-    private  val historyFragment : HistoryFragment by lazy { HistoryFragment() }
-    private  val stationDetailsFragment : StationDetailsFragment by lazy { StationDetailsFragment() }
+    private  val radioSearchFragment : RadioSearchFragment by lazy { RadioSearchFragment().apply{
+        exitTransition = Fade()
+        }
+    }
+    private  val favStationsFragment : FavStationsFragment by lazy { FavStationsFragment(). apply{
+        exitTransition = Fade()
+    } }
+
+
+
+
+    private  val historyFragment : HistoryFragment by lazy { HistoryFragment().apply{
+        exitTransition = Fade()
+
+        }
+    }
+    private  val stationDetailsFragment : StationDetailsFragment by lazy { StationDetailsFragment().apply {
+        enterTransition = Slide(Gravity.BOTTOM)
+        exitTransition = Slide(Gravity.BOTTOM)
+    }
+
+    }
     private var previousImageUri : Uri? = null
 
 
@@ -76,7 +109,7 @@ class MainActivity : AppCompatActivity() {
         } else if (bindPlayer.tvExpandHideText.text == resources.getString(R.string.Expand)) {
             this.moveTaskToBack(true)
         } else {
-            handleNavigationToFragments(null)
+            handleNavigationToFragments(null, Fade())
         }
     }
 
@@ -177,7 +210,7 @@ class MainActivity : AppCompatActivity() {
     private fun setOnBottomNavClickListener(){
 
         bind.bottomNavigationView.setOnItemSelectedListener {
-           handleNavigationToFragments(it)
+           handleNavigationToFragments(it, null)
 
         }
     }
@@ -187,7 +220,7 @@ class MainActivity : AppCompatActivity() {
 
             if(isStubPlayerBindInflated){
                 if(bindPlayer.tvExpandHideText.text == resources.getString(R.string.Hide)){
-                    handleNavigationToFragments(it)
+                    handleNavigationToFragments(it, Fade())
                 }
             }
         }
@@ -238,18 +271,20 @@ class MainActivity : AppCompatActivity() {
             }
 
             else {
-                handleNavigationToFragments(null)
+                handleNavigationToFragments(null, Fade())
             }
         }
 
     }
 
-    private fun handleNavigationToFragments(item : MenuItem?) : Boolean {
+    private fun handleNavigationToFragments(item : MenuItem?, fade: Fade?) : Boolean {
 
         val menuItem = bind.bottomNavigationView.selectedItemId
 
         when(item?.itemId ?: menuItem) {
             R.id.mi_radioSearchFragment -> {
+
+                radioSearchFragment.enterTransition = fade ?: Slide(Gravity.END)
 
                 supportFragmentManager.beginTransaction().apply {
                     replace(R.id.flFragment, radioSearchFragment)
@@ -259,6 +294,8 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.mi_favStationsFragment -> {
 
+                favStationsFragment.enterTransition = fade ?: Slide(Gravity.START)
+
                 supportFragmentManager.beginTransaction().apply {
                     replace(R.id.flFragment, favStationsFragment)
                     addToBackStack(null)
@@ -266,6 +303,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             R.id.mi_historyFragment -> {
+
+                historyFragment.enterTransition = fade ?: Slide(Gravity.START)
                 supportFragmentManager.beginTransaction().apply {
                     replace(R.id.flFragment, historyFragment)
                     addToBackStack(null)
