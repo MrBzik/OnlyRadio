@@ -25,6 +25,7 @@ import com.example.radioplayer.databinding.ActivityMainBinding
 import com.example.radioplayer.databinding.StubPlayerActivityMainBinding
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
+import com.example.radioplayer.ui.animations.CustomFadeOutTransition
 import com.example.radioplayer.ui.animations.LoadingAnim
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.fragments.*
@@ -33,6 +34,7 @@ import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.utils.Constants.FAB_POSITION_X
 import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
+import com.example.radioplayer.utils.Constants.SEARCH_FULL_COUNTRY_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
@@ -62,38 +64,37 @@ class MainActivity : AppCompatActivity() {
     val separatorLeftAnim : LoadingAnim by lazy { LoadingAnim(sideSeparatorStart, this)  }
     val separatorRightAnim : LoadingAnim by lazy { LoadingAnim(sideSeparatorEnd, this)  }
 
-    val animationIn : Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.scale_up) }
+    val animationIn : Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.fall_down) }
     val layoutAnimationController : LayoutAnimationController by lazy {
         LayoutAnimationController(animationIn).apply {
-            delay = 0.15f
+            delay = 0.1f
             order = LayoutAnimationController.ORDER_NORMAL
         }
     }
+    val animationOut : Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.fade_out_anim) }
+    val layoutAnimationControllerOut : LayoutAnimationController by lazy {
+        LayoutAnimationController(animationOut).apply {
+            delay = 0f
+            order = LayoutAnimationController.ORDER_REVERSE
+        }
+    }
+
 
 
     @Inject
     lateinit var glide : RequestManager
 
     private var currentStation : RadioStation? = null
-    private var isFavoured = false
-
-    private  val radioSearchFragment : RadioSearchFragment by lazy { RadioSearchFragment().apply{
-        exitTransition = Fade()
-        }
-    }
-    private  val favStationsFragment : FavStationsFragment by lazy { FavStationsFragment(). apply{
-        exitTransition = Fade()
-    } }
 
 
+    private  val radioSearchFragment : RadioSearchFragment by lazy { RadioSearchFragment() }
 
+    private  val favStationsFragment : FavStationsFragment by lazy { FavStationsFragment() }
 
-    private  val historyFragment : HistoryFragment by lazy { HistoryFragment().apply{
-        exitTransition = Fade()
+    private  val historyFragment : HistoryFragment by lazy { HistoryFragment() }
 
-        }
-    }
     private  val stationDetailsFragment : StationDetailsFragment by lazy { StationDetailsFragment().apply {
+
         enterTransition = Slide(Gravity.BOTTOM)
         exitTransition = Slide(Gravity.BOTTOM)
     }
@@ -109,7 +110,7 @@ class MainActivity : AppCompatActivity() {
         } else if (bindPlayer.tvExpandHideText.text == resources.getString(R.string.Expand)) {
             this.moveTaskToBack(true)
         } else {
-            handleNavigationToFragments(null, Fade())
+            handleNavigationToFragments(null)
         }
     }
 
@@ -161,7 +162,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     private fun setupInitialNavigation(){
 
 
@@ -183,7 +183,6 @@ class MainActivity : AppCompatActivity() {
                 inflatePlayerStubAndCallRelatedMethods()
             }
 
-            checkIfStationFavoured(station)
 
             updateImageAndTitle(station)
 
@@ -199,8 +198,7 @@ class MainActivity : AppCompatActivity() {
         bindPlayer.root.slideAnim(500, 0, R.anim.fade_in_anim)
 
         clickListenerToHandleNavigationWithDetailsFragment()
-        observeIfNewStationFavoured()
-        addToFavClickListener()
+
         onClickListenerForTogglePlay()
         observePlaybackStateToChangeIcons()
     }
@@ -210,7 +208,7 @@ class MainActivity : AppCompatActivity() {
     private fun setOnBottomNavClickListener(){
 
         bind.bottomNavigationView.setOnItemSelectedListener {
-           handleNavigationToFragments(it, null)
+           handleNavigationToFragments(it)
 
         }
     }
@@ -220,35 +218,15 @@ class MainActivity : AppCompatActivity() {
 
             if(isStubPlayerBindInflated){
                 if(bindPlayer.tvExpandHideText.text == resources.getString(R.string.Hide)){
-                    handleNavigationToFragments(it, Fade())
+                    handleNavigationToFragments(it)
                 }
             }
         }
     }
 
-    private fun observeIfNewStationFavoured(){
-
-        databaseViewModel.isStationFavoured.observe(this){
-
-            paintButtonAddToFav(it)
-
-            isFavoured = it
-
-
-        }
-    }
 
 
 
-    private fun paintButtonAddToFav(isInDB : Boolean){
-        if(!isInDB){
-            bind.fabAddToFav.setImageResource(R.drawable.ic_add_to_fav)
-
-        } else {
-            bind.fabAddToFav.setImageResource(R.drawable.ic_added_to_fav)
-
-        }
-    }
 
 
 
@@ -258,6 +236,9 @@ class MainActivity : AppCompatActivity() {
 
             if(bindPlayer.tvExpandHideText.text == resources.getString(R.string.Expand)) {
 
+
+                putFadeOutForDetailsFragment()
+
                 supportFragmentManager.beginTransaction().apply {
                     replace(R.id.flFragment, stationDetailsFragment)
                     addToBackStack(null)
@@ -266,27 +247,28 @@ class MainActivity : AppCompatActivity() {
 
 
                 bindPlayer.tvExpandHideText.setText(R.string.Hide)
-                bind.fabAddToFav.isVisible = true
+
           
             }
 
             else {
-                handleNavigationToFragments(null, Fade())
+                handleNavigationToFragments(null)
             }
         }
 
     }
 
-    private fun handleNavigationToFragments(item : MenuItem?, fade: Fade?) : Boolean {
+    private fun handleNavigationToFragments(item : MenuItem?) : Boolean {
 
         val menuItem = bind.bottomNavigationView.selectedItemId
 
         when(item?.itemId ?: menuItem) {
             R.id.mi_radioSearchFragment -> {
 
-                radioSearchFragment.enterTransition = fade ?: Slide(Gravity.END)
+                radioSearchFragment.exitTransition = null
 
                 supportFragmentManager.beginTransaction().apply {
+                    setCustomAnimations(R.anim.blank_anim, android.R.anim.fade_out)
                     replace(R.id.flFragment, radioSearchFragment)
                     addToBackStack(null)
                     commit()
@@ -294,9 +276,10 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.mi_favStationsFragment -> {
 
-                favStationsFragment.enterTransition = fade ?: Slide(Gravity.START)
+                favStationsFragment.exitTransition = null
 
                 supportFragmentManager.beginTransaction().apply {
+                    setCustomAnimations(R.anim.blank_anim, android.R.anim.fade_out)
                     replace(R.id.flFragment, favStationsFragment)
                     addToBackStack(null)
                     commit()
@@ -304,8 +287,9 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.mi_historyFragment -> {
 
-                historyFragment.enterTransition = fade ?: Slide(Gravity.START)
+                historyFragment.exitTransition = null
                 supportFragmentManager.beginTransaction().apply {
+                    setCustomAnimations(R.anim.blank_anim, android.R.anim.fade_out)
                     replace(R.id.flFragment, historyFragment)
                     addToBackStack(null)
                     commit()
@@ -315,43 +299,34 @@ class MainActivity : AppCompatActivity() {
 
         if(isStubPlayerBindInflated){
             bindPlayer.tvExpandHideText.setText(R.string.Expand)
-            bind.fabAddToFav.visibility = View.GONE
+
         }
 
         return true
     }
 
-    private fun addToFavClickListener(){
 
-        bind.fabAddToFav.setOnClickListener {
+    private fun putFadeOutForDetailsFragment(){
 
-            if(isFavoured) {
+        when(bind.bottomNavigationView.selectedItemId) {
+            R.id.mi_radioSearchFragment -> {
 
-                currentStation?.let {
-                    databaseViewModel.updateIsFavouredState(0, it.stationuuid)
-                    Snackbar.make(findViewById(R.id.rootLayout),
-                        "Station removed from favs", Snackbar.LENGTH_SHORT).show()
-                    databaseViewModel.isStationFavoured.postValue(false)
-                }
+                radioSearchFragment.exitTransition = Fade()
 
-            } else {
-                currentStation?.let {
-                    databaseViewModel.updateIsFavouredState(System.currentTimeMillis(), it.stationuuid)
-                    Snackbar.make(findViewById(R.id.rootLayout),
-                        "Station saved to favs", Snackbar.LENGTH_SHORT).show()
-                    databaseViewModel.isStationFavoured.postValue(true)
-                }
+            }
+            R.id.mi_favStationsFragment -> {
+
+                favStationsFragment.exitTransition = Fade()
+
+            }
+            R.id.mi_historyFragment -> {
+
+                historyFragment.exitTransition = Fade()
+
             }
         }
     }
 
-
-
-
-
-    private fun checkIfStationFavoured(station: RadioStation){
-        databaseViewModel.checkIfStationIsFavoured(station.stationuuid)
-    }
 
 
     private fun updateImageAndTitle(station : RadioStation){
@@ -418,6 +393,9 @@ class MainActivity : AppCompatActivity() {
             putString(SEARCH_PREF_TAG, mainViewModel.searchParamTag.value)
             putString(SEARCH_PREF_NAME, mainViewModel.searchParamName.value)
             putString(SEARCH_PREF_COUNTRY, mainViewModel.searchParamCountry.value)
+            putString(SEARCH_FULL_COUNTRY_NAME, mainViewModel.searchFullCountryName)
+
+
         }.apply()
 
         if(mainViewModel.isFabUpdated){

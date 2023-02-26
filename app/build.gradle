@@ -38,10 +38,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
 
-//        debug {
-//
-//            debuggable false
-//        }
+        debug {
+
+            debuggable false
+        }
     }
 
     buildFeatures {

@@ -10,30 +10,6 @@
 
     >
 
-  <com.google.android.material.floatingactionbutton.FloatingActionButton
-      android:id="@+id/fabAddToFav"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginEnd="30dp"
-      android:layout_marginBottom="40dp"
-      android:visibility="gone"
-      app:backgroundTint="@color/floating_buttons"
-      app:layout_constraintBottom_toBottomOf="@+id/flFragment"
-      app:layout_constraintEnd_toEndOf="parent" />
-
-  <ImageView
-      android:id="@+id/ivNoInternet"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:src="@drawable/ic_no_intenet"
-      android:elevation="3dp"
-      android:visibility="gone"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0.5"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintVertical_bias="0.5" />
 
 
   <View
@@ -51,7 +27,7 @@
       android:id="@+id/toolbar"
       android:layout_width="match_parent"
       android:layout_height="60dp"
-      android:elevation="1dp"
+
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintHorizontal_bias="0.5"
       app:layout_constraintStart_toStartOf="parent"
@@ -65,7 +41,6 @@
       android:layout_height="0dp"
       android:layout_marginStart="10dp"
       android:layout_marginEnd="7dp"
-      android:elevation="2dp"
       app:layout_constraintBottom_toTopOf="@id/stubPlayer"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintHorizontal_bias="0.5"
@@ -74,7 +49,18 @@
       app:layout_constraintVertical_bias="0.5"
 
       />
-
+  <ImageView
+      android:id="@+id/ivNoInternet"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:src="@drawable/ic_no_intenet"
+      android:visibility="gone"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.5"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintVertical_bias="0.5" />
   <View
       android:id="@+id/viewSeparatorEnd"
       android:layout_width="2dp"
@@ -92,7 +78,7 @@
       android:layout_height="60dp"
       android:inflatedId="@+id/stubPlayer"
       android:layout="@layout/stub_player_activity_main"
-      android:translationZ="-5dp"
+
       app:layout_constraintBottom_toTopOf="@id/separatorSecond"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent" />

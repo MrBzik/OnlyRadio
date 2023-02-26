@@ -90,9 +90,10 @@ class CountryPickerDialog(
 
     private fun setOnAdapterClickListener(){
 
-        countryAdapter.setOnCountryClickListener {
+        countryAdapter.setOnCountryClickListener { code, name ->
 
-            mainViewModel.searchParamCountry.postValue(it)
+            mainViewModel.searchParamCountry.postValue(code)
+            mainViewModel.searchFullCountryName = name
 
             dismiss()
         }

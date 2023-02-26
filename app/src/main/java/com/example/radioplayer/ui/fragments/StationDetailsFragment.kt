@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
@@ -38,12 +39,15 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     private var currentRadioStation : RadioStation? = null
 
+    private var isFavoured = false
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
 
         pixabayViewModel = ViewModelProvider(requireActivity())[PixabayViewModel::class.java]
+
 
         subscribeToObservers()
 
@@ -53,7 +57,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         endLoadingBarIfNeeded()
 
-
+        addToFavClickListener()
     }
 
     private fun endLoadingBarIfNeeded(){
@@ -65,14 +69,47 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         observeCurrentStationAndUpdateUI()
 
+        observeIfNewStationFavoured()
+
         updateListOfPlaylists()
 
+    }
+
+
+    private fun observeIfNewStationFavoured(){
+
+        databaseViewModel.isStationFavoured.observe(viewLifecycleOwner){
+
+            paintButtonAddToFav(it)
+
+            isFavoured = it
+
+
+        }
+    }
+
+
+    private fun checkIfStationFavoured(station: RadioStation){
+        databaseViewModel.checkIfStationIsFavoured(station.stationuuid)
+    }
+
+
+    private fun paintButtonAddToFav(isInDB : Boolean){
+        if(!isInDB){
+            bind.fabAddToFav.setImageResource(R.drawable.ic_add_to_fav)
+
+        } else {
+            bind.fabAddToFav.setImageResource(R.drawable.ic_added_to_fav)
+
+        }
     }
 
 
     private fun observeCurrentStationAndUpdateUI(){
 
         mainViewModel.newRadioStation.observe(viewLifecycleOwner){
+
+            checkIfStationFavoured(it)
 
             currentRadioStation = it
 
@@ -138,6 +175,32 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
 
     }
+
+
+    private fun addToFavClickListener(){
+
+        bind.fabAddToFav.setOnClickListener {
+
+            if(isFavoured) {
+
+                currentRadioStation?.let {
+                    databaseViewModel.updateIsFavouredState(0, it.stationuuid)
+                    Snackbar.make(requireActivity().findViewById(R.id.rootLayout),
+                        "Station removed from favs", Snackbar.LENGTH_SHORT).show()
+                    databaseViewModel.isStationFavoured.postValue(false)
+                }
+
+            } else {
+                currentRadioStation?.let {
+                    databaseViewModel.updateIsFavouredState(System.currentTimeMillis(), it.stationuuid)
+                    Snackbar.make(requireActivity().findViewById(R.id.rootLayout),
+                        "Station saved to favs", Snackbar.LENGTH_SHORT).show()
+                    databaseViewModel.isStationFavoured.postValue(true)
+                }
+            }
+        }
+    }
+
 
 
     private fun insertStationInPlaylist(playlistName : String){

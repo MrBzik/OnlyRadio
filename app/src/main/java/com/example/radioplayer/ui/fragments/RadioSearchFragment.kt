@@ -1,5 +1,6 @@
 package com.example.radioplayer.ui.fragments
 
+import android.opengl.Visibility
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE
 import android.util.Log
@@ -13,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.radioplayer.R
@@ -35,8 +37,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@FlowPreview
-@ExperimentalCoroutinesApi
+
 @AndroidEntryPoint
 class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     FragmentRadioSearchBinding::inflate
@@ -47,9 +48,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     @Inject
     lateinit var pagingRadioAdapter : PagingRadioAdapter
-
-    private var checkInitialLaunch = true
-    private var isNewSearch = false
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -78,13 +76,35 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         setDragListenerForButton()
         getFabSearchPositionIfNeeded()
 
-//        setLayoutAnimationController()
+        setLayoutAnimationController()
+
+        setRecyclerChildrenAttachListener()
+
+        observeNoResultDetector()
+
 //
-//        setRecyclerChildrenAttachListener()
+//        observeRecyclerAnimations()
+    }
+
+    private fun observeNoResultDetector(){
+
+        mainViewModel.noResultDetection.observe(viewLifecycleOwner){noResult ->
 
 
-//
-        observeRecyclerAnimations()
+            if(noResult){
+                bind.tvResultMessage.apply {
+                    val tag = mainViewModel.lastSearchTag.ifBlank { "not selected" }
+
+                    val name = mainViewModel.lastSearchName.ifBlank { "not selected" }
+
+                    val country = mainViewModel.searchFullCountryName.ifBlank { "not selected" }
+
+                    val message = "No results for\n\nname: $name\ntag: $tag\ncountry: $country"
+                    text = message
+
+                }
+            }   else bind.tvResultMessage.visibility = View.GONE
+        }
     }
 
     private fun setLayoutAnimationController (){
@@ -92,6 +112,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         bind.rvSearchStations.layoutAnimation = (activity as MainActivity).layoutAnimationController
 
     }
+
+    private var isToToggleRvVisibility = true
 
     private var isNewSearchForAnimations = true
 
@@ -101,15 +123,22 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             override fun onChildViewAttachedToWindow(view: View) {
 
+
                 if(isNewSearchForAnimations){
 
                     bind.rvSearchStations.apply {
 
-                    Log.d("CHECKTAGS", "onChil: ${System.currentTimeMillis()}")
+                        layoutAnimation = (activity as MainActivity).layoutAnimationController
+
+
+//                    Log.d("CHECKTAGS", "onChil: ${System.currentTimeMillis()}")
                         post {
-                            Log.d("CHECKTAGS", "onPost: ${System.currentTimeMillis()}")
-                            startLayoutAnimation()
+//                            Log.d("CHECKTAGS", "onPost: ${System.currentTimeMillis()}")
+
+                            visibility = View.VISIBLE
+                            isToToggleRvVisibility = false
                             scrollToPosition(0)
+                            startLayoutAnimation()
 
                         }
                     }
@@ -127,24 +156,24 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     }
 
-    private fun observeRecyclerAnimations(){
-
-        bind.rvSearchStations.layoutAnimationListener = object: Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation?) {
-                    Log.d("CHECKTAGS", "animSt: ${System.currentTimeMillis()}")
-            }
-
-            override fun onAnimationEnd(animation: Animation?) {
-
-                Log.d("CHECKTAGS", "animEd: ${System.currentTimeMillis()}")
-            }
-
-            override fun onAnimationRepeat(animation: Animation?) {
-
-            }
-        }
-
-    }
+//    private fun observeRecyclerAnimations(){
+//
+//        bind.rvSearchStations.layoutAnimationListener = object: Animation.AnimationListener {
+//            override fun onAnimationStart(animation: Animation?) {
+//                    Log.d("CHECKTAGS", "animSt: ${System.currentTimeMillis()}")
+//            }
+//
+//            override fun onAnimationEnd(animation: Animation?) {
+//
+//                Log.d("CHECKTAGS", "animEd: ${System.currentTimeMillis()}")
+//            }
+//
+//            override fun onAnimationRepeat(animation: Animation?) {
+//
+//            }
+//        }
+//
+//    }
 
 
     private fun observePlaybackState(){
@@ -269,20 +298,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                 (activity as MainActivity).separatorLeftAnim.endLoadingAnim()
                 (activity as MainActivity).separatorRightAnim.endLoadingAnim()
 
-
-                if(isNewSearch){
-//                 handleScrollUpOnNewSearch()
-                 isNewSearch = false
-                }
             }
         }
-    }
-
-    private fun handleScrollUpOnNewSearch() = viewLifecycleOwner.lifecycleScope.launch {
-
-
-        delay(100)
-        bind.rvSearchStations.smoothScrollToPosition(0)
     }
 
 
@@ -294,23 +311,38 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             mainViewModel.stationsFlow.collectLatest {
 
                 isNewSearchForAnimations = true
+                launchRecyclerOutAnim()
 
-                    if(checkInitialLaunch){
-                        checkInitialLaunch = false
-                    } else {
-                        isNewSearch = true
-                    }
-
-                Log.d("CHECKTAGS", "onSubm: ${System.currentTimeMillis()}")
+//                Log.d("CHECKTAGS", "onSubm: ${System.currentTimeMillis()}")
                 pagingRadioAdapter.submitData(it)
 
             }
         }
     }
 
+    private fun launchRecyclerOutAnim(){
+        bind.rvSearchStations.apply {
+            layoutAnimation = (activity as MainActivity).layoutAnimationControllerOut
+            startLayoutAnimation()
+            isToToggleRvVisibility = true
+            postDelayed({
+                if(isToToggleRvVisibility)
+                    visibility = View.INVISIBLE
+            }, 100)
+            showLoadingResultsMessage()
+        }
+    }
+
+    private fun showLoadingResultsMessage(){
+        bind.tvResultMessage.apply {
+            text = "Waiting for response from servers..."
+            visibility = View.VISIBLE
+            slideAnim(100, 0, R.anim.fade_in_anim)
+        }
+    }
+
 
     private fun setSearchToolbar() {
-
 
         bind.tvTag.setOnClickListener {
 
@@ -340,7 +372,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         bind.swipeRefresh.setOnRefreshListener {
 
-            initiateNewSearch()
+            mainViewModel.initiateNewSearch()
 
             bind.swipeRefresh.isRefreshing = false
 
@@ -351,62 +383,12 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
 
         bind.fabInitiateSearch.setOnClickListener {
-            initiateNewSearch()
+            mainViewModel.initiateNewSearch()
         }
 
     }
 
 
-    private fun initiateNewSearch(){
-
-        val name = bind.tvName.text.toString()
-
-        val tag = bind.tvTag.text.toString()
-
-        val country = bind.tvSelectedCountry.text.toString()
-
-        val bundle = Bundle().apply {
-
-
-            if(tag == "Tag") {
-                putString("TAG", "")
-            } else {
-                putString("TAG", tag)
-            }
-
-           if(country == "Country"){
-               putString("COUNTRY", "")
-           } else {
-               putString("COUNTRY", country)
-           }
-
-            if(name == "Name"){
-                putString("NAME", "")
-            } else {
-                putString("NAME", name)
-            }
-
-        }
-        mainViewModel.isNewSearch = true
-       val check = mainViewModel.setSearchBy(bundle)
-
-//
-//        launchRecyclerOutAnim(check)
-
-
-    }
-
-//    private fun launchRecyclerOutAnim(isValid : Boolean){
-//        if(isValid){
-//            bind.rvSearchStations.apply {
-//                layoutAnimation = layoutAnimationControllerOut
-//                startLayoutAnimation()
-//
-//            }
-//        }
-//
-//
-//    }
 
 
     private fun setSearchParamsObservers(){
@@ -429,7 +411,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     override fun onDestroyView() {
         super.onDestroyView()
-        checkInitialLaunch = true
         bind.rvSearchStations.adapter = null
         _bind = null
     }

@@ -19,8 +19,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
-@FlowPreview
+
 @HiltViewModel
 class PixabayViewModel @Inject constructor(
     private val repository: PixabayRepository
@@ -33,6 +32,7 @@ class PixabayViewModel @Inject constructor(
 
     private val imageSearchBy : MutableLiveData<String> = MutableLiveData("music")
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val imagesFlow = imageSearchBy.asFlow()
         .debounce(800)
         .flatMapLatest {

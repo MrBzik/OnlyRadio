@@ -45,16 +45,16 @@ class FilterCountriesAdapter(): ListAdapter<Country, FilterCountriesAdapter.Coun
             root.setOnClickListener {
                 onItemClickListener?.let { click ->
 
-                    click(item.countryCode)
+                    click(item.countryCode, item.countryName)
 
                 }
             }
         }
     }
 
-    private var onItemClickListener : ((String) -> Unit)? = null
+    private var onItemClickListener : ((code : String, fullName : String) -> Unit)? = null
 
-    fun setOnCountryClickListener(listener : (String) -> Unit){
+    fun setOnCountryClickListener(listener : (code :String, fullName : String) -> Unit){
         onItemClickListener = listener
     }
 

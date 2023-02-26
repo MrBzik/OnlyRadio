@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.example.radioplayer.ui.MainActivity
@@ -32,6 +33,7 @@ abstract class BaseFragment<VB: ViewBinding>(
 
         _bind = bindingInflater(inflater)
 
+        ViewCompat.setTransitionName(bind.root, bind.javaClass.name)
         return bind.root
     }
 

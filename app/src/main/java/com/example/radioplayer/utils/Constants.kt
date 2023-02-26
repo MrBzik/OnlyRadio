@@ -56,6 +56,7 @@ object Constants {
     const val SEARCH_PREF_TAG = "search preferences tag"
     const val SEARCH_PREF_NAME = "search preferences name"
     const val SEARCH_PREF_COUNTRY = "search preferences country"
+    const val SEARCH_FULL_COUNTRY_NAME = "full country name for no result message"
 
 
     // SearchFragment Floating button positioning

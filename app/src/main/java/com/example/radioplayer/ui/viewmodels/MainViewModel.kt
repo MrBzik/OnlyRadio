@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
 import android.util.Log
 import androidx.core.os.bundleOf
-import androidx.core.view.isVisible
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.example.radioplayer.adapters.datasources.RadioStationsDataSource
@@ -17,16 +16,15 @@ import com.example.radioplayer.connectivityObserver.NetworkConnectivityObserver
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.repositories.DatabaseRepository
-import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.FAB_POSITION_X
 import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
+import com.example.radioplayer.utils.Constants.SEARCH_FULL_COUNTRY_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
-import com.example.radioplayer.utils.Country
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -35,8 +33,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
-@FlowPreview
+
 @HiltViewModel
 class MainViewModel @Inject constructor(
     app : Application,
@@ -57,6 +54,8 @@ class MainViewModel @Inject constructor(
        var isHistoryAnimationToPlay = true
        var isSearchAnimationToPlay = true
        var isFavouriteAnimationToPlay = true
+
+       var noResultDetection : MutableLiveData<Boolean> = MutableLiveData()
 
     init {
 
@@ -85,7 +84,7 @@ class MainViewModel @Inject constructor(
                     hasInternetConnection.postValue(true)
                     if(wasSearchInterrupted){
                         wasSearchInterrupted = false
-                        searchBy.postValue(lastSearchBundle)
+                        searchBy.postValue(true)
                     }
                 }
                 ConnectivityObserver.Status.Unavailable -> {
@@ -104,12 +103,46 @@ class MainViewModel @Inject constructor(
     }
 
 
+       val searchPreferences = app.getSharedPreferences("SearchPref", Context.MODE_PRIVATE)
 
        val searchParamTag : MutableLiveData<String> = MutableLiveData()
        val searchParamName : MutableLiveData<String> = MutableLiveData()
        val searchParamCountry : MutableLiveData<String> = MutableLiveData()
 
-       val searchPreferences = app.getSharedPreferences("SearchPref", Context.MODE_PRIVATE)
+       var lastSearchCountry = searchPreferences.getString(SEARCH_PREF_COUNTRY, "") ?: ""
+       var lastSearchName = searchPreferences.getString(SEARCH_PREF_NAME, "")?: ""
+       var lastSearchTag = searchPreferences.getString(SEARCH_PREF_TAG, "")?: ""
+       var searchFullCountryName = searchPreferences.getString(SEARCH_FULL_COUNTRY_NAME, "")?: ""
+
+
+    private val searchBy : MutableLiveData<Boolean> = MutableLiveData()
+
+
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val stationsFlow = searchBy.asFlow()
+        .flatMapLatest {
+            searchStationsPaging()
+        }
+        .cachedIn(viewModelScope)
+
+    private var wasSearchInterrupted = false
+
+
+       init {
+           searchParamTag.postValue(lastSearchTag)
+           searchParamName.postValue(lastSearchName)
+           searchParamCountry.postValue(lastSearchCountry)
+           searchBy.postValue(true)
+
+           viewModelScope.launch {
+               delay(600)
+               if(hasInternetConnection.value == false){
+                   wasSearchInterrupted = true
+               }
+               this.cancel()
+           }
+       }
 
 
        var fabX = 0f
@@ -128,28 +161,26 @@ class MainViewModel @Inject constructor(
 
 
        private suspend fun searchWithNewParams(
-            limit : Int, offset : Int, bundle: Bundle
-        ) : List<RadioStation> {
+            limit : Int, offset : Int) : List<RadioStation> {
 
            withContext(Dispatchers.IO) {
 
                val calcOffset = limit * offset
 
-               bundle.apply {
-
-                   val tag = getString("TAG") ?: ""
-                   val name = getString("NAME") ?: ""
-                   val country = getString("COUNTRY") ?: ""
-
-                   this.putInt("OFFSET", calcOffset)
 
                    val response = radioSource.getRadioStationsSource(
                        offset = calcOffset,
                        pageSize = limit,
-                       country = country,
-                       tag = tag,
-                       name = name
+                       country = lastSearchCountry,
+                       tag = lastSearchTag,
+                       name = lastSearchName
                    )
+
+                   if(isNewSearch && response?.size == 0){
+                       noResultDetection.postValue(true)
+                   } else {
+                       noResultDetection.postValue(false)
+                   }
 
                    response?.let {
 
@@ -168,7 +199,7 @@ class MainViewModel @Inject constructor(
                            )
                        }
                    }
-               }
+
 
                 if(isDelayNeededForServiceConnection){
                     delay(1000)
@@ -184,6 +215,7 @@ class MainViewModel @Inject constructor(
 
            radioServiceConnection.sendCommand(COMMAND_NEW_SEARCH, firstRunBundle)
 
+
            isNewSearch = false
 
            return listOfStations
@@ -192,11 +224,9 @@ class MainViewModel @Inject constructor(
 
 
 
-    private fun searchStationsPaging(
-        bundle: Bundle
-    ): Flow<PagingData<RadioStation>> {
+    private fun searchStationsPaging(): Flow<PagingData<RadioStation>> {
         val loader : StationsPageLoader = { pageIndex, pageSize ->
-            searchWithNewParams(pageSize, pageIndex, bundle)
+            searchWithNewParams(pageSize, pageIndex)
         }
 
         return Pager(
@@ -212,68 +242,28 @@ class MainViewModel @Inject constructor(
 
 
 
-    private val initialSearchBundle = Bundle().apply {
+    fun initiateNewSearch()  {
+        if(
+            lastSearchName == searchParamName.value &&
+            lastSearchTag == searchParamTag.value &&
+            lastSearchCountry == searchParamCountry.value
+        ) return
 
-        val tag = searchPreferences.getString(SEARCH_PREF_TAG, "")
-        val name = searchPreferences.getString(SEARCH_PREF_NAME, "")
-        val country = searchPreferences.getString(SEARCH_PREF_COUNTRY, "")
+                isNewSearch = true
+                lastSearchName = searchParamName.value ?: ""
+                lastSearchTag = searchParamTag.value ?: ""
+                lastSearchCountry = searchParamCountry.value ?: ""
 
-        searchParamTag.postValue(tag ?: "")
-        searchParamName.postValue(name ?: "")
-        searchParamCountry.postValue(country ?: "")
-
-        putString("TAG", tag)
-        putString("NAME", name)
-        putString("COUNTRY", country)
-
-    }
-    private var lastSearchBundle = Bundle()
-    private var wasSearchInterrupted = false
-
-    private val searchBy : MutableLiveData<Bundle> = MutableLiveData()
-
-    init {
-        searchBy.postValue(initialSearchBundle)
-        viewModelScope.launch {
-            delay(600)
-            if(hasInternetConnection.value == false){
-                lastSearchBundle = initialSearchBundle
-                wasSearchInterrupted = true
-            }
-            this.cancel()
-        }
-    }
-
-
-
-    val stationsFlow = searchBy.asFlow()
-        .flatMapLatest {
-            searchStationsPaging(it)
-        }
-        .cachedIn(viewModelScope)
-
-
-    fun setSearchBy(value : Bundle) : Boolean {
-
-        searchBy.value?.let {
-        if(it.getString("TAG") == value.getString("TAG")
-            && it.getString("NAME") == value.getString("NAME")
-            && it.getString("COUNTRY") == value.getString("COUNTRY")
-
-        )  return false
 
                 if(hasInternetConnection.value == true){
-                    searchBy.postValue(value)
-                    return true
+
+                    searchBy.postValue(true)
+
                 } else {
-                    lastSearchBundle = value
                     wasSearchInterrupted = true
                 }
-        }
-            return false
+
     }
-
-
 
 
         fun playOrToggleStation(station : RadioStation, searchFlag : Int = 0) {

@@ -77,9 +77,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         setOnSaveOptionsClickListener()
 
-//        setLayoutAnimationController()
-//
-//        setRecyclerChildrenAttachListener()
+        setLayoutAnimationController()
+
+        setRecyclerChildrenAttachListener()
     }
 
     private fun setLayoutAnimationController (){

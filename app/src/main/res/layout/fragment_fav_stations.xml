@@ -7,6 +7,30 @@
     android:animateLayoutChanges="true">
 
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvPlaylists"
+        android:layout_width="0dp"
+        android:layout_height="130dp"
+        android:layout_gravity="bottom"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ivArrowBackToFav"
+        app:layout_constraintTop_toBottomOf="@id/simpleView"
+
+        />
+
+    <View
+        android:id="@+id/simpleView"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/toolbar"
+
+        />
+
     <TextView
         android:id="@+id/tvPlaylistName"
         android:layout_width="0dp"
@@ -19,7 +43,7 @@
         app:layout_constraintEnd_toStartOf="@id/tvPlaylistEdit"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:elevation="2dp"
+
         />
 
     <ImageView
@@ -30,7 +54,7 @@
         android:src="@drawable/ic_playlists_arrow_expand"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:elevation="2dp"
+
         />
 
     <ImageView
@@ -42,7 +66,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:elevation="2dp"
+
         />
 
     <TextView
@@ -57,7 +81,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:elevation="2dp"
+
         />
 
 
@@ -71,20 +95,10 @@
         android:textAppearance="@style/mainTextButtons"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:elevation="2dp"
+
         />
 
-    <View
-        android:id="@+id/simpleView"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/toolbar"
-        android:elevation="1dp"
-        />
+
 
 
     <ImageView
@@ -98,17 +112,6 @@
         app:layout_constraintTop_toTopOf="@+id/rvPlaylists" />
 
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvPlaylists"
-        android:layout_width="0dp"
-        android:layout_height="130dp"
-        android:layout_gravity="bottom"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/ivArrowBackToFav"
-        app:layout_constraintTop_toBottomOf="@id/simpleView"
-        android:elevation="0dp"
-        />
 
 
     <androidx.recyclerview.widget.RecyclerView

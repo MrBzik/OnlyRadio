@@ -335,11 +335,13 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 mainAdapter.currentRadioStationName = name
             }
 
+            layoutAnimation = (activity as MainActivity).layoutAnimationController
+
             if(mainViewModel.isFavouriteAnimationToPlay){
                 post {
                     scheduleLayoutAnimation()
                 }
-                mainViewModel.isFavouriteAnimationToPlay = false
+//                mainViewModel.isFavouriteAnimationToPlay = false
             }
 
 
