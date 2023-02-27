@@ -28,6 +28,8 @@ object Constants {
     const val NETWORK_ERROR = "network error"
 
     const val COMMAND_NEW_SEARCH = "new search"
+    const val COMMAND_START_RECORDING = "start exoRecord recording"
+    const val COMMAND_STOP_RECORDING = "stop exoRecord recording"
 
     const val COMMAND_LOAD_FROM_PLAYLIST = "load from playlist"
 

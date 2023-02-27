@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
@@ -25,6 +26,8 @@ import com.example.radioplayer.utils.Constants.COMMAND_LOAD_FROM_PLAYLIST
 import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Constants.NETWORK_ERROR
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
+import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
+import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
@@ -33,11 +36,19 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
+import com.google.android.exoplayer2.extractor.ogg.OggExtractor
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
+import com.google.android.exoplayer2.upstream.DataSource
+import com.google.android.exoplayer2.upstream.DataSpec
 import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
+import com.google.android.exoplayer2.upstream.FileDataSource
 import dagger.hilt.android.AndroidEntryPoint
+import dev.brookmg.exorecord.lib.ExoRecord
+import dev.brookmg.exorecord.lib.IExoRecord
+import dev.brookmg.exorecordogg.ExoRecordOgg
 import kotlinx.coroutines.*
+import java.io.File
 import javax.inject.Inject
 
 
@@ -58,6 +69,9 @@ class RadioService : MediaBrowserServiceCompat() {
 
     @Inject
     lateinit var glide : RequestManager
+
+    @Inject
+    lateinit var exoRecord: ExoRecord
 
     private val serviceJob = Job()
 
@@ -164,6 +178,19 @@ class RadioService : MediaBrowserServiceCompat() {
                     searchRadioStations(isNewSearch)
 
                 }
+
+                COMMAND_START_RECORDING -> {
+
+                    if(isExoRecordListenerToSet){
+                        setExoRecordListener()
+                    }
+                    startRecording()
+                }
+
+                COMMAND_STOP_RECORDING -> {
+                    stopRecording()
+                }
+
             }
 
         })
@@ -184,9 +211,66 @@ class RadioService : MediaBrowserServiceCompat() {
 
         radioSource.subscribeToFavouredStations.observeForever(observerForDatabase)
 
+//        serviceScope.launch {
+//            delay(10000)
+//            withContext(Dispatchers.Main){
+//                playRecorded()
+//            }
+//        }
 
 
     }
+
+
+    private val exoRecordListener = object : ExoRecord.ExoRecordListener{
+
+        override fun onStartRecording(recordFileName: String) {
+
+            radioSource.exoRecordState.postValue(true)
+        }
+        override fun onStopRecording(record: IExoRecord.Record) {
+
+            radioSource.exoRecordState.postValue(false)
+
+            val converter = ExoRecordOgg.convertFile(
+                this@RadioService.application,
+                record.filePath,
+                44_100,
+                2,
+                1f){ progress ->
+
+                if(progress == 100.0f){
+                    Log.d("CHECKTAGS", "over")
+                    try {
+                        deleteFile(record.filePath)
+                    } catch (e: java.lang.Exception){
+                        Log.d("CHECKTAGS", e.stackTraceToString())
+                    }
+                }
+            }
+        }
+    }
+
+    private var isExoRecordListenerToSet = true
+
+    private fun setExoRecordListener(){
+        exoRecord.addExoRecordListener("MainListener", exoRecordListener)
+        isExoRecordListenerToSet = false
+    }
+
+
+    private fun startRecording () = serviceScope.launch {
+        exoRecord.startRecording()
+    }
+
+    private fun stopRecording () = serviceScope.launch {
+       exoRecord.stopRecording()
+
+    }
+
+
+
+
 
 
    private inner class RadioQueueNavigator : TimelineQueueNavigator(mediaSession){
@@ -197,7 +281,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
              return it.description
 
-           } ?: return radioSource.stations[windowIndex].description
+           } ?: return radioSource.stations.first().description
 
        }
    }
@@ -217,6 +301,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
       val mediaItem = MediaItem.fromUri(uri.toUri())
 
+
+
       val mediaSource = if(uri.contains("m3u8")) {
           HlsMediaSource.Factory(dataSourceFactory)
               .createMediaSource(mediaItem)
@@ -230,9 +316,27 @@ class RadioService : MediaBrowserServiceCompat() {
         exoPlayer.playWhenReady = playNow
 
 
-
 //        exoPlayer.setMediaSource(radioSource.asMediaSource(dataSourceFactory))
 //        exoPlayer.seekTo(curStationIndex, 0L)
+
+    }
+
+
+    private fun playRecorded(){
+
+
+      val mediaItem = MediaItem.fromUri("${this.filesDir.path}/radio-1889320320851258.ogg")
+
+
+
+        val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(mediaItem)
+
+
+        exoPlayer.setMediaSource(mediaSource)
+        exoPlayer.prepare()
+        exoPlayer.playWhenReady = true
+
 
 
     }
@@ -258,6 +362,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
         serviceScope.cancel()
         radioSource.subscribeToFavouredStations.removeObserver(observerForDatabase)
+
+        exoRecord.removeExoRecordListener("MainListener")
 
         exoPlayer.removeListener(radioPlayerEventListener)
         exoPlayer.release()

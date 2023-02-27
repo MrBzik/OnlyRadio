@@ -17,6 +17,8 @@ import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
+import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
+import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
 import com.example.radioplayer.utils.Constants.FAB_POSITION_X
 import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
@@ -285,6 +287,19 @@ class MainViewModel @Inject constructor(
                     .playFromMediaId(station.stationuuid, bundleOf(Pair("SEARCH_FLAG", searchFlag)))
             }
         }
+
+
+        // ExoRecord
+
+        fun startRecording() {
+            radioServiceConnection.sendCommand(COMMAND_START_RECORDING, null)
+        }
+
+        fun stopRecording(){
+            radioServiceConnection.sendCommand(COMMAND_STOP_RECORDING, null)
+        }
+
+        var exoRecordState = radioSource.exoRecordState
 
 
 //    private fun getCountries() = viewModelScope.launch {

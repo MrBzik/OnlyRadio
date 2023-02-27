@@ -3,6 +3,7 @@ package com.example.radioplayer.ui.fragments
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
@@ -20,6 +21,8 @@ import com.example.radioplayer.ui.dialogs.AddStationToPlaylistDialog
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import dev.brookmg.exorecord.lib.ExoRecord
+import dev.brookmg.exorecord.lib.IExoRecord
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -42,6 +45,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     private var isFavoured = false
 
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -58,7 +62,48 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         endLoadingBarIfNeeded()
 
         addToFavClickListener()
+
+        setupRecordingButton()
+
+        observeExoRecordState()
+
     }
+
+
+    private fun setupRecordingButton(){
+
+        setFabRecordListener()
+
+    }
+
+
+    private var isRecording = false
+
+    private fun observeExoRecordState(){
+
+        mainViewModel.exoRecordState.observe(viewLifecycleOwner){
+
+            if(it){
+                 isRecording = true
+                 bind.fabRecording.setImageResource(R.drawable.ic_stop_recording)
+            } else {
+                isRecording = false
+                bind.fabRecording.setImageResource(R.drawable.ic_start_recording)
+            }
+
+        }
+    }
+
+    private fun setFabRecordListener(){
+        bind.fabRecording.setOnClickListener{
+            if(isRecording){
+                mainViewModel.stopRecording()
+            } else {
+                mainViewModel.startRecording()
+            }
+        }
+    }
+
 
     private fun endLoadingBarIfNeeded(){
         (activity as MainActivity).separatorLeftAnim.endLoadingAnim()
@@ -221,6 +266,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     override fun onDestroyView() {
         super.onDestroyView()
+
         _bind = null
     }
 

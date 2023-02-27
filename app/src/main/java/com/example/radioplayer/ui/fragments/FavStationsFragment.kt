@@ -337,14 +337,9 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             layoutAnimation = (activity as MainActivity).layoutAnimationController
 
-            if(mainViewModel.isFavouriteAnimationToPlay){
                 post {
                     scheduleLayoutAnimation()
                 }
-//                mainViewModel.isFavouriteAnimationToPlay = false
-            }
-
-
         }
     }
 

@@ -122,7 +122,7 @@ class CountryPickerDialog(
         bind.tvClearSelection.setOnClickListener{
 
             mainViewModel.searchParamCountry.postValue("")
-
+            mainViewModel.searchFullCountryName = ""
             dismiss()
         }
     }

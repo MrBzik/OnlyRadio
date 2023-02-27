@@ -77,9 +77,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         setOnSaveOptionsClickListener()
 
-        setLayoutAnimationController()
+//        setLayoutAnimationController()
 
-        setRecyclerChildrenAttachListener()
+//        setRecyclerChildrenAttachListener()
     }
 
     private fun setLayoutAnimationController (){
@@ -208,12 +208,14 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 mainViewModel.newRadioStation.value?.let { currentRadioStationID = it.stationuuid}
             }
 
+            layoutAnimation = (activity as MainActivity).layoutAnimationController
 
+            post {
+                    scheduleLayoutAnimation()
+                }
 
 //            if(mainViewModel.isHistoryAnimationToPlay){
-//                post {
-//                    startLayoutAnimation()
-//                }
+//
 //
 //                mainViewModel.isHistoryAnimationToPlay = false
 //

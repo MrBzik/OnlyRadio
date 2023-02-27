@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.relations.DateWithStations
@@ -34,6 +35,8 @@ class RadioSource @Inject constructor(
     var stationsFromPlaylist = mutableListOf<MediaMetadataCompat>()
 
     var stationsFromHistory = mutableListOf<MediaMetadataCompat>()
+
+    var exoRecordState : MutableLiveData<Boolean> = MutableLiveData(false)
 
 
     suspend fun getAllCountries() = radioApi.getAllCountries()
