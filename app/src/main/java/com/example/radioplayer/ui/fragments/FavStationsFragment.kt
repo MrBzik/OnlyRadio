@@ -8,6 +8,7 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +18,7 @@ import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PlaylistsAdapter
 import com.example.radioplayer.adapters.RadioDatabaseAdapter
 import com.example.radioplayer.data.local.entities.Playlist
+import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.databinding.FragmentFavStationsBinding
 import com.example.radioplayer.exoPlayer.isPlayEnabled
@@ -32,7 +34,12 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
+
+
 
 @AndroidEntryPoint
 class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
@@ -222,8 +229,14 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             }
 
             setPlaylistClickListener { playlist, position ->
-                databaseViewModel.subscribeToStationsInPlaylist(playlist.playlistName)
-                currentPlaylistPosition = position
+
+                if(
+                   !isInFavouriteTab && playlist.playlistName == currentPlaylistName
+                        ) {/*DO NOTHING*/ }
+                else {
+                    databaseViewModel.subscribeToStationsInPlaylist(playlist.playlistName)
+                    currentPlaylistPosition = position
+                }
             }
 
             handleDragAndDrop = { stationID, playlistName ->
@@ -234,9 +247,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
                 }
                     else {
-                    databaseViewModel.deleteStationPlaylistCrossRef(StationPlaylistCrossRef(
-                        stationID, currentPlaylistName))
-
+                    databaseViewModel.deleteStationPlaylistCrossRef(
+                        stationID, currentPlaylistName)
                     }
 
                 insertStationInPlaylist(stationID, playlistName)
@@ -262,11 +274,45 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         databaseViewModel.observableListOfStations.observe(viewLifecycleOwner){
 
-            mainAdapter.listOfStations = it
+            mainAdapter.listOfStations = it.toMutableList()
 
         }
 
+        observePlaylist()
+
     }
+
+    private fun observePlaylist(){
+        databaseViewModel.stationsInPlaylist.observe(viewLifecycleOwner){ playlist ->
+            playlist?.radioStations?.let { stations ->
+                sortStationsInPlaylist(stations)
+               }
+            }
+        }
+
+
+    private fun sortStationsInPlaylist(stations : List<RadioStation>){
+
+        lifecycleScope.launch {
+
+            val result: MutableList<RadioStation> = mutableListOf()
+
+            val stationIndexMap = stations.withIndex().associate { it.value.stationuuid to it.index }
+
+            val order = databaseViewModel.getPlaylistOrder(currentPlaylistName)
+
+            order.forEach { crossref ->
+                val index = stationIndexMap[crossref.stationuuid]
+                if (index != null) {
+                    result.add(stations[index])
+                }
+            }
+            databaseViewModel.playlist.postValue(result)
+        }
+    }
+
+
+
 
     private fun observeFavOrPlaylistState(){
 
@@ -336,7 +382,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             }
 
             layoutAnimation = (activity as MainActivity).layoutAnimationController
-
                 post {
                     scheduleLayoutAnimation()
                 }
@@ -370,56 +415,62 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val position = viewHolder.layoutPosition
             val stationID = mainAdapter.listOfStations[position].stationuuid
-
+            val favouredAt =  mainAdapter.listOfStations[position].favouredAt
             if(databaseViewModel.isInFavouriteTab.value!!){
-                handleSwipeOnFavStation(stationID)
+                handleSwipeOnFavStation(stationID, favouredAt)
             } else{
                 handleSwipeOnPlaylistStation(stationID)
             }
         }
     }
 
-    private fun handleSwipeOnFavStation(stationID : String){
+    private fun handleSwipeOnFavStation(stationID : String, favouredAt : Long){
 
         databaseViewModel.updateIsFavouredState(0, stationID).also{
             Snackbar.make(
                 requireActivity().findViewById(R.id.rootLayout),
                 "Station removed from favs", Snackbar.LENGTH_LONG
             ).apply {
+
                 setAction("UNDO"){
-                    databaseViewModel.updateIsFavouredState(System.currentTimeMillis(), stationID)
+                    databaseViewModel.updateIsFavouredState(favouredAt, stationID)
                 }
             }.show()
         }
     }
 
+
+
     private fun handleSwipeOnPlaylistStation(stationID : String){
+        val playlistName = currentPlaylistName
+        lifecycleScope.launch {
+            val timeOfInsertion = databaseViewModel.getTimeOfStationPlaylistInsertion(stationID, playlistName)
+            databaseViewModel.deleteStationPlaylistCrossRef(stationID, playlistName)
+            withContext(Dispatchers.Main){
+                Snackbar.make(
+                    requireActivity().findViewById(R.id.rootLayout),
+                    "Station removed from $playlistName", Snackbar.LENGTH_LONG
+                ).apply {
+                    setAction("UNDO"){
+                        databaseViewModel.insertStationPlaylistCrossRef(
+                            StationPlaylistCrossRef(
+                                stationID, playlistName, timeOfInsertion
+                            )
+                        )
+                    }
 
-        databaseViewModel.deleteStationPlaylistCrossRef(
-            StationPlaylistCrossRef(stationID, currentPlaylistName)
-        )
-
-        Snackbar.make(
-            requireActivity().findViewById(R.id.rootLayout),
-            "Station removed from $currentPlaylistName", Snackbar.LENGTH_LONG
-        ).apply {
-            setAction("UNDO"){
-
-                databaseViewModel.insertStationPlaylistCrossRefAndUpdate(
-                    StationPlaylistCrossRef(stationID, currentPlaylistName),
-                    currentPlaylistName
-                )
+                }.show()
             }
-        }.show()
+        }
     }
 
 
     private fun insertStationInPlaylist(stationID: String, playlistName : String){
 
-            databaseViewModel.insertStationPlaylistCrossRefAndUpdate(
+            databaseViewModel.insertStationPlaylistCrossRef(
                 StationPlaylistCrossRef(
-                    stationID, playlistName
-                ), currentPlaylistName
+                    stationID, playlistName, System.currentTimeMillis()
+                )
             )
 
             Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),

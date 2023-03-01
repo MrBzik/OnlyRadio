@@ -10,6 +10,7 @@ import androidx.room.Transaction
 import com.example.radioplayer.data.local.entities.HistoryDate
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
+import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.data.local.relations.DateWithStations
 import com.example.radioplayer.data.local.relations.PlaylistWithStations
 import com.example.radioplayer.data.local.relations.StationDateCrossRef
@@ -53,17 +54,24 @@ interface  RadioDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStationPlaylistCrossRef(stationPlaylistCrossRef: StationPlaylistCrossRef)
 
-    @Delete
-    suspend fun deleteStationPlaylistCrossRef(stationPlaylistCrossRef: StationPlaylistCrossRef)
+    @Query("SELECT addedAt FROM stationplaylistcrossref WHERE stationuuid =:stationID AND playlistName=:playlistName")
+    suspend fun getTimeOfStationPlaylistInsertion(stationID : String, playlistName : String) : Long
+
+
+    @Query("DELETE FROM StationPlaylistCrossRef WHERE stationuuid =:stationID AND playlistName =:playlistName")
+    suspend fun deleteStationPlaylistCrossRef(stationID : String, playlistName : String)
 
     @Transaction
     @Query("SELECT * FROM Playlist WHERE playlistName =:playlistName LIMIT 1")
     suspend fun getStationsInPlaylist(playlistName : String) : PlaylistWithStations?
 
+
     @Transaction
     @Query("SELECT * FROM Playlist WHERE playlistName =:playlistName LIMIT 1")
     fun subscribeToStationsInPlaylist(playlistName : String) : LiveData<PlaylistWithStations?>
 
+    @Query("SELECT * FROM StationPlaylistCrossRef WHERE playlistName =:playlistName ORDER BY addedAt DESC")
+    suspend fun subscribeToPlaylistOrder(playlistName: String) : List<StationPlaylistCrossRef>
 
     @Query("DELETE FROM StationPlaylistCrossRef WHERE playlistName =:playlistName")
     suspend fun deleteAllCrossRefOfPlaylist(playlistName: String)
@@ -130,5 +138,23 @@ interface  RadioDAO {
     //test
     @Query("SELECT COUNT(stationuuid) FROM RadioStation")
     suspend fun getAllStations() : Int
+
+
+    // Recordings
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertRecording(recording : Recording)
+
+    @Query("SELECT * FROM Recording ORDER BY timeStamp DESC")
+    fun getAllRecordings() : LiveData<List<Recording>>
+
+    @Query("SELECT * FROM Recording WHERE id =:id LIMIT 1")
+    suspend fun getCurrentRecording(id : String) : Recording
+
+    @Delete
+    suspend fun deleteRecording(rec : Recording)
+
+    @Query("UPDATE Recording SET duration=:duration WHERE id =:id")
+    suspend fun updateRecordingDuration(duration : String, id : String)
 
 }

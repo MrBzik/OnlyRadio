@@ -9,11 +9,12 @@
 
 
     <TextView
-        android:id="@+id/ivAddToPlaylist"
+        android:id="@+id/tvAddToPlaylist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="Add to playlist"
+        android:visibility="gone"
         android:textAppearance="@style/mainTextButtons"
         app:layout_constraintEnd_toStartOf="@+id/ivArrowAddToPlaylist"
         app:layout_constraintTop_toTopOf="parent" />
@@ -23,6 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:visibility="gone"
         android:src="@drawable/ic_arrow_drop_down"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -53,16 +55,28 @@
         app:layout_constraintTop_toBottomOf="@+id/tvName" />
 
     <TextView
+        android:id="@+id/tvHomePage"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="Homepage"
+        android:visibility="gone"
+        android:gravity="center_vertical"
+        android:textAppearance="@style/mainTextButtons"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivIcon"/>
+
+    <TextView
         android:id="@+id/tvCountry"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:visibility="gone"
         android:textAppearance="@style/detailsTextExtras"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivIcon" />
+        app:layout_constraintTop_toBottomOf="@+id/tvHomePage" />
 
     <TextView
         android:id="@+id/tvLanguage"
@@ -90,7 +104,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvLanguage"
-        app:layout_constraintBottom_toTopOf="@id/fabStationHomePage"
+        app:layout_constraintBottom_toTopOf="@id/fabAddToFav"
         >
 
         <TextView
@@ -103,23 +117,13 @@
     </ScrollView>
 
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabStationHomePage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginBottom="40dp"
-        android:src="@drawable/ic_station_home_page"
-        app:backgroundTint="@color/floating_buttons"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddToFav"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="30dp"
+        android:visibility="gone"
         android:layout_marginBottom="40dp"
         app:backgroundTint="@color/floating_buttons"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -129,11 +133,23 @@
         android:id="@+id/fabRecording"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
         android:layout_marginBottom="40dp"
         app:backgroundTint="@color/floating_buttons"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/fabAddToFav"
-        app:layout_constraintStart_toEndOf="@+id/fabStationHomePage" />
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/tvTimer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:visibility="gone"
+        android:text="00:00:00"
+        android:textAppearance="@style/dialogCurrentValue"
+        app:layout_constraintBottom_toBottomOf="@+id/fabRecording"
+        app:layout_constraintStart_toEndOf="@+id/fabRecording"
+        app:layout_constraintTop_toTopOf="@+id/fabRecording" />
 
 
 

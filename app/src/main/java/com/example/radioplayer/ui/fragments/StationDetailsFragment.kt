@@ -3,26 +3,23 @@ package com.example.radioplayer.ui.fragments
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
-import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
+import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
+import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.databinding.FragmentStationDetailsBinding
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.dialogs.AddStationToPlaylistDialog
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import dev.brookmg.exorecord.lib.ExoRecord
-import dev.brookmg.exorecord.lib.IExoRecord
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -41,6 +38,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     lateinit var glide : RequestManager
 
     private var currentRadioStation : RadioStation? = null
+    private var currentRecording : Recording? = null
 
     private var isFavoured = false
 
@@ -52,22 +50,47 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         pixabayViewModel = ViewModelProvider(requireActivity())[PixabayViewModel::class.java]
 
-
-        subscribeToObservers()
-
-        setAddToPlaylistClickListener()
-
-        setFabStationHomePageClickListener()
+        checkIfRadioOrRecordAndCallFunctions()
 
         endLoadingBarIfNeeded()
 
-        addToFavClickListener()
+    }
 
-        setupRecordingButton()
+    private fun checkIfRadioOrRecordAndCallFunctions(){
 
-        observeExoRecordState()
+        mainViewModel.newRadioStation.value?.let {
+
+            if(it is PlayingItem.FromRadio){
+                observeIfNewStationFavoured()
+                updateUiForRadioStation(it.radioStation)
+                updateListOfPlaylists()
+                setAddToPlaylistClickListener()
+                setFabStationHomePageClickListener()
+                addToFavClickListener()
+                setupRecordingButton()
+                observeExoRecordState()
+
+            } else if(it is PlayingItem.FromRecordings){
+                updateUiForRecording(it.recording)
+            }
+
+
+
+
+        }
 
     }
+
+    private fun updateUiForRecording(recording: Recording){
+
+        bind.tvName.text = recording.name
+        glide
+            .load(recording.iconUri)
+            .transition(DrawableTransitionOptions.withCrossFade())
+            .into(bind.ivIcon)
+    }
+
+
 
 
     private fun setupRecordingButton(){
@@ -78,6 +101,9 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
 
     private var isRecording = false
+    private var isTimerObserverSet = false
+    private var isConverterCallbackSet = false
+    private var durationOfRecording = ""
 
     private fun observeExoRecordState(){
 
@@ -85,12 +111,49 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
             if(it){
                  isRecording = true
-                 bind.fabRecording.setImageResource(R.drawable.ic_stop_recording)
-            } else {
-                isRecording = false
-                bind.fabRecording.setImageResource(R.drawable.ic_start_recording)
-            }
 
+                 bind.tvTimer.visibility = View.VISIBLE
+
+                 if(!isTimerObserverSet){
+                     mainViewModel.exoRecordTimer.observe(viewLifecycleOwner){ time ->
+                         bind.tvTimer.text = time
+                     }
+                     isTimerObserverSet = true
+                 }
+
+
+                 bind.fabRecording.setImageResource(R.drawable.ic_stop_recording)
+
+                 val id = (mainViewModel.radioSource.newExoRecord)
+                 val name = "Rec. ${currentRadioStation?.name}"
+                 databaseViewModel.insertNewRecording(
+                     id,
+                     currentRadioStation?.favicon ?: "",
+                     name,
+                     "00:00:00"
+                 )
+
+
+            } else {
+
+                durationOfRecording = bind.tvTimer.text.toString()
+                bind.tvTimer.text = "Processing..."
+                bind.fabRecording.setImageResource(R.drawable.ic_start_recording)
+
+                if(!isConverterCallbackSet){
+                    mainViewModel.exoRecordFinishConverting.observe(viewLifecycleOwner){ finished ->
+                        if(finished){
+                            bind.tvTimer.text = "Saved"
+                            isRecording = false
+                            databaseViewModel
+                                .updateRecordingDuration(
+                                    durationOfRecording,
+                                mainViewModel.radioSource.newExoRecord)
+                        }
+                    }
+                    isConverterCallbackSet = true
+                }
+            }
         }
     }
 
@@ -110,15 +173,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         (activity as MainActivity).separatorRightAnim.endLoadingAnim()
     }
 
-    private fun subscribeToObservers(){
-
-        observeCurrentStationAndUpdateUI()
-
-        observeIfNewStationFavoured()
-
-        updateListOfPlaylists()
-
-    }
 
 
     private fun observeIfNewStationFavoured(){
@@ -128,7 +182,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             paintButtonAddToFav(it)
 
             isFavoured = it
-
 
         }
     }
@@ -150,39 +203,45 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     }
 
 
-    private fun observeCurrentStationAndUpdateUI(){
+    private fun updateUiForRadioStation(station : RadioStation){
 
-        mainViewModel.newRadioStation.observe(viewLifecycleOwner){
+            homepageUrl = station.homepage
+            if(!homepageUrl.isNullOrBlank()){
+                bind.tvHomePage.visibility = View.VISIBLE
+            }
 
-            checkIfStationFavoured(it)
+            bind.fabAddToFav.visibility = View.VISIBLE
+            bind.fabRecording.visibility = View.VISIBLE
+            bind.tvAddToPlaylist.visibility = View.VISIBLE
+            bind.ivArrowAddToPlaylist.visibility = View.VISIBLE
 
-            currentRadioStation = it
 
-            bind.tvName.text = it.name
+            checkIfStationFavoured(station)
+
+            currentRadioStation = station
+
+            bind.tvName.text = station.name
 
             glide
-                .load(it.favicon)
+                .load(station.favicon)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(bind.ivIcon)
 
-            homepageUrl = it.homepage
-
-
-            if(!it.country.isNullOrBlank()){
+            if(!station.country.isNullOrBlank()){
                 bind.tvCountry.isVisible = true
-                bind.tvCountry.text = it.country
+                bind.tvCountry.text = station.country
             }
 
-            if(!it.language.isNullOrBlank()){
+            if(!station.language.isNullOrBlank()){
                 bind.tvLanguage.isVisible = true
-                bind.tvLanguage.text = "Languages : ${it.language}"
+                bind.tvLanguage.text = "Languages : ${station.language}"
             }
-            if(!it.tags.isNullOrBlank()){
+            if(!station.tags.isNullOrBlank()){
                 bind.svTvTags.isVisible = true
-                val tags = it.tags.replace(",", ", ")
+                val tags = station.tags.replace(",", ", ")
                 bind.tvTags.text = "Tags : $tags"
             }
-        }
+
     }
 
 
@@ -197,9 +256,9 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     private fun setFabStationHomePageClickListener(){
 
-        bind.fabStationHomePage.setOnClickListener {
+        bind.tvHomePage.setOnClickListener {
 
-            if(homepageUrl != "null") {
+            if(!homepageUrl.isNullOrBlank()) {
                 val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(homepageUrl))
                 startActivity(webIntent)
             }
@@ -208,13 +267,11 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     private fun setAddToPlaylistClickListener(){
 
-        bind.ivAddToPlaylist.setOnClickListener {
+        bind.tvAddToPlaylist.setOnClickListener {
             AddStationToPlaylistDialog(
                 requireContext(), listOfPlaylists, databaseViewModel, pixabayViewModel, glide
             ) { playlistName ->
-
                 insertStationInPlaylist(playlistName)
-
             }.show()
         }
 
@@ -252,10 +309,10 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         currentRadioStation?.let { station ->
 
-            databaseViewModel.insertStationPlaylistCrossRefAndUpdate(
+            databaseViewModel.insertStationPlaylistCrossRef(
                 StationPlaylistCrossRef(
-                    station.stationuuid, playlistName
-                ), playlistName
+                    station.stationuuid, playlistName, System.currentTimeMillis()
+                )
             )
 
             Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
@@ -266,7 +323,8 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     override fun onDestroyView() {
         super.onDestroyView()
-
+        isTimerObserverSet = false
+        isConverterCallbackSet = false
         _bind = null
     }
 

@@ -99,6 +99,7 @@
       android:background="@color/toolbar"
       android:padding="5dp"
       app:itemPaddingBottom="13dp"
+      app:labelVisibilityMode="labeled"
       app:itemTextAppearanceActive="@style/bottomNavTextActive"
       app:itemTextAppearanceInactive="@style/bottomNavTextInactive"
       app:layout_constraintBottom_toTopOf="@id/separatorLowest"

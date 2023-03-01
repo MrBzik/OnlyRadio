@@ -2,7 +2,6 @@ package com.example.radioplayer.ui.viewmodels
 
 import android.app.Application
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.*
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -14,7 +13,7 @@ import com.example.radioplayer.adapters.models.StationWithDateModel
 import com.example.radioplayer.data.local.entities.HistoryDate
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
-import com.example.radioplayer.data.local.relations.PlaylistWithStations
+import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.data.local.relations.StationDateCrossRef
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.exoPlayer.RadioSource
@@ -71,16 +70,18 @@ class DatabaseViewModel @Inject constructor(
     }
 
 
-    fun insertStationPlaylistCrossRefAndUpdate(
-                    crossRef: StationPlaylistCrossRef,
-                    playlistName : String
+    fun insertStationPlaylistCrossRef(
+                    crossRef: StationPlaylistCrossRef
                     ) = viewModelScope.launch {
         repository.insertStationPlaylistCrossRef(crossRef)
 
     }
 
-    fun deleteStationPlaylistCrossRef(crossRef: StationPlaylistCrossRef) = viewModelScope.launch {
-        repository.deleteStationPlaylistCrossRef(crossRef)
+    suspend fun getTimeOfStationPlaylistInsertion(stationID : String, playlistName : String)
+            = repository.getTimeOfStationPlaylistInsertion(stationID, playlistName)
+
+    fun deleteStationPlaylistCrossRef(stationID: String, playlistName: String) = viewModelScope.launch {
+        repository.deleteStationPlaylistCrossRef(stationID, playlistName)
     }
 
 
@@ -91,35 +92,51 @@ class DatabaseViewModel @Inject constructor(
     private val stationInFavoured = repository.getAllFavouredStations()
 
 
-    private var stationsInPlaylist = Transformations.switchMap(
-        currentPlaylistName) { v ->
-                repository.subscribeToStationsInPlaylist(v)
-        }
+//     var stationsPlaylistOrder = Transformations.switchMap(
+//        currentPlaylistName) { playlistName ->
+//
+//        repository.subscribeToPlaylistOrder(playlistName)
+//
+//
+//    }
 
+
+    suspend fun getPlaylistOrder(playlistName: String) = repository.getPlaylistOrder(playlistName)
+
+
+     var stationsInPlaylist = Transformations.switchMap(
+        currentPlaylistName) { playlistName ->
+//                Log.d("CHECKTAGS", "in playlist")
+                repository.subscribeToStationsInPlaylist(playlistName)
+        }
 
 
     var isInFavouriteTab: MutableLiveData<Boolean> = MutableLiveData(true)
 
-
     val observableListOfStations = MediatorLiveData<List<RadioStation>>()
+
+
+    val playlist : MutableLiveData<List<RadioStation>> = MutableLiveData()
 
 
     init {
 
         observableListOfStations.addSource(stationInFavoured) { favStations ->
-            if (isInFavouriteTab.value!!) {
+            if (isInFavouriteTab.value == true) {
                 observableListOfStations.value = favStations
 
             }
         }
-        observableListOfStations.addSource(stationsInPlaylist) { playlistStations ->
-            if (!isInFavouriteTab.value!!) {
-                observableListOfStations.value = playlistStations?.radioStations?.reversed()
+        observableListOfStations.addSource(playlist) { playlistStations ->
+            if (isInFavouriteTab.value == false) {
+                observableListOfStations.value = playlistStations
 
             }
         }
-
     }
+
+
+
 
 
     fun subscribeToStationsInPlaylist(playlistName: String)
@@ -343,4 +360,40 @@ class DatabaseViewModel @Inject constructor(
             isCleanUpNeeded = false
         }
     }
+
+
+    // Recordings
+
+    fun insertNewRecording (
+        recordID : String,
+        iconURI : String,
+        name : String,
+        duration : String
+        ) = viewModelScope.launch {
+            repository.insertRecording(
+                Recording(
+                    id = recordID,
+                    iconUri = iconURI,
+                    name = name,
+                    timeStamp = System.currentTimeMillis(),
+                    duration = duration)
+            )
+    }
+
+    fun insertNewRecording(rec : Recording) =
+        viewModelScope.launch {
+            repository.insertRecording(rec)
+        }
+
+
+    val allRecordingsLiveData = radioSource.allRecordingsLiveData
+
+    fun deleteRecording(rec : Recording) = viewModelScope.launch {
+        repository.deleteRecording(rec)
+    }
+
+    fun updateRecordingDuration(duration : String, id : String) = viewModelScope.launch {
+        repository.updateRecordingDuration(duration, id)
+    }
+
 }

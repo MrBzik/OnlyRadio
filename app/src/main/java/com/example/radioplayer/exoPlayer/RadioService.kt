@@ -5,6 +5,9 @@ import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
 import android.content.Intent
+import android.icu.text.DateFormat
+import android.icu.text.SimpleDateFormat
+import android.icu.util.TimeZone
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
@@ -18,6 +21,7 @@ import androidx.lifecycle.Observer
 import androidx.media.MediaBrowserServiceCompat
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.data.local.entities.RadioStation
+import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlaybackPreparer
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerNotificationListener
@@ -31,6 +35,8 @@ import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
+import com.example.radioplayer.utils.Utils
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -49,6 +55,9 @@ import dev.brookmg.exorecord.lib.IExoRecord
 import dev.brookmg.exorecordogg.ExoRecordOgg
 import kotlinx.coroutines.*
 import java.io.File
+import java.time.Duration
+import java.time.Instant
+import java.util.*
 import javax.inject.Inject
 
 
@@ -73,7 +82,7 @@ class RadioService : MediaBrowserServiceCompat() {
     @Inject
     lateinit var exoRecord: ExoRecord
 
-    private val serviceJob = Job()
+    private val serviceJob = SupervisorJob()
 
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
 
@@ -94,7 +103,9 @@ class RadioService : MediaBrowserServiceCompat() {
         radioSource.createMediaItemsFromDB(it)
     }
 
-
+    private val observerForRecordings = Observer<List<Recording>>{
+        radioSource.createMediaItemsFromRecordings(it)
+    }
 
     private fun searchRadioStations(
             isNewSearch : Boolean
@@ -155,6 +166,15 @@ class RadioService : MediaBrowserServiceCompat() {
                         true
                     )
                 }
+                SEARCH_FROM_RECORDINGS -> {
+                    preparePlayer(
+                        radioSource.recordings,
+                        itemToPlay,
+                        playNow = true,
+                        isFromRecordings = true
+                    )
+                }
+
                 else -> {
                     preparePlayer(
                         radioSource.stationsFromPlaylist,
@@ -210,13 +230,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
         radioSource.subscribeToFavouredStations.observeForever(observerForDatabase)
-
-//        serviceScope.launch {
-//            delay(10000)
-//            withContext(Dispatchers.Main){
-//                playRecorded()
-//            }
-//        }
+        radioSource.allRecordingsLiveData.observeForever(observerForRecordings)
 
 
     }
@@ -224,27 +238,48 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private val exoRecordListener = object : ExoRecord.ExoRecordListener{
 
-        override fun onStartRecording(recordFileName: String) {
+        lateinit var timer : Timer
 
+        override fun onStartRecording(recordFileName: String) {
+            radioSource.newExoRecord = recordFileName.replace(".wav", ".ogg")
             radioSource.exoRecordState.postValue(true)
+            radioSource.exoRecordFinishConverting.postValue(false)
+
+            timer = Timer()
+            timer.scheduleAtFixedRate(object : TimerTask() {
+                val startTime = System.currentTimeMillis()
+                override fun run() {
+                    val differance = (System.currentTimeMillis() - startTime)
+                    radioSource.exoRecordTimer.postValue(Utils.timerFormat(differance))
+                }
+            }, 0L, 1000L)
+
+
         }
         override fun onStopRecording(record: IExoRecord.Record) {
 
+            timer.cancel()
+            isConverterWorking = true
             radioSource.exoRecordState.postValue(false)
 
-            val converter = ExoRecordOgg.convertFile(
-                this@RadioService.application,
-                record.filePath,
-                44_100,
-                2,
-                1f){ progress ->
+            CoroutineScope(Dispatchers.IO).launch {
+                val converter = ExoRecordOgg.convertFile(
+                    this@RadioService.application,
+                    record.filePath,
+                    44_100,
+                    2,
+                    0.4f){ progress ->
 
-                if(progress == 100.0f){
-                    Log.d("CHECKTAGS", "over")
-                    try {
-                        deleteFile(record.filePath)
-                    } catch (e: java.lang.Exception){
-                        Log.d("CHECKTAGS", e.stackTraceToString())
+                    if(progress == 100.0f){
+                        Log.d("CHECKTAGS", "over")
+                        try {
+                            deleteFile(record.filePath)
+                            isConverterWorking = false
+                            radioSource.exoRecordFinishConverting.postValue(true)
+                        } catch (e: java.lang.Exception){
+                            Log.d("CHECKTAGS", e.stackTraceToString())
+                        }
+                        this.cancel()
                     }
                 }
             }
@@ -253,6 +288,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private var isExoRecordListenerToSet = true
 
+    private var isConverterWorking = false
+
     private fun setExoRecordListener(){
         exoRecord.addExoRecordListener("MainListener", exoRecordListener)
         isExoRecordListenerToSet = false
@@ -260,12 +297,15 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
     private fun startRecording () = serviceScope.launch {
-        exoRecord.startRecording()
+        if(!isConverterWorking){
+            exoRecord.startRecording()
+        }
     }
 
     private fun stopRecording () = serviceScope.launch {
-       exoRecord.stopRecording()
-
+       if(!isConverterWorking){
+           exoRecord.stopRecording()
+       }
     }
 
 
@@ -289,7 +329,8 @@ class RadioService : MediaBrowserServiceCompat() {
     private fun preparePlayer(
         stations : List<MediaMetadataCompat>,
         itemToPlay : MediaMetadataCompat?,
-        playNow : Boolean
+        playNow : Boolean,
+        isFromRecordings : Boolean = false
     ){
 
 
@@ -299,9 +340,12 @@ class RadioService : MediaBrowserServiceCompat() {
           ""
       }
 
-      val mediaItem = MediaItem.fromUri(uri.toUri())
-
-
+       val mediaItem = if(isFromRecordings){
+           val uriOgg = "${this.filesDir.path}/$uri"
+           MediaItem.fromUri(uriOgg.toUri())
+       } else {
+           MediaItem.fromUri(uri.toUri())
+       }
 
       val mediaSource = if(uri.contains("m3u8")) {
           HlsMediaSource.Factory(dataSourceFactory)
@@ -321,25 +365,6 @@ class RadioService : MediaBrowserServiceCompat() {
 
     }
 
-
-    private fun playRecorded(){
-
-
-      val mediaItem = MediaItem.fromUri("${this.filesDir.path}/radio-1889320320851258.ogg")
-
-
-
-        val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(mediaItem)
-
-
-        exoPlayer.setMediaSource(mediaSource)
-        exoPlayer.prepare()
-        exoPlayer.playWhenReady = true
-
-
-
-    }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
@@ -362,6 +387,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
         serviceScope.cancel()
         radioSource.subscribeToFavouredStations.removeObserver(observerForDatabase)
+        radioSource.allRecordingsLiveData.removeObserver(observerForRecordings)
 
         exoRecord.removeExoRecordListener("MainListener")
 

@@ -42,9 +42,10 @@ object Constants {
     const val SEARCH_FROM_FAVOURITES = 1
     const val SEARCH_FROM_PLAYLIST = 2
     const val SEARCH_FROM_HISTORY = 3
+    const val SEARCH_FROM_RECORDINGS = 4
 
 
-    const val DATE_FORMAT = "dd.MM.yyyy"
+    const val DATE_FORMAT = "dd.MM.yyyy HH:mm"
 
 
     const val HISTORY_OPTIONS = "History options"

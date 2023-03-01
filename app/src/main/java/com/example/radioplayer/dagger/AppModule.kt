@@ -38,7 +38,10 @@ object AppModule {
     @Singleton
     fun providesRadioDB(
         @ApplicationContext app : Context
-    ) : RadioDB = Room.databaseBuilder(app, RadioDB::class.java, DATABASE_NAME).build()
+    ) : RadioDB = Room.databaseBuilder(
+        app, RadioDB::class.java, DATABASE_NAME)
+        .addMigrations(RadioDB.migration10To11)
+        .build()
 
     @Provides
     @Singleton

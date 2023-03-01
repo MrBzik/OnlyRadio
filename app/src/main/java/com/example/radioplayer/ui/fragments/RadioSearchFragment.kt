@@ -117,6 +117,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private var isNewSearchForAnimations = true
 
+    private var isInitialLaunch = true
+
     private fun setRecyclerChildrenAttachListener(){
 
         bind.rvSearchStations.addOnChildAttachStateChangeListener(object :RecyclerView.OnChildAttachStateChangeListener{
@@ -131,13 +133,18 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                         layoutAnimation = (activity as MainActivity).layoutAnimationController
 
 
-//                    Log.d("CHECKTAGS", "onChil: ${System.currentTimeMillis()}")
+
                         post {
-//                            Log.d("CHECKTAGS", "onPost: ${System.currentTimeMillis()}")
 
                             visibility = View.VISIBLE
                             isToToggleRvVisibility = false
-                            scrollToPosition(0)
+
+                            if(!isInitialLaunch){
+                                scrollToPosition(0)
+                            } else {
+                                isInitialLaunch = false
+                            }
+
                             startLayoutAnimation()
 
                         }
@@ -413,6 +420,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         super.onDestroyView()
         bind.rvSearchStations.adapter = null
         _bind = null
+        isInitialLaunch = true
     }
 
 }

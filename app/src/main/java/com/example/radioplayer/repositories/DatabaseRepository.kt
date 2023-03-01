@@ -5,6 +5,7 @@ import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.entities.HistoryDate
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
+import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.data.local.relations.StationDateCrossRef
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import javax.inject.Inject
@@ -34,8 +35,11 @@ class DatabaseRepository @Inject constructor(
     suspend fun insertStationPlaylistCrossRef (crossRef: StationPlaylistCrossRef)
             = radioDAO.insertStationPlaylistCrossRef(crossRef)
 
-    suspend fun deleteStationPlaylistCrossRef (crossRef: StationPlaylistCrossRef)
-            = radioDAO.deleteStationPlaylistCrossRef(crossRef)
+    suspend fun getTimeOfStationPlaylistInsertion(stationID : String, playlistName : String)
+            = radioDAO.getTimeOfStationPlaylistInsertion(stationID, playlistName)
+
+    suspend fun deleteStationPlaylistCrossRef (stationID: String, playlistName: String)
+            = radioDAO.deleteStationPlaylistCrossRef(stationID, playlistName)
 
 
     fun getAllPlaylists () = radioDAO.getAllPlaylists()
@@ -47,6 +51,7 @@ class DatabaseRepository @Inject constructor(
 
     fun subscribeToStationsInPlaylist(playlistName: String) = radioDAO.subscribeToStationsInPlaylist(playlistName)
 
+   suspend fun getPlaylistOrder(playlistName : String) = radioDAO.subscribeToPlaylistOrder(playlistName)
 
     suspend fun deleteAllCrossRefOfPlaylist(playlistName: String)
             = radioDAO.deleteAllCrossRefOfPlaylist(playlistName)
@@ -109,5 +114,17 @@ class DatabaseRepository @Inject constructor(
     suspend fun deleteDate(date : HistoryDate) = radioDAO.deleteDate(date)
 
     suspend fun getAllStations() = radioDAO.getAllStations()
+
+
+    // Recording
+
+    suspend fun insertRecording(recording : Recording) = radioDAO.insertRecording(recording)
+
+    suspend fun getCurrentRecording(id : String)  = radioDAO.getCurrentRecording(id)
+
+    suspend fun deleteRecording(rec : Recording) = radioDAO.deleteRecording(rec)
+
+    suspend fun updateRecordingDuration(duration : String, id : String)
+            = radioDAO.updateRecordingDuration(duration, id)
 
 }

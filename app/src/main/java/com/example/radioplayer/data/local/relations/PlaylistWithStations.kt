@@ -12,7 +12,9 @@ data class PlaylistWithStations (
         parentColumn = "playlistName",
         entityColumn = "stationuuid",
         associateBy = Junction(StationPlaylistCrossRef::class)
+
     )
         val radioStations : List<RadioStation>
 
         )
+

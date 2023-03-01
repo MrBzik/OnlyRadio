@@ -18,5 +18,10 @@
         android:title="History"
        />
 
+    <item
+        android:id="@+id/mi_recordingsFragment"
+        android:title="Rec"
+        />
+
 
 </menu>

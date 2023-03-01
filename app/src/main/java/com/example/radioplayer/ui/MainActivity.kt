@@ -21,6 +21,7 @@ import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
+import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.databinding.ActivityMainBinding
 import com.example.radioplayer.databinding.StubPlayerActivityMainBinding
 import com.example.radioplayer.exoPlayer.isPlayEnabled
@@ -84,7 +85,7 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var glide : RequestManager
 
-    private var currentStation : RadioStation? = null
+    private var currentPlayingItem : PlayingItem? = null
 
 
     private  val radioSearchFragment : RadioSearchFragment by lazy { RadioSearchFragment() }
@@ -92,6 +93,8 @@ class MainActivity : AppCompatActivity() {
     private  val favStationsFragment : FavStationsFragment by lazy { FavStationsFragment() }
 
     private  val historyFragment : HistoryFragment by lazy { HistoryFragment() }
+
+    private  val recordingsFragment : RecordingsFragment by lazy { RecordingsFragment() }
 
     private  val stationDetailsFragment : StationDetailsFragment by lazy { StationDetailsFragment().apply {
 
@@ -175,16 +178,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun observeNewStation(){
 
-        mainViewModel.newRadioStation.observe(this){ station ->
+        mainViewModel.newRadioStation.observe(this){ playingItem ->
 
-            currentStation = station
+            currentPlayingItem = playingItem
 
             if(!isStubPlayerBindInflated) {
                 inflatePlayerStubAndCallRelatedMethods()
             }
 
 
-            updateImageAndTitle(station)
+            updateImageAndTitle(playingItem)
 
         }
     }
@@ -295,6 +298,19 @@ class MainActivity : AppCompatActivity() {
                     commit()
                 }
             }
+
+            R.id.mi_recordingsFragment -> {
+
+                recordingsFragment.exitTransition = null
+                supportFragmentManager.beginTransaction().apply {
+                    setCustomAnimations(R.anim.blank_anim, android.R.anim.fade_out)
+                    replace(R.id.flFragment, recordingsFragment)
+                    addToBackStack(null)
+                    commit()
+                }
+            }
+
+
         }
 
         if(isStubPlayerBindInflated){
@@ -324,14 +340,31 @@ class MainActivity : AppCompatActivity() {
                 historyFragment.exitTransition = Fade()
 
             }
+            R.id.mi_recordingsFragment -> {
+
+                recordingsFragment.exitTransition = Fade()
+            }
         }
     }
 
 
 
-    private fun updateImageAndTitle(station : RadioStation){
+    private fun updateImageAndTitle(playingItem : PlayingItem){
 
-        val newImage = station.favicon?.toUri()
+        val newImage : Uri?
+        var name = ""
+
+        when (playingItem) {
+            is PlayingItem.FromRadio -> {
+                name = playingItem.radioStation.name ?: ""
+                newImage = playingItem.radioStation.favicon?.toUri()
+            }
+            is PlayingItem.FromRecordings -> {
+                name = playingItem.recording.name
+                newImage = playingItem.recording.iconUri.toUri()
+            }
+        }
+
 
         newImage?.let { uri ->
 
@@ -345,7 +378,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        bindPlayer.tvStationTitle.text = station.name
+        bindPlayer.tvStationTitle.text = name
 
     }
 
@@ -353,9 +386,16 @@ class MainActivity : AppCompatActivity() {
 
         bindPlayer.ivTogglePlayCurrentStation.setOnClickListener {
 
-            currentStation?.let {
+            currentPlayingItem?.let {
 
-                mainViewModel.playOrToggleStation(it)
+                when(it){
+                    is PlayingItem.FromRadio -> {
+                        mainViewModel.playOrToggleStation(it.radioStation)
+                    }
+                    is PlayingItem.FromRecordings -> {
+                        mainViewModel.playOrToggleStation(rec = it.recording)
+                    }
+                }
             }
         }
     }

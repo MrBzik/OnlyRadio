@@ -2,6 +2,7 @@ package com.example.radioplayer.ui.fragments
 
 import android.graphics.Rect
 import android.os.Bundle
+import android.support.v4.media.MediaMetadataCompat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -205,7 +206,10 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             historyAdapter.apply {
                 defaultTextColor = ContextCompat.getColor(requireContext(), R.color.default_text_color)
                 selectedTextColor = ContextCompat.getColor(requireContext(), R.color.selected_text_color)
-                mainViewModel.newRadioStation.value?.let { currentRadioStationID = it.stationuuid}
+                mainViewModel.currentRadioStation.value?.let {
+                    val name =  it.getString(MediaMetadataCompat.METADATA_KEY_TITLE)
+                    this.currentRadioStationID = name
+                }
             }
 
             layoutAnimation = (activity as MainActivity).layoutAnimationController
