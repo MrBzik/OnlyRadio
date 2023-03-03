@@ -11,7 +11,6 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
 import androidx.activity.viewModels
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
@@ -20,13 +19,11 @@ import androidx.transition.Slide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.R
-import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.databinding.ActivityMainBinding
 import com.example.radioplayer.databinding.StubPlayerActivityMainBinding
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
-import com.example.radioplayer.ui.animations.CustomFadeOutTransition
 import com.example.radioplayer.ui.animations.LoadingAnim
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.fragments.*
@@ -40,7 +37,6 @@ import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
 
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -89,20 +85,22 @@ class MainActivity : AppCompatActivity() {
 
 
     private  val radioSearchFragment : RadioSearchFragment by lazy { RadioSearchFragment() }
-
     private  val favStationsFragment : FavStationsFragment by lazy { FavStationsFragment() }
-
     private  val historyFragment : HistoryFragment by lazy { HistoryFragment() }
-
     private  val recordingsFragment : RecordingsFragment by lazy { RecordingsFragment() }
-
     private  val stationDetailsFragment : StationDetailsFragment by lazy { StationDetailsFragment().apply {
-
         enterTransition = Slide(Gravity.BOTTOM)
         exitTransition = Slide(Gravity.BOTTOM)
+        }
     }
 
+    private  val recordingDetailsFragment : RecordingDetailsFragment by lazy { RecordingDetailsFragment().apply {
+        enterTransition = Slide(Gravity.BOTTOM)
+        exitTransition = Slide(Gravity.BOTTOM)
+         }
     }
+
+
     private var previousImageUri : Uri? = null
 
 
@@ -142,8 +140,6 @@ class MainActivity : AppCompatActivity() {
         setOnBottomNavClickListener()
 
         setOnBottomNavItemReselect()
-
-        observeInternetConnection()
 
 
     }
@@ -239,18 +235,20 @@ class MainActivity : AppCompatActivity() {
 
             if(bindPlayer.tvExpandHideText.text == resources.getString(R.string.Expand)) {
 
-
                 putFadeOutForDetailsFragment()
 
                 supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.flFragment, stationDetailsFragment)
+
+                    if(mainViewModel.isRadioTrueRecordingFalse){
+                        replace(R.id.flFragment, stationDetailsFragment)
+                    } else {
+                        replace(R.id.flFragment, recordingDetailsFragment)
+                    }
                     addToBackStack(null)
                     commit()
                 }
 
-
                 bindPlayer.tvExpandHideText.setText(R.string.Hide)
-
           
             }
 

@@ -47,6 +47,7 @@ object ServiceModule {
         renderersFactory: DefaultRenderersFactory
     ) = ExoPlayer.Builder(app, renderersFactory)
         .setAudioAttributes(audioAttributes, true)
+        .setPauseAtEndOfMediaItems(true)
         .setHandleAudioBecomingNoisy(true)
         .build()
 

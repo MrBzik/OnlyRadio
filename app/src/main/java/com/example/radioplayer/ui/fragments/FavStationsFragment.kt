@@ -1,11 +1,14 @@
 package com.example.radioplayer.ui.fragments
 
 
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -67,6 +70,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     private var currentPlaylistPosition = 0
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -95,6 +99,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         endLoadingBarIfNeeded()
 
     }
+
 
 
     private fun observePlaybackState(){
@@ -213,8 +218,14 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         bind.ivArrowBackToFav.setOnClickListener {
 
+
             databaseViewModel.getAllFavouredStations()
 
+            bind.rvFavStations.post {
+
+                bind.rvFavStations.scheduleLayoutAnimation()
+
+            }
         }
     }
 
@@ -234,8 +245,14 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                    !isInFavouriteTab && playlist.playlistName == currentPlaylistName
                         ) {/*DO NOTHING*/ }
                 else {
+
                     databaseViewModel.subscribeToStationsInPlaylist(playlist.playlistName)
                     currentPlaylistPosition = position
+
+                    bind.rvFavStations.post {
+
+                        bind.rvFavStations.scheduleLayoutAnimation()
+                    }
                 }
             }
 
@@ -274,15 +291,16 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         databaseViewModel.observableListOfStations.observe(viewLifecycleOwner){
 
-            mainAdapter.listOfStations = it.toMutableList()
+
+            mainAdapter.listOfStations = it
 
         }
 
-        observePlaylist()
+        observeUnfilteredPlaylist()
 
     }
 
-    private fun observePlaylist(){
+    private fun observeUnfilteredPlaylist(){
         databaseViewModel.stationsInPlaylist.observe(viewLifecycleOwner){ playlist ->
             playlist?.radioStations?.let { stations ->
                 sortStationsInPlaylist(stations)
@@ -371,6 +389,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             setHasFixedSize(true)
             ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this)
 
+
+
             mainAdapter.apply {
                 defaultTextColor = ContextCompat.getColor(requireContext(), R.color.default_text_color)
                 selectedTextColor = ContextCompat.getColor(requireContext(), R.color.selected_text_color)
@@ -383,6 +403,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             layoutAnimation = (activity as MainActivity).layoutAnimationController
                 post {
+
                     scheduleLayoutAnimation()
                 }
         }
@@ -416,7 +437,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             val position = viewHolder.layoutPosition
             val stationID = mainAdapter.listOfStations[position].stationuuid
             val favouredAt =  mainAdapter.listOfStations[position].favouredAt
-            if(databaseViewModel.isInFavouriteTab.value!!){
+            if(databaseViewModel.isInFavouriteTab.value == true){
                 handleSwipeOnFavStation(stationID, favouredAt)
             } else{
                 handleSwipeOnPlaylistStation(stationID)

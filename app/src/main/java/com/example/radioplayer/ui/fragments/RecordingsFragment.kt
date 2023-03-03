@@ -3,6 +3,7 @@ package com.example.radioplayer.ui.fragments
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -39,6 +40,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
         recordingsAdapter.setOnClickListener {
             mainViewModel.playOrToggleStation(rec = it, searchFlag = SEARCH_FROM_RECORDINGS)
+
         }
     }
 
@@ -58,7 +60,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
             layoutManager = LinearLayoutManager(requireContext())
             edgeEffectFactory = BounceEdgeEffectFactory()
             setHasFixedSize(true)
-            ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this)
+//            ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this)
         }
     }
 

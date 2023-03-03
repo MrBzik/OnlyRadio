@@ -26,6 +26,7 @@ import com.example.radioplayer.utils.Constants.HISTORY_ONE_DAY
 import com.example.radioplayer.utils.Constants.HISTORY_OPTIONS
 import com.example.radioplayer.utils.Utils.fromDateToString
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
@@ -134,9 +135,6 @@ class DatabaseViewModel @Inject constructor(
             }
         }
     }
-
-
-
 
 
     fun subscribeToStationsInPlaylist(playlistName: String)

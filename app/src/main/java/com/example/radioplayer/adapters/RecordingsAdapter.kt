@@ -1,7 +1,9 @@
 package com.example.radioplayer.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -11,6 +13,7 @@ import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.databinding.ItemRecordingBinding
+import com.example.radioplayer.databinding.ItemRecordingWithSeekbarBinding
 import java.text.DateFormat
 import java.util.*
 import javax.inject.Inject
@@ -20,11 +23,11 @@ class RecordingsAdapter @Inject constructor(
     private val glideFactory : DrawableCrossFadeFactory
 ) : RecyclerView.Adapter<RecordingsAdapter.RecordingItemHolder>() {
 
-    class RecordingItemHolder (val bind : ItemRecordingBinding) : RecyclerView.ViewHolder(bind.root)
+    class RecordingItemHolder (val bind : ItemRecordingWithSeekbarBinding) : RecyclerView.ViewHolder(bind.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecordingItemHolder {
        return RecordingItemHolder(
-           ItemRecordingBinding.inflate(
+           ItemRecordingWithSeekbarBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
             )
        )
@@ -57,6 +60,9 @@ class RecordingsAdapter @Inject constructor(
 
             onItemClickListener?.let { click ->
                 click(recording)
+
+               holder.bind.seekBar.visibility = View.VISIBLE
+
             }
         }
 

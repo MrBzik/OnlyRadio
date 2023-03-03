@@ -28,7 +28,8 @@ class RadioNotificationManager (
     private val context : Context,
    sessionToken : MediaSessionCompat.Token,
    notificationListener: NotificationListener,
-    private val glide : RequestManager
+    private val glide : RequestManager,
+    private val newRecording : () -> Unit
     ) {
 
     private val serviceJob = SupervisorJob()
@@ -77,7 +78,7 @@ class RadioNotificationManager (
         var currentBitmap: Bitmap? = null
 
         override fun getCurrentContentTitle(player: Player): CharSequence {
-
+            newRecording()
             return mediaController.metadata.description.title.toString()
         }
 

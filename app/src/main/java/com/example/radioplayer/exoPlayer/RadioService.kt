@@ -1,14 +1,8 @@
 package com.example.radioplayer.exoPlayer
 
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
-import android.content.Context
 import android.content.Intent
-import android.icu.text.DateFormat
-import android.icu.text.SimpleDateFormat
-import android.icu.util.TimeZone
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
@@ -17,6 +11,7 @@ import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_URI
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import androidx.core.net.toUri
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.media.MediaBrowserServiceCompat
 import com.bumptech.glide.RequestManager
@@ -25,8 +20,6 @@ import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlaybackPreparer
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerNotificationListener
-import com.example.radioplayer.utils.Constants
-import com.example.radioplayer.utils.Constants.COMMAND_LOAD_FROM_PLAYLIST
 import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Constants.NETWORK_ERROR
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
@@ -42,21 +35,14 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
-import com.google.android.exoplayer2.extractor.ogg.OggExtractor
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
-import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DataSpec
 import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
-import com.google.android.exoplayer2.upstream.FileDataSource
 import dagger.hilt.android.AndroidEntryPoint
 import dev.brookmg.exorecord.lib.ExoRecord
 import dev.brookmg.exorecord.lib.IExoRecord
 import dev.brookmg.exorecordogg.ExoRecordOgg
 import kotlinx.coroutines.*
-import java.io.File
-import java.time.Duration
-import java.time.Instant
 import java.util.*
 import javax.inject.Inject
 
@@ -82,6 +68,9 @@ class RadioService : MediaBrowserServiceCompat() {
     @Inject
     lateinit var exoRecord: ExoRecord
 
+    @Inject
+    lateinit var radioServiceConnection: RadioServiceConnection
+
     private val serviceJob = SupervisorJob()
 
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
@@ -99,6 +88,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private var isPlayerInitialized = false
 
+    private var isFromRecording = false
+
     private val observerForDatabase = Observer<List<RadioStation>>{
         radioSource.createMediaItemsFromDB(it)
     }
@@ -106,6 +97,12 @@ class RadioService : MediaBrowserServiceCompat() {
     private val observerForRecordings = Observer<List<Recording>>{
         radioSource.createMediaItemsFromRecordings(it)
     }
+
+    companion object{
+        var curRecordTotalDuration = MutableLiveData(0L)
+        val recordingPlaybackPosition = MutableLiveData<Long>()
+    }
+
 
     private fun searchRadioStations(
             isNewSearch : Boolean
@@ -138,7 +135,11 @@ class RadioService : MediaBrowserServiceCompat() {
             mediaSession.sessionToken,
             RadioPlayerNotificationListener(this),
             glide
-            )
+            ) {
+//            if(isFromRecording){
+//                curRecordTotalDuration = exoPlayer.duration
+//            }
+        }
 
         val radioPlaybackPreparer = RadioPlaybackPreparer(radioSource, { itemToPlay, flag ->
 
@@ -232,9 +233,52 @@ class RadioService : MediaBrowserServiceCompat() {
         radioSource.subscribeToFavouredStations.observeForever(observerForDatabase)
         radioSource.allRecordingsLiveData.observeForever(observerForRecordings)
 
+//        recordingPlaybackPosition.observeForever(){
+//
+//            Log.d("CHECKTAGS", "duration : $curRecordTotalDuration, position : $it")
+//
+//        }
+
+
 
     }
 
+
+    private var isRecordingDurationListenerRunning = false
+    var isPlaybackStatePlaying = false
+
+
+    fun listenToRecordDuration ()  {
+
+        if(!isRecordingDurationListenerRunning && isFromRecording){
+            isRecordingDurationListenerRunning = true
+
+            val duration = exoPlayer.duration
+                curRecordTotalDuration.postValue(duration)
+
+                  CoroutineScope(Dispatchers.IO).launch {
+
+                while (isFromRecording && isPlaybackStatePlaying){
+
+                    val pos = radioServiceConnection.playbackState.value?.currentPlaybackPosition ?: 0L
+
+                    if(pos >= duration) {
+
+                        withContext(Dispatchers.Main + serviceJob){
+                            exoPlayer.seekTo(0)
+                            exoPlayer.playWhenReady = false
+                            recordingPlaybackPosition.postValue(0)
+                        }
+                        break
+                    }
+
+                    recordingPlaybackPosition.postValue(pos)
+                    delay(500)
+                }
+                isRecordingDurationListenerRunning = false
+            }
+        }
+    }
 
     private val exoRecordListener = object : ExoRecord.ExoRecordListener{
 
@@ -333,6 +377,7 @@ class RadioService : MediaBrowserServiceCompat() {
         isFromRecordings : Boolean = false
     ){
 
+        this.isFromRecording = isFromRecordings
 
       val uri = try {
           stations[stations.indexOf(itemToPlay)].getString(METADATA_KEY_MEDIA_URI)
@@ -355,15 +400,20 @@ class RadioService : MediaBrowserServiceCompat() {
               .createMediaSource(mediaItem)
       }
 
+        exoPlayer.skipSilenceEnabled = true
+
         exoPlayer.setMediaSource(mediaSource)
         exoPlayer.prepare()
         exoPlayer.playWhenReady = playNow
+
 
 
 //        exoPlayer.setMediaSource(radioSource.asMediaSource(dataSourceFactory))
 //        exoPlayer.seekTo(curStationIndex, 0L)
 
     }
+
+
 
 
     override fun onTaskRemoved(rootIntent: Intent?) {

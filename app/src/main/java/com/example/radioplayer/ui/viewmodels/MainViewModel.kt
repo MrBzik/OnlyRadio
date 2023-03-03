@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
-import android.util.Log
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
@@ -31,10 +30,7 @@ import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 
@@ -69,14 +65,18 @@ class MainViewModel @Inject constructor(
                 if(itemId.contains(".ogg")) {
                     val item = repository.getCurrentRecording(itemId)
                     newRadioStation.postValue(PlayingItem.FromRecordings(item))
+                    isRadioTrueRecordingFalse = false
                 } else {
                     val item = repository.getCurrentRadioStation(itemId)
                     newRadioStation.postValue(PlayingItem.FromRadio(item))
+                    isRadioTrueRecordingFalse = true
                 }
             }
         }
 
     }
+
+
 
 
     var hasInternetConnection : MutableLiveData<Boolean> = MutableLiveData(false)
@@ -274,9 +274,16 @@ class MainViewModel @Inject constructor(
     }
 
 
+        fun seekTo(position : Long){
+            radioServiceConnection.transportControls.seekTo(position)
+
+        }
+
+
         fun playOrToggleStation(station : RadioStation? = null, searchFlag : Int = 0, rec : Recording? = null) {
 
             val isPrepared = playbackState.value?.isPrepared ?: false
+
 
             val id = station?.stationuuid ?: (rec?.id ?: "")
 
@@ -294,7 +301,10 @@ class MainViewModel @Inject constructor(
 
                 if(station == null){
                     newRadioStation.postValue(PlayingItem.FromRecordings(rec!!))
+                    isRadioTrueRecordingFalse = false
+
                 } else {
+                    isRadioTrueRecordingFalse = true
                     newRadioStation.postValue(PlayingItem.FromRadio(station))
                 }
 
@@ -303,6 +313,10 @@ class MainViewModel @Inject constructor(
             }
         }
 
+        var isRadioTrueRecordingFalse = true
+
+        val currentPlayerPosition = RadioService.recordingPlaybackPosition
+        val currentPlayerDuration = RadioService.curRecordTotalDuration
 
 
         // ExoRecord

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.SeekBar
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.RequestManager
@@ -15,9 +16,11 @@ import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.databinding.FragmentStationDetailsBinding
+import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.dialogs.AddStationToPlaylistDialog
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
+import com.example.radioplayer.utils.Utils
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -38,7 +41,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     lateinit var glide : RequestManager
 
     private var currentRadioStation : RadioStation? = null
-    private var currentRecording : Recording? = null
+
 
     private var isFavoured = false
 
@@ -50,47 +53,38 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         pixabayViewModel = ViewModelProvider(requireActivity())[PixabayViewModel::class.java]
 
-        checkIfRadioOrRecordAndCallFunctions()
+        getNewRadioStation()
+
+        updateListOfPlaylists()
+
+        setAddToPlaylistClickListener()
+
+        setFabStationHomePageClickListener()
+
+        addToFavClickListener()
+
+        setupRecordingButton()
+
+        observeExoRecordState()
 
         endLoadingBarIfNeeded()
 
     }
 
-    private fun checkIfRadioOrRecordAndCallFunctions(){
+    private fun getNewRadioStation(){
 
         mainViewModel.newRadioStation.value?.let {
 
             if(it is PlayingItem.FromRadio){
+
+                currentRadioStation = it.radioStation
+
                 observeIfNewStationFavoured()
                 updateUiForRadioStation(it.radioStation)
-                updateListOfPlaylists()
-                setAddToPlaylistClickListener()
-                setFabStationHomePageClickListener()
-                addToFavClickListener()
-                setupRecordingButton()
-                observeExoRecordState()
 
-            } else if(it is PlayingItem.FromRecordings){
-                updateUiForRecording(it.recording)
             }
-
-
-
-
         }
-
     }
-
-    private fun updateUiForRecording(recording: Recording){
-
-        bind.tvName.text = recording.name
-        glide
-            .load(recording.iconUri)
-            .transition(DrawableTransitionOptions.withCrossFade())
-            .into(bind.ivIcon)
-    }
-
-
 
 
     private fun setupRecordingButton(){
@@ -98,7 +92,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         setFabRecordListener()
 
     }
-
 
     private var isRecording = false
     private var isTimerObserverSet = false
@@ -210,11 +203,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                 bind.tvHomePage.visibility = View.VISIBLE
             }
 
-            bind.fabAddToFav.visibility = View.VISIBLE
-            bind.fabRecording.visibility = View.VISIBLE
-            bind.tvAddToPlaylist.visibility = View.VISIBLE
-            bind.ivArrowAddToPlaylist.visibility = View.VISIBLE
-
 
             checkIfStationFavoured(station)
 
@@ -237,7 +225,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                 bind.tvLanguage.text = "Languages : ${station.language}"
             }
             if(!station.tags.isNullOrBlank()){
-                bind.svTvTags.isVisible = true
+                bind.tvTags.isVisible = true
                 val tags = station.tags.replace(",", ", ")
                 bind.tvTags.text = "Tags : $tags"
             }

@@ -8,10 +8,14 @@ import android.widget.Toast
 import com.example.radioplayer.exoPlayer.RadioService
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.Timeline
+import com.google.android.exoplayer2.Tracks
+import com.google.android.exoplayer2.audio.AudioAttributes
 
 class RadioPlayerEventListener (
     private val radioService : RadioService
         ) : Player.Listener {
+
 
 
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
@@ -19,11 +23,17 @@ class RadioPlayerEventListener (
         super.onPlayWhenReadyChanged(playWhenReady, playbackState)
 
         if(playbackState == Player.STATE_READY && !playWhenReady) {
+            radioService.isPlaybackStatePlaying = false
 
             if(Build.VERSION.SDK_INT > 24) { radioService.stopForeground(STOP_FOREGROUND_DETACH)}
             else {radioService.stopForeground(false)}
             radioService.isForegroundService = false
         }
+         else if(playbackState == Player.STATE_READY && playWhenReady){
+            radioService.isPlaybackStatePlaying = true
+            radioService.listenToRecordDuration()
+
+         }
 
     }
 

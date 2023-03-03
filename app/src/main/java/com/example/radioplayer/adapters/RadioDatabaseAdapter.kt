@@ -155,7 +155,7 @@ class RadioDatabaseAdapter @Inject constructor(
 
     private val differ = AsyncListDiffer(this, diffCallback)
 
-    var listOfStations : MutableList<RadioStation>
+    var listOfStations : List<RadioStation>
     get() = differ.currentList
     set(value) = differ.submitList(value)
 

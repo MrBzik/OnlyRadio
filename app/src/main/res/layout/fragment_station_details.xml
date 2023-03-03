@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/main_background"
-   >
+    android:background="@color/main_background">
 
 
     <TextView
@@ -14,7 +13,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="Add to playlist"
-        android:visibility="gone"
         android:textAppearance="@style/mainTextButtons"
         app:layout_constraintEnd_toStartOf="@+id/ivArrowAddToPlaylist"
         app:layout_constraintTop_toTopOf="parent" />
@@ -24,7 +22,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:visibility="gone"
         android:src="@drawable/ic_arrow_drop_down"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -35,10 +32,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
-        android:gravity="center"
-        android:textSize="22sp"
-        android:paddingHorizontal="16dp"
         android:fontFamily="sans-serif-smallcaps"
+        android:gravity="center"
+        android:paddingHorizontal="16dp"
+        android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -57,65 +54,63 @@
     <TextView
         android:id="@+id/tvHomePage"
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:text="Homepage"
-        android:visibility="gone"
+        android:layout_height="50dp"
+        android:layout_marginTop="8dp"
         android:gravity="center_vertical"
+        android:text="Homepage"
         android:textAppearance="@style/mainTextButtons"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivIcon"/>
-
-    <TextView
-        android:id="@+id/tvCountry"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:visibility="gone"
-        android:textAppearance="@style/detailsTextExtras"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvHomePage" />
+        app:layout_constraintTop_toBottomOf="@+id/ivIcon" />
 
-    <TextView
-        android:id="@+id/tvLanguage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:gravity="center"
-        android:visibility="gone"
-        android:paddingHorizontal="16dp"
-        android:textAppearance="@style/detailsTextExtras"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvCountry" />
 
     <ScrollView
         android:id="@+id/svTvTags"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="20dp"
         android:layout_marginBottom="10dp"
-        android:visibility="gone"
         android:paddingHorizontal="16dp"
+        app:layout_constraintBottom_toTopOf="@id/fabAddToFav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvLanguage"
-        app:layout_constraintBottom_toTopOf="@id/fabAddToFav"
-        >
+        app:layout_constraintTop_toBottomOf="@+id/tvHomePage">
 
-        <TextView
-            android:id="@+id/tvTags"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textAppearance="@style/detailsTextExtras"
-            />
-    </ScrollView>
+            android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/tvCountry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textAppearance="@style/detailsTextExtras"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvLanguage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:textAppearance="@style/detailsTextExtras"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvTags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:textAppearance="@style/detailsTextExtras"
+                android:visibility="gone" />
+        </LinearLayout>
+
+    </ScrollView>
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -123,7 +118,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="30dp"
-        android:visibility="gone"
         android:layout_marginBottom="40dp"
         app:backgroundTint="@color/floating_buttons"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -137,16 +131,17 @@
         android:layout_marginBottom="40dp"
         app:backgroundTint="@color/floating_buttons"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent" />
+
 
     <TextView
         android:id="@+id/tvTimer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:visibility="gone"
         android:text="00:00:00"
         android:textAppearance="@style/dialogCurrentValue"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/fabRecording"
         app:layout_constraintStart_toEndOf="@+id/fabRecording"
         app:layout_constraintTop_toTopOf="@+id/fabRecording" />
