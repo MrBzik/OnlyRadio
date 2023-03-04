@@ -124,7 +124,6 @@ class DatabaseRepository @Inject constructor(
 
     suspend fun deleteRecording(rec : Recording) = radioDAO.deleteRecording(rec)
 
-    suspend fun updateRecordingDuration(duration : String, id : String)
-            = radioDAO.updateRecordingDuration(duration, id)
+
 
 }

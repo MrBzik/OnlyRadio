@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_URI
+import android.support.v4.media.MediaMetadataCompat.*
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import androidx.core.net.toUri
@@ -99,8 +99,10 @@ class RadioService : MediaBrowserServiceCompat() {
     }
 
     companion object{
-        var curRecordTotalDuration = MutableLiveData(0L)
+        val currentSongTitle = MutableLiveData<String>()
+        var curRecordTotalDuration = MutableLiveData<Long>()
         val recordingPlaybackPosition = MutableLiveData<Long>()
+
     }
 
 
@@ -116,6 +118,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
     override fun onCreate() {
         super.onCreate()
+
 
 
         val activityIntent = packageManager?.getLaunchIntentForPackage(packageName)?.let {
@@ -139,6 +142,8 @@ class RadioService : MediaBrowserServiceCompat() {
 //            if(isFromRecording){
 //                curRecordTotalDuration = exoPlayer.duration
 //            }
+
+
         }
 
         val radioPlaybackPreparer = RadioPlaybackPreparer(radioSource, { itemToPlay, flag ->
@@ -228,18 +233,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
         radioNotificationManager.showNotification(exoPlayer)
 
-
-
         radioSource.subscribeToFavouredStations.observeForever(observerForDatabase)
         radioSource.allRecordingsLiveData.observeForever(observerForRecordings)
-
-//        recordingPlaybackPosition.observeForever(){
-//
-//            Log.d("CHECKTAGS", "duration : $curRecordTotalDuration, position : $it")
-//
-//        }
-
-
 
     }
 
@@ -250,25 +245,27 @@ class RadioService : MediaBrowserServiceCompat() {
 
     fun listenToRecordDuration ()  {
 
-        if(!isRecordingDurationListenerRunning && isFromRecording){
+        if(isFromRecording) {
+
+            curRecordTotalDuration.postValue(exoPlayer.duration)
+        }
+
+        if(!isRecordingDurationListenerRunning){
+
             isRecordingDurationListenerRunning = true
 
-            val duration = exoPlayer.duration
-                curRecordTotalDuration.postValue(duration)
-
-                  CoroutineScope(Dispatchers.IO).launch {
+                  serviceScope.launch {
 
                 while (isFromRecording && isPlaybackStatePlaying){
 
                     val pos = radioServiceConnection.playbackState.value?.currentPlaybackPosition ?: 0L
 
-                    if(pos >= duration) {
+                    if(exoPlayer.duration in 0..pos) {
 
-                        withContext(Dispatchers.Main + serviceJob){
-                            exoPlayer.seekTo(0)
-                            exoPlayer.playWhenReady = false
-                            recordingPlaybackPosition.postValue(0)
-                        }
+                       exoPlayer.seekTo(0)
+                       exoPlayer.playWhenReady = false
+                       recordingPlaybackPosition.postValue(0)
+
                         break
                     }
 
@@ -283,9 +280,10 @@ class RadioService : MediaBrowserServiceCompat() {
     private val exoRecordListener = object : ExoRecord.ExoRecordListener{
 
         lateinit var timer : Timer
+        var duration = 0L
 
         override fun onStartRecording(recordFileName: String) {
-            radioSource.newExoRecord = recordFileName.replace(".wav", ".ogg")
+
             radioSource.exoRecordState.postValue(true)
             radioSource.exoRecordFinishConverting.postValue(false)
 
@@ -293,8 +291,8 @@ class RadioService : MediaBrowserServiceCompat() {
             timer.scheduleAtFixedRate(object : TimerTask() {
                 val startTime = System.currentTimeMillis()
                 override fun run() {
-                    val differance = (System.currentTimeMillis() - startTime)
-                    radioSource.exoRecordTimer.postValue(Utils.timerFormat(differance))
+                    duration = (System.currentTimeMillis() - startTime)
+                    radioSource.exoRecordTimer.postValue(duration)
                 }
             }, 0L, 1000L)
 
@@ -315,8 +313,12 @@ class RadioService : MediaBrowserServiceCompat() {
                     0.4f){ progress ->
 
                     if(progress == 100.0f){
-                        Log.d("CHECKTAGS", "over")
                         try {
+                            insertNewRecording(
+                                record.filePath,
+                                System.currentTimeMillis(),
+                                duration
+                            )
                             deleteFile(record.filePath)
                             isConverterWorking = false
                             radioSource.exoRecordFinishConverting.postValue(true)
@@ -329,6 +331,23 @@ class RadioService : MediaBrowserServiceCompat() {
             }
         }
     }
+
+
+    private suspend fun insertNewRecording(
+        filePath : String, timeStamp : Long, duration : Long
+    ) {
+
+        val id = filePath.replace(".wav", ".ogg")
+        val iconUri = currentStation?.getString(METADATA_KEY_DISPLAY_ICON_URI) ?: ""
+        val name = "Rec. ${ currentStation?.getString(METADATA_KEY_DISPLAY_TITLE) ?: ""}"
+
+        radioSource.insertRecording(
+            Recording(
+                id, iconUri, timeStamp, name, duration
+            )
+        )
+    }
+
 
     private var isExoRecordListenerToSet = true
 
@@ -377,6 +396,7 @@ class RadioService : MediaBrowserServiceCompat() {
         isFromRecordings : Boolean = false
     ){
 
+        Log.d("CHECKTAGS", "preparer")
         this.isFromRecording = isFromRecordings
 
       val uri = try {
@@ -399,8 +419,6 @@ class RadioService : MediaBrowserServiceCompat() {
           ProgressiveMediaSource.Factory(dataSourceFactory)
               .createMediaSource(mediaItem)
       }
-
-        exoPlayer.skipSilenceEnabled = true
 
         exoPlayer.setMediaSource(mediaSource)
         exoPlayer.prepare()
@@ -433,8 +451,6 @@ class RadioService : MediaBrowserServiceCompat() {
 
     override fun onDestroy() {
 
-
-
         serviceScope.cancel()
         radioSource.subscribeToFavouredStations.removeObserver(observerForDatabase)
         radioSource.allRecordingsLiveData.removeObserver(observerForRecordings)
@@ -464,11 +480,11 @@ class RadioService : MediaBrowserServiceCompat() {
         parentId: String,
         result: Result<MutableList<MediaBrowserCompat.MediaItem>>
     ) {
-       when(parentId){
-           MEDIA_ROOT_ID -> {
-               val resultSent = radioSource.whenReady { isInitialized ->
-                   if(isInitialized){
-                        try{
+//       when(parentId){
+//           MEDIA_ROOT_ID -> {
+//               val resultSent = radioSource.whenReady { isInitialized ->
+//                   if(isInitialized){
+//                        try{
 
 //                            result.sendResult(radioSource.asMediaItems())
 
@@ -476,19 +492,19 @@ class RadioService : MediaBrowserServiceCompat() {
 //                                preparePlayer(radioSource.stations, radioSource.stations[0], false)
 //                                isPlayerInitialized = true
 //                            }
-                        } catch (e : java.lang.IllegalStateException){
-                         notifyChildrenChanged(MEDIA_ROOT_ID)
-                        }
-                   } else {
-                       mediaSession.sendSessionEvent(NETWORK_ERROR, null)
-                       result.sendResult(null)
-                   }
-               }
+//                        } catch (e : java.lang.IllegalStateException){
+//                         notifyChildrenChanged(MEDIA_ROOT_ID)
+//                        }
+//                   } else {
+//                       mediaSession.sendSessionEvent(NETWORK_ERROR, null)
+//                       result.sendResult(null)
+//                   }
+//               }
 //               if(!resultSent) {
 //                   result.detach()
 //               }
-           }
-       }
+//           }
+//       }
     }
 
 

@@ -362,21 +362,21 @@ class DatabaseViewModel @Inject constructor(
 
     // Recordings
 
-    fun insertNewRecording (
-        recordID : String,
-        iconURI : String,
-        name : String,
-        duration : String
-        ) = viewModelScope.launch {
-            repository.insertRecording(
-                Recording(
-                    id = recordID,
-                    iconUri = iconURI,
-                    name = name,
-                    timeStamp = System.currentTimeMillis(),
-                    duration = duration)
-            )
-    }
+//    fun insertNewRecording (
+//        recordID : String,
+//        iconURI : String,
+//        name : String,
+//        duration : String
+//        ) = viewModelScope.launch {
+//            repository.insertRecording(
+//                Recording(
+//                    id = recordID,
+//                    iconUri = iconURI,
+//                    name = name,
+//                    timeStamp = System.currentTimeMillis(),
+//                    duration = duration)
+//            )
+//    }
 
     fun insertNewRecording(rec : Recording) =
         viewModelScope.launch {
@@ -388,10 +388,6 @@ class DatabaseViewModel @Inject constructor(
 
     fun deleteRecording(rec : Recording) = viewModelScope.launch {
         repository.deleteRecording(rec)
-    }
-
-    fun updateRecordingDuration(duration : String, id : String) = viewModelScope.launch {
-        repository.updateRecordingDuration(duration, id)
     }
 
 }

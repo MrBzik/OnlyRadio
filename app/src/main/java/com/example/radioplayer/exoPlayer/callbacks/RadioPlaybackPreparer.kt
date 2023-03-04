@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.ResultReceiver
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
@@ -41,13 +42,15 @@ class RadioPlaybackPreparer (
 
     override fun onPrepareFromMediaId(mediaId: String, playWhenReady: Boolean, extras: Bundle?) {
 
+
         var flag = 666
 
         extras?.let {
             flag = it.getInt("SEARCH_FLAG", 0)
         }
 
-        radioSource.whenReady {
+
+//        radioSource.whenReady {
             val itemToPlay =
                     when(flag){
                         SEARCH_FROM_API -> radioSource.stations.find {
@@ -68,7 +71,7 @@ class RadioPlaybackPreparer (
                     }
 
             playerPrepared(itemToPlay, flag)
-        }
+//        }
 
     }
 

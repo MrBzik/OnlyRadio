@@ -1,7 +1,6 @@
 package com.example.radioplayer.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import com.bumptech.glide.RequestManager
@@ -9,7 +8,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.databinding.FragmentRecordingDetailsBinding
-import com.example.radioplayer.exoPlayer.isPlaying
+import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,22 +41,17 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
     private fun subscribeToObservers(){
 
         observeCurrentRecording()
-        observePlaybackState()
+
+        observeRecordingDuration()
+
         observePlayerPosition()
-
-
-        mainViewModel.currentPlayerPosition.value?.let {
-            Log.d("CHECKTAGS", "pos : $it")
-            bind.seekBar.progress = it.toInt()
-        }
-
 
     }
 
 
     private fun observeCurrentRecording(){
 
-        mainViewModel.newRadioStation.observe(viewLifecycleOwner) {
+        mainViewModel.newPlayingItem.observe(viewLifecycleOwner) {
 
         if(it is PlayingItem.FromRecordings){
 
@@ -65,7 +59,6 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
             updateUiForRecording(it.recording)
 
-            observeRecordingDuration()
 
             }
         }
@@ -87,6 +80,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 seekBar?.let {
                     mainViewModel.seekTo(it.progress.toLong())
+                    RadioService.recordingPlaybackPosition.postValue(it.progress.toLong())
                     isSeekBarToUpdate = true
                 }
             }
@@ -98,7 +92,6 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
         mainViewModel.currentPlayerPosition.observe(viewLifecycleOwner){
             if(isSeekBarToUpdate){
                 bind.seekBar.progress = it.toInt()
-                Log.d("CHECKTAGS", "pos : $it")
                 setTvRecordingPlayingTime(it)
             }
         }
@@ -110,16 +103,6 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
     private fun observeRecordingDuration(){
         mainViewModel.currentPlayerDuration.observe(viewLifecycleOwner){
             bind.seekBar.max = it.toInt()
-        }
-    }
-
-
-    private fun observePlaybackState(){
-        mainViewModel.playbackState.observe(viewLifecycleOwner){
-            if(it?.isPlaying == true){
-                bind.seekBar.progress = it.position.toInt()
-
-            }
         }
     }
 

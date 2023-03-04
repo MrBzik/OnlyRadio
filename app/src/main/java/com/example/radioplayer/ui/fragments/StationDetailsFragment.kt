@@ -3,8 +3,8 @@ package com.example.radioplayer.ui.fragments
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import android.widget.SeekBar
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.RequestManager
@@ -12,11 +12,10 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
-import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.databinding.FragmentStationDetailsBinding
-import com.example.radioplayer.exoPlayer.isPlaying
+import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.dialogs.AddStationToPlaylistDialog
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
@@ -73,7 +72,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     private fun getNewRadioStation(){
 
-        mainViewModel.newRadioStation.value?.let {
+        mainViewModel.newPlayingItem.value?.let {
 
             if(it is PlayingItem.FromRadio){
 
@@ -109,22 +108,12 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
                  if(!isTimerObserverSet){
                      mainViewModel.exoRecordTimer.observe(viewLifecycleOwner){ time ->
-                         bind.tvTimer.text = time
+                         bind.tvTimer.text = Utils.timerFormat(time)
                      }
                      isTimerObserverSet = true
                  }
 
-
                  bind.fabRecording.setImageResource(R.drawable.ic_stop_recording)
-
-                 val id = (mainViewModel.radioSource.newExoRecord)
-                 val name = "Rec. ${currentRadioStation?.name}"
-                 databaseViewModel.insertNewRecording(
-                     id,
-                     currentRadioStation?.favicon ?: "",
-                     name,
-                     "00:00:00"
-                 )
 
 
             } else {
@@ -135,13 +124,12 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
                 if(!isConverterCallbackSet){
                     mainViewModel.exoRecordFinishConverting.observe(viewLifecycleOwner){ finished ->
+
                         if(finished){
+
                             bind.tvTimer.text = "Saved"
                             isRecording = false
-                            databaseViewModel
-                                .updateRecordingDuration(
-                                    durationOfRecording,
-                                mainViewModel.radioSource.newExoRecord)
+
                         }
                     }
                     isConverterCallbackSet = true
@@ -214,11 +202,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                 .load(station.favicon)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(bind.ivIcon)
-
-            if(!station.country.isNullOrBlank()){
-                bind.tvCountry.isVisible = true
-                bind.tvCountry.text = station.country
-            }
 
             if(!station.language.isNullOrBlank()){
                 bind.tvLanguage.isVisible = true

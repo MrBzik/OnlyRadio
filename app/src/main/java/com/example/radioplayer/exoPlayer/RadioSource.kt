@@ -12,7 +12,7 @@ import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.data.local.relations.DateWithStations
 import com.example.radioplayer.data.remote.RadioApi
 import com.example.radioplayer.data.remote.entities.*
-import com.example.radioplayer.exoPlayer.State.*
+
 import com.example.radioplayer.utils.Constants.API_RADIO_SEARCH_URL
 import com.example.radioplayer.utils.Constants.API_RADIO_TOP_VOTE_SEARCH_URL
 import com.example.radioplayer.utils.Constants.BASE_RADIO_URL
@@ -41,12 +41,16 @@ class RadioSource @Inject constructor(
     var stationsFromHistory = mutableListOf<MediaMetadataCompat>()
 
     val exoRecordState : MutableLiveData<Boolean> = MutableLiveData(false)
-    val exoRecordTimer : MutableLiveData<String> = MutableLiveData()
+    val exoRecordTimer : MutableLiveData<Long> = MutableLiveData()
     val exoRecordFinishConverting : MutableLiveData<Boolean> = MutableLiveData()
-    var newExoRecord = ""
+
 
 
     suspend fun getAllCountries() = radioApi.getAllCountries()
+
+
+    suspend fun insertRecording(recording : Recording) = radioDAO.insertRecording(recording)
+
 
 
 
@@ -166,7 +170,8 @@ class RadioSource @Inject constructor(
 
     suspend fun getRadioStations (isNewSearch : Boolean)   {
 
-            state = STATE_PROCESSING
+//            state = STATE_PROCESSING
+
               _stations?.let {
 
                   if(isNewSearch) {
@@ -183,7 +188,7 @@ class RadioSource @Inject constructor(
                       }
                   }
 
-                        state = STATE_INITIALIZED
+//                     state = STATE_INITIALIZED
                 }
     }
 
@@ -214,42 +219,42 @@ class RadioSource @Inject constructor(
 
 
 
-    private val onReadyListeners = mutableListOf<(Boolean) -> Unit>()
+//    private val onReadyListeners = mutableListOf<(Boolean) -> Unit>()
 
-    private var state = STATE_CREATED
-        set(value) {
-            if (value == STATE_INITIALIZED || value == STATE_ERROR) {
-                synchronized(onReadyListeners) {
-                    field = value
-                    onReadyListeners.forEach { listener ->
-                        listener(value == STATE_INITIALIZED)
-                    }
-                }
-            } else {
-                field = value
-            }
-        }
+//    private var state = STATE_CREATED
+//        set(value) {
+//            if (value == STATE_INITIALIZED || value == STATE_ERROR) {
+//                synchronized(onReadyListeners) {
+//                    field = value
+//                    onReadyListeners.forEach { listener ->
+//                        listener(value == STATE_INITIALIZED)
+//                    }
+//                }
+//            } else {
+//                field = value
+//            }
+//        }
 
-    fun whenReady(action : (Boolean) -> Unit) : Boolean {
+//    fun whenReady(action : (Boolean) -> Unit) : Boolean {
+//
+//        if(state == STATE_CREATED || state == STATE_PROCESSING) {
+//            onReadyListeners += action
+//            return false
+//        }
+//        else {
+//            action(state == STATE_INITIALIZED)
+//            return true
+//        }
+//    }
 
-        if(state == STATE_CREATED || state == STATE_PROCESSING) {
-            onReadyListeners += action
-            return false
-        }
-        else {
-            action(state == STATE_INITIALIZED)
-            return true
-        }
-    }
-
-
-}
-
-enum class State {
-
-    STATE_CREATED,
-    STATE_PROCESSING,
-    STATE_INITIALIZED,
-    STATE_ERROR
 
 }
+
+//enum class State {
+//
+//    STATE_CREATED,
+//    STATE_PROCESSING,
+//    STATE_INITIALIZED,
+//    STATE_ERROR
+//
+//}

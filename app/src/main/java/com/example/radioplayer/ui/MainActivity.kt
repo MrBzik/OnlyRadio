@@ -1,9 +1,11 @@
 package com.example.radioplayer.ui
 
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
@@ -14,6 +16,7 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.transition.Fade
 import androidx.transition.Slide
 import com.bumptech.glide.RequestManager
@@ -38,6 +41,10 @@ import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
 
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -174,7 +181,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun observeNewStation(){
 
-        mainViewModel.newRadioStation.observe(this){ playingItem ->
+        mainViewModel.newPlayingItem.observe(this){ playingItem ->
 
             currentPlayingItem = playingItem
 
@@ -196,12 +203,54 @@ class MainActivity : AppCompatActivity() {
 
         bindPlayer.root.slideAnim(500, 0, R.anim.fade_in_anim)
 
+        lifecycleScope.launch {
+            delay(1600)
+            withContext(Dispatchers.Main){
+//                bindPlayer.tvStationTitle.ellipsize = TextUtils.TruncateAt.MARQUEE
+                bindPlayer.tvStationTitle.isSingleLine = true
+                bindPlayer.tvStationTitle.isSelected = true
+//                bindPlayer.tvStationTitle.requestFocus()
+            }
+        }
+
         clickListenerToHandleNavigationWithDetailsFragment()
 
         onClickListenerForTogglePlay()
         observePlaybackStateToChangeIcons()
+
+        observeCurrentSongTitle()
+
     }
 
+
+    private fun observeCurrentSongTitle (){
+
+        mainViewModel.currentSongTitle.observe(this){ title ->
+
+            handleTitleText(title)
+        }
+    }
+
+
+    private fun handleTitleText(title : String){
+
+        if(title.equals("NULL", ignoreCase = true) || title.isBlank()){
+            bindPlayer.tvStationTitle.apply {
+                text = "Playing : no info"
+                setTextColor(Color.WHITE)
+                alpha = 0.6f
+            }
+        } else {
+
+            bindPlayer.tvStationTitle.apply {
+
+                text = title
+                setTextColor(Color.YELLOW)
+                alpha = 1f
+
+            }
+        }
+    }
 
 
     private fun setOnBottomNavClickListener(){
@@ -354,11 +403,11 @@ class MainActivity : AppCompatActivity() {
 
         when (playingItem) {
             is PlayingItem.FromRadio -> {
-                name = playingItem.radioStation.name ?: ""
+//                name = playingItem.radioStation.name ?: ""
                 newImage = playingItem.radioStation.favicon?.toUri()
             }
             is PlayingItem.FromRecordings -> {
-                name = playingItem.recording.name
+//                name = playingItem.recording.name
                 newImage = playingItem.recording.iconUri.toUri()
             }
         }
@@ -376,7 +425,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        bindPlayer.tvStationTitle.text = name
+//        bindPlayer.tvStationTitle.text = name
 
     }
 
@@ -388,7 +437,23 @@ class MainActivity : AppCompatActivity() {
 
                 when(it){
                     is PlayingItem.FromRadio -> {
-                        mainViewModel.playOrToggleStation(it.radioStation)
+                      val isPlaying =  mainViewModel.playOrToggleStation(it.radioStation)
+                      if(isPlaying){
+                          bindPlayer.tvStationTitle.apply {
+                              setTextColor(Color.YELLOW)
+                              alpha = 1f
+                          }
+
+                      } else {
+
+                          bindPlayer.tvStationTitle.apply {
+                              setTextColor(Color.WHITE)
+                              alpha = 0.6f
+                          }
+
+                      }
+
+
                     }
                     is PlayingItem.FromRecordings -> {
                         mainViewModel.playOrToggleStation(rec = it.recording)

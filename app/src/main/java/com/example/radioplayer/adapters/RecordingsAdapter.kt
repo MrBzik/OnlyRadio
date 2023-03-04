@@ -1,9 +1,11 @@
 package com.example.radioplayer.adapters
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
+import android.widget.SeekBar
+import android.widget.TextView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -12,8 +14,10 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withC
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Recording
-import com.example.radioplayer.databinding.ItemRecordingBinding
 import com.example.radioplayer.databinding.ItemRecordingWithSeekbarBinding
+import com.example.radioplayer.exoPlayer.RadioService
+import com.example.radioplayer.utils.Utils
+import org.w3c.dom.Text
 import java.text.DateFormat
 import java.util.*
 import javax.inject.Inject
@@ -40,34 +44,71 @@ class RecordingsAdapter @Inject constructor(
     }
 
     override fun onBindViewHolder(holder: RecordingItemHolder, position: Int) {
+
         val recording = listOfRecordings[position]
 
         holder.bind.apply {
 
             tvPrimary.text = recording.name
             tvSecondary.text = convertLongToDate(recording.timeStamp)
-            tvDuration.text = recording.duration
+            tvDuration.text = Utils.timerFormat(recording.durationMills)
             glide
                 .load(recording.iconUri)
                 .placeholder(R.drawable.ic_radio_default)
                 .transition(withCrossFade(glideFactory))
                 .into(ivItemImage)
-        }
 
 
+            if(recording.id == playingRecordingId){
 
-            holder.bind.ivItemImage.setOnClickListener {
+                itemSeekbarHandler?.let { handler ->
 
-            onItemClickListener?.let { click ->
-                click(recording)
+                    previousSeekbar = seekBar
+                    previousTvTime = tvDuration
+                    handler(seekBar, tvDuration,false)
+                }
 
-               holder.bind.seekBar.visibility = View.VISIBLE
+            } else {
+                seekBar.visibility = View.GONE
 
+            }
+
+            ivItemImage.setOnClickListener {
+
+                onItemClickListener?.let { click ->
+                    click(recording)
+
+                    if(playingRecordingId == recording.id) {/*DO NOTHING*/}
+                    else {
+                        itemSeekbarHandler?.let { handler ->
+
+                            previousSeekbar?.let{
+                                it.setOnSeekBarChangeListener(null)
+                                it.visibility = View.GONE
+                            }
+                                previousSeekbar = seekBar
+
+                                previousTvTime?.text = Utils.timerFormat(recording.durationMills)
+
+                                handler(seekBar, tvDuration, true)
+                            }
+                        }
+                    }
+                }
             }
         }
 
-    }
 
+    var playingRecordingId = ""
+
+    private var previousSeekbar : SeekBar? = null
+    private var previousTvTime : TextView? = null
+
+    private var itemSeekbarHandler : ((seekBar : SeekBar, tvDuration : TextView, isNewItem : Boolean) -> Unit)? = null
+
+    fun setItemSeekbarHandler (handler : (seekbar : SeekBar, tvDuration : TextView, isNewItem : Boolean) -> Unit){
+        itemSeekbarHandler = handler
+    }
 
 
     private var onItemClickListener : ((Recording) -> Unit)? = null

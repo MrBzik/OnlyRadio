@@ -23,10 +23,11 @@ import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
         StationDateCrossRef::class,
         Recording::class
                ],
-        version = 12,
+        version = 13,
          autoMigrations = [
         AutoMigration(from = 9, to = 10, spec = RadioDB.Migration9To10::class),
-        AutoMigration(from = 11, to = 12, spec = RadioDB.Migration11To12::class)
+        AutoMigration(from = 11, to = 12, spec = RadioDB.Migration11To12::class),
+        AutoMigration(from = 12, to = 13, spec = RadioDB.Migration12To13::class)
     ]
 )
 
@@ -41,6 +42,9 @@ abstract class RadioDB : RoomDatabase() {
     class Migration9To10 : AutoMigrationSpec
 
     class Migration11To12 : AutoMigrationSpec
+
+    @DeleteColumn(tableName = "Recording", columnName = "duration")
+    class Migration12To13 : AutoMigrationSpec
 
     companion object{
 

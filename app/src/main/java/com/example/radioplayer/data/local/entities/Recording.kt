@@ -13,6 +13,6 @@ data class Recording (
     val iconUri : String,
     val timeStamp : Long,
     val name : String,
-    @ColumnInfo(name = "duration", defaultValue = "unknown")
-    val duration : String
+    @ColumnInfo(name = "durationMills", defaultValue = "0")
+    val durationMills : Long
         )

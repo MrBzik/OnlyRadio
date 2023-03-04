@@ -6,15 +6,18 @@ import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import com.example.radioplayer.exoPlayer.RadioService
-import com.google.android.exoplayer2.PlaybackException
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.Timeline
-import com.google.android.exoplayer2.Tracks
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.audio.AudioAttributes
+import com.google.android.exoplayer2.metadata.Metadata
 
 class RadioPlayerEventListener (
     private val radioService : RadioService
         ) : Player.Listener {
+
+    override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+        super.onMediaMetadataChanged(mediaMetadata)
+        RadioService.currentSongTitle.postValue(mediaMetadata.title.toString())
+    }
 
 
 
@@ -30,6 +33,7 @@ class RadioPlayerEventListener (
             radioService.isForegroundService = false
         }
          else if(playbackState == Player.STATE_READY && playWhenReady){
+
             radioService.isPlaybackStatePlaying = true
             radioService.listenToRecordDuration()
 

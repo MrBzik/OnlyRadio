@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
+import android.util.Log
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
@@ -49,13 +51,18 @@ class MainViewModel @Inject constructor(
        private var listOfStations = listOf<RadioStation>()
        var isNewSearch = true
        var isDelayNeededForServiceConnection = true
-       val newRadioStation : MutableLiveData<PlayingItem> = MutableLiveData()
+
+       val newPlayingItem : MutableLiveData<PlayingItem> = MutableLiveData()
 
        var isHistoryAnimationToPlay = true
        var isSearchAnimationToPlay = true
        var isFavouriteAnimationToPlay = true
 
        var noResultDetection : MutableLiveData<Boolean> = MutableLiveData()
+
+       val currentSongTitle = RadioService.currentSongTitle
+
+
 
     init {
 
@@ -64,11 +71,11 @@ class MainViewModel @Inject constructor(
                 val itemId = it.getString(METADATA_KEY_MEDIA_ID)
                 if(itemId.contains(".ogg")) {
                     val item = repository.getCurrentRecording(itemId)
-                    newRadioStation.postValue(PlayingItem.FromRecordings(item))
+                    newPlayingItem.postValue(PlayingItem.FromRecordings(item))
                     isRadioTrueRecordingFalse = false
                 } else {
                     val item = repository.getCurrentRadioStation(itemId)
-                    newRadioStation.postValue(PlayingItem.FromRadio(item))
+                    newPlayingItem.postValue(PlayingItem.FromRadio(item))
                     isRadioTrueRecordingFalse = true
                 }
             }
@@ -280,37 +287,49 @@ class MainViewModel @Inject constructor(
         }
 
 
-        fun playOrToggleStation(station : RadioStation? = null, searchFlag : Int = 0, rec : Recording? = null) {
+        fun playOrToggleStation(
+            station : RadioStation? = null,
+            searchFlag : Int = 0,
+            rec : Recording? = null) : Boolean {
 
             val isPrepared = playbackState.value?.isPrepared ?: false
 
-
             val id = station?.stationuuid ?: (rec?.id ?: "")
-
 
             if(isPrepared && id
                     == currentRadioStation.value?.getString(METADATA_KEY_MEDIA_ID)){
                 playbackState.value?.let { playbackState ->
                     when {
-                        playbackState.isPlaying -> radioServiceConnection.transportControls.pause()
-                        playbackState.isPlayEnabled -> radioServiceConnection.transportControls.play()
 
+                        playbackState.isPlaying -> {
+                            radioServiceConnection.transportControls.pause()
+                            return false
+                        }
+
+                        playbackState.isPlayEnabled -> {
+                            radioServiceConnection.transportControls.play()
+                            return true
+                        }
+                           else -> false
                     }
                 }
             } else{
 
                 if(station == null){
-                    newRadioStation.postValue(PlayingItem.FromRecordings(rec!!))
+                    newPlayingItem.postValue(PlayingItem.FromRecordings(rec!!))
                     isRadioTrueRecordingFalse = false
+                    RadioService.recordingPlaybackPosition.postValue(0)
 
                 } else {
                     isRadioTrueRecordingFalse = true
-                    newRadioStation.postValue(PlayingItem.FromRadio(station))
+                    newPlayingItem.postValue(PlayingItem.FromRadio(station))
                 }
 
                 radioServiceConnection.transportControls
                     .playFromMediaId(id, bundleOf(Pair("SEARCH_FLAG", searchFlag)))
             }
+
+            return false
         }
 
         var isRadioTrueRecordingFalse = true
