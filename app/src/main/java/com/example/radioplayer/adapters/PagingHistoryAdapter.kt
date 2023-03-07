@@ -109,11 +109,12 @@ class PagingHistoryAdapter @Inject constructor(
                     .transition(withCrossFade(glideFactory))
                     .into(ivItemImage)
 
-                ivItemImage.setOnClickListener {
+                root.setOnClickListener {
 
                     onItemClickListener?.let { click ->
 
                         click(item.radioStation)
+                    }
 
                         if(item.radioStation.stationuuid == currentRadioStationID){
 
@@ -140,7 +141,7 @@ class PagingHistoryAdapter @Inject constructor(
                         selectedAdapterPosition = holder.absoluteAdapterPosition
                         previousItemHolder = holder
                     }
-                }
+
 
 
                 if(item.radioStation.stationuuid == currentRadioStationID){

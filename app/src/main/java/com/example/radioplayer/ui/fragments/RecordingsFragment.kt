@@ -55,7 +55,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
         observePlayingItem()
 
-        observeRecordingDuration()
+//        observeRecordingDuration()
 
         observePlayerPosition()
 
@@ -101,13 +101,13 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
     }
 
 
-    private fun observeRecordingDuration(){
-        mainViewModel.currentPlayerDuration.observe(viewLifecycleOwner){
-
-            currentItemSeekbar?.max = it.toInt()
-
-        }
-    }
+//    private fun observeRecordingDuration(){
+//        mainViewModel.currentPlayerDuration.observe(viewLifecycleOwner){
+//
+//            currentItemSeekbar?.max = it.toInt()
+//
+//        }
+//    }
 
 
 
@@ -121,13 +121,15 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
             if(!isItemChanged){
 
-                mainViewModel.currentPlayerDuration.value?.let { duration ->
-                    seekbar.max = duration.toInt()
-                }
+//                mainViewModel.currentPlayerDuration.value?.let { duration ->
+//                    seekbar.max = duration.toInt()
+//                }
 
                 mainViewModel.currentPlayerPosition.value?.let { position ->
                     seekbar.progress = position.toInt()
+                    setTvRecordingPlayingTime(position)
                 }
+
             }
             setSeekbarChangeListener(seekbar)
         }
@@ -183,8 +185,12 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
     private fun setAdapterClickListener(){
 
-        recordingsAdapter.setOnClickListener {
-            mainViewModel.playOrToggleStation(rec = it, searchFlag = SEARCH_FROM_RECORDINGS)
+        recordingsAdapter.setOnClickListener { recording, position ->
+            mainViewModel.playOrToggleStation(
+                rec = recording,
+                searchFlag = SEARCH_FROM_RECORDINGS,
+                recPosition = position
+            )
 
         }
     }
@@ -206,6 +212,12 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
             edgeEffectFactory = BounceEdgeEffectFactory()
             setHasFixedSize(true)
             setToggleItemDeletion()
+
+            layoutAnimation = (activity as MainActivity).layoutAnimationController
+
+            post {
+                scheduleLayoutAnimation()
+            }
 
         }
     }
@@ -244,7 +256,6 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
             val position = viewHolder.layoutPosition
             val recording = recordingsAdapter.listOfRecordings[position]
 
-
             databaseViewModel.deleteRecording(recording)
 
             Snackbar.make(
@@ -262,6 +273,8 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
                event == DISMISS_EVENT_SWIPE ) {
                 try {
                     requireActivity().deleteFile(recording.id)
+
+                    mainViewModel.updateRecordingsPlaylist(position)
                 } catch (e: java.lang.Exception) {
                     Log.d("CHECKTAGS", e.stackTraceToString())
                 }
@@ -288,6 +301,8 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
     override fun onDestroyView() {
         super.onDestroyView()
         currentItemSeekbar = null
+        currentItemTvDuration = null
+        currentRecording = null
         isDeletingEnabled = false
         bind.rvRecordings.adapter = null
         _bind = null

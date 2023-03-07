@@ -1,24 +1,37 @@
 package com.example.radioplayer.utils
 
-val listOfTags = listOf("50s", "60s", "70s", "80s", "90s", "00s",
-    "hits", "top", "pop", "rock", "adult contemporary", "country", "dance", "electro","eclectic",
-    "jazz", "oldies", "classic","alternative", "house", "ambient", "folk", "blues",
-    "charts", "disco", "edm", "funk", "grupera", "heavy metal", "hip-hop", "indie", "instrumental",
-    "juvenil", "kids", "latin", "spanish", "bollywood", "lounge", "mainstream", "metal", "punk", "rap",
-    "reggae", "relax", "religion", "religious", "retro", "romantic", "rnb", "schlager", "soul", "techno",
-    "traffic", "trance", "urban", "tropical", "traditional", "smooth", "salsa", "romántica", "anime",
-    "children", "christmas", "club", "contemporary", "decades", "downtempo", "drum and bass",
-    "economics", "experimental", "freeform", "gothic", "grupero", "hardcore", "hiphop",
-    "industrial", "lifestyle",  "live", "local", "love", "new wave", "opera",
-    "party", "r&b", "salsa", "independent", "workout", "vocal", "underground", "swing",
-    "romance", "remixes", "progressive", "nostalgia",
-    "new age", "jungle", "guitar", "groove", "garage", "ethnic", "dubstep", "dj", "avant-garde",
-    "acoustic", "orchestral", "piano", "medieval","meditation",
-    "chill","nature", "spiritual", "slow", "sleep", "international", "regional", "entretenimiento",
-    "entertainment", "easy listening", "news", "talk", "speech", "comedy", "storytelling", "podcast",
-    "culture", "science", "film", "literature", "soundtrack", "information", "sport", "tv", "noticias",
-    "politics",
-    "education", "moi merino", "commercial", "banda", "balada", "bible", "christian", "catholic", "gospel"
+val listOfTags = listOf("decades","50s", "60s", "70s", "80s", "90s", "00s",
+    "charts","hits", "top",
+
+    "-----GENRES & TRENDS-----",
+    "acoustic","adult contemporary","alternative","ambient","anime","avant-garde","blues",
+    "bollywood","classic","club","contemporary","country","dance","disco","dj",
+    "drum and bass","dubstep","eclectic","edm","electro","ethnic","experimental",
+    "folk","freeform","funk","garage","gothic","groove","guitar","hardcore",
+    "heavy metal","hip-hop","hiphop","house","independent","indie","industrial",
+    "instrumental","jazz","jungle", "latin", "lifestyle","lounge","love","mainstream","metal",
+    "new age","new wave","nostalgia","oldies","opera","orchestral","party","piano","pop",
+    "progressive","punk","r&b","rap","reggae","remixes","retro","rnb","rock","romance",
+    "romantic","romántica","salsa","schlager","smooth", "spanish", "swing","techno",
+    "traditional","traffic","trance","tropical","underground","urban","vocal","workout",
+
+    "-----SPECIAL-----",
+    "chill","downtempo", "meditation", "nature","relax", "sleep", "slow", "soul", "spiritual",
+
+    "-----TALK, NEWS, etc-----",
+
+    "balada","banda","bible","catholic","christian","christmas","comedy","commercial","culture",
+    "easy listening","economics","education","entertainment","entretenimiento","film","gospel",
+    "information","international","literature","live","local","medieval","news","noticias","podcast",
+    "politics","regional","religion","religious","science","soundtrack","speech","sport",
+    "storytelling","talk","tv" ,
+
+    "-----OTHER-----",
+
+    "children", "juvenil", "kids",
+
+    "grupera", "grupero", "moi merino"
+
     )
 
 

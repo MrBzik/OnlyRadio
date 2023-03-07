@@ -390,4 +390,8 @@ class DatabaseViewModel @Inject constructor(
         repository.deleteRecording(rec)
     }
 
+    fun renameRecording(id : String, newName: String) = viewModelScope.launch {
+        repository.renameRecording(id, newName)
+    }
+
 }

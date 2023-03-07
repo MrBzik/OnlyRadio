@@ -10,6 +10,7 @@ import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.databinding.FragmentRecordingDetailsBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.MainActivity
+import com.example.radioplayer.ui.dialogs.RenameRecordingDialog
 import com.example.radioplayer.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -34,15 +35,39 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
         setSeekbarChangeListener()
 
+        setRecordingsRenameClickListener()
+
         endLoadingBarIfNeeded()
 
     }
+
+    private fun setRecordingsRenameClickListener(){
+        bind.tvRename.setOnClickListener {
+            currentRecording?.let { recording ->
+                RenameRecordingDialog(requireContext(), recording.name){ newName ->
+                    mainViewModel.newPlayingItem.postValue(
+                        PlayingItem.FromRecordings(
+                            Recording(
+                                recording.id,
+                                recording.iconUri,
+                                recording.timeStamp,
+                                newName,
+                                recording.durationMills
+                            )
+                        )
+                    )
+                    databaseViewModel.renameRecording(recording.id, newName)
+                }.show()
+            }
+        }
+    }
+
 
     private fun subscribeToObservers(){
 
         observeCurrentRecording()
 
-        observeRecordingDuration()
+//        observeRecordingDuration()
 
         observePlayerPosition()
 
@@ -59,6 +84,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
             updateUiForRecording(it.recording)
 
+            bind.seekBar.max = it.recording.durationMills.toInt()
 
             }
         }
@@ -100,11 +126,11 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
         bind.tvRecordingPlayingTime.text = Utils.timerFormat(time)
     }
 
-    private fun observeRecordingDuration(){
-        mainViewModel.currentPlayerDuration.observe(viewLifecycleOwner){
-            bind.seekBar.max = it.toInt()
-        }
-    }
+//    private fun observeRecordingDuration(){
+//        mainViewModel.currentPlayerDuration.observe(viewLifecycleOwner){
+//            bind.seekBar.max = it.toInt()
+//        }
+//    }
 
     private fun updateUiForRecording(recording: Recording){
 

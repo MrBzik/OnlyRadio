@@ -7,6 +7,8 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import com.example.radioplayer.exoPlayer.RadioSource
+import com.example.radioplayer.utils.Constants.REC_POSITION
+import com.example.radioplayer.utils.Constants.SEARCH_FLAG
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
@@ -18,7 +20,7 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 class RadioPlaybackPreparer (
 
     private val radioSource: RadioSource,
-    private val playerPrepared : (MediaMetadataCompat?, Int) -> Unit,
+    private val playerPrepared : (MediaMetadataCompat?, flag: Int, recPosition : Int) -> Unit,
     private val onCommand : (String, Bundle?) -> Unit
         ) : MediaSessionConnector.PlaybackPreparer {
 
@@ -46,9 +48,9 @@ class RadioPlaybackPreparer (
         var flag = 666
 
         extras?.let {
-            flag = it.getInt("SEARCH_FLAG", 0)
+            flag = it.getInt(SEARCH_FLAG, 0)
         }
-
+        var recPosition = 0
 
 //        radioSource.whenReady {
             val itemToPlay =
@@ -62,15 +64,20 @@ class RadioPlaybackPreparer (
                           SEARCH_FROM_HISTORY -> radioSource.stationsFromHistory.find{
                               it.description.mediaId == mediaId
                           }
-                           SEARCH_FROM_RECORDINGS -> radioSource.recordings.find {
-                               it.description.mediaId == mediaId
+                           SEARCH_FROM_RECORDINGS -> {
+
+                               recPosition = extras?.getInt(REC_POSITION, 0) ?: 0
+
+                               radioSource.recordings.find {
+                                   it.description.mediaId == mediaId
+                               }
                            }
                          else -> radioSource.stationsFromPlaylist.find {
                              it.description.mediaId == mediaId
                          }
                     }
 
-            playerPrepared(itemToPlay, flag)
+            playerPrepared(itemToPlay, flag, recPosition)
 //        }
 
     }

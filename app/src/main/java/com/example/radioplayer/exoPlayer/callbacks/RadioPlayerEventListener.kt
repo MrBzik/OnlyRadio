@@ -16,6 +16,7 @@ class RadioPlayerEventListener (
 
     override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
         super.onMediaMetadataChanged(mediaMetadata)
+        radioService.radioNotificationManager.updateNotification()
         RadioService.currentSongTitle.postValue(mediaMetadata.title.toString())
     }
 

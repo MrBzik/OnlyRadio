@@ -51,7 +51,7 @@ class RecordingsAdapter @Inject constructor(
 
             tvPrimary.text = recording.name
             tvSecondary.text = convertLongToDate(recording.timeStamp)
-            tvDuration.text = Utils.timerFormat(recording.durationMills)
+
             glide
                 .load(recording.iconUri)
                 .placeholder(R.drawable.ic_radio_default)
@@ -61,34 +61,41 @@ class RecordingsAdapter @Inject constructor(
 
             if(recording.id == playingRecordingId){
 
-                itemSeekbarHandler?.let { handler ->
+                previousSeekbar = seekBar
+                previousTvTime = tvDuration
+                previousTvTimeValue = recording.durationMills
 
-                    previousSeekbar = seekBar
-                    previousTvTime = tvDuration
+                seekBar.max = recording.durationMills.toInt()
+
+                itemSeekbarHandler?.let { handler ->
                     handler(seekBar, tvDuration,false)
                 }
 
             } else {
                 seekBar.visibility = View.GONE
-
+                tvDuration.text = Utils.timerFormat(recording.durationMills)
             }
 
-            ivItemImage.setOnClickListener {
+            root.setOnClickListener {
 
                 onItemClickListener?.let { click ->
-                    click(recording)
+                    click(recording, position)
 
                     if(playingRecordingId == recording.id) {/*DO NOTHING*/}
                     else {
+
+                        previousSeekbar?.let{
+                            it.setOnSeekBarChangeListener(null)
+                            it.visibility = View.GONE
+                        }
+                        previousTvTime?.text = Utils.timerFormat(previousTvTimeValue)
+
+                        seekBar.max = recording.durationMills.toInt()
+                        previousSeekbar = seekBar
+                        previousTvTime = tvDuration
+                        previousTvTimeValue = recording.durationMills
+
                         itemSeekbarHandler?.let { handler ->
-
-                            previousSeekbar?.let{
-                                it.setOnSeekBarChangeListener(null)
-                                it.visibility = View.GONE
-                            }
-                                previousSeekbar = seekBar
-
-                                previousTvTime?.text = Utils.timerFormat(recording.durationMills)
 
                                 handler(seekBar, tvDuration, true)
                             }
@@ -104,6 +111,8 @@ class RecordingsAdapter @Inject constructor(
     private var previousSeekbar : SeekBar? = null
     private var previousTvTime : TextView? = null
 
+    private var previousTvTimeValue = 0L
+
     private var itemSeekbarHandler : ((seekBar : SeekBar, tvDuration : TextView, isNewItem : Boolean) -> Unit)? = null
 
     fun setItemSeekbarHandler (handler : (seekbar : SeekBar, tvDuration : TextView, isNewItem : Boolean) -> Unit){
@@ -111,9 +120,9 @@ class RecordingsAdapter @Inject constructor(
     }
 
 
-    private var onItemClickListener : ((Recording) -> Unit)? = null
+    private var onItemClickListener : ((Recording, position : Int) -> Unit)? = null
 
-    fun setOnClickListener(listener : (Recording) -> Unit){
+    fun setOnClickListener(listener : (Recording, position : Int) -> Unit){
         onItemClickListener = listener
     }
 

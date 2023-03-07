@@ -16,7 +16,9 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withC
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
+import com.example.radioplayer.databinding.ItemRadioWithTextBinding
 import com.example.radioplayer.databinding.RadioItemBinding
+import com.example.radioplayer.utils.RandomColors
 import java.lang.String
 import javax.inject.Inject
 
@@ -26,17 +28,18 @@ class PagingRadioAdapter @Inject constructor(
 
 ) : PagingDataAdapter<RadioStation, PagingRadioAdapter.RadioItemHolder>(StationsComparator) {
 
+    val randColors = RandomColors()
 
     class RadioItemHolder (itemView : View) : RecyclerView.ViewHolder(itemView)  {
-        var bind : RadioItemBinding
+        var bind : ItemRadioWithTextBinding
         init {
-            bind = RadioItemBinding.bind(itemView)
+            bind = ItemRadioWithTextBinding.bind(itemView)
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RadioItemHolder {
        return RadioItemHolder(
-           LayoutInflater.from(parent.context).inflate(R.layout.radio_item, parent, false)
+           LayoutInflater.from(parent.context).inflate(R.layout.item_radio_with_text, parent, false)
        )
 
     }
@@ -48,14 +51,40 @@ class PagingRadioAdapter @Inject constructor(
 
             tvPrimary.text = station.name
             tvSecondary.text = station.country
-            glide
-                .load(station.favicon)
-                .placeholder(R.drawable.ic_radio_default)
-                .transition(withCrossFade(glideFactory))
-                .into(ivItemImage)
+
+            if(station.favicon.isNullOrBlank()){
+
+
+                station.name?.let { name ->
+                    var char = 'X'
+
+                    for(l in name.indices){
+                        if(name[l].isLetter()){
+                            char = name[l]
+                            break
+                        }
+                    }
+
+                    val color = randColors.getColor()
+
+                    tvPlaceholder.text = char.toString().uppercase()
+                    tvPlaceholder.setTextColor(color)
+                    tvPlaceholder.visibility = View.VISIBLE
+                    ivItemImage.visibility = View.GONE
+                }
+            } else {
+                ivItemImage.visibility = View.VISIBLE
+                tvPlaceholder.visibility = View.GONE
+
+                glide
+                    .load(station.favicon)
+                    .placeholder(R.drawable.ic_radio_default)
+                    .transition(withCrossFade(glideFactory))
+                    .into(ivItemImage)
+            }
         }
 
-        holder.bind.ivItemImage.setOnClickListener {
+        holder.itemView.setOnClickListener {
 
             onItemClickListener?.let { click ->
                 click(station)
@@ -87,7 +116,7 @@ class PagingRadioAdapter @Inject constructor(
 
 
 
-    private fun restoreState(bind: RadioItemBinding){
+    private fun restoreState(bind: ItemRadioWithTextBinding){
         bind.apply {
             radioItemRootLayout.setBackgroundResource(R.color.main_background)
             tvPrimary.setTextColor(defaultTextColor)
@@ -96,7 +125,7 @@ class PagingRadioAdapter @Inject constructor(
         }
     }
 
-    private fun handleStationPlaybackState(bind: RadioItemBinding){
+    private fun handleStationPlaybackState(bind: ItemRadioWithTextBinding){
         if(currentPlaybackState){
             bind.apply {
                radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)

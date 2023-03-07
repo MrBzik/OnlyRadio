@@ -154,6 +154,10 @@ interface  RadioDAO {
     @Delete
     suspend fun deleteRecording(rec : Recording)
 
+    @Query("UPDATE Recording SET name =:newName  WHERE id =:id")
+    suspend fun renameRecording(id : String, newName: String)
+
+
 //    @Query("UPDATE Recording SET duration=:duration WHERE id =:id")
 //    suspend fun updateRecordingDuration(duration : String, id : String)
 

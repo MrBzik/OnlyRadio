@@ -402,8 +402,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             }
 
             layoutAnimation = (activity as MainActivity).layoutAnimationController
-                post {
 
+                post {
                     scheduleLayoutAnimation()
                 }
         }

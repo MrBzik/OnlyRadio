@@ -23,9 +23,10 @@
         android:progressDrawable="@drawable/seekbar"
         android:background="@null"
         android:layout_marginTop="7dp"
-        android:layout_marginStart="85dp"
+        android:layout_marginStart="69dp"
         android:paddingStart="0dp"
         android:paddingEnd="0dp"
+        android:progress="100"
         android:visibility="gone"
         />
 
@@ -69,12 +70,12 @@
 
     <TextView
         android:id="@+id/tvDuration"
-        android:layout_width="match_parent"
+        android:layout_width="80dp"
         android:layout_height="18dp"
         android:fontFamily="@font/aldrich"
         android:textColor="@color/default_text_color"
         android:alpha="0.6"
-        android:gravity="end"
+        android:layout_gravity="end"
         android:text="00:00:00"
         android:maxLines="1"
         android:textSize="14sp"

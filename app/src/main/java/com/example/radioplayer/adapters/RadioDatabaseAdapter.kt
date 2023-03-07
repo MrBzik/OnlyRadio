@@ -57,7 +57,7 @@ class RadioDatabaseAdapter @Inject constructor(
             restoreState(holder.bind)
 
 
-            holder.bind.ivItemImage.setOnClickListener {
+            holder.itemView.setOnClickListener {
 
             onItemClickListener?.let { click ->
                 click(station)

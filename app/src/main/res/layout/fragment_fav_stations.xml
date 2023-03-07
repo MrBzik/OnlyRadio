@@ -7,20 +7,32 @@
     android:animateLayoutChanges="true">
 
 
+    <ImageView
+        android:id="@+id/ivArrowBackToFav"
+        android:visibility="gone"
+        android:layout_width="40dp"
+        android:layout_height="130dp"
+        android:elevation="-1dp"
+        android:src="@drawable/ic_back_to_fav_playlist"
+        android:background="@color/main_background"
+        app:layout_constraintBottom_toBottomOf="@+id/rvPlaylists"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/rvPlaylists" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPlaylists"
         android:layout_width="0dp"
         android:layout_height="130dp"
         android:layout_gravity="bottom"
         android:visibility="gone"
+        android:background="@color/main_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivArrowBackToFav"
-        app:layout_constraintTop_toBottomOf="@id/simpleView"
-
+        app:layout_constraintTop_toBottomOf="@id/viewToolbar"
         />
 
     <View
-        android:id="@+id/simpleView"
+        android:id="@+id/viewToolbar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -98,21 +110,13 @@
 
         />
 
-    <ImageView
-        android:id="@+id/ivArrowBackToFav"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/ic_back_to_fav_playlist"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/rvPlaylists"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/rvPlaylists" />
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvFavStations"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:elevation="-2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

@@ -58,7 +58,8 @@ class FilterTagsAdapter(): ListAdapter<String, FilterTagsAdapter.TagHolder>(DIFF
                             originalList
                         else {
                             originalList.filter { tag ->
-                                tag.contains(charSequence, ignoreCase = true)
+                                tag.contains(charSequence, ignoreCase = true) &&
+                                !tag.contains("---")
                             }
                         }
                     }

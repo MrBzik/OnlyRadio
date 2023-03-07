@@ -1,6 +1,7 @@
 package com.example.radioplayer.exoPlayer
 
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
@@ -18,6 +19,10 @@ import com.example.radioplayer.utils.Constants.API_RADIO_TOP_VOTE_SEARCH_URL
 import com.example.radioplayer.utils.Constants.BASE_RADIO_URL
 import com.example.radioplayer.utils.Constants.BASE_RADIO_URL3
 import com.example.radioplayer.utils.Constants.listOfUrls
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.upstream.DefaultDataSource
 
 import javax.inject.Inject
 
@@ -95,6 +100,24 @@ class RadioSource @Inject constructor(
         }.toMutableList()
     }
 
+
+    fun createConcatenatingMediaFromRecordings(
+        dataSourceFactory: DefaultDataSource.Factory,
+        fileDirPath : String
+    )  : ConcatenatingMediaSource {
+        val concatenatingMediaSource = ConcatenatingMediaSource()
+        recordings.forEach { recording ->
+
+            val uri = "$fileDirPath/${recording.getString(METADATA_KEY_MEDIA_URI)}"
+            val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(MediaItem.fromUri(uri))
+            concatenatingMediaSource.addMediaSource(mediaSource)
+        }
+            return concatenatingMediaSource
+    }
+
+
+
     suspend fun getStationsInPlaylist(playlistName: String) {
 
         val response = radioDAO.getStationsInPlaylist(playlistName)
@@ -120,6 +143,7 @@ class RadioSource @Inject constructor(
     suspend fun getRadioStationsSource(
         country: String = "", tag: String = "", name: String = "", offset: Int = 0, pageSize: Int
     ): RadioStations? {
+
 
         val response = try {
 

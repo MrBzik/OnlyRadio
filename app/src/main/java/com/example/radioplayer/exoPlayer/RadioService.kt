@@ -21,20 +21,20 @@ import com.example.radioplayer.exoPlayer.callbacks.RadioPlaybackPreparer
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerNotificationListener
 import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
-import com.example.radioplayer.utils.Constants.NETWORK_ERROR
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
 import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
+import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RECORDINGS_PLAYLIST
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
-import com.example.radioplayer.utils.Utils
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
@@ -75,7 +75,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
 
-    private lateinit var radioNotificationManager: RadioNotificationManager
+     lateinit var radioNotificationManager: RadioNotificationManager
 
     private lateinit var mediaSession : MediaSessionCompat
     private lateinit var mediaSessionConnector : MediaSessionConnector
@@ -100,7 +100,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
     companion object{
         val currentSongTitle = MutableLiveData<String>()
-        var curRecordTotalDuration = MutableLiveData<Long>()
+//        var curRecordTotalDuration = MutableLiveData<Long>()
         val recordingPlaybackPosition = MutableLiveData<Long>()
 
     }
@@ -139,14 +139,12 @@ class RadioService : MediaBrowserServiceCompat() {
             RadioPlayerNotificationListener(this),
             glide
             ) {
-//            if(isFromRecording){
-//                curRecordTotalDuration = exoPlayer.duration
-//            }
-
-
+             exoPlayer.mediaMetadata.title
         }
 
-        val radioPlaybackPreparer = RadioPlaybackPreparer(radioSource, { itemToPlay, flag ->
+
+
+        val radioPlaybackPreparer = RadioPlaybackPreparer(radioSource, { itemToPlay, flag, recPos ->
 
             currentStation = itemToPlay
 
@@ -177,7 +175,8 @@ class RadioService : MediaBrowserServiceCompat() {
                         radioSource.recordings,
                         itemToPlay,
                         playNow = true,
-                        isFromRecordings = true
+                        isFromRecordings = true,
+                        recIndex = recPos
                     )
                 }
 
@@ -217,6 +216,10 @@ class RadioService : MediaBrowserServiceCompat() {
                     stopRecording()
                 }
 
+                COMMAND_UPDATE_RECORDINGS_PLAYLIST -> {
+                    val position = extras?.getInt("POSITION") ?: 0
+                    updateRecordingsPlaylist(position)
+                }
             }
 
         })
@@ -239,18 +242,22 @@ class RadioService : MediaBrowserServiceCompat() {
     }
 
 
+    private fun updateRecordingsPlaylist(position : Int){
+        if(isFromRecording){
+
+            exoPlayer.removeMediaItem(position)
+
+        }
+    }
+
+
     private var isRecordingDurationListenerRunning = false
     var isPlaybackStatePlaying = false
 
 
     fun listenToRecordDuration ()  {
 
-        if(isFromRecording) {
-
-            curRecordTotalDuration.postValue(exoPlayer.duration)
-        }
-
-        if(!isRecordingDurationListenerRunning){
+        if(isFromRecording && !isRecordingDurationListenerRunning){
 
             isRecordingDurationListenerRunning = true
 
@@ -372,62 +379,71 @@ class RadioService : MediaBrowserServiceCompat() {
     }
 
 
-
-
-
-
    private inner class RadioQueueNavigator : TimelineQueueNavigator(mediaSession){
 
        override fun getMediaDescription(player: Player, windowIndex: Int): MediaDescriptionCompat {
 
-            currentStation?.let {
-
-             return it.description
-
-           } ?: return radioSource.stations.first().description
+           return if (isFromRecording) radioSource.recordings[windowIndex].description
+           else currentStation?.description ?: radioSource.stations.first().description
 
        }
    }
 
+
+    private var isRecordingSourceUpdated = false
+    private lateinit var recordingSource : ConcatenatingMediaSource
+    private var isRecordingSourceSet = false
+
     private fun preparePlayer(
-        stations : List<MediaMetadataCompat>,
+        playlist : List<MediaMetadataCompat>,
         itemToPlay : MediaMetadataCompat?,
         playNow : Boolean,
-        isFromRecordings : Boolean = false
+        isFromRecordings : Boolean = false,
+        recIndex : Int = 0
     ){
 
-        Log.d("CHECKTAGS", "preparer")
         this.isFromRecording = isFromRecordings
 
-      val uri = try {
-          stations[stations.indexOf(itemToPlay)].getString(METADATA_KEY_MEDIA_URI)
-      } catch (e : ArrayIndexOutOfBoundsException){
-          ""
-      }
+        if(isFromRecordings){
 
-       val mediaItem = if(isFromRecordings){
-           val uriOgg = "${this.filesDir.path}/$uri"
-           MediaItem.fromUri(uriOgg.toUri())
-       } else {
-           MediaItem.fromUri(uri.toUri())
-       }
+            if(!isRecordingSourceUpdated) {
+                recordingSource = radioSource.createConcatenatingMediaFromRecordings(
+                    dataSourceFactory, this.filesDir.path
+                )
+                isRecordingSourceUpdated = true
+            }
+            if(!isRecordingSourceSet){
+                exoPlayer.setMediaSource(recordingSource)
+                exoPlayer.prepare()
+                isRecordingSourceSet = true
+            }
+            
+            exoPlayer.seekTo(recIndex, 0L)
+            exoPlayer.playWhenReady = playNow
 
-      val mediaSource = if(uri.contains("m3u8")) {
-          HlsMediaSource.Factory(dataSourceFactory)
-              .createMediaSource(mediaItem)
-      } else {
-          ProgressiveMediaSource.Factory(dataSourceFactory)
-              .createMediaSource(mediaItem)
-      }
+        } else {
 
-        exoPlayer.setMediaSource(mediaSource)
-        exoPlayer.prepare()
-        exoPlayer.playWhenReady = playNow
+            val uri = try {
+                playlist[playlist.indexOf(itemToPlay)].getString(METADATA_KEY_MEDIA_URI)
+            } catch (e : ArrayIndexOutOfBoundsException){
+                ""
+            }
 
+            val mediaItem = MediaItem.fromUri(uri.toUri())
 
+            val mediaSource = if(uri.contains("m3u8")) {
+                HlsMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(mediaItem)
+            } else {
+                ProgressiveMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(mediaItem)
+            }
 
-//        exoPlayer.setMediaSource(radioSource.asMediaSource(dataSourceFactory))
-//        exoPlayer.seekTo(curStationIndex, 0L)
+            exoPlayer.setMediaSource(mediaSource)
+            isRecordingSourceSet = false
+            exoPlayer.prepare()
+            exoPlayer.playWhenReady = playNow
+        }
 
     }
 

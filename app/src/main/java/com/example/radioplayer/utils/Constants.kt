@@ -30,6 +30,7 @@ object Constants {
     const val COMMAND_NEW_SEARCH = "new search"
     const val COMMAND_START_RECORDING = "start exoRecord recording"
     const val COMMAND_STOP_RECORDING = "stop exoRecord recording"
+    const val COMMAND_UPDATE_RECORDINGS_PLAYLIST = "update recording playlist after deleting"
 
     const val COMMAND_LOAD_FROM_PLAYLIST = "load from playlist"
 
@@ -37,13 +38,13 @@ object Constants {
 
     const val DATABASE_NAME = "radio_stations_db"
 
-
+    const val SEARCH_FLAG = "search flag"
     const val SEARCH_FROM_API = 0
     const val SEARCH_FROM_FAVOURITES = 1
     const val SEARCH_FROM_PLAYLIST = 2
     const val SEARCH_FROM_HISTORY = 3
     const val SEARCH_FROM_RECORDINGS = 4
-
+    const val REC_POSITION = "recording position"
 
     const val DATE_FORMAT = "dd.MM.yyyy HH:mm"
 

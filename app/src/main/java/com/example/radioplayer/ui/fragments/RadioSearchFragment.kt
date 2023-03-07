@@ -1,28 +1,21 @@
 package com.example.radioplayer.ui.fragments
 
-import android.opengl.Visibility
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE
-import android.util.Log
 import android.view.DragEvent
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
-import android.view.animation.LayoutAnimationController
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
-import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
+import com.example.radioplayer.ui.animations.RvAlphaAnim
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.CountryPickerDialog
 import com.example.radioplayer.ui.dialogs.NameDialog
@@ -30,9 +23,6 @@ import com.example.radioplayer.ui.dialogs.TagPickerDialog
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.listOfTags
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -46,6 +36,10 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private val allTags = listOfTags
 
+    private var isNewSearchForAnimations = true
+
+    private var isInitialLaunch = true
+
     @Inject
     lateinit var pagingRadioAdapter : PagingRadioAdapter
 
@@ -53,12 +47,13 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         setSearchParamsObservers()
 
         setSearchToolbar()
 
         setRecycleView()
+
+        subscribeToStationsFlow()
 
         observePlaybackState()
 
@@ -70,20 +65,12 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         listenSearchButton()
 
-        subscribeToStationsFlow()
-
         setDragListenerForLayout()
         setDragListenerForButton()
         getFabSearchPositionIfNeeded()
 
-        setLayoutAnimationController()
-
-        setRecyclerChildrenAttachListener()
-
         observeNoResultDetector()
 
-//
-//        observeRecyclerAnimations()
     }
 
     private fun observeNoResultDetector(){
@@ -107,80 +94,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         }
     }
 
-    private fun setLayoutAnimationController (){
-
-        bind.rvSearchStations.layoutAnimation = (activity as MainActivity).layoutAnimationController
-
-    }
-
-    private var isToToggleRvVisibility = true
-
-    private var isNewSearchForAnimations = true
-
-    private var isInitialLaunch = true
-
-    private fun setRecyclerChildrenAttachListener(){
-
-        bind.rvSearchStations.addOnChildAttachStateChangeListener(object :RecyclerView.OnChildAttachStateChangeListener{
-
-            override fun onChildViewAttachedToWindow(view: View) {
-
-
-                if(isNewSearchForAnimations){
-
-                    bind.rvSearchStations.apply {
-
-                        layoutAnimation = (activity as MainActivity).layoutAnimationController
-
-
-
-                        post {
-
-                            visibility = View.VISIBLE
-                            isToToggleRvVisibility = false
-
-                            if(!isInitialLaunch){
-                                scrollToPosition(0)
-                            } else {
-                                isInitialLaunch = false
-                            }
-
-                            startLayoutAnimation()
-
-                        }
-                    }
-
-                }
-
-                isNewSearchForAnimations = false
-                    mainViewModel.isSearchAnimationToPlay = false
-            }
-
-            override fun onChildViewDetachedFromWindow(view: View) {
-
-            }
-        })
-
-    }
-
-//    private fun observeRecyclerAnimations(){
-//
-//        bind.rvSearchStations.layoutAnimationListener = object: Animation.AnimationListener {
-//            override fun onAnimationStart(animation: Animation?) {
-//                    Log.d("CHECKTAGS", "animSt: ${System.currentTimeMillis()}")
-//            }
-//
-//            override fun onAnimationEnd(animation: Animation?) {
-//
-//                Log.d("CHECKTAGS", "animEd: ${System.currentTimeMillis()}")
-//            }
-//
-//            override fun onAnimationRepeat(animation: Animation?) {
-//
-//            }
-//        }
-//
-//    }
 
 
     private fun observePlaybackState(){
@@ -259,7 +172,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             databaseViewModel.checkDateAndUpdateHistory(it.stationuuid)
 
         }
-
     }
 
 
@@ -277,6 +189,12 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             itemAnimator = null
 
+            layoutAnimation = (activity as MainActivity).layoutAnimationController
+
+//            post {
+//                scheduleLayoutAnimation()
+//            }
+
             mainViewModel.currentRadioStation.value?.let {
               val name =  it.getString(METADATA_KEY_TITLE)
                 pagingRadioAdapter.currentRadioStationName = name
@@ -288,7 +206,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         pagingRadioAdapter.addLoadStateListener {
 
-
             if (it.refresh is LoadState.Loading ||
                 it.append is LoadState.Loading)
 
@@ -297,7 +214,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             (activity as MainActivity).separatorLeftAnim.startLoadingAnim()
             (activity as MainActivity).separatorRightAnim.startLoadingAnim()
 
-
             }
 
             else {
@@ -305,6 +221,27 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                 (activity as MainActivity).separatorLeftAnim.endLoadingAnim()
                 (activity as MainActivity).separatorRightAnim.endLoadingAnim()
 
+                if(isNewSearchForAnimations ){
+
+                    bind.rvSearchStations.apply {
+
+                        if(isInitialLaunch){
+                            scheduleLayoutAnimation()
+                            isInitialLaunch = false
+
+                        } else {
+
+                            post {
+
+                                alpha = 1f
+                                scrollToPosition(0)
+                                startLayoutAnimation()
+                            }
+                        }
+                    }
+
+                    isNewSearchForAnimations = false
+                }
             }
         }
     }
@@ -318,32 +255,36 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             mainViewModel.stationsFlow.collectLatest {
 
                 isNewSearchForAnimations = true
-                launchRecyclerOutAnim()
 
-//                Log.d("CHECKTAGS", "onSubm: ${System.currentTimeMillis()}")
+                if(!isInitialLaunch){
+                    launchRecyclerOutAnim()
+                }
+                showLoadingResultsMessage()
                 pagingRadioAdapter.submitData(it)
 
             }
         }
     }
 
+
+    private val alphaAnim = RvAlphaAnim()
+
     private fun launchRecyclerOutAnim(){
-        bind.rvSearchStations.apply {
-            layoutAnimation = (activity as MainActivity).layoutAnimationControllerOut
-            startLayoutAnimation()
-            isToToggleRvVisibility = true
-            postDelayed({
-                if(isToToggleRvVisibility)
-                    visibility = View.INVISIBLE
-            }, 100)
-            showLoadingResultsMessage()
+
+        if(!bind.tvResultMessage.isVisible){
+
+            bind.rvSearchStations.apply {
+
+                alphaAnim.startAnim(this)
+
+            }
         }
     }
 
     private fun showLoadingResultsMessage(){
         bind.tvResultMessage.apply {
-            text = "Waiting for response from servers..."
             visibility = View.VISIBLE
+            text = "Waiting for response from servers..."
             slideAnim(100, 0, R.anim.fade_in_anim)
         }
     }
@@ -351,18 +292,16 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private fun setSearchToolbar() {
 
-        bind.tvTag.setOnClickListener {
-
-          TagPickerDialog(requireContext(), allTags, mainViewModel).apply {
-              show()
-
-          }
+        bind.llTag.setOnClickListener {
+            bind.tvTag.isPressed = true
+            TagPickerDialog(requireContext(), allTags, mainViewModel).show()
         }
 
 
-        bind.tvName.setOnClickListener {
 
-            NameDialog(requireContext(), it as TextView, mainViewModel).show()
+        bind.llName.setOnClickListener {
+            bind.tvName.isPressed = true
+            NameDialog(requireContext(), bind.tvName, mainViewModel).show()
 
         }
 
@@ -387,7 +326,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     }
 
     private fun listenSearchButton(){
-
 
         bind.fabInitiateSearch.setOnClickListener {
             mainViewModel.initiateNewSearch()
@@ -421,6 +359,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         bind.rvSearchStations.adapter = null
         _bind = null
         isInitialLaunch = true
+
     }
 
 }

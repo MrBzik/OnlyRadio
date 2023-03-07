@@ -1,5 +1,6 @@
 package com.example.radioplayer.ui
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -8,6 +9,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -68,20 +70,20 @@ class MainActivity : AppCompatActivity() {
     val separatorLeftAnim : LoadingAnim by lazy { LoadingAnim(sideSeparatorStart, this)  }
     val separatorRightAnim : LoadingAnim by lazy { LoadingAnim(sideSeparatorEnd, this)  }
 
-    val animationIn : Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.fall_down) }
+    private val animationIn : Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.fall_down) }
     val layoutAnimationController : LayoutAnimationController by lazy {
         LayoutAnimationController(animationIn).apply {
             delay = 0.1f
             order = LayoutAnimationController.ORDER_NORMAL
         }
     }
-    val animationOut : Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.fade_out_anim) }
-    val layoutAnimationControllerOut : LayoutAnimationController by lazy {
-        LayoutAnimationController(animationOut).apply {
-            delay = 0f
-            order = LayoutAnimationController.ORDER_REVERSE
-        }
-    }
+//    val animationOut : Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.fade_out_anim) }
+//    val layoutAnimationControllerOut : LayoutAnimationController by lazy {
+//        LayoutAnimationController(animationOut).apply {
+//            delay = 0f
+//            order = LayoutAnimationController.ORDER_REVERSE
+//        }
+//    }
 
 
 
@@ -203,15 +205,11 @@ class MainActivity : AppCompatActivity() {
 
         bindPlayer.root.slideAnim(500, 0, R.anim.fade_in_anim)
 
-        lifecycleScope.launch {
-            delay(1600)
-            withContext(Dispatchers.Main){
-//                bindPlayer.tvStationTitle.ellipsize = TextUtils.TruncateAt.MARQUEE
+
                 bindPlayer.tvStationTitle.isSingleLine = true
                 bindPlayer.tvStationTitle.isSelected = true
-//                bindPlayer.tvStationTitle.requestFocus()
-            }
-        }
+
+
 
         clickListenerToHandleNavigationWithDetailsFragment()
 
@@ -236,7 +234,7 @@ class MainActivity : AppCompatActivity() {
 
         if(title.equals("NULL", ignoreCase = true) || title.isBlank()){
             bindPlayer.tvStationTitle.apply {
-                text = "Playing : no info"
+                text = "Playing: no info"
                 setTextColor(Color.WHITE)
                 alpha = 0.6f
             }
@@ -275,37 +273,41 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
-
-
+    @SuppressLint("ClickableViewAccessibility")
     private fun clickListenerToHandleNavigationWithDetailsFragment(){
 
-        bindPlayer.tvStationTitle.setOnClickListener{
+        bindPlayer.tvStationTitle.setOnTouchListener { _, event ->
 
-            if(bindPlayer.tvExpandHideText.text == resources.getString(R.string.Expand)) {
+            if (event.action == MotionEvent.ACTION_DOWN){
 
-                putFadeOutForDetailsFragment()
+                if(bindPlayer.tvExpandHideText.text == resources.getString(R.string.Expand)) {
 
-                supportFragmentManager.beginTransaction().apply {
+                    putFadeOutForDetailsFragment()
 
-                    if(mainViewModel.isRadioTrueRecordingFalse){
-                        replace(R.id.flFragment, stationDetailsFragment)
-                    } else {
-                        replace(R.id.flFragment, recordingDetailsFragment)
+                    supportFragmentManager.beginTransaction().apply {
+
+                        if(mainViewModel.isRadioTrueRecordingFalse){
+                            replace(R.id.flFragment, stationDetailsFragment)
+                        } else {
+                            replace(R.id.flFragment, recordingDetailsFragment)
+                        }
+                        addToBackStack(null)
+                        commit()
                     }
-                    addToBackStack(null)
-                    commit()
+
+                    bindPlayer.tvExpandHideText.setText(R.string.Hide)
+
                 }
 
-                bindPlayer.tvExpandHideText.setText(R.string.Hide)
-          
+                else {
+
+                    handleNavigationToFragments(null)
+
+                }
             }
 
-            else {
-                handleNavigationToFragments(null)
-            }
+            true
         }
-
     }
 
     private fun handleNavigationToFragments(item : MenuItem?) : Boolean {
@@ -398,17 +400,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateImageAndTitle(playingItem : PlayingItem){
 
-        val newImage : Uri?
         var name = ""
 
-        when (playingItem) {
+        val newImage : Uri? = when (playingItem) {
             is PlayingItem.FromRadio -> {
-//                name = playingItem.radioStation.name ?: ""
-                newImage = playingItem.radioStation.favicon?.toUri()
+                playingItem.radioStation.favicon?.toUri()
             }
             is PlayingItem.FromRecordings -> {
-//                name = playingItem.recording.name
-                newImage = playingItem.recording.iconUri.toUri()
+                playingItem.recording.iconUri.toUri()
             }
         }
 

@@ -29,7 +29,7 @@ class RadioNotificationManager (
    sessionToken : MediaSessionCompat.Token,
    notificationListener: NotificationListener,
     private val glide : RequestManager,
-    private val newRecording : () -> Unit
+    private val newSong : () -> CharSequence?
     ) {
 
     private val serviceJob = SupervisorJob()
@@ -70,6 +70,11 @@ class RadioNotificationManager (
     }
 
 
+    fun updateNotification(){
+
+        notificationManager.invalidate()
+    }
+
     private inner class DescriptionAdapter (
         private val mediaController : MediaControllerCompat
             ) : MediaDescriptionAdapter {
@@ -78,7 +83,7 @@ class RadioNotificationManager (
         var currentBitmap: Bitmap? = null
 
         override fun getCurrentContentTitle(player: Player): CharSequence {
-            newRecording()
+
             return mediaController.metadata.description.title.toString()
         }
 
@@ -88,7 +93,7 @@ class RadioNotificationManager (
         }
 
         override fun getCurrentContentText(player: Player): CharSequence? {
-            return mediaController.metadata.description.subtitle.toString()
+            return newSong()
         }
 
 

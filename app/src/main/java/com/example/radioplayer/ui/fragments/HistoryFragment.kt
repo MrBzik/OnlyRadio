@@ -207,8 +207,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 defaultTextColor = ContextCompat.getColor(requireContext(), R.color.default_text_color)
                 selectedTextColor = ContextCompat.getColor(requireContext(), R.color.selected_text_color)
                 mainViewModel.currentRadioStation.value?.let {
-                    val name =  it.getString(MediaMetadataCompat.METADATA_KEY_TITLE)
-                    this.currentRadioStationID = name
+                    val id =  it.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)
+                    this.currentRadioStationID = id
                 }
             }
 

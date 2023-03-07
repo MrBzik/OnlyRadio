@@ -28,60 +28,68 @@
 
 
     <TextView
-        android:id="@+id/tvName"
+        android:id="@+id/tvSongTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="70dp"
         android:fontFamily="sans-serif-smallcaps"
         android:gravity="center"
         android:paddingHorizontal="16dp"
-        android:textSize="22sp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"  />
 
     <ImageView
         android:id="@+id/ivIcon"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="10dp"
+        android:layout_width="850dp"
+        android:layout_height="85dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvName" />
-
-    <TextView
-        android:id="@+id/tvHomePage"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginTop="8dp"
-        android:gravity="center_vertical"
-        android:text="Homepage"
-        android:textAppearance="@style/mainTextButtons"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivIcon" />
+        app:layout_constraintTop_toBottomOf="@+id/tvSongTitle" />
 
 
     <ScrollView
         android:id="@+id/svTvTags"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="10dp"
         android:paddingHorizontal="16dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintBottom_toTopOf="@id/fabAddToFav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvHomePage">
+        app:layout_constraintTop_toBottomOf="@+id/ivIcon">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-smallcaps"
+                android:gravity="center"
+                android:textSize="20sp"
+             />
+
+
+            <TextView
+                android:id="@+id/tvHomePage"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="Homepage"
+                android:textAppearance="@style/mainTextButtons"
+                android:visibility="gone"
+              />
+
 
             <TextView
                 android:id="@+id/tvLanguage"

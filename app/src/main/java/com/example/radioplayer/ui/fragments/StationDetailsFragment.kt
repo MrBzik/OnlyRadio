@@ -1,6 +1,7 @@
 package com.example.radioplayer.ui.fragments
 
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -80,9 +81,29 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
                 observeIfNewStationFavoured()
                 updateUiForRadioStation(it.radioStation)
-
+                observeCurrentSongTitle()
             }
         }
+    }
+
+
+    private fun observeCurrentSongTitle(){
+
+        mainViewModel.currentSongTitle.observe(viewLifecycleOwner){ title ->
+
+            if(title.equals("NULL", ignoreCase = true) || title.isBlank()){
+                bind.tvSongTitle.apply {
+                    text = "Playing: no info"
+
+                }
+            } else {
+                bind.tvSongTitle.apply {
+                    text = "Playing: $title"
+                }
+            }
+        }
+
+
     }
 
 

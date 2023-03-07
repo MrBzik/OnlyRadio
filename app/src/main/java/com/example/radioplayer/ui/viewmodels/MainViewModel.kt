@@ -22,10 +22,13 @@ import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
 import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
+import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RECORDINGS_PLAYLIST
 import com.example.radioplayer.utils.Constants.FAB_POSITION_X
 import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
+import com.example.radioplayer.utils.Constants.REC_POSITION
+import com.example.radioplayer.utils.Constants.SEARCH_FLAG
 import com.example.radioplayer.utils.Constants.SEARCH_FULL_COUNTRY_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
@@ -54,9 +57,6 @@ class MainViewModel @Inject constructor(
 
        val newPlayingItem : MutableLiveData<PlayingItem> = MutableLiveData()
 
-       var isHistoryAnimationToPlay = true
-       var isSearchAnimationToPlay = true
-       var isFavouriteAnimationToPlay = true
 
        var noResultDetection : MutableLiveData<Boolean> = MutableLiveData()
 
@@ -178,7 +178,8 @@ class MainViewModel @Inject constructor(
        private suspend fun searchWithNewParams(
             limit : Int, offset : Int) : List<RadioStation> {
 
-           withContext(Dispatchers.IO) {
+               delay(3000)
+
 
                val calcOffset = limit * offset
 
@@ -196,6 +197,7 @@ class MainViewModel @Inject constructor(
                    } else {
                        noResultDetection.postValue(false)
                    }
+
 
                    response?.let {
 
@@ -220,7 +222,6 @@ class MainViewModel @Inject constructor(
                     delay(1000)
                     isDelayNeededForServiceConnection = false
                 }
-       }
 
            val firstRunBundle = Bundle().apply {
 
@@ -229,7 +230,6 @@ class MainViewModel @Inject constructor(
            }
 
            radioServiceConnection.sendCommand(COMMAND_NEW_SEARCH, firstRunBundle)
-
 
            isNewSearch = false
 
@@ -277,7 +277,6 @@ class MainViewModel @Inject constructor(
          } else {
              wasSearchInterrupted = true
          }
-
     }
 
 
@@ -290,7 +289,9 @@ class MainViewModel @Inject constructor(
         fun playOrToggleStation(
             station : RadioStation? = null,
             searchFlag : Int = 0,
-            rec : Recording? = null) : Boolean {
+            rec : Recording? = null,
+            recPosition : Int = 0
+        ) : Boolean {
 
             val isPrepared = playbackState.value?.isPrepared ?: false
 
@@ -326,7 +327,10 @@ class MainViewModel @Inject constructor(
                 }
 
                 radioServiceConnection.transportControls
-                    .playFromMediaId(id, bundleOf(Pair("SEARCH_FLAG", searchFlag)))
+                    .playFromMediaId(id, bundleOf(
+                        Pair(SEARCH_FLAG, searchFlag),
+                        Pair(REC_POSITION, recPosition)
+                        ))
             }
 
             return false
@@ -335,8 +339,6 @@ class MainViewModel @Inject constructor(
         var isRadioTrueRecordingFalse = true
 
         val currentPlayerPosition = RadioService.recordingPlaybackPosition
-        val currentPlayerDuration = RadioService.curRecordTotalDuration
-
 
         // ExoRecord
 
@@ -351,6 +353,15 @@ class MainViewModel @Inject constructor(
         val exoRecordFinishConverting = radioSource.exoRecordFinishConverting
         val exoRecordState = radioSource.exoRecordState
         val exoRecordTimer = radioSource.exoRecordTimer
+
+
+        fun updateRecordingsPlaylist(position : Int){
+            radioServiceConnection.sendCommand(
+                COMMAND_UPDATE_RECORDINGS_PLAYLIST,
+                bundleOf(Pair("POSITION", position))
+                )
+        }
+
 
 //    private fun getCountries() = viewModelScope.launch {
 //

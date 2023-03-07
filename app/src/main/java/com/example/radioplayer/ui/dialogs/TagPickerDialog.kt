@@ -95,6 +95,10 @@ class TagPickerDialog (
 
         tagAdapter.setOnTagClickListener { tag ->
 
+            if(tag.contains("---")){
+                return@setOnTagClickListener
+            }
+
             mainViewModel.searchParamTag.postValue(tag)
 
            dismiss()
