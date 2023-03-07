@@ -108,10 +108,10 @@ class RecordingsAdapter @Inject constructor(
 
     var playingRecordingId = ""
 
-    private var previousSeekbar : SeekBar? = null
-    private var previousTvTime : TextView? = null
+    var previousSeekbar : SeekBar? = null
+    var previousTvTime : TextView? = null
 
-    private var previousTvTimeValue = 0L
+    var previousTvTimeValue = 0L
 
     private var itemSeekbarHandler : ((seekBar : SeekBar, tvDuration : TextView, isNewItem : Boolean) -> Unit)? = null
 

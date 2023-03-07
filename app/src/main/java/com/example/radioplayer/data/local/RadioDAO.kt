@@ -151,8 +151,8 @@ interface  RadioDAO {
     @Query("SELECT * FROM Recording WHERE id =:id LIMIT 1")
     suspend fun getCurrentRecording(id : String) : Recording
 
-    @Delete
-    suspend fun deleteRecording(rec : Recording)
+    @Query("DELETE FROM Recording WHERE id =:recId")
+    suspend fun deleteRecording(recId : String)
 
     @Query("UPDATE Recording SET name =:newName  WHERE id =:id")
     suspend fun renameRecording(id : String, newName: String)

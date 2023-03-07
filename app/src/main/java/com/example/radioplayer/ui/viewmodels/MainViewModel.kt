@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
-import android.util.Log
-import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
@@ -19,14 +17,17 @@ import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.repositories.DatabaseRepository
+import com.example.radioplayer.utils.Constants.COMMAND_ADD_RECORDING_AT_POSITION
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
 import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
-import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RECORDINGS_PLAYLIST
+import com.example.radioplayer.utils.Constants.COMMAND_DELETE_RECORDING_AT_POSITION
 import com.example.radioplayer.utils.Constants.FAB_POSITION_X
 import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
+import com.example.radioplayer.utils.Constants.RECORDING_ID
+import com.example.radioplayer.utils.Constants.RECORDING_POSITION
 import com.example.radioplayer.utils.Constants.REC_POSITION
 import com.example.radioplayer.utils.Constants.SEARCH_FLAG
 import com.example.radioplayer.utils.Constants.SEARCH_FULL_COUNTRY_NAME
@@ -355,11 +356,23 @@ class MainViewModel @Inject constructor(
         val exoRecordTimer = radioSource.exoRecordTimer
 
 
-        fun updateRecordingsPlaylist(position : Int){
+        fun commandToDeleteRecordingAtPosition(position : Int, recId : String){
             radioServiceConnection.sendCommand(
-                COMMAND_UPDATE_RECORDINGS_PLAYLIST,
-                bundleOf(Pair("POSITION", position))
+                COMMAND_DELETE_RECORDING_AT_POSITION,
+                bundleOf(
+                    Pair(RECORDING_POSITION, position),
+                    Pair(RECORDING_ID, recId)
+                    )
                 )
+        }
+
+        fun commandToInsertRecordingAtPosition(position : Int){
+            radioServiceConnection.sendCommand(
+                COMMAND_ADD_RECORDING_AT_POSITION,
+                    bundleOf(
+                        Pair(RECORDING_POSITION, position)
+                    )
+            )
         }
 
 

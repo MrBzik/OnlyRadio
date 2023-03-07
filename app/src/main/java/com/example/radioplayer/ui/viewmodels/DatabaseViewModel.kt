@@ -36,7 +36,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DatabaseViewModel @Inject constructor(
-        app : Application,
+        private val app : Application,
         private val repository: DatabaseRepository,
         private val radioSource: RadioSource
 ) : AndroidViewModel(app) {
@@ -378,16 +378,16 @@ class DatabaseViewModel @Inject constructor(
 //            )
 //    }
 
-    fun insertNewRecording(rec : Recording) =
-        viewModelScope.launch {
-            repository.insertRecording(rec)
-        }
+//    fun insertNewRecording(rec : Recording) =
+//        viewModelScope.launch {
+//            repository.insertRecording(rec)
+//        }
 
 
     val allRecordingsLiveData = radioSource.allRecordingsLiveData
 
-    fun deleteRecording(rec : Recording) = viewModelScope.launch {
-        repository.deleteRecording(rec)
+    fun removeRecordingFile(recordingID : String){
+        app.deleteFile(recordingID)
     }
 
     fun renameRecording(id : String, newName: String) = viewModelScope.launch {

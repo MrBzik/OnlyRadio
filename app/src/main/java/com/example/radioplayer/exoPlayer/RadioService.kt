@@ -20,11 +20,14 @@ import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlaybackPreparer
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerNotificationListener
+import com.example.radioplayer.utils.Constants.COMMAND_ADD_RECORDING_AT_POSITION
 import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
 import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
-import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RECORDINGS_PLAYLIST
+import com.example.radioplayer.utils.Constants.COMMAND_DELETE_RECORDING_AT_POSITION
+import com.example.radioplayer.utils.Constants.RECORDING_ID
+import com.example.radioplayer.utils.Constants.RECORDING_POSITION
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
@@ -34,7 +37,6 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
@@ -90,18 +92,26 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private var isFromRecording = false
 
+    private var deleteRecordingAt = -1
+    private var addRecordingAt = -1
+    private var isRecordingsPlaylistUpdateNeeded = false
+
     private val observerForDatabase = Observer<List<RadioStation>>{
         radioSource.createMediaItemsFromDB(it)
     }
 
     private val observerForRecordings = Observer<List<Recording>>{
-        radioSource.createMediaItemsFromRecordings(it)
+        radioSource.handleRecordingsUpdates(it, deleteRecordingAt, addRecordingAt)
+        if(isRecordingsPlaylistUpdateNeeded){
+            updateRecordingsPlaylist()
+            isRecordingsPlaylistUpdateNeeded = false
+        }
     }
 
     companion object{
         val currentSongTitle = MutableLiveData<String>()
-//        var curRecordTotalDuration = MutableLiveData<Long>()
         val recordingPlaybackPosition = MutableLiveData<Long>()
+        var recordingToInsert : Recording? = null
 
     }
 
@@ -118,7 +128,6 @@ class RadioService : MediaBrowserServiceCompat() {
 
     override fun onCreate() {
         super.onCreate()
-
 
 
         val activityIntent = packageManager?.getLaunchIntentForPackage(packageName)?.let {
@@ -216,13 +225,30 @@ class RadioService : MediaBrowserServiceCompat() {
                     stopRecording()
                 }
 
-                COMMAND_UPDATE_RECORDINGS_PLAYLIST -> {
-                    val position = extras?.getInt("POSITION") ?: 0
-                    updateRecordingsPlaylist(position)
+                COMMAND_DELETE_RECORDING_AT_POSITION -> {
+                    deleteRecordingAt = extras?.getInt(RECORDING_POSITION) ?: 0
+                    val recId = extras?.getString(RECORDING_ID) ?: ""
+                    isRecordingsPlaylistUpdateNeeded = true
+                    CoroutineScope(Dispatchers.IO).launch {
+
+                        radioSource.deleteRecording(recId)
+                    }
+                }
+
+                COMMAND_ADD_RECORDING_AT_POSITION -> {
+                    addRecordingAt = extras?.getInt(RECORDING_POSITION) ?: 0
+                    isRecordingsPlaylistUpdateNeeded = true
+                    recordingToInsert?.let {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            radioSource.insertRecording(it)
+                        }
+
+                    }
                 }
             }
-
         })
+
+
 
 
         mediaSessionConnector = MediaSessionConnector(mediaSession)
@@ -241,14 +267,6 @@ class RadioService : MediaBrowserServiceCompat() {
 
     }
 
-
-    private fun updateRecordingsPlaylist(position : Int){
-        if(isFromRecording){
-
-            exoPlayer.removeMediaItem(position)
-
-        }
-    }
 
 
     private var isRecordingDurationListenerRunning = false
@@ -390,9 +408,46 @@ class RadioService : MediaBrowserServiceCompat() {
    }
 
 
-    private var isRecordingSourceUpdated = false
-    private lateinit var recordingSource : ConcatenatingMediaSource
+    private var isRecordingSourceFilled = false
+
     private var isRecordingSourceSet = false
+
+    private val listOfRecordings : MutableList<MediaItem> by lazy { mutableListOf() }
+
+    private fun updateRecordingsPlaylist(){
+        if(isRecordingSourceFilled){
+
+            if(addRecordingAt != -1){
+                val dirPath = this.filesDir.path
+                val fileName = radioSource.recordings[addRecordingAt].getString(METADATA_KEY_MEDIA_ID)
+                val item = MediaItem.fromUri("$dirPath/$fileName")
+                listOfRecordings.add(addRecordingAt, item)
+                if(isFromRecording){
+                    exoPlayer.addMediaItem(addRecordingAt, item)
+                }
+                addRecordingAt = -1
+
+            } else {
+                listOfRecordings.removeAt(deleteRecordingAt)
+                if(isFromRecording){
+                    exoPlayer.removeMediaItem(deleteRecordingAt)
+                }
+                deleteRecordingAt = -1
+            }
+        }
+    }
+
+
+    private fun createListOfRecordings(){
+
+        val dirPath = this.filesDir.path
+
+        radioSource.recordings.forEach {
+            val fileName = it.getString(METADATA_KEY_MEDIA_ID)
+            val item = MediaItem.fromUri("$dirPath/$fileName")
+            listOfRecordings.add(item)
+        }
+    }
 
     private fun preparePlayer(
         playlist : List<MediaMetadataCompat>,
@@ -406,14 +461,13 @@ class RadioService : MediaBrowserServiceCompat() {
 
         if(isFromRecordings){
 
-            if(!isRecordingSourceUpdated) {
-                recordingSource = radioSource.createConcatenatingMediaFromRecordings(
-                    dataSourceFactory, this.filesDir.path
-                )
-                isRecordingSourceUpdated = true
+            if(!isRecordingSourceFilled) {
+                createListOfRecordings()
+                isRecordingSourceFilled = true
             }
+
             if(!isRecordingSourceSet){
-                exoPlayer.setMediaSource(recordingSource)
+                exoPlayer.setMediaItems(listOfRecordings)
                 exoPlayer.prepare()
                 isRecordingSourceSet = true
             }
@@ -438,6 +492,8 @@ class RadioService : MediaBrowserServiceCompat() {
                 ProgressiveMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(mediaItem)
             }
+
+
 
             exoPlayer.setMediaSource(mediaSource)
             isRecordingSourceSet = false

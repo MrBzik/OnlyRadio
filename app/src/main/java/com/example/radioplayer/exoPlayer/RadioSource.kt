@@ -1,11 +1,9 @@
 package com.example.radioplayer.exoPlayer
 
 
-import android.content.Context
 import android.content.SharedPreferences
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.entities.RadioStation
@@ -19,10 +17,6 @@ import com.example.radioplayer.utils.Constants.API_RADIO_TOP_VOTE_SEARCH_URL
 import com.example.radioplayer.utils.Constants.BASE_RADIO_URL
 import com.example.radioplayer.utils.Constants.BASE_RADIO_URL3
 import com.example.radioplayer.utils.Constants.listOfUrls
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.upstream.DefaultDataSource
 
 import javax.inject.Inject
 
@@ -55,8 +49,7 @@ class RadioSource @Inject constructor(
 
 
     suspend fun insertRecording(recording : Recording) = radioDAO.insertRecording(recording)
-
-
+    suspend fun deleteRecording(recId : String) = radioDAO.deleteRecording(recId)
 
 
     suspend fun getStationsInDate(limit: Int, offset: Int, initialDate: String): DateWithStations {
@@ -85,10 +78,30 @@ class RadioSource @Inject constructor(
     }
 
 
-    fun createMediaItemsFromRecordings(listOfRecordings : List<Recording>){
+    fun handleRecordingsUpdates(
+        listOfRecordings : List<Recording>,
+        deleteAt : Int,
+        addRecordingAt : Int
+    ){
+        if(deleteAt != -1){
+            recordings.removeAt(deleteAt)
+        }
+        else if(addRecordingAt != -1){
+            val rec = listOfRecordings[addRecordingAt]
+            val mediaRec = createMediaMetadataCompatFromRecording(rec)
+            recordings.add(addRecordingAt, mediaRec)
+        }
+        else {
+            recordings = listOfRecordings.map { recording ->
+                createMediaMetadataCompatFromRecording(recording)
+            }.toMutableList()
+        }
+    }
 
-        recordings = listOfRecordings.map { recording ->
-            MediaMetadataCompat.Builder()
+
+    private fun createMediaMetadataCompatFromRecording(recording : Recording) : MediaMetadataCompat{
+
+        return MediaMetadataCompat.Builder()
             .putString(METADATA_KEY_TITLE, recording.name)
             .putString(METADATA_KEY_DISPLAY_TITLE, recording.name)
             .putString(METADATA_KEY_MEDIA_ID, recording.id)
@@ -97,24 +110,24 @@ class RadioSource @Inject constructor(
             .putString(METADATA_KEY_MEDIA_URI, recording.id)
             .putString(METADATA_KEY_DISPLAY_SUBTITLE, "recording")
             .build()
-        }.toMutableList()
     }
 
 
-    fun createConcatenatingMediaFromRecordings(
-        dataSourceFactory: DefaultDataSource.Factory,
-        fileDirPath : String
-    )  : ConcatenatingMediaSource {
-        val concatenatingMediaSource = ConcatenatingMediaSource()
-        recordings.forEach { recording ->
 
-            val uri = "$fileDirPath/${recording.getString(METADATA_KEY_MEDIA_URI)}"
-            val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(MediaItem.fromUri(uri))
-            concatenatingMediaSource.addMediaSource(mediaSource)
-        }
-            return concatenatingMediaSource
-    }
+//    fun createConcatenatingMediaFromRecordings(
+//        dataSourceFactory: DefaultDataSource.Factory,
+//        fileDirPath : String
+//    )  : ConcatenatingMediaSource {
+//        val concatenatingMediaSource = ConcatenatingMediaSource()
+//        recordings.forEach { recording ->
+//
+//            val uri = "$fileDirPath/${recording.getString(METADATA_KEY_MEDIA_URI)}"
+//            val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
+//                .createMediaSource(MediaItem.fromUri(uri))
+//            concatenatingMediaSource.addMediaSource(mediaSource)
+//        }
+//            return concatenatingMediaSource
+//    }
 
 
 

@@ -118,11 +118,8 @@ class DatabaseRepository @Inject constructor(
 
     // Recording
 
-    suspend fun insertRecording(recording : Recording) = radioDAO.insertRecording(recording)
 
     suspend fun getCurrentRecording(id : String)  = radioDAO.getCurrentRecording(id)
-
-    suspend fun deleteRecording(rec : Recording) = radioDAO.deleteRecording(rec)
 
     suspend fun renameRecording(id : String, newName: String) = radioDAO.renameRecording(id, newName)
 

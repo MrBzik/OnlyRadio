@@ -2,7 +2,6 @@ package com.example.radioplayer.ui.fragments
 
 import android.animation.ValueAnimator
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.SeekBar
@@ -101,14 +100,6 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
     }
 
 
-//    private fun observeRecordingDuration(){
-//        mainViewModel.currentPlayerDuration.observe(viewLifecycleOwner){
-//
-//            currentItemSeekbar?.max = it.toInt()
-//
-//        }
-//    }
-
 
 
     private fun setCurrentItemSeekbarHandler(){
@@ -120,10 +111,6 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
             currentItemTvDuration = tvDuration
 
             if(!isItemChanged){
-
-//                mainViewModel.currentPlayerDuration.value?.let { duration ->
-//                    seekbar.max = duration.toInt()
-//                }
 
                 mainViewModel.currentPlayerPosition.value?.let { position ->
                     seekbar.progress = position.toInt()
@@ -254,9 +241,50 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val position = viewHolder.layoutPosition
+
             val recording = recordingsAdapter.listOfRecordings[position]
 
-            databaseViewModel.deleteRecording(recording)
+            currentRecording?.let {
+
+                if(it.id == recording.id &&
+                    recordingsAdapter.listOfRecordings.size > position
+                ){
+                    val newRecToPlay = recordingsAdapter.listOfRecordings[position+1]
+                    mainViewModel.newPlayingItem.postValue(
+                        PlayingItem.FromRecordings(newRecToPlay)
+                    )
+                    recordingsAdapter.playingRecordingId = newRecToPlay.id
+
+                    val newViewHolder = bind.rvRecordings.findViewHolderForAdapterPosition(position+1)
+                    newViewHolder.let { holder ->
+
+                        animator.cancel()
+                        isInitialLaunchOrNewItem = true
+                        currentItemSeekbar = holder?.itemView?.findViewById(R.id.seekBar)
+                        currentItemTvDuration = holder?.itemView?.findViewById(R.id.tvDuration)
+                        recordingsAdapter.apply {
+                            previousSeekbar = currentItemSeekbar
+                            previousTvTime = currentItemTvDuration
+                            previousTvTimeValue = newRecToPlay.durationMills
+                        }
+
+                        currentItemSeekbar?.apply {
+                            visibility = View.VISIBLE
+                            max = newRecToPlay.durationMills.toInt()
+                            progress = 0
+                        }
+
+
+
+                    }
+
+                }
+            }
+
+
+
+            mainViewModel.commandToDeleteRecordingAtPosition(position, recording.id)
+
 
             Snackbar.make(
                 requireActivity().findViewById(R.id.rootLayout),
@@ -271,19 +299,16 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
             if(event == DISMISS_EVENT_CONSECUTIVE ||
                event == DISMISS_EVENT_TIMEOUT ||
                event == DISMISS_EVENT_SWIPE ) {
-                try {
-                    requireActivity().deleteFile(recording.id)
 
-                    mainViewModel.updateRecordingsPlaylist(position)
-                } catch (e: java.lang.Exception) {
-                    Log.d("CHECKTAGS", e.stackTraceToString())
+                databaseViewModel.removeRecordingFile(recording.id)
+
                 }
             }
         }
-    })
-
+    )
                 setAction("UNDO"){
-                    databaseViewModel.insertNewRecording(recording)
+                    RadioService.recordingToInsert = recording
+                    mainViewModel.commandToInsertRecordingAtPosition(position)
                 }
             }.show()
 
