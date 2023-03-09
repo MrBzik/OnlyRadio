@@ -37,8 +37,6 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
         setRecordingsRenameClickListener()
 
-        endLoadingBarIfNeeded()
-
     }
 
     private fun setRecordingsRenameClickListener(){
@@ -66,8 +64,6 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
     private fun subscribeToObservers(){
 
         observeCurrentRecording()
-
-//        observeRecordingDuration()
 
         observePlayerPosition()
 
@@ -126,11 +122,6 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
         bind.tvRecordingPlayingTime.text = Utils.timerFormat(time)
     }
 
-//    private fun observeRecordingDuration(){
-//        mainViewModel.currentPlayerDuration.observe(viewLifecycleOwner){
-//            bind.seekBar.max = it.toInt()
-//        }
-//    }
 
     private fun updateUiForRecording(recording: Recording){
 
@@ -142,11 +133,6 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
     }
 
-
-    private fun endLoadingBarIfNeeded(){
-        (activity as MainActivity).separatorLeftAnim.endLoadingAnim()
-        (activity as MainActivity).separatorRightAnim.endLoadingAnim()
-    }
 
 
     override fun onDestroyView() {

@@ -32,9 +32,11 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
+import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.audio.AudioProcessor
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -115,6 +117,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
     }
 
+    private var recSampleRate = 0
+    private var recChannelsCount = 2
 
     private fun searchRadioStations(
             isNewSearch : Boolean
@@ -275,6 +279,28 @@ class RadioService : MediaBrowserServiceCompat() {
 
     fun listenToRecordDuration ()  {
 
+
+        serviceScope.launch {
+
+            while (true){
+
+                val format = exoPlayer.audioFormat
+                val encoding = format?.pcmEncoding
+                val sampleRate = format?.sampleRate
+                val channels = format?.channelCount
+
+                Log.d("CHECKTAGS", "$encoding, $sampleRate, $channels")
+
+//                exoRecord.exoRecordProcessor.configure(AudioProcessor.AudioFormat(sampleRate!!, channels!!, encoding!!))
+
+                delay(1000)
+
+            }
+
+        }
+
+
+
         if(isFromRecording && !isRecordingDurationListenerRunning){
 
             isRecordingDurationListenerRunning = true
@@ -329,12 +355,13 @@ class RadioService : MediaBrowserServiceCompat() {
             isConverterWorking = true
             radioSource.exoRecordState.postValue(false)
 
+
             CoroutineScope(Dispatchers.IO).launch {
                 val converter = ExoRecordOgg.convertFile(
                     this@RadioService.application,
                     record.filePath,
-                    44_100,
-                    2,
+                    recSampleRate,
+                    recChannelsCount,
                     0.4f){ progress ->
 
                     if(progress == 100.0f){
@@ -386,6 +413,18 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private fun startRecording () = serviceScope.launch {
         if(!isConverterWorking){
+
+            val format = exoPlayer.audioFormat
+            val sampleRate = format?.sampleRate ?: 0
+            val channels = format?.channelCount ?: 0
+
+            Log.d("CHECKTAGS", "$sampleRate, $channels")
+
+            recSampleRate = sampleRate
+            recChannelsCount = channels
+
+            exoRecord.exoRecordProcessor.configure(AudioProcessor.AudioFormat(sampleRate, channels,  C.ENCODING_PCM_16BIT))
+
             exoRecord.startRecording()
         }
     }
@@ -499,6 +538,7 @@ class RadioService : MediaBrowserServiceCompat() {
             isRecordingSourceSet = false
             exoPlayer.prepare()
             exoPlayer.playWhenReady = playNow
+
         }
 
     }

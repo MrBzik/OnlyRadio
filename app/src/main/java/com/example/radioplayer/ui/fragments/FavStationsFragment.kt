@@ -1,14 +1,11 @@
 package com.example.radioplayer.ui.fragments
 
 
-import android.animation.ValueAnimator
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -96,7 +93,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         editPlaylistClickListener()
 
-        endLoadingBarIfNeeded()
+//        endLoadingBarIfNeeded()
 
     }
 
@@ -120,10 +117,10 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         }
     }
 
-    private fun endLoadingBarIfNeeded(){
-        (activity as MainActivity).separatorLeftAnim.endLoadingAnim()
-        (activity as MainActivity).separatorRightAnim.endLoadingAnim()
-    }
+//    private fun endLoadingBarIfNeeded(){
+//        (activity as MainActivity).separatorAnimation.endLoadingAnim()
+//        (activity as MainActivity).separatorRightAnim.endLoadingAnim()
+//    }
 
     private fun editPlaylistClickListener(){
 

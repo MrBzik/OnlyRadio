@@ -1,22 +1,24 @@
 package com.example.radioplayer.ui.fragments
 
 import android.content.Intent
-import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.databinding.FragmentStationDetailsBinding
-import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.dialogs.AddStationToPlaylistDialog
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
@@ -66,8 +68,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         setupRecordingButton()
 
         observeExoRecordState()
-
-        endLoadingBarIfNeeded()
 
     }
 
@@ -170,13 +170,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     }
 
 
-    private fun endLoadingBarIfNeeded(){
-        (activity as MainActivity).separatorLeftAnim.endLoadingAnim()
-        (activity as MainActivity).separatorRightAnim.endLoadingAnim()
-    }
-
-
-
     private fun observeIfNewStationFavoured(){
 
         databaseViewModel.isStationFavoured.observe(viewLifecycleOwner){
@@ -222,11 +215,32 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             glide
                 .load(station.favicon)
                 .transition(DrawableTransitionOptions.withCrossFade())
+                .listener(object : RequestListener<Drawable>{
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                       return false
+                    }
+                })
                 .into(bind.ivIcon)
 
             if(!station.language.isNullOrBlank()){
                 bind.tvLanguage.isVisible = true
-                bind.tvLanguage.text = "Languages : ${station.language}"
+                val languages = station.language.replace(",", ", ")
+                bind.tvLanguage.text = "Languages : $languages"
             }
             if(!station.tags.isNullOrBlank()){
                 bind.tvTags.isVisible = true

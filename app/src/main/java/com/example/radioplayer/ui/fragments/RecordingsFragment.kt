@@ -58,7 +58,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
         observePlayerPosition()
 
-        endLoadingBarIfNeeded()
+//        endLoadingBarIfNeeded()
 
 
     }
@@ -318,10 +318,10 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
     private val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
 
 
-    private fun endLoadingBarIfNeeded(){
-        (activity as MainActivity).separatorLeftAnim.endLoadingAnim()
-        (activity as MainActivity).separatorRightAnim.endLoadingAnim()
-    }
+//    private fun endLoadingBarIfNeeded(){
+//        (activity as MainActivity).separatorAnimation.endLoadingAnim()
+//        (activity as MainActivity).separatorRightAnim.endLoadingAnim()
+//    }
 
     override fun onDestroyView() {
         super.onDestroyView()

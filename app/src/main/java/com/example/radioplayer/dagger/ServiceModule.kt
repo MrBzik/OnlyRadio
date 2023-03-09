@@ -2,6 +2,7 @@ package com.example.radioplayer.dagger
 
 import android.app.Application
 import android.content.Context
+import android.os.Handler
 import com.example.radioplayer.data.remote.RadioApi
 import com.example.radioplayer.utils.Constants
 import com.google.android.exoplayer2.C
@@ -12,8 +13,12 @@ import com.google.android.exoplayer2.audio.AudioCapabilities
 import com.google.android.exoplayer2.audio.AudioCapabilities.DEFAULT_AUDIO_CAPABILITIES
 import com.google.android.exoplayer2.audio.AudioSink
 import com.google.android.exoplayer2.audio.DefaultAudioSink
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.upstream.BandwidthMeter
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
 import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.TransferListener
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

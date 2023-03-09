@@ -15,7 +15,7 @@ import com.example.radioplayer.databinding.FragmentRadioSearchBinding
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
-import com.example.radioplayer.ui.animations.RvAlphaAnim
+import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.CountryPickerDialog
 import com.example.radioplayer.ui.dialogs.NameDialog
@@ -72,6 +72,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         observeNoResultDetector()
 
     }
+
 
     private fun observeNoResultDetector(){
 
@@ -211,15 +212,15 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             {
 
-            (activity as MainActivity).separatorLeftAnim.startLoadingAnim()
-            (activity as MainActivity).separatorRightAnim.startLoadingAnim()
+            (activity as MainActivity).startSeparatorsLoadAnim()
+//            (activity as MainActivity).separatorRightAnim.startLoadingAnim()
 
             }
 
             else {
 
-                (activity as MainActivity).separatorLeftAnim.endLoadingAnim()
-                (activity as MainActivity).separatorRightAnim.endLoadingAnim()
+                (activity as MainActivity).endSeparatorsLoadAnim()
+//                (activity as MainActivity).separatorRightAnim.endLoadingAnim()
 
                 if(isNewSearchForAnimations ){
 
@@ -267,7 +268,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     }
 
 
-    private val alphaAnim = RvAlphaAnim()
+    private val alphaAnim = AlphaFadeOutAnim(1f, 100)
 
     private fun launchRecyclerOutAnim(){
 

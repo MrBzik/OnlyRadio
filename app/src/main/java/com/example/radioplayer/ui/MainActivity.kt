@@ -3,10 +3,8 @@ package com.example.radioplayer.ui
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -16,13 +14,15 @@ import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.core.view.isVisible
-import androidx.lifecycle.lifecycleScope
 import androidx.transition.Fade
 import androidx.transition.Slide
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.example.radioplayer.R
 import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.databinding.ActivityMainBinding
@@ -41,12 +41,9 @@ import com.example.radioplayer.utils.Constants.SEARCH_FULL_COUNTRY_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
+import com.example.radioplayer.utils.RandomColors
 
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -63,12 +60,22 @@ class MainActivity : AppCompatActivity() {
 
     private var isStubPlayerBindInflated = false
 
-    var sideSeparatorStart : Drawable? = null
-    var sideSeparatorEnd : Drawable? = null
 
 
-    val separatorLeftAnim : LoadingAnim by lazy { LoadingAnim(sideSeparatorStart, this)  }
-    val separatorRightAnim : LoadingAnim by lazy { LoadingAnim(sideSeparatorEnd, this)  }
+    val separatorAnimation : LoadingAnim by lazy { LoadingAnim(this,
+        bind.viewSeparatorStart, bind.viewSeparatorEnd,
+        bind.separatorLowest, bind.separatorSecond) }
+
+    fun startSeparatorsLoadAnim(){
+        separatorAnimation.startLoadingAnim()
+    }
+
+    fun endSeparatorsLoadAnim(){
+        separatorAnimation.endLoadingAnim()
+
+    }
+
+
 
     private val animationIn : Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.fall_down) }
     val layoutAnimationController : LayoutAnimationController by lazy {
@@ -77,13 +84,6 @@ class MainActivity : AppCompatActivity() {
             order = LayoutAnimationController.ORDER_NORMAL
         }
     }
-//    val animationOut : Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.fade_out_anim) }
-//    val layoutAnimationControllerOut : LayoutAnimationController by lazy {
-//        LayoutAnimationController(animationOut).apply {
-//            delay = 0f
-//            order = LayoutAnimationController.ORDER_REVERSE
-//        }
-//    }
 
 
 
@@ -109,8 +109,6 @@ class MainActivity : AppCompatActivity() {
          }
     }
 
-
-    private var previousImageUri : Uri? = null
 
 
     override fun onBackPressed() {
@@ -138,7 +136,6 @@ class MainActivity : AppCompatActivity() {
 
         window.navigationBarColor = ContextCompat.getColor(this, R.color.toolbar)
 
-        setupSidesSeparators()
 
         setupInitialNavigation()
 
@@ -160,14 +157,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupSidesSeparators(){
-
-        sideSeparatorStart = ContextCompat.getDrawable(this, R.drawable.gradient_for_separators)
-        sideSeparatorEnd =ContextCompat.getDrawable(this, R.drawable.gradient_for_separators)
-        bind.viewSeparatorStart.background = sideSeparatorStart
-        bind.viewSeparatorEnd.background = sideSeparatorEnd
-
-    }
 
 
     private fun setupInitialNavigation(){
@@ -192,7 +181,7 @@ class MainActivity : AppCompatActivity() {
             }
 
 
-            updateImageAndTitle(playingItem)
+            updateImage(playingItem)
 
         }
     }
@@ -208,7 +197,6 @@ class MainActivity : AppCompatActivity() {
 
                 bindPlayer.tvStationTitle.isSingleLine = true
                 bindPlayer.tvStationTitle.isSelected = true
-
 
 
         clickListenerToHandleNavigationWithDetailsFragment()
@@ -283,6 +271,7 @@ class MainActivity : AppCompatActivity() {
                 if(bindPlayer.tvExpandHideText.text == resources.getString(R.string.Expand)) {
 
                     putFadeOutForDetailsFragment()
+                    endSeparatorsLoadAnim()
 
                     supportFragmentManager.beginTransaction().apply {
 
@@ -313,6 +302,11 @@ class MainActivity : AppCompatActivity() {
     private fun handleNavigationToFragments(item : MenuItem?) : Boolean {
 
         val menuItem = bind.bottomNavigationView.selectedItemId
+
+        if((item?.itemId ?: menuItem) != R.id.mi_radioSearchFragment){
+            endSeparatorsLoadAnim()
+        }
+
 
         when(item?.itemId ?: menuItem) {
             R.id.mi_radioSearchFragment -> {
@@ -396,37 +390,82 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val randColors = RandomColors()
+
+    private fun setTvPlaceHolderLetter(name : String){
+
+        var char = 'X'
+
+        for(l in name.indices){
+            if(name[l].isLetter()){
+                char = name[l]
+                break
+            }
+        }
+        val color = randColors.getColor()
+        bindPlayer.tvPlaceholder.apply {
+            text = char.toString().uppercase()
+            setTextColor(color)
+            alpha = 0.6f
+        }
 
 
-    private fun updateImageAndTitle(playingItem : PlayingItem){
+    }
+
+    private fun updateImage(playingItem : PlayingItem){
 
         var name = ""
 
-        val newImage : Uri? = when (playingItem) {
+        val newImage = when (playingItem) {
             is PlayingItem.FromRadio -> {
-                playingItem.radioStation.favicon?.toUri()
+                name = playingItem.radioStation.name ?: "X"
+                playingItem.radioStation.favicon
             }
             is PlayingItem.FromRecordings -> {
-                playingItem.recording.iconUri.toUri()
+                name = playingItem.recording.name
+                playingItem.recording.iconUri
             }
         }
 
 
-        newImage?.let { uri ->
+            if(newImage.isNullOrBlank()){
+                bindPlayer.ivCurrentStationImage.visibility = View.GONE
+                setTvPlaceHolderLetter(name)
 
-            if(previousImageUri == uri){/*DO NOTHING*/} else{
+            } else {
 
+                bindPlayer.tvPlaceholder.alpha = 0f
+                bindPlayer.ivCurrentStationImage.visibility = View.VISIBLE
                 glide
-                    .load(uri)
+                    .load(newImage)
+                    .listener(object : RequestListener<Drawable>{
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+
+                            bindPlayer.ivCurrentStationImage.visibility = View.GONE
+                            setTvPlaceHolderLetter(name)
+                            return true
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            return false
+                        }
+                    })
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(bindPlayer.ivCurrentStationImage)
-                previousImageUri = uri
             }
         }
 
-//        bindPlayer.tvStationTitle.text = name
-
-    }
 
     private fun onClickListenerForTogglePlay(){
 
@@ -436,22 +475,7 @@ class MainActivity : AppCompatActivity() {
 
                 when(it){
                     is PlayingItem.FromRadio -> {
-                      val isPlaying =  mainViewModel.playOrToggleStation(it.radioStation)
-                      if(isPlaying){
-                          bindPlayer.tvStationTitle.apply {
-                              setTextColor(Color.YELLOW)
-                              alpha = 1f
-                          }
-
-                      } else {
-
-                          bindPlayer.tvStationTitle.apply {
-                              setTextColor(Color.WHITE)
-                              alpha = 0.6f
-                          }
-
-                      }
-
+                     mainViewModel.playOrToggleStation(it.radioStation)
 
                     }
                     is PlayingItem.FromRecordings -> {
@@ -472,11 +496,18 @@ class MainActivity : AppCompatActivity() {
                     it.isPlaying -> {
                         bindPlayer.ivTogglePlayCurrentStation
                             .setImageResource(R.drawable.ic_pause_play)
-
+                        bindPlayer.tvStationTitle.apply {
+                            setTextColor(Color.YELLOW)
+                            alpha = 1f
+                        }
                     }
                     it.isPlayEnabled -> {
                         bindPlayer.ivTogglePlayCurrentStation
                             .setImageResource(R.drawable.ic_play_pause)
+                        bindPlayer.tvStationTitle.apply {
+                            setTextColor(Color.WHITE)
+                            alpha = 0.6f
+                        }
 
                     }
                 }

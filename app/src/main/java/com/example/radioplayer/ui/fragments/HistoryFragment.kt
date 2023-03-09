@@ -1,21 +1,10 @@
 package com.example.radioplayer.ui.fragments
 
-import android.graphics.Rect
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.view.animation.AnimationUtils
-import android.view.animation.LayoutAnimationController
-import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.doOnNextLayout
-import androidx.core.view.get
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,17 +19,12 @@ import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
 import com.example.radioplayer.ui.dialogs.HistorySettingsDialog
 import com.example.radioplayer.ui.dialogs.HistoryWarningDialog
-import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
-import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Utils.fromDateToString
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.sql.Date
 import java.util.Calendar
 import javax.inject.Inject
@@ -267,10 +251,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 it.append is LoadState.Loading)
 
 
-
             else {
-                (activity as MainActivity).separatorLeftAnim.endLoadingAnim()
-                (activity as MainActivity).separatorRightAnim.endLoadingAnim()
+                (activity as MainActivity).endSeparatorsLoadAnim()
+//                (activity as MainActivity).separatorRightAnim.endLoadingAnim()
             }
         }
     }

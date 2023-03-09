@@ -179,9 +179,6 @@ class MainViewModel @Inject constructor(
        private suspend fun searchWithNewParams(
             limit : Int, offset : Int) : List<RadioStation> {
 
-               delay(3000)
-
-
                val calcOffset = limit * offset
 
 

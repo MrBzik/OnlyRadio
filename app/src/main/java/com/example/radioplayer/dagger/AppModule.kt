@@ -63,8 +63,6 @@ object AppModule {
 
         return Glide.with(app).setDefaultRequestOptions(
             RequestOptions()
-                .fallback(R.drawable.ic_radio_default)
-                .error(R.drawable.ic_radio_default)
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
         )
     }

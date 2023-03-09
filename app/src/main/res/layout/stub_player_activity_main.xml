@@ -2,16 +2,29 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="65dp"
     >
 
 
     <ImageView
         android:id="@+id/ivCurrentStationImage"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:layout_marginStart="10dp"
-        android:src="@drawable/ic_radio_default"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
+
+    <TextView
+        android:id="@+id/tvPlaceholder"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="17dp"
+        android:fontFamily="@font/ranchers"
+        android:text="D"
+        android:textSize="40sp"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -30,9 +43,10 @@
         android:maxLines="1"
         android:focusableInTouchMode="true"
         android:textSize="14sp"
+        android:layout_marginStart="75dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/ivTogglePlayCurrentStation"
-        app:layout_constraintStart_toEndOf="@+id/ivCurrentStationImage" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/tvExpandHideText"
@@ -48,7 +62,7 @@
     <ImageView
         android:id="@+id/ivTogglePlayCurrentStation"
         android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_height="65dp"
         android:src="@drawable/ic_play_pause"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
