@@ -45,8 +45,10 @@ class RadioSource @Inject constructor(
 
 
 
-    suspend fun getAllCountries() = radioApi.getAllCountries()
+//    suspend fun getAllCountries() = radioApi.getAllCountries()
 
+
+    suspend fun getAllTags() = radioApi.getAllTags()
 
     suspend fun insertRecording(recording : Recording) = radioDAO.insertRecording(recording)
     suspend fun deleteRecording(recId : String) = radioDAO.deleteRecording(recId)

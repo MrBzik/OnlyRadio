@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
+import android.util.Log
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
@@ -15,6 +16,7 @@ import com.example.radioplayer.connectivityObserver.NetworkConnectivityObserver
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.data.models.PlayingItem
+import com.example.radioplayer.data.remote.entities.RadioTagsItem
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.utils.Constants.COMMAND_ADD_RECORDING_AT_POSITION
@@ -34,6 +36,7 @@ import com.example.radioplayer.utils.Constants.SEARCH_FULL_COUNTRY_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
+import com.example.radioplayer.utils.listOfTags
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -372,70 +375,78 @@ class MainViewModel @Inject constructor(
             )
         }
 
-
-//    private fun getCountries() = viewModelScope.launch {
 //
-//        val response = radioSource.getAllCountries()
+//private fun getAllTags () = viewModelScope.launch {
 //
-//        var count = 0
-//
-//        val listOfCountries = mutableListOf<Country>()
-//
-//        val builder = StringBuilder()
-//        val builder2 = StringBuilder()
-//        val builder3 = StringBuilder()
-//        val builder4 = StringBuilder()
-//        val builder5 = StringBuilder()
+//    val response = radioSource.getAllTags()
 //
 //
-//        response.forEach {
+//    var included = 0
+//    var excluded = 0
 //
-//            if(count < 45) {
-//                count++
-//                builder.append(
-//                    "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
-//                )
-//            } else if(count < 90) {
-//            count++
-//            builder2.append(
-//                "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
-//            )
-//        } else if(count < 135) {
-//                count++
-//                builder3.append(
-//                    "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
-//                )
-//            } else if(count < 175) {
-//                count++
-//                builder4.append(
-//                    "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
-//                )
-//            } else {
-//                count++
-//                builder5.append(
-//                    "Country(\"${it.name}\", \"${it.iso_3166_1}\"), "
-//                )
+//
+//
+//    response.body()?.let{
+//
+//        it.forEach{
+//            included += it.stationcount
+//        }
+//
+//
+//        Log.d("CHECKTAGS", "initial size : ${it.size}")
+//
+//        val withoutMinors =  it.filter {
+//            it.stationcount > 7
+//        }
+//
+//        Log.d("CHECKTAGS", "minus minors : ${withoutMinors.size}")
+//
+//
+//        val withoutObvious = mutableListOf<RadioTagsItem>()
+//
+//        withoutMinors.forEach { item ->
+//
+//            var isFind = true
+//
+//            for(i in listOfTags.indices){
+//
+//                if(item.name.contains(listOfTags[i], ignoreCase = false)){
+//                    isFind = false
+//                    break
+//                }
+//
 //            }
 //
+//            if(isFind){
+//                withoutObvious.add(item)
+//            }
 //        }
 //
-//        Log.d("CHECKTAGS", builder.toString())
-//        Log.d("CHECKTAGS", builder2.toString())
-//        Log.d("CHECKTAGS", builder3.toString())
-//        Log.d("CHECKTAGS", builder4.toString())
-//        Log.d("CHECKTAGS", builder5.toString())
+//        Log.d("CHECKTAGS", "minus included : ${withoutObvious.size}")
+//
+//
+//        withoutObvious.forEach {
+//
+//            excluded += it.stationcount
+//
+//            Log.d("CHECKTAGS", "name : ${it.name}, num : ${it.stationcount})")
+//
+//
+//        }
+//
+//
+//        Log.d("CHECKTAGS", "included stations : $included, excluded : $excluded")
 //
 //    }
-
-
+//
+//}
+//
 //    init {
 //
-//        viewModelScope.launch {
-//           val list = repository.getAllStations()
-//            Log.d("CHECKTAGS", list.toString())
-//        }
-//
+//        getAllTags()
 //    }
+//
+
 
 }
 

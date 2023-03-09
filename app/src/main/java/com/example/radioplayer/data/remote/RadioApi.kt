@@ -95,7 +95,7 @@ interface RadioApi {
         @POST("/json/tags")
         suspend fun getAllTags() : Response<RadioTags>
 
-        @POST("/json/countries")
-        suspend fun getAllCountries() : Response<Countries>
+//        @POST("/json/countries")
+//        suspend fun getAllCountries() : Response<Countries>
 
 }

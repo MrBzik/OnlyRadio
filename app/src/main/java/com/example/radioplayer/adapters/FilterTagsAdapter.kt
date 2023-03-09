@@ -34,16 +34,17 @@ class FilterTagsAdapter(): ListAdapter<String, FilterTagsAdapter.TagHolder>(DIFF
         holder.itemView.setOnClickListener {
 
             onItemClickListener?.let { click ->
-                click(item)
+                click(item, position)
             }
 
         }
 
+
     }
 
-    private var onItemClickListener : ((String) -> Unit)? = null
+    private var onItemClickListener : ((tag : String, position : Int) -> Unit)? = null
 
-    fun setOnTagClickListener(listener : (String) -> Unit){
+    fun setOnTagClickListener(listener : (tag : String, position : Int) -> Unit){
         onItemClickListener = listener
     }
 

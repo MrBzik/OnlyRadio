@@ -96,7 +96,6 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private var deleteRecordingAt = -1
     private var addRecordingAt = -1
-    private var isRecordingsPlaylistUpdateNeeded = false
 
     private val observerForDatabase = Observer<List<RadioStation>>{
         radioSource.createMediaItemsFromDB(it)
@@ -104,10 +103,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private val observerForRecordings = Observer<List<Recording>>{
         radioSource.handleRecordingsUpdates(it, deleteRecordingAt, addRecordingAt)
-        if(isRecordingsPlaylistUpdateNeeded){
-            updateRecordingsPlaylist()
-            isRecordingsPlaylistUpdateNeeded = false
-        }
+        addRecordingAt = -1
+        deleteRecordingAt = -1
     }
 
     companion object{
@@ -157,7 +154,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
 
-        val radioPlaybackPreparer = RadioPlaybackPreparer(radioSource, { itemToPlay, flag, recPos ->
+        val radioPlaybackPreparer = RadioPlaybackPreparer(radioSource, { itemToPlay, flag ->
 
             currentStation = itemToPlay
 
@@ -188,8 +185,7 @@ class RadioService : MediaBrowserServiceCompat() {
                         radioSource.recordings,
                         itemToPlay,
                         playNow = true,
-                        isFromRecordings = true,
-                        recIndex = recPos
+                        isFromRecordings = true
                     )
                 }
 
@@ -232,7 +228,7 @@ class RadioService : MediaBrowserServiceCompat() {
                 COMMAND_DELETE_RECORDING_AT_POSITION -> {
                     deleteRecordingAt = extras?.getInt(RECORDING_POSITION) ?: 0
                     val recId = extras?.getString(RECORDING_ID) ?: ""
-                    isRecordingsPlaylistUpdateNeeded = true
+
                     CoroutineScope(Dispatchers.IO).launch {
 
                         radioSource.deleteRecording(recId)
@@ -241,17 +237,15 @@ class RadioService : MediaBrowserServiceCompat() {
 
                 COMMAND_ADD_RECORDING_AT_POSITION -> {
                     addRecordingAt = extras?.getInt(RECORDING_POSITION) ?: 0
-                    isRecordingsPlaylistUpdateNeeded = true
+
                     recordingToInsert?.let {
                         CoroutineScope(Dispatchers.IO).launch {
                             radioSource.insertRecording(it)
                         }
-
                     }
                 }
             }
         })
-
 
 
 
@@ -280,24 +274,24 @@ class RadioService : MediaBrowserServiceCompat() {
     fun listenToRecordDuration ()  {
 
 
-        serviceScope.launch {
-
-            while (true){
-
-                val format = exoPlayer.audioFormat
-                val encoding = format?.pcmEncoding
-                val sampleRate = format?.sampleRate
-                val channels = format?.channelCount
-
-                Log.d("CHECKTAGS", "$encoding, $sampleRate, $channels")
+//        serviceScope.launch {
+//
+//            while (true){
+//
+//                val format = exoPlayer.audioFormat
+//                val encoding = format?.pcmEncoding
+//                val sampleRate = format?.sampleRate
+//                val channels = format?.channelCount
+//
+//                Log.d("CHECKTAGS", "$encoding, $sampleRate, $channels")
 
 //                exoRecord.exoRecordProcessor.configure(AudioProcessor.AudioFormat(sampleRate!!, channels!!, encoding!!))
 
-                delay(1000)
-
-            }
-
-        }
+//                delay(1000)
+//
+//            }
+//
+//        }
 
 
 
@@ -366,6 +360,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
                     if(progress == 100.0f){
                         try {
+                            addRecordingAt = 0
                             insertNewRecording(
                                 record.filePath,
                                 System.currentTimeMillis(),
@@ -418,7 +413,7 @@ class RadioService : MediaBrowserServiceCompat() {
             val sampleRate = format?.sampleRate ?: 0
             val channels = format?.channelCount ?: 0
 
-            Log.d("CHECKTAGS", "$sampleRate, $channels")
+//            Log.d("CHECKTAGS", "$sampleRate, $channels")
 
             recSampleRate = sampleRate
             recChannelsCount = channels
@@ -446,104 +441,40 @@ class RadioService : MediaBrowserServiceCompat() {
        }
    }
 
-
-    private var isRecordingSourceFilled = false
-
-    private var isRecordingSourceSet = false
-
-    private val listOfRecordings : MutableList<MediaItem> by lazy { mutableListOf() }
-
-    private fun updateRecordingsPlaylist(){
-        if(isRecordingSourceFilled){
-
-            if(addRecordingAt != -1){
-                val dirPath = this.filesDir.path
-                val fileName = radioSource.recordings[addRecordingAt].getString(METADATA_KEY_MEDIA_ID)
-                val item = MediaItem.fromUri("$dirPath/$fileName")
-                listOfRecordings.add(addRecordingAt, item)
-                if(isFromRecording){
-                    exoPlayer.addMediaItem(addRecordingAt, item)
-                }
-                addRecordingAt = -1
-
-            } else {
-                listOfRecordings.removeAt(deleteRecordingAt)
-                if(isFromRecording){
-                    exoPlayer.removeMediaItem(deleteRecordingAt)
-                }
-                deleteRecordingAt = -1
-            }
-        }
-    }
-
-
-    private fun createListOfRecordings(){
-
-        val dirPath = this.filesDir.path
-
-        radioSource.recordings.forEach {
-            val fileName = it.getString(METADATA_KEY_MEDIA_ID)
-            val item = MediaItem.fromUri("$dirPath/$fileName")
-            listOfRecordings.add(item)
-        }
-    }
-
     private fun preparePlayer(
         playlist : List<MediaMetadataCompat>,
         itemToPlay : MediaMetadataCompat?,
         playNow : Boolean,
-        isFromRecordings : Boolean = false,
-        recIndex : Int = 0
+        isFromRecordings : Boolean = false
     ){
 
         this.isFromRecording = isFromRecordings
 
-        if(isFromRecordings){
-
-            if(!isRecordingSourceFilled) {
-                createListOfRecordings()
-                isRecordingSourceFilled = true
-            }
-
-            if(!isRecordingSourceSet){
-                exoPlayer.setMediaItems(listOfRecordings)
-                exoPlayer.prepare()
-                isRecordingSourceSet = true
-            }
-            
-            exoPlayer.seekTo(recIndex, 0L)
-            exoPlayer.playWhenReady = playNow
-
-        } else {
-
-            val uri = try {
-                playlist[playlist.indexOf(itemToPlay)].getString(METADATA_KEY_MEDIA_URI)
-            } catch (e : ArrayIndexOutOfBoundsException){
-                ""
-            }
-
-            val mediaItem = MediaItem.fromUri(uri.toUri())
-
-            val mediaSource = if(uri.contains("m3u8")) {
-                HlsMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(mediaItem)
-            } else {
-                ProgressiveMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(mediaItem)
-            }
-
-
-
-            exoPlayer.setMediaSource(mediaSource)
-            isRecordingSourceSet = false
-            exoPlayer.prepare()
-            exoPlayer.playWhenReady = playNow
-
+        var uri = try {
+            playlist[playlist.indexOf(itemToPlay)].getString(METADATA_KEY_MEDIA_URI)
+        } catch (e : ArrayIndexOutOfBoundsException){
+            ""
         }
 
-    }
+         if(isFromRecordings){
+             val fileDir = this@RadioService.filesDir.path
+             uri = "$fileDir/$uri"
+         }
 
+         val mediaItem = MediaItem.fromUri(uri.toUri())
+         val mediaSource = if(uri.contains("m3u8")) {
+             HlsMediaSource.Factory(dataSourceFactory)
+                 .createMediaSource(mediaItem)
+         } else {
+             ProgressiveMediaSource.Factory(dataSourceFactory)
+                 .createMediaSource(mediaItem)
+         }
 
+         exoPlayer.setMediaSource(mediaSource)
+         exoPlayer.prepare()
+         exoPlayer.playWhenReady = playNow
+
+      }
 
 
     override fun onTaskRemoved(rootIntent: Intent?) {

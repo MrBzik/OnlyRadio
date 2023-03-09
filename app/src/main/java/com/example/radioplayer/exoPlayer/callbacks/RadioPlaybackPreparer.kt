@@ -20,7 +20,7 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 class RadioPlaybackPreparer (
 
     private val radioSource: RadioSource,
-    private val playerPrepared : (MediaMetadataCompat?, flag: Int, recPosition : Int) -> Unit,
+    private val playerPrepared : (MediaMetadataCompat?, flag: Int) -> Unit,
     private val onCommand : (String, Bundle?) -> Unit
         ) : MediaSessionConnector.PlaybackPreparer {
 
@@ -50,7 +50,7 @@ class RadioPlaybackPreparer (
         extras?.let {
             flag = it.getInt(SEARCH_FLAG, 0)
         }
-        var recPosition = 0
+
 
 //        radioSource.whenReady {
             val itemToPlay =
@@ -66,8 +66,6 @@ class RadioPlaybackPreparer (
                           }
                            SEARCH_FROM_RECORDINGS -> {
 
-                               recPosition = extras?.getInt(REC_POSITION, 0) ?: 0
-
                                radioSource.recordings.find {
                                    it.description.mediaId == mediaId
                                }
@@ -77,7 +75,7 @@ class RadioPlaybackPreparer (
                          }
                     }
 
-            playerPrepared(itemToPlay, flag, recPosition)
+            playerPrepared(itemToPlay, flag)
 //        }
 
     }

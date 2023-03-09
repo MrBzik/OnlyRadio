@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.adapters.FilterTagsAdapter
 import com.example.radioplayer.databinding.DialogPickTagBinding
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.utils.*
 import com.example.radioplayer.utils.KeyboardObserver.observeKeyboardState
 
 class TagPickerDialog (
@@ -27,7 +28,7 @@ class TagPickerDialog (
     private val bind get() = _bind!!
 
     private lateinit var tagAdapter : FilterTagsAdapter
-
+    private val tagsList = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -68,12 +69,46 @@ class TagPickerDialog (
     private fun setupRecyclerView(){
 
         tagAdapter = FilterTagsAdapter()
-        tagAdapter.submitList(listOfItems)
+        fillInitialTagList()
+        tagAdapter.submitList(tagsList)
+
 
         bind.recyclerView.apply {
             adapter = tagAdapter
             layoutManager = LinearLayoutManager(requireContext)
         }
+    }
+
+    private fun fillInitialTagList() {
+
+        tagsList.apply {
+
+            addAll(listOfTags)
+
+            add(TAG_BY_PERIOD)
+            addAll(byPeriodTags)
+
+            add(TAG_BY_GENRE)
+            addAll(byGenreTags)
+
+            add(TAG_BY_SPECIAL)
+            addAll(specialTags)
+
+            add(TAG_BY_TALK)
+            addAll(talkNewsTags)
+
+            add(TAG_BY_RELIGION)
+            addAll(religionTags)
+
+            add(TAG_BY_ORIGIN)
+            addAll(byOriginTags)
+
+            add(TAG_BY_OTHER)
+            addAll(otherTags)
+
+        }
+
+
     }
 
     private fun setEditTextAdapterFilter(){
@@ -93,19 +128,61 @@ class TagPickerDialog (
 
     private fun setupAdapterClickListener(){
 
-        tagAdapter.setOnTagClickListener { tag ->
+        tagAdapter.setOnTagClickListener { tag, position ->
 
             if(tag.contains("---")){
-                return@setOnTagClickListener
+
+               val itemCount = removeTagsSubList(tag)
+
+                tagAdapter.submitList(tagsList)
+                tagAdapter.notifyItemRangeRemoved(position+1, itemCount)
+
+            } else {
+
+                mainViewModel.searchParamTag.postValue(tag)
+
+                dismiss()
+            }
+        }
+    }
+
+    private fun removeTagsSubList(label : String) : Int {
+
+        when(label){
+            TAG_BY_PERIOD -> {
+                tagsList.removeAll(byPeriodTags)
+                return byPeriodTags.size
+            }
+            TAG_BY_GENRE -> {
+                tagsList.removeAll(byGenreTags)
+                return byGenreTags.size
+            }
+            TAG_BY_SPECIAL -> {
+                tagsList.removeAll(specialTags)
+                return specialTags.size
+            }
+            TAG_BY_TALK -> {
+                tagsList.removeAll(talkNewsTags)
+                return talkNewsTags.size
+            }
+            TAG_BY_RELIGION -> {
+                tagsList.removeAll(religionTags)
+                return religionTags.size
+            }
+            TAG_BY_ORIGIN -> {
+                tagsList.removeAll(byOriginTags)
+                return byOriginTags.size
+            }
+            TAG_BY_OTHER -> {
+                tagsList.removeAll(otherTags)
+                return otherTags.size
             }
 
-            mainViewModel.searchParamTag.postValue(tag)
-
-           dismiss()
-
+            else -> return 0
         }
-
     }
+
+
 
     private fun setupButtons(){
         bind.tvClearSelection.setOnClickListener{
