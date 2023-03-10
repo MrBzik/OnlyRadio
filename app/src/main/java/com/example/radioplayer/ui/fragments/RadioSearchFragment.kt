@@ -1,7 +1,9 @@
 package com.example.radioplayer.ui.fragments
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE
+import android.util.Log
 import android.view.DragEvent
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -11,6 +13,7 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
+import com.example.radioplayer.adapters.models.TagWithGenre
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
@@ -20,8 +23,8 @@ import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.CountryPickerDialog
 import com.example.radioplayer.ui.dialogs.NameDialog
 import com.example.radioplayer.ui.dialogs.TagPickerDialog
+import com.example.radioplayer.utils.*
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
-import com.example.radioplayer.utils.listOfTags
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -34,7 +37,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 ) {
 
 
-    private val allTags = listOfTags
+    private val allTags = listOfTagsSimple
 
     private var isNewSearchForAnimations = true
 
@@ -42,6 +45,38 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     @Inject
     lateinit var pagingRadioAdapter : PagingRadioAdapter
+
+
+    companion object {
+
+        var tagAdapterPosition : Parcelable? = null
+
+        val tagsList : ArrayList<TagWithGenre> by lazy { ArrayList<TagWithGenre>().apply {
+                    addAll(listOfTags)
+
+                    add(TagWithGenre.Genre(TAG_BY_PERIOD))
+                    addAll(tagsListByPeriod)
+
+                    add(TagWithGenre.Genre(TAG_BY_GENRE))
+                    addAll(tagsListByGenre)
+
+                    add(TagWithGenre.Genre(TAG_BY_SPECIAL))
+                    addAll(tagsListSpecial)
+
+                    add(TagWithGenre.Genre(TAG_BY_TALK))
+                    addAll(tagsListByTalk)
+
+                    add(TagWithGenre.Genre(TAG_BY_RELIGION))
+                    addAll(tagsListReligion)
+
+                    add(TagWithGenre.Genre(TAG_BY_ORIGIN))
+                    addAll(tagsListByOrigin)
+
+                    add(TagWithGenre.Genre(TAG_BY_OTHER))
+                    addAll(tagsListOther)
+            }
+        }
+    }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -295,7 +330,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         bind.llTag.setOnClickListener {
             bind.tvTag.isPressed = true
-            TagPickerDialog(requireContext(), allTags, mainViewModel).show()
+            TagPickerDialog(requireContext(), mainViewModel).show()
         }
 
 

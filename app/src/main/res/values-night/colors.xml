@@ -26,4 +26,6 @@
     <color name="default_text_color">#FFFFFFFF</color>
     <color name="selected_text_color">#ff0</color>
     <color name="seekbar_text_style">#6F3403</color>
+    <color name="selected_genre_color">#99FFFF00</color>
+    <color name="unselected_genre_color">#80FFFFFF</color>
 </resources>

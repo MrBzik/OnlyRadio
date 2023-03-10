@@ -202,20 +202,10 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                     scheduleLayoutAnimation()
                 }
 
-//            if(mainViewModel.isHistoryAnimationToPlay){
-//
-//
-//                mainViewModel.isHistoryAnimationToPlay = false
-//
-//            } else {
-//                layoutAnimation = null
-//            }
-
 
 
         }
 
-        setAdapterLoadStateListener()
     }
 
     private fun subscribeToHistory(){
@@ -242,21 +232,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     }
 
 
-
-    private fun setAdapterLoadStateListener(){
-
-        historyAdapter.addLoadStateListener {
-
-            if (it.refresh is LoadState.Loading ||
-                it.append is LoadState.Loading)
-
-
-            else {
-                (activity as MainActivity).endSeparatorsLoadAnim()
-//                (activity as MainActivity).separatorRightAnim.endLoadingAnim()
-            }
-        }
-    }
 
 
     private fun updateCurrentDate(){

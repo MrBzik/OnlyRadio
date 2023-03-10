@@ -6,20 +6,21 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.*
 import androidx.appcompat.app.AppCompatDialog
-import androidx.core.view.doOnLayout
-import androidx.core.view.doOnNextLayout
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.radioplayer.R
 import com.example.radioplayer.adapters.FilterTagsAdapter
+import com.example.radioplayer.adapters.models.TagWithGenre
 import com.example.radioplayer.databinding.DialogPickTagBinding
+import com.example.radioplayer.ui.fragments.RadioSearchFragment
+import com.example.radioplayer.ui.fragments.RadioSearchFragment.Companion.tagsList
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.utils.*
 import com.example.radioplayer.utils.KeyboardObserver.observeKeyboardState
 
 class TagPickerDialog (
     private val requireContext : Context,
-    private val listOfItems : List<String>,
     private val mainViewModel: MainViewModel
     )
     : AppCompatDialog(requireContext) {
@@ -28,7 +29,6 @@ class TagPickerDialog (
     private val bind get() = _bind!!
 
     private lateinit var tagAdapter : FilterTagsAdapter
-    private val tagsList = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -69,47 +69,27 @@ class TagPickerDialog (
     private fun setupRecyclerView(){
 
         tagAdapter = FilterTagsAdapter()
-        fillInitialTagList()
-        tagAdapter.submitList(tagsList)
+        tagAdapter.apply {
+            submitList(tagsList)
+            defaultTextColor = ContextCompat.getColor(requireContext, R.color.unselected_genre_color)
+            selectedTextColor = ContextCompat.getColor(requireContext, R.color.selected_genre_color)
+            openingDrawable = R.drawable.tags_expand
+            closingDrawable = R.drawable.tags_shrink
+        }
 
 
         bind.recyclerView.apply {
             adapter = tagAdapter
             layoutManager = LinearLayoutManager(requireContext)
-        }
-    }
-
-    private fun fillInitialTagList() {
-
-        tagsList.apply {
-
-            addAll(listOfTags)
-
-            add(TAG_BY_PERIOD)
-            addAll(byPeriodTags)
-
-            add(TAG_BY_GENRE)
-            addAll(byGenreTags)
-
-            add(TAG_BY_SPECIAL)
-            addAll(specialTags)
-
-            add(TAG_BY_TALK)
-            addAll(talkNewsTags)
-
-            add(TAG_BY_RELIGION)
-            addAll(religionTags)
-
-            add(TAG_BY_ORIGIN)
-            addAll(byOriginTags)
-
-            add(TAG_BY_OTHER)
-            addAll(otherTags)
-
+            RadioSearchFragment.tagAdapterPosition?.let {
+                layoutManager?.onRestoreInstanceState(it)
+            }
         }
 
 
+
     }
+
 
     private fun setEditTextAdapterFilter(){
 
@@ -130,56 +110,121 @@ class TagPickerDialog (
 
         tagAdapter.setOnTagClickListener { tag, position ->
 
-            if(tag.contains("---")){
+            if(tag is TagWithGenre.Genre){
 
-               val itemCount = removeTagsSubList(tag)
+                if(tag.isOpened) {
 
-                tagAdapter.submitList(tagsList)
-                tagAdapter.notifyItemRangeRemoved(position+1, itemCount)
+                    removeTagsSubList(tag.genre, position)
 
-            } else {
+                } else {
 
-                mainViewModel.searchParamTag.postValue(tag)
+                    addTagsSublist(tag.genre, position)
+                }
+
+
+            } else if(tag is TagWithGenre.Tag) {
+
+                mainViewModel.searchParamTag.postValue(tag.tag)
 
                 dismiss()
+
             }
         }
     }
 
-    private fun removeTagsSubList(label : String) : Int {
+    private fun addTagsSublist(genre : String, position: Int){
 
-        when(label){
+        var itemCount = 0
+
+        when(genre){
             TAG_BY_PERIOD -> {
-                tagsList.removeAll(byPeriodTags)
-                return byPeriodTags.size
+
+                tagsList.addAll(position+1, tagsListByPeriod)
+                itemCount = tagsListByPeriod.size
             }
             TAG_BY_GENRE -> {
-                tagsList.removeAll(byGenreTags)
-                return byGenreTags.size
+                tagsList.addAll(position+1, tagsListByGenre)
+                itemCount = tagsListByGenre.size
+
             }
             TAG_BY_SPECIAL -> {
-                tagsList.removeAll(specialTags)
-                return specialTags.size
+                tagsList.addAll(position+1, tagsListSpecial)
+                itemCount = tagsListSpecial.size
+
             }
             TAG_BY_TALK -> {
-                tagsList.removeAll(talkNewsTags)
-                return talkNewsTags.size
+                tagsList.addAll(position+1, tagsListByTalk)
+                itemCount = tagsListByTalk.size
+
             }
             TAG_BY_RELIGION -> {
-                tagsList.removeAll(religionTags)
-                return religionTags.size
+                tagsList.addAll(position+1, tagsListReligion)
+                itemCount = tagsListReligion.size
+
             }
             TAG_BY_ORIGIN -> {
-                tagsList.removeAll(byOriginTags)
-                return byOriginTags.size
+                tagsList.addAll(position+1, tagsListByOrigin)
+                itemCount = tagsListByOrigin.size
+
             }
             TAG_BY_OTHER -> {
-                tagsList.removeAll(otherTags)
-                return otherTags.size
-            }
+                tagsList.addAll(position+1, tagsListOther)
+                itemCount = tagsListOther.size
 
-            else -> return 0
+            }
         }
+
+        (tagsList[position] as TagWithGenre.Genre).isOpened = true
+        tagAdapter.submitList(tagsList)
+        tagAdapter.notifyItemRangeInserted(position+1, itemCount)
+
+    }
+
+    private fun removeTagsSubList(genre : String, position : Int)  {
+
+        var itemCount = 0
+
+        when(genre){
+            TAG_BY_PERIOD -> {
+                tagsList.removeAll(tagsListByPeriod)
+                itemCount = tagsListByPeriod.size
+            }
+            TAG_BY_GENRE -> {
+                tagsList.removeAll(tagsListByGenre)
+                itemCount = tagsListByGenre.size
+
+            }
+            TAG_BY_SPECIAL -> {
+                tagsList.removeAll(tagsListSpecial)
+                itemCount = tagsListSpecial.size
+
+            }
+            TAG_BY_TALK -> {
+                tagsList.removeAll(tagsListByTalk)
+                itemCount = tagsListByTalk.size
+
+            }
+            TAG_BY_RELIGION -> {
+                tagsList.removeAll(tagsListReligion)
+                itemCount = tagsListReligion.size
+
+            }
+            TAG_BY_ORIGIN -> {
+                tagsList.removeAll(tagsListByOrigin)
+                itemCount = tagsListByOrigin.size
+
+            }
+            TAG_BY_OTHER -> {
+                tagsList.removeAll(tagsListOther)
+                itemCount = tagsListOther.size
+
+            }
+        }
+
+        (tagsList[position] as TagWithGenre.Genre).isOpened = false
+        tagAdapter.submitList(tagsList)
+        tagAdapter.notifyItemRangeRemoved(position+1, itemCount)
+
     }
 
 
@@ -205,6 +250,9 @@ class TagPickerDialog (
 
     override fun onStop() {
         super.onStop()
+
+        RadioSearchFragment.tagAdapterPosition = bind.recyclerView.layoutManager?.onSaveInstanceState()
+
         bind.recyclerView.adapter = null
         _bind = null
 
