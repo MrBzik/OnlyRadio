@@ -166,7 +166,7 @@ class RadioDatabaseAdapter @Inject constructor(
 
     var defaultTextColor = 0
     var selectedTextColor = 0
-    var currentRadioStationName = ""
+    var currentRadioStationName : String? = null
     var currentPlaybackState = false
     private var previousItemHolder : RadioItemHolder? = null
 

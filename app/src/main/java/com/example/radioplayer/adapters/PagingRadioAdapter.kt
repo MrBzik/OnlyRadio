@@ -28,7 +28,6 @@ import com.example.radioplayer.databinding.RadioItemBinding
 import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
 import com.example.radioplayer.ui.animations.fadeOut
 import com.example.radioplayer.utils.RandomColors
-import java.lang.String
 import javax.inject.Inject
 
 class PagingRadioAdapter @Inject constructor(
@@ -210,7 +209,7 @@ class PagingRadioAdapter @Inject constructor(
         }
     }
 
-    var currentRadioStationName = ""
+    var currentRadioStationName : String? = null
     var currentPlaybackState = false
     var previousItemHolder : RadioItemHolder? = null
 

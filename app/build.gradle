@@ -75,9 +75,17 @@ dependencies {
     api "com.google.android.exoplayer:extension-mediasession:2.18.2"
     implementation 'com.google.android.exoplayer:exoplayer-hls:2.18.2'
 
-    //ExoPlayer recording
-    implementation 'com.github.brookmg.exorecord:exorecord:0.3.3'
-    implementation 'com.github.brookmg.exorecord:exorecordogg:0.3.3'
+//    //ExoPlayer recording
+//    implementation 'com.github.brookmg.exorecord:exorecord:0.3.3'
+//    implementation 'com.github.brookmg.exorecord:exorecordogg:0.3.3'
+
+    // ExoRecording Fork
+    implementation 'com.github.MrBzik.ExoRecord:exorecord:TestTrim'
+    implementation 'com.github.MrBzik.ExoRecord:exorecordogg:TestTrim'
+
+    implementation 'com.arthenica:ffmpeg-kit-full:5.1'
+    implementation 'com.writingminds:FFmpegAndroid:0.3.2'
+
 
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'

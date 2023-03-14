@@ -190,10 +190,12 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             historyAdapter.apply {
                 defaultTextColor = ContextCompat.getColor(requireContext(), R.color.default_text_color)
                 selectedTextColor = ContextCompat.getColor(requireContext(), R.color.selected_text_color)
-                mainViewModel.currentRadioStation.value?.let {
-                    val id =  it.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)
-                    this.currentRadioStationID = id
-                }
+
+                    mainViewModel.currentRadioStation.value?.let {
+                        val id =  it.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)
+                        currentRadioStationID = id
+                    }
+
             }
 
             layoutAnimation = (activity as MainActivity).layoutAnimationController

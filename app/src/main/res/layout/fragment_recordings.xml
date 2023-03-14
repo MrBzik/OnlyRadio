@@ -22,11 +22,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Swipe-delete: off"
+        android:text="Swipe-delete: "
         android:layout_marginStart="8dp"
         android:textAppearance="@style/mainTextButtons"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvDeleteOption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="off"
+        android:textAppearance="@style/mainTextTitle"
+        app:layout_constraintStart_toEndOf="@+id/tvEnableDeleting"
+        app:layout_constraintTop_toTopOf="parent"/>
+
 
 
     <TextView

@@ -79,7 +79,7 @@ class RecordingsAdapter @Inject constructor(
             root.setOnClickListener {
 
                 onItemClickListener?.let { click ->
-                    click(recording, position)
+                    click(recording)
 
                     if(playingRecordingId == recording.id) {/*DO NOTHING*/}
                     else {
@@ -120,9 +120,9 @@ class RecordingsAdapter @Inject constructor(
     }
 
 
-    private var onItemClickListener : ((Recording, position : Int) -> Unit)? = null
+    private var onItemClickListener : ((Recording) -> Unit)? = null
 
-    fun setOnClickListener(listener : (Recording, position : Int) -> Unit){
+    fun setOnClickListener(listener : (Recording) -> Unit){
         onItemClickListener = listener
     }
 

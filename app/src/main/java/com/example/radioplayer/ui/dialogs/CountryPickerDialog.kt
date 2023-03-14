@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.adapters.FilterCountriesAdapter
 import com.example.radioplayer.databinding.DialogPickCountryBinding
+import com.example.radioplayer.ui.fragments.RadioSearchFragment
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.utils.KeyboardObserver
 import com.example.radioplayer.utils.listOfCountries
@@ -109,6 +110,11 @@ class CountryPickerDialog(
 
             adapter = countryAdapter
             layoutManager = LinearLayoutManager(requireContext)
+
+            RadioSearchFragment.countriesAdapterPosition?.let {
+                layoutManager?.onRestoreInstanceState(it)
+            }
+
         }
     }
 
@@ -130,6 +136,8 @@ class CountryPickerDialog(
 
     override fun onStop() {
         super.onStop()
+        RadioSearchFragment.countriesAdapterPosition =
+            bind.rvCountries.layoutManager?.onSaveInstanceState()
         bind.rvCountries.adapter = null
         _bind = null
     }

@@ -47,16 +47,17 @@
         android:id="@+id/tvPlaylistName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:ellipsize="end"
+        android:paddingHorizontal="8dp"
         android:maxLines="1"
+        android:gravity="center"
+        android:text="playlist name"
         android:textAppearance="@style/mainTextTitle"
-        app:layout_constraintEnd_toStartOf="@id/tvPlaylistEdit"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/tvPlaylistsExpand"
+        app:layout_constraintStart_toEndOf="@+id/tvPlaylistEdit"
 
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/ivArrowPlaylistsExpand"
@@ -87,10 +88,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="Edit"
-        android:textAppearance="@style/mainTextButtons"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        android:textAppearance="@style/mainTextButtons"
+        android:layout_marginStart="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
 

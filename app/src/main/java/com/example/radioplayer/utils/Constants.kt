@@ -23,6 +23,10 @@ object Constants {
     const val NOTIFICATION_ID = 1
     const val CHANNEL_ID = "radio"
 
+    const val RECORDING_CHANNEL_ID = "recording channel"
+
+
+
     const val MEDIA_ROOT_ID = "media root id"
 
     const val NETWORK_ERROR = "network error"
@@ -32,8 +36,9 @@ object Constants {
     const val COMMAND_STOP_RECORDING = "stop exoRecord recording"
     const val COMMAND_DELETE_RECORDING_AT_POSITION = "delete recording and update playlist"
     const val COMMAND_ADD_RECORDING_AT_POSITION = "add recording at position and update"
+    const val COMMAND_REMOVE_CURRENT_PLAYING_ITEM = "remove playing item from exoplayer"
 
-    const val RECORDING_POSITION = "recirding at position"
+    const val RECORDING_POSITION = "recording at position"
     const val RECORDING_ID = "id of recording"
 
     const val COMMAND_LOAD_FROM_PLAYLIST = "load from playlist"
@@ -48,7 +53,6 @@ object Constants {
     const val SEARCH_FROM_PLAYLIST = 2
     const val SEARCH_FROM_HISTORY = 3
     const val SEARCH_FROM_RECORDINGS = 4
-    const val REC_POSITION = "recording position"
 
     const val DATE_FORMAT = "dd.MM.yyyy HH:mm"
 
@@ -71,4 +75,8 @@ object Constants {
     const val FAB_POSITION_X = "FAB_POSITION_X"
     const val FAB_POSITION_Y = "FAB_POSITION_Y"
     const val IS_FAB_UPDATED = "IS_FAB_UPDATED"
+
+    //Recording preferences
+
+    const val RECORDING_QUALITY_PREF = "recording quality pref"
 }

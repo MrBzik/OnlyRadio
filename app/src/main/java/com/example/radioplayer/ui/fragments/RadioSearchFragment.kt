@@ -3,7 +3,6 @@ package com.example.radioplayer.ui.fragments
 import android.os.Bundle
 import android.os.Parcelable
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE
-import android.util.Log
 import android.view.DragEvent
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -50,30 +49,41 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     companion object {
 
         var tagAdapterPosition : Parcelable? = null
+        var countriesAdapterPosition : Parcelable? = null
+
 
         val tagsList : ArrayList<TagWithGenre> by lazy { ArrayList<TagWithGenre>().apply {
-                    addAll(listOfTags)
 
-                    add(TagWithGenre.Genre(TAG_BY_PERIOD))
-                    addAll(tagsListByPeriod)
 
-                    add(TagWithGenre.Genre(TAG_BY_GENRE))
-                    addAll(tagsListByGenre)
+                add(TagWithGenre.Genre(TAG_BY_PERIOD))
+                addAll(tagsListByPeriod)
 
-                    add(TagWithGenre.Genre(TAG_BY_SPECIAL))
-                    addAll(tagsListSpecial)
+                add(TagWithGenre.Genre(TAG_BY_SPECIAL))
+                addAll(tagsListSpecial)
 
-                    add(TagWithGenre.Genre(TAG_BY_TALK))
-                    addAll(tagsListByTalk)
+                add(TagWithGenre.Genre(TAG_BY_GENRE))
+                addAll(tagsListByGenre)
 
-                    add(TagWithGenre.Genre(TAG_BY_RELIGION))
-                    addAll(tagsListReligion)
+                add(TagWithGenre.Genre(TAG_BY_CLASSIC))
+                addAll(tagsListClassics)
 
-                    add(TagWithGenre.Genre(TAG_BY_ORIGIN))
-                    addAll(tagsListByOrigin)
+                add(TagWithGenre.Genre(TAG_BY_MINDFUL))
+                addAll(tagsListMindful)
 
-                    add(TagWithGenre.Genre(TAG_BY_OTHER))
-                    addAll(tagsListOther)
+                add(TagWithGenre.Genre(TAG_BY_EXPERIMENTAL))
+                addAll(tagsListExperimental)
+
+                add(TagWithGenre.Genre(TAG_BY_TALK))
+                addAll(tagsListByTalk)
+
+                add(TagWithGenre.Genre(TAG_BY_RELIGION))
+                addAll(tagsListReligion)
+
+                add(TagWithGenre.Genre(TAG_BY_ORIGIN))
+                addAll(tagsListByOrigin)
+
+                add(TagWithGenre.Genre(TAG_BY_OTHER))
+                addAll(tagsListOther)
             }
         }
     }

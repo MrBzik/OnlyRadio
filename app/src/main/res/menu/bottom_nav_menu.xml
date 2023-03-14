@@ -10,7 +10,7 @@
 
     <item
         android:id="@+id/mi_favStationsFragment"
-        android:title="Playlists"
+        android:title="Favoured"
        />
 
 

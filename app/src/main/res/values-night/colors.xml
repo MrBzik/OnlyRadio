@@ -28,4 +28,8 @@
     <color name="seekbar_text_style">#6F3403</color>
     <color name="selected_genre_color">#99FFFF00</color>
     <color name="unselected_genre_color">#80FFFFFF</color>
+    <color name="option_selected">#698E03</color>
+    <color name="switch_track_selected">#99698E03</color>
+    <color name="switch_track_unselected">#121111</color>
+
 </resources>

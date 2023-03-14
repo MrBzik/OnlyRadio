@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
 import android.view.View
 import android.widget.ImageView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -342,13 +343,20 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
 
             if(it){
-                bind.tvPlaylistName.text = getString(R.string.Favoured)
+                bind.tvPlaylistName.text = ""
+//                    getString(R.string.Favoured)
+
+
+
                 searchFlag = SEARCH_FROM_FAVOURITES
 
             } else{
 
                 searchFlag = SEARCH_FROM_PLAYLIST
+
+
             }
+            bind.tvPlaylistName.requestLayout()
         }
 
     }

@@ -1,5 +1,6 @@
 package com.example.radioplayer.utils
 
+import android.util.Log
 import java.lang.StringBuilder
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -53,6 +54,30 @@ object Utils {
 
         return String.format("%02d:%02d:%02d", hours, minutes, seconds)
 
+    }
+
+
+    fun timerFormatCut(mills : Long) : String {
+
+        var milliseconds = mills
+        var mode = 1
+
+        val hours = TimeUnit.MILLISECONDS.toHours(milliseconds)
+        if(hours != 0L) mode = 3
+        milliseconds -= TimeUnit.HOURS.toMillis(hours)
+
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds)
+        if(minutes != 0L && mode == 1) mode = 2
+        milliseconds -= TimeUnit.MINUTES.toMillis(minutes)
+
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds)
+        milliseconds -= TimeUnit.SECONDS.toMillis(seconds)
+
+        return when(mode){
+            3 -> String.format("%02d:%02d:%02d", hours, minutes, seconds)
+            2 -> String.format("%02d:%02d", minutes, seconds)
+            else ->   String.format("%02d", seconds)
+        }
     }
 
 

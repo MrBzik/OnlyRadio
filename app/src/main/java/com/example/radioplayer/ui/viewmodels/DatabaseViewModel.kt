@@ -378,10 +378,14 @@ class DatabaseViewModel @Inject constructor(
 //            )
 //    }
 
-//    fun insertNewRecording(rec : Recording) =
-//        viewModelScope.launch {
-//            repository.insertRecording(rec)
-//        }
+    fun insertNewRecording(rec : Recording) =
+        viewModelScope.launch {
+            repository.insertRecording(rec)
+        }
+
+    fun deleteRecording(recId : String) = viewModelScope.launch {
+        repository.deleteRecording(recId)
+    }
 
 
     val allRecordingsLiveData = radioSource.allRecordingsLiveData

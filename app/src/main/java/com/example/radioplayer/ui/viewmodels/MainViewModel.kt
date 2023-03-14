@@ -22,13 +22,13 @@ import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
 import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
 import com.example.radioplayer.utils.Constants.COMMAND_DELETE_RECORDING_AT_POSITION
+import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_CURRENT_PLAYING_ITEM
 import com.example.radioplayer.utils.Constants.FAB_POSITION_X
 import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
 import com.example.radioplayer.utils.Constants.RECORDING_ID
 import com.example.radioplayer.utils.Constants.RECORDING_POSITION
-import com.example.radioplayer.utils.Constants.REC_POSITION
 import com.example.radioplayer.utils.Constants.SEARCH_FLAG
 import com.example.radioplayer.utils.Constants.SEARCH_FULL_COUNTRY_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
@@ -283,12 +283,17 @@ class MainViewModel @Inject constructor(
 
         }
 
+        fun stopPlay(){
+
+            radioServiceConnection.transportControls.stop()
+            radioServiceConnection.sendCommand(COMMAND_REMOVE_CURRENT_PLAYING_ITEM, null)
+
+        }
 
         fun playOrToggleStation(
             station : RadioStation? = null,
             searchFlag : Int = 0,
-            rec : Recording? = null,
-            recPosition : Int = 0
+            rec : Recording? = null
         ) : Boolean {
 
             val isPrepared = playbackState.value?.isPrepared ?: false
@@ -326,9 +331,7 @@ class MainViewModel @Inject constructor(
 
                 radioServiceConnection.transportControls
                     .playFromMediaId(id, bundleOf(
-                        Pair(SEARCH_FLAG, searchFlag),
-                        Pair(REC_POSITION, recPosition)
-                        ))
+                        Pair(SEARCH_FLAG, searchFlag)))
             }
 
             return false
@@ -353,24 +356,26 @@ class MainViewModel @Inject constructor(
         val exoRecordTimer = radioSource.exoRecordTimer
 
 
-        fun commandToDeleteRecordingAtPosition(position : Int, recId : String){
-            radioServiceConnection.sendCommand(
-                COMMAND_DELETE_RECORDING_AT_POSITION,
-                bundleOf(
-                    Pair(RECORDING_POSITION, position),
-                    Pair(RECORDING_ID, recId)
-                    )
-                )
-        }
+//        fun commandToDeleteRecordingAtPosition(position : Int, recId : String){
+//            radioServiceConnection.sendCommand(
+//                COMMAND_DELETE_RECORDING_AT_POSITION,
+//                bundleOf(
+//                    Pair(RECORDING_POSITION, position),
+//                    Pair(RECORDING_ID, recId)
+//                    )
+//                )
+//        }
+//
+//        fun commandToInsertRecordingAtPosition(position : Int){
+//            radioServiceConnection.sendCommand(
+//                COMMAND_ADD_RECORDING_AT_POSITION,
+//                    bundleOf(
+//                        Pair(RECORDING_POSITION, position)
+//                    )
+//            )
+//        }
 
-        fun commandToInsertRecordingAtPosition(position : Int){
-            radioServiceConnection.sendCommand(
-                COMMAND_ADD_RECORDING_AT_POSITION,
-                    bundleOf(
-                        Pair(RECORDING_POSITION, position)
-                    )
-            )
-        }
+
 
 //
 //private fun getAllTags () = viewModelScope.launch {

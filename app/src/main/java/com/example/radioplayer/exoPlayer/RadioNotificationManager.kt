@@ -54,7 +54,9 @@ class RadioNotificationManager (
                     setSmallIcon(R.drawable.ic_radio_default)
                     setMediaSessionToken(sessionToken)
                     setUseChronometer(false)
-                    setColor(Color.BLACK)
+                    setUseNextAction(false)
+                    setUsePreviousAction(false)
+                    setColor(R.color.main_background)
                 }
 
 

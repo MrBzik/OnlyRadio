@@ -51,7 +51,7 @@ class RadioSource @Inject constructor(
     suspend fun getAllTags() = radioApi.getAllTags()
 
     suspend fun insertRecording(recording : Recording) = radioDAO.insertRecording(recording)
-    suspend fun deleteRecording(recId : String) = radioDAO.deleteRecording(recId)
+//    suspend fun deleteRecording(recId : String) = radioDAO.deleteRecording(recId)
 
 
     suspend fun getStationsInDate(limit: Int, offset: Int, initialDate: String): DateWithStations {
@@ -81,23 +81,21 @@ class RadioSource @Inject constructor(
 
 
     fun handleRecordingsUpdates(
-        listOfRecordings : List<Recording>,
-        deleteAt : Int,
-        addRecordingAt : Int
+        listOfRecordings : List<Recording>
     ){
-        if(deleteAt != -1){
-            recordings.removeAt(deleteAt)
-        }
-        else if(addRecordingAt != -1){
-            val rec = listOfRecordings[addRecordingAt]
-            val mediaRec = createMediaMetadataCompatFromRecording(rec)
-            recordings.add(addRecordingAt, mediaRec)
-        }
-        else {
+//        if(deleteAt != -1){
+//            recordings.removeAt(deleteAt)
+//        }
+//        else if(addRecordingAt != -1){
+//            val rec = listOfRecordings[addRecordingAt]
+//            val mediaRec = createMediaMetadataCompatFromRecording(rec)
+//            recordings.add(addRecordingAt, mediaRec)
+//        }
+
             recordings = listOfRecordings.map { recording ->
                 createMediaMetadataCompatFromRecording(recording)
             }.toMutableList()
-        }
+
     }
 
 

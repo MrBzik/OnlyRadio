@@ -138,7 +138,6 @@ class TagPickerDialog (
 
         when(genre){
             TAG_BY_PERIOD -> {
-
                 tagsList.addAll(position+1, tagsListByPeriod)
                 itemCount = tagsListByPeriod.size
             }
@@ -147,11 +146,27 @@ class TagPickerDialog (
                 itemCount = tagsListByGenre.size
 
             }
-            TAG_BY_SPECIAL -> {
-                tagsList.addAll(position+1, tagsListSpecial)
-                itemCount = tagsListSpecial.size
+            TAG_BY_MINDFUL -> {
+                tagsList.addAll(position+1, tagsListMindful)
+                itemCount = tagsListMindful.size
 
             }
+            TAG_BY_CLASSIC -> {
+                tagsList.addAll(position+1, tagsListClassics)
+                itemCount = tagsListClassics.size
+            }
+
+            TAG_BY_EXPERIMENTAL ->{
+                tagsList.addAll(position+1, tagsListExperimental)
+                itemCount = tagsListExperimental.size
+            }
+
+            TAG_BY_SPECIAL ->{
+                tagsList.addAll(position+1, tagsListSpecial)
+                itemCount = tagsListSpecial.size
+            }
+
+
             TAG_BY_TALK -> {
                 tagsList.addAll(position+1, tagsListByTalk)
                 itemCount = tagsListByTalk.size
@@ -194,11 +209,28 @@ class TagPickerDialog (
                 itemCount = tagsListByGenre.size
 
             }
-            TAG_BY_SPECIAL -> {
-                tagsList.removeAll(tagsListSpecial)
-                itemCount = tagsListSpecial.size
+            TAG_BY_MINDFUL -> {
+                tagsList.removeAll(tagsListMindful)
+                itemCount = tagsListMindful.size
 
             }
+
+            TAG_BY_CLASSIC -> {
+                tagsList.removeAll( tagsListClassics)
+                itemCount = tagsListClassics.size
+            }
+
+            TAG_BY_EXPERIMENTAL ->{
+                tagsList.removeAll( tagsListExperimental)
+                itemCount = tagsListExperimental.size
+            }
+
+            TAG_BY_SPECIAL ->{
+                tagsList.removeAll( tagsListSpecial)
+                itemCount = tagsListSpecial.size
+            }
+
+
             TAG_BY_TALK -> {
                 tagsList.removeAll(tagsListByTalk)
                 itemCount = tagsListByTalk.size

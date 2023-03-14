@@ -284,7 +284,7 @@ class PagingHistoryAdapter @Inject constructor(
        }
     }
 
-    var currentRadioStationID = ""
+    var currentRadioStationID : String? = null
     var currentPlaybackState = false
     private var selectedAdapterPosition = -2
     private var previousItemHolder : StationViewHolder? = null

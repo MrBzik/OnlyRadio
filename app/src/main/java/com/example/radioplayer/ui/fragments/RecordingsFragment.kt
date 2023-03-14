@@ -17,6 +17,8 @@ import com.example.radioplayer.databinding.FragmentRecordingsBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
+import com.example.radioplayer.ui.animations.slideAnim
+import com.example.radioplayer.ui.dialogs.RecordingSettingsDialog
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.Utils
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -54,12 +56,20 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
         observePlayingItem()
 
-//        observeRecordingDuration()
 
         observePlayerPosition()
 
-//        endLoadingBarIfNeeded()
+        setupSettingClickListener()
 
+    }
+
+    private fun setupSettingClickListener(){
+
+        bind.tvRecordingSettings.setOnClickListener {
+
+            RecordingSettingsDialog(requireContext()).show()
+
+        }
 
     }
 
@@ -172,11 +182,10 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
     private fun setAdapterClickListener(){
 
-        recordingsAdapter.setOnClickListener { recording, position ->
+        recordingsAdapter.setOnClickListener { recording ->
             mainViewModel.playOrToggleStation(
                 rec = recording,
-                searchFlag = SEARCH_FROM_RECORDINGS,
-                recPosition = position
+                searchFlag = SEARCH_FROM_RECORDINGS
             )
 
         }
@@ -216,11 +225,11 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
         bind.tvEnableDeleting.setOnClickListener {
             if(!isDeletingEnabled){
                 isDeletingEnabled = true
-                bind.tvEnableDeleting.text = "Swipe-delete: on"
+                bind.tvDeleteOption.text = "on"
                 itemTouchHelper.attachToRecyclerView(bind.rvRecordings)
             } else {
                 isDeletingEnabled = false
-                bind.tvEnableDeleting.text = "Swipe-delete: off"
+                bind.tvDeleteOption.text = "off"
                 itemTouchHelper.attachToRecyclerView(null)
             }
         }
@@ -246,44 +255,30 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
             currentRecording?.let {
 
-                if(it.id == recording.id &&
-                    recordingsAdapter.listOfRecordings.size > position
-                ){
-                    val newRecToPlay = recordingsAdapter.listOfRecordings[position+1]
-                    mainViewModel.newPlayingItem.postValue(
-                        PlayingItem.FromRecordings(newRecToPlay)
-                    )
-                    recordingsAdapter.playingRecordingId = newRecToPlay.id
+                if(it.id == recording.id){
+                    animator.cancel()
 
-                    val newViewHolder = bind.rvRecordings.findViewHolderForAdapterPosition(position+1)
-                    newViewHolder.let { holder ->
+                    currentItemSeekbar = null
+                    currentItemTvDuration = null
 
-                        animator.cancel()
-                        isInitialLaunchOrNewItem = true
-                        currentItemSeekbar = holder?.itemView?.findViewById(R.id.seekBar)
-                        currentItemTvDuration = holder?.itemView?.findViewById(R.id.tvDuration)
                         recordingsAdapter.apply {
-                            previousSeekbar = currentItemSeekbar
-                            previousTvTime = currentItemTvDuration
-                            previousTvTimeValue = newRecToPlay.durationMills
+                            playingRecordingId = "null"
+                            previousSeekbar = null
+                            previousTvTime = null
+                            previousTvTimeValue = 0
                         }
-
-                        currentItemSeekbar?.apply {
-                            visibility = View.VISIBLE
-                            max = newRecToPlay.durationMills.toInt()
-                            progress = 0
-                        }
-
-
 
                     }
-
+                currentRecording = null
+                mainViewModel.stopPlay()
+                (activity as MainActivity).bindPlayer.root.apply {
+                    visibility = View.GONE
+                    slideAnim(300, 0, R.anim.fade_out_anim)
+                    }
                 }
-            }
 
 
-
-            mainViewModel.commandToDeleteRecordingAtPosition(position, recording.id)
+            databaseViewModel.deleteRecording(recording.id)
 
 
             Snackbar.make(
@@ -307,8 +302,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
         }
     )
                 setAction("UNDO"){
-                    RadioService.recordingToInsert = recording
-                    mainViewModel.commandToInsertRecordingAtPosition(position)
+                    databaseViewModel.insertNewRecording(recording)
                 }
             }.show()
 
@@ -316,12 +310,6 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
     }
 
     private val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
-
-
-//    private fun endLoadingBarIfNeeded(){
-//        (activity as MainActivity).separatorAnimation.endLoadingAnim()
-//        (activity as MainActivity).separatorRightAnim.endLoadingAnim()
-//    }
 
     override fun onDestroyView() {
         super.onDestroyView()

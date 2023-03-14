@@ -123,4 +123,8 @@ class DatabaseRepository @Inject constructor(
 
     suspend fun renameRecording(id : String, newName: String) = radioDAO.renameRecording(id, newName)
 
+    suspend fun insertRecording(recording : Recording) = radioDAO.insertRecording(recording)
+
+    suspend fun deleteRecording(recId : String) = radioDAO.deleteRecording(recId)
+
 }

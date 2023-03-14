@@ -122,6 +122,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -178,6 +181,12 @@ class MainActivity : AppCompatActivity() {
 
             if(!isStubPlayerBindInflated) {
                 inflatePlayerStubAndCallRelatedMethods()
+            } else if(bindPlayer.root.visibility == View.GONE){
+
+                bindPlayer.root.visibility = View.VISIBLE
+                bindPlayer.root.slideAnim(500, 0, R.anim.fade_in_anim)
+                bindPlayer.tvStationTitle.isSingleLine = true
+                bindPlayer.tvStationTitle.isSelected = true
             }
 
 
@@ -422,6 +431,7 @@ class MainActivity : AppCompatActivity() {
                 playingItem.radioStation.favicon
             }
             is PlayingItem.FromRecordings -> {
+                bindPlayer.tvStationTitle.text = "From recordings"
                 name = playingItem.recording.name
                 playingItem.recording.iconUri
             }
