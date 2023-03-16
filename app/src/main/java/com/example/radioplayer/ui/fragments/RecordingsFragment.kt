@@ -268,12 +268,14 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
                             previousTvTimeValue = 0
                         }
 
-                    }
-                currentRecording = null
-                mainViewModel.stopPlay()
-                (activity as MainActivity).bindPlayer.root.apply {
-                    visibility = View.GONE
-                    slideAnim(300, 0, R.anim.fade_out_anim)
+                    currentRecording = null
+                    mainViewModel.stopPlay()
+
+                    (activity as MainActivity).bindPlayer.root.apply {
+                        visibility = View.GONE
+                        slideAnim(300, 0, R.anim.fade_out_anim)
+
+                        }
                     }
                 }
 

@@ -21,22 +21,24 @@ import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.media.MediaBrowserServiceCompat
+import com.arthenica.ffmpegkit.FFmpegKit
 import com.bumptech.glide.RequestManager
+import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlaybackPreparer
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerNotificationListener
-import com.example.radioplayer.utils.Constants.COMMAND_ADD_RECORDING_AT_POSITION
+
 import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
 import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
-import com.example.radioplayer.utils.Constants.COMMAND_DELETE_RECORDING_AT_POSITION
+
 import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_CURRENT_PLAYING_ITEM
+import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.RECORDING_CHANNEL_ID
-import com.example.radioplayer.utils.Constants.RECORDING_ID
-import com.example.radioplayer.utils.Constants.RECORDING_POSITION
+
 import com.example.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
@@ -45,6 +47,7 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioProcessor
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
@@ -52,11 +55,13 @@ import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dev.brookmg.exorecord.lib.ExoRecord
 import dev.brookmg.exorecord.lib.IExoRecord
 import dev.brookmg.exorecordogg.ExoRecordOgg
 import kotlinx.coroutines.*
+import java.io.File
 import java.util.*
 import javax.inject.Inject
 
@@ -112,13 +117,15 @@ class RadioService : MediaBrowserServiceCompat() {
     }
 
     private val observerForRecordings = Observer<List<Recording>>{
+        Log.d("CHECKTAGS", "updated recordings")
         radioSource.handleRecordingsUpdates(it)
     }
 
     companion object{
         val currentSongTitle = MutableLiveData<String>()
         val recordingPlaybackPosition = MutableLiveData<Long>()
-
+        val recordingDuration = MutableLiveData<Long>()
+        var playbackSpeed = 100
     }
 
 
@@ -167,7 +174,8 @@ class RadioService : MediaBrowserServiceCompat() {
         }
 
 
-        val radioPlaybackPreparer = RadioPlaybackPreparer(radioSource, { itemToPlay, flag ->
+        val radioPlaybackPreparer = RadioPlaybackPreparer(
+            radioSource, { itemToPlay, flag, playWhenRady ->
 
             currentStation = itemToPlay
 
@@ -176,28 +184,28 @@ class RadioService : MediaBrowserServiceCompat() {
                     preparePlayer(
                         radioSource.stationsFavoured,
                         itemToPlay,
-                        true
+                        playWhenRady
                     )
                 }
                 SEARCH_FROM_API -> {
                     preparePlayer(
                         radioSource.stations,
                         itemToPlay,
-                        true
+                        playWhenRady
                     )
                 }
                 SEARCH_FROM_HISTORY -> {
                     preparePlayer(
                         radioSource.stationsFromHistory,
                         itemToPlay,
-                        true
+                        playWhenRady
                     )
                 }
                 SEARCH_FROM_RECORDINGS -> {
                     preparePlayer(
                         radioSource.recordings,
                         itemToPlay,
-                        playNow = true,
+                        playNow = playWhenRady,
                         isFromRecordings = true
                     )
                 }
@@ -206,7 +214,7 @@ class RadioService : MediaBrowserServiceCompat() {
                     preparePlayer(
                         radioSource.stationsFromPlaylist,
                         itemToPlay,
-                        true
+                        playWhenRady
                     )
                 }
             }
@@ -238,30 +246,22 @@ class RadioService : MediaBrowserServiceCompat() {
                     stopRecording()
                 }
 
-//                COMMAND_DELETE_RECORDING_AT_POSITION -> {
-//                    deleteRecordingAt = extras?.getInt(RECORDING_POSITION) ?: 0
-//                    val recId = extras?.getString(RECORDING_ID) ?: ""
-//
-//                    CoroutineScope(Dispatchers.IO).launch {
-//
-//                        radioSource.deleteRecording(recId)
-//                    }
-//                }
-
-//                COMMAND_ADD_RECORDING_AT_POSITION -> {
-//                    addRecordingAt = extras?.getInt(RECORDING_POSITION) ?: 0
-//
-//                    recordingToInsert?.let {
-//                        CoroutineScope(Dispatchers.IO).launch {
-//                            radioSource.insertRecording(it)
-//                        }
-//                    }
-//                }
-
                 COMMAND_REMOVE_CURRENT_PLAYING_ITEM ->{
                     exoPlayer.clearMediaItems()
                 }
 
+                COMMAND_UPDATE_PLAYBACK_SPEED -> {
+
+                    val isToPlay = isPlaybackStatePlaying
+                    exoPlayer.stop()
+                    val newValue = playbackSpeed.toFloat()/100
+                    val params = PlaybackParameters(newValue, newValue)
+                    exoPlayer.playbackParameters = params
+                    exoPlayer.prepare()
+                    if(isToPlay){
+                        exoPlayer.play()
+                    }
+                }
             }
         })
 
@@ -333,7 +333,6 @@ class RadioService : MediaBrowserServiceCompat() {
 
     fun listenToRecordDuration ()  {
 
-
         serviceScope.launch {
 
             while (true){
@@ -379,6 +378,10 @@ class RadioService : MediaBrowserServiceCompat() {
                     }
 
                     recordingPlaybackPosition.postValue(pos)
+                    if(exoPlayer.duration > 0){
+                        recordingDuration.postValue(exoPlayer.duration)
+                    }
+
                     delay(500)
                 }
                 isRecordingDurationListenerRunning = false
@@ -419,12 +422,50 @@ class RadioService : MediaBrowserServiceCompat() {
             isConverterWorking = true
             radioSource.exoRecordState.postValue(false)
 
-
-            CoroutineScope(Dispatchers.IO).launch {
-
                 val setting = recQualityPref.getFloat(RECORDING_QUALITY_PREF, 0.4f)
                 Log.d("CHECKTAGS", setting.toString())
 
+//                val wavFilePath = this@RadioService.filesDir.absolutePath + File.separator + record.filePath
+//                val output = this@RadioService.filesDir.absolutePath + File.separator + record.filePath.split(".").first() + ".ogg"
+
+
+//                val command = arrayOf( "-i", wavFilePath,
+//                    "-ac", recChannelsCount.toString(),"-acodec",
+//                    "libvorbis",
+//                    output)
+//
+//
+//                FFmpegKit.executeWithArgumentsAsync(command
+//                ) { session ->
+//
+//                    if(session.returnCode.isValueSuccess) {
+//                     Log.d("CHECKTAGS", "success")
+//
+//
+//                        CoroutineScope(Dispatchers.IO).launch {
+//
+//                            try {
+//
+//                                insertNewRecording(
+//                                    record.filePath.split(".").first() + ".ogg",
+//                                    System.currentTimeMillis(),
+//                                    duration
+//                                )
+////                                deleteFile(record.filePath)
+//                                isConverterWorking = false
+//                                radioSource.exoRecordFinishConverting.postValue(true)
+//                            } catch (e: java.lang.Exception){
+//                                Log.d("CHECKTAGS", e.stackTraceToString())
+//                            }
+//                        }
+//
+//                    } else if(session.returnCode.isValueError){
+//                        Log.d("CHECKTAGS", "error")
+//                    }
+//                }
+
+
+            CoroutineScope(Dispatchers.IO).launch {
 
                 val converter = ExoRecordOgg.convertFile(
                     this@RadioService.application,
@@ -432,7 +473,7 @@ class RadioService : MediaBrowserServiceCompat() {
                     recSampleRate,
                     recChannelsCount,
                     setting
-                    ){ progress ->
+                ){ progress ->
 
                     if(progress == 100.0f){
                         try {
@@ -450,6 +491,7 @@ class RadioService : MediaBrowserServiceCompat() {
                         this.cancel()
                     }
                 }
+
             }
         }
     }
@@ -502,7 +544,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
             Log.d("CHECKTAGS", "rec in : $recChannelsCount, $recSampleRate")
 
-            exoRecord.exoRecordProcessor.configure(AudioProcessor.AudioFormat(sampleRate, channels,  C.ENCODING_PCM_16BIT))
+//            exoRecord.exoRecordProcessor.configure(AudioProcessor.AudioFormat(sampleRate, channels,  C.ENCODING_PCM_16BIT))
 
             exoRecord.startRecording()
         }
@@ -544,6 +586,8 @@ class RadioService : MediaBrowserServiceCompat() {
              uri = "$fileDir/$uri"
          }
 
+        Log.d("CHECKTAGS", "uri is : $uri")
+
          val lastPath = uri.toUri().lastPathSegment
 
          val mediaItem = MediaItem.fromUri(uri.toUri())
@@ -554,6 +598,14 @@ class RadioService : MediaBrowserServiceCompat() {
          } else {
              ProgressiveMediaSource.Factory(dataSourceFactory)
                  .createMediaSource(mediaItem)
+         }
+
+         if(!isFromRecordings){
+
+             val params = PlaybackParameters(1f, 1f)
+             exoPlayer.playbackParameters = params
+
+             playbackSpeed = 100
          }
 
          exoPlayer.setMediaSource(mediaSource)

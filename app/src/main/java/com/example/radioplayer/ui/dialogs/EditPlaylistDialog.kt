@@ -37,8 +37,7 @@ class EditPlaylistDialog (
     private val databaseViewModel: DatabaseViewModel,
     private val pixabayViewModel: PixabayViewModel,
     private val glide : RequestManager,
-    private val deletePlaylist : (Boolean) -> Unit,
-    private val updateCover : (Boolean, String) -> Unit
+    private val deletePlaylist : (Boolean) -> Unit
 ) : AppCompatDialog(requireContext) {
 
     private var _bind : DialogEditPlaylistBinding? = null
@@ -232,16 +231,10 @@ class EditPlaylistDialog (
 
             else {
 
-                if (imageSelected == currentPlaylist.coverURI){ /*DO NOTHING*/ }
-                else {
+                if (imageSelected != currentPlaylist.coverURI)
                     databaseViewModel.editPlaylistCover(currentPlaylistName, imageSelected)
-                }
-                if (nameField == currentPlaylistName || nameField.isEmpty()) {
 
-                    updateCover(true, imageSelected)
-
-
-                } else {
+                if (nameField != currentPlaylistName && nameField.isNotBlank()) {
                     databaseViewModel.editOldCrossRefWithPlaylist(currentPlaylistName, nameField)
                     databaseViewModel.editPlaylistName(currentPlaylistName, nameField)
                     databaseViewModel.currentPlaylistName.postValue(nameField)

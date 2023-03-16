@@ -316,7 +316,25 @@ val tagsListOther = setOf(
     TagWithGenre.Tag("student"),
     TagWithGenre.Tag("surf music"),
     TagWithGenre.Tag("university")
+
 )
+
+val QUEEN = "Exclusive Radio – Queen"
+val QUEEN_URL = "https://streaming.exclusive.radio/er/queen/icecast.audio"
+
+val QUEEN_NET = "Queenradio.net"
+val QUEEN_NET_URL = "http://n06.radiojar.com/4gw72qm8u68uv?rj-ttl=5&rj-tok=AAABhuNtzuUAEIBZr_gdGrrSlQ"
+
+val QEEN_RMF = "RMF Queen"
+val QEEN_RMF_URL = "http://195.150.20.8/QUEEN"
+
+val QUEEN_VIRGIN = "Virgin Radio Rockstar: Queen"
+val QUEEN_VIRGIN_URL = "https://icy.unitedradio.it/Virgin_05.mp3"
+
+ // BEATLES
+
+val BEATLES = "John Paul George and Ringo"
+val BEATLES_URL = "John Paul George and Ringo"
 
 
 

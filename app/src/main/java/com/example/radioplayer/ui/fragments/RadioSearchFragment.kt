@@ -3,13 +3,17 @@ package com.example.radioplayer.ui.fragments
 import android.os.Bundle
 import android.os.Parcelable
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE
+import android.util.Log
 import android.view.DragEvent
 import android.view.View
+import android.view.animation.Animation
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
 import com.example.radioplayer.adapters.models.TagWithGenre
@@ -116,6 +120,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         observeNoResultDetector()
 
+//        setAnimationListener()
     }
 
 
@@ -217,6 +222,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             databaseViewModel.insertRadioStation(it)
             databaseViewModel.checkDateAndUpdateHistory(it.stationuuid)
 
+            Log.d("CHECKTAGS", it.url.toString())
+
         }
     }
 
@@ -237,9 +244,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             layoutAnimation = (activity as MainActivity).layoutAnimationController
 
-//            post {
-//                scheduleLayoutAnimation()
-//            }
 
             mainViewModel.currentRadioStation.value?.let {
               val name =  it.getString(METADATA_KEY_TITLE)
@@ -258,14 +262,13 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             {
 
             (activity as MainActivity).startSeparatorsLoadAnim()
-//            (activity as MainActivity).separatorRightAnim.startLoadingAnim()
 
             }
 
             else {
 
                 (activity as MainActivity).endSeparatorsLoadAnim()
-//                (activity as MainActivity).separatorRightAnim.endLoadingAnim()
+
 
                 if(isNewSearchForAnimations ){
 
@@ -276,13 +279,11 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                             isInitialLaunch = false
 
                         } else {
+                            alpha = 1f
+                            scrollToPosition(0)
+                            startLayoutAnimation()
 
-                            post {
 
-                                alpha = 1f
-                                scrollToPosition(0)
-                                startLayoutAnimation()
-                            }
                         }
                     }
 
@@ -292,6 +293,37 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         }
     }
 
+//
+//    private fun setChildrenAttachListener(){
+//
+//        bind.rvSearchStations.addOnChildAttachStateChangeListener(object : RecyclerView.OnChildAttachStateChangeListener{
+//            override fun onChildViewAttachedToWindow(view: View) {
+//
+//            }
+//
+//            override fun onChildViewDetachedFromWindow(view: View) {
+//
+//            }
+//        })
+//
+//    }
+
+
+//    private fun setAnimationListener(){
+//
+//        bind.rvSearchStations.layoutAnimationListener = object : Animation.AnimationListener{
+//            override fun onAnimationStart(animation: Animation?) {
+//
+//            }
+//
+//            override fun onAnimationEnd(animation: Animation?) {
+//            }
+//
+//            override fun onAnimationRepeat(animation: Animation?) {
+//            }
+//        }
+//
+//    }
 
 
     private fun subscribeToStationsFlow(){
@@ -306,6 +338,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                     launchRecyclerOutAnim()
                 }
                 showLoadingResultsMessage()
+
                 pagingRadioAdapter.submitData(it)
 
             }

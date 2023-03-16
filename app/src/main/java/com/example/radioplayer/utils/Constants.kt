@@ -34,14 +34,10 @@ object Constants {
     const val COMMAND_NEW_SEARCH = "new search"
     const val COMMAND_START_RECORDING = "start exoRecord recording"
     const val COMMAND_STOP_RECORDING = "stop exoRecord recording"
-    const val COMMAND_DELETE_RECORDING_AT_POSITION = "delete recording and update playlist"
-    const val COMMAND_ADD_RECORDING_AT_POSITION = "add recording at position and update"
     const val COMMAND_REMOVE_CURRENT_PLAYING_ITEM = "remove playing item from exoplayer"
+    const val COMMAND_UPDATE_PLAYBACK_SPEED = "update playback speed"
 
-    const val RECORDING_POSITION = "recording at position"
-    const val RECORDING_ID = "id of recording"
 
-    const val COMMAND_LOAD_FROM_PLAYLIST = "load from playlist"
 
     const val PAGE_SIZE = 10
 
@@ -53,6 +49,7 @@ object Constants {
     const val SEARCH_FROM_PLAYLIST = 2
     const val SEARCH_FROM_HISTORY = 3
     const val SEARCH_FROM_RECORDINGS = 4
+    const val PLAY_WHEN_READY = "play when ready"
 
     const val DATE_FORMAT = "dd.MM.yyyy HH:mm"
 
@@ -79,4 +76,5 @@ object Constants {
     //Recording preferences
 
     const val RECORDING_QUALITY_PREF = "recording quality pref"
+
 }

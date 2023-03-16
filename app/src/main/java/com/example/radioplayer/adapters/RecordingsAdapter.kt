@@ -139,7 +139,7 @@ class RecordingsAdapter @Inject constructor(
         }
 
         override fun areContentsTheSame(oldItem: Recording, newItem: Recording): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.id == newItem.id && oldItem.name == newItem.name
         }
     }
 

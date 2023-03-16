@@ -39,7 +39,7 @@ android {
         }
 
 //        debug {
-//
+//            minifyEnabled true
 //            debuggable false
 //        }
     }
@@ -83,8 +83,8 @@ dependencies {
     implementation 'com.github.MrBzik.ExoRecord:exorecord:TestTrim'
     implementation 'com.github.MrBzik.ExoRecord:exorecordogg:TestTrim'
 
-    implementation 'com.arthenica:ffmpeg-kit-full:5.1'
-    implementation 'com.writingminds:FFmpegAndroid:0.3.2'
+    implementation 'com.arthenica:ffmpeg-kit-min:5.1'
+
 
 
     // Retrofit

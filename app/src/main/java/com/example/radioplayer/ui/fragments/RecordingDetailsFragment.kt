@@ -7,12 +7,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.SeekBar
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import com.arthenica.ffmpegkit.FFmpegKit
-import com.arthenica.ffmpegkit.FFmpegSession
-import com.arthenica.ffmpegkit.FFmpegSessionCompleteCallback
 
-import com.arthenica.ffmpegkit.ReturnCode
+import com.arthenica.ffmpegkit.FFmpegKit
+
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.R
@@ -22,9 +21,10 @@ import com.example.radioplayer.databinding.FragmentRecordingDetailsBinding
 import com.example.radioplayer.exoPlayer.RadioService
 
 import com.example.radioplayer.ui.dialogs.RenameRecordingDialog
+import com.example.radioplayer.utils.Constants
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.Utils
-import com.github.hiteshsondhi88.libffmpeg.FFmpeg
-import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler
+
 import com.google.android.material.slider.RangeSlider
 import com.google.android.material.snackbar.Snackbar
 
@@ -32,9 +32,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
+
 import javax.inject.Inject
 
 
@@ -52,6 +52,12 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
     private var isSeekBarToUpdate = true
 
+    private var isTrimmerWorking = false
+
+    private var isRecordingToUpdate = false
+
+    private var isTvTrimProcessVisible = false
+
     private lateinit var recordingCutterPref : SharedPreferences
     private var switchPref = true
 
@@ -65,6 +71,75 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
         setRecordingsRenameClickListener()
 
         setSwitchPreference()
+
+        setRangeSeekbarListener()
+
+        setTrimmingAudioButton()
+
+        observeRecordingPlaylistUpdate()
+
+        setPlaybackSpeedButtons()
+
+        setCutExpandClickListener()
+    }
+
+    private fun setCutExpandClickListener(){
+
+        handleCutContainerVisibility(mainViewModel.isCutExpanded)
+
+        bind.tvCutExpander.setOnClickListener {
+            mainViewModel.isCutExpanded = !mainViewModel.isCutExpanded
+
+            handleCutContainerVisibility(mainViewModel.isCutExpanded)
+
+        }
+    }
+
+    private fun handleCutContainerVisibility(isVisible : Boolean){
+
+        bind.tvSwitchOption.isVisible = isVisible
+        bind.switchKeepOriginal.isVisible = isVisible
+        bind.rangeSlider.isVisible = isVisible
+        bind.tvProcessTrim.isVisible = isVisible && isTvTrimProcessVisible
+
+        bind.ivIcon.isVisible = !isVisible
+
+        bind.tvCutExpander.apply {
+            if(isVisible)
+                setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_playlists_arrow_shrink, 0)
+            else
+                setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_playlists_arrow_expand, 0)
+        }
+
+    }
+
+
+    private fun setPlaybackSpeedButtons(){
+
+       updatePlaybackSpeedDisplayValue()
+
+        bind.fabSpeedMinus.setOnClickListener {
+
+            if(RadioService.playbackSpeed > 10){
+                RadioService.playbackSpeed -= 10
+                mainViewModel.updatePlaybackSpeed()
+                updatePlaybackSpeedDisplayValue()
+            }
+
+        }
+
+        bind.fabSpeedPlus.setOnClickListener {
+            if(RadioService.playbackSpeed < 300){
+                RadioService.playbackSpeed += 10
+                mainViewModel.updatePlaybackSpeed()
+                updatePlaybackSpeedDisplayValue()
+            }
+        }
+    }
+
+
+    private fun updatePlaybackSpeedDisplayValue(){
+        bind.tvPlaybackSpeedValue.text = "${RadioService.playbackSpeed}%"
     }
 
 
@@ -89,6 +164,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
         bind.tvRename.setOnClickListener {
             currentRecording?.let { recording ->
                 RenameRecordingDialog(requireContext(), recording.name){ newName ->
+
                     mainViewModel.newPlayingItem.postValue(
                         PlayingItem.FromRecordings(
                             Recording(
@@ -101,6 +177,8 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
                         )
                     )
                     databaseViewModel.renameRecording(recording.id, newName)
+
+
                 }.show()
             }
         }
@@ -112,6 +190,9 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
         observeCurrentRecording()
 
         observePlayerPosition()
+
+        observeRecordingDuration()
+
 
     }
 
@@ -128,53 +209,104 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
             bind.seekBar.max = it.recording.durationMills.toInt()
 
-            setRangeSeekbar(it.recording)
-
-            setTrimmingAudio(it.recording)
+            updateRangeSeekbar(it.recording)
 
             }
         }
     }
 
 
-    private fun setTrimmingAudio(rec : Recording){
+    private fun setTrimmingAudioButton(){
 
-        bind.tvTrim.setOnClickListener {
+        bind.tvProcessTrim.setOnClickListener {
+            if(!isTrimmerWorking){
 
-            val totalDuration = (rec.durationMills/1000).toInt()
-            val trimStart = bind.rangeSlider.values[0].toInt()
-            val trimEnd = totalDuration - bind.rangeSlider.values[1].toInt()
-            val duration = (rec.durationMills/1000).toInt() - trimEnd - trimStart
-            val oggFilePath = requireActivity().filesDir.absolutePath.toString() + "/" + rec.id
-
-            val currentTime = System.currentTimeMillis()
-            val output = requireActivity().filesDir.absolutePath.toString() + File.separator + currentTime + ".ogg"
-
-            val command = arrayOf( "-ss", trimStart.toString(), "-i",
-                oggFilePath, "-t", duration.toString(), "-c", "copy", output)
-
-            FFmpegKit.executeWithArgumentsAsync(command
-            ) { session ->
-
-                if(session.returnCode.isValueSuccess) {
-                    Snackbar.make(requireActivity().findViewById(R.id.rootLayout), "Success!", Snackbar.LENGTH_SHORT).show()
-                    databaseViewModel.insertNewRecording(
-                        Recording(
-                            id ="$currentTime.ogg",
-                            iconUri = rec.iconUri,
-                            timeStamp = currentTime,
-                            name = rec.name,
-                            durationMills = (duration*1000).toLong()
-                        )
-                    )
-                } else if(session.returnCode.isValueError){
-                    Snackbar.make(requireActivity().findViewById(R.id.rootLayout), "Something went wrong!", Snackbar.LENGTH_SHORT).show()
+                currentRecording?.let {
+                    trimAudio(it)
                 }
             }
         }
     }
 
-    private fun setRangeSeekbar(rec : Recording){
+
+    private fun trimAudio(rec : Recording){
+
+        isTrimmerWorking = true
+
+        bind.tvProcessTrim.text = "Processing..."
+
+        val totalDuration = (rec.durationMills/1000).toInt()
+        val trimStart = bind.rangeSlider.values[0].toInt()
+        val trimEnd = totalDuration - bind.rangeSlider.values[1].toInt()
+        val duration = (rec.durationMills/1000).toInt() - trimEnd - trimStart
+        val oggFilePath = requireActivity().filesDir.absolutePath.toString() + "/" + rec.id
+
+        val currentTime = System.currentTimeMillis()
+        val output = requireActivity().filesDir.absolutePath.toString() + File.separator + currentTime + ".ogg"
+
+        val command = arrayOf( "-ss", trimStart.toString(), "-i",
+            oggFilePath, "-t", duration.toString(), "-c", "copy", output)
+
+       FFmpegKit.executeWithArgumentsAsync(command
+        ) { session ->
+
+           var message = ""
+
+            if(session.returnCode.isValueSuccess) {
+
+
+                val newRecording = Recording(
+                    id ="$currentTime.ogg",
+                    iconUri = rec.iconUri,
+                    timeStamp = currentTime,
+                    name = rec.name,
+                    durationMills = (duration*1000).toLong()
+                )
+
+                databaseViewModel.insertNewRecording(newRecording)
+                message = "Success!"
+
+
+                if(!switchPref){
+                    databaseViewModel.deleteRecording(rec.id)
+                    currentRecording = newRecording
+                    isRecordingToUpdate = true
+
+                }
+
+            } else if(session.returnCode.isValueError){
+
+                message = "Something went wrong!"
+
+            }
+
+           lifecycleScope.launch(Dispatchers.Main){
+               Snackbar.make(requireActivity().findViewById(R.id.rootLayout), message, Snackbar.LENGTH_SHORT).show()
+               isTrimmerWorking = false
+               bind.tvProcessTrim.visibility = View.GONE
+               isTvTrimProcessVisible = false
+           }
+          session.cancel()
+        }
+    }
+
+    private fun observeRecordingPlaylistUpdate(){
+
+        mainViewModel.isRecordingUpdated.observe(viewLifecycleOwner){
+            if(isRecordingToUpdate && currentRecording != null){
+                mainViewModel.playOrToggleStation(
+                    rec = currentRecording,
+                    searchFlag = SEARCH_FROM_RECORDINGS,
+                    playWhenReady = false
+                )
+                isRecordingToUpdate = false
+            }
+        }
+    }
+
+
+
+    private fun updateRangeSeekbar(rec : Recording){
 
         val seconds = (rec.durationMills / 1000).toFloat()
 
@@ -188,14 +320,22 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
             values = listOf(0f, seconds)
 
-
-            addOnChangeListener(RangeSlider.OnChangeListener { _, _, fromUser ->
-                if(fromUser && bind.tvTrim.visibility == View.GONE){
-
-                    bind.tvTrim.visibility = View.VISIBLE
-                }
-            })
         }
+    }
+
+    private fun setRangeSeekbarListener(){
+
+        bind.rangeSlider.addOnChangeListener(RangeSlider.OnChangeListener { _, _, fromUser ->
+            if(fromUser && bind.tvProcessTrim.visibility == View.GONE){
+
+                bind.tvProcessTrim.apply {
+                    visibility = View.VISIBLE
+                    text = "Apply"
+                    isTvTrimProcessVisible = true
+                }
+            }
+        })
+
     }
 
     private fun setSeekbarChangeListener(){
@@ -220,6 +360,15 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
         })
     }
 
+    private fun observeRecordingDuration(){
+
+        mainViewModel.currentRecordingDuration.observe(viewLifecycleOwner){
+            bind.seekBar.max = it.toInt()
+        }
+
+
+    }
+
 
     private fun observePlayerPosition(){
         mainViewModel.currentPlayerPosition.observe(viewLifecycleOwner){
@@ -229,6 +378,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
             }
         }
     }
+
     private fun setTvRecordingPlayingTime(time : Long){
         bind.tvRecordingPlayingTime.text = Utils.timerFormat(time)
     }
@@ -248,6 +398,8 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
     override fun onDestroyView() {
         super.onDestroyView()
+        isRecordingToUpdate = false
+        isTvTrimProcessVisible = false
         recordingCutterPref.edit().putBoolean(RECORDING_CUT_PREF, switchPref).apply()
         _bind = null
     }

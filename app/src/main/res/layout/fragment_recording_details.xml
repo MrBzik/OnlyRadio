@@ -4,7 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/main_background">
+    android:background="@color/main_background"
+    android:animateLayoutChanges="true"
+    >
+
+
+    <TextView
+        android:id="@+id/tvCutExpander"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="16dp"
+        android:text="Cut recording"
+        android:textAppearance="@style/mainTextButtons"
+        app:drawableEndCompat="@drawable/ic_playlists_arrow_expand"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <TextView
@@ -12,30 +27,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:layout_marginStart="10dp"
         android:text="Rename"
         android:textAppearance="@style/mainTextButtons"
-        app:layout_constraintEnd_toStartOf="@+id/ivArrowAddToPlaylist"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/ivArrowAddToPlaylist"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/ic_arrow_drop_down"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:drawableEndCompat="@drawable/ic_playlists_arrow_expand"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
 
     <TextView
         android:id="@+id/tvName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="70dp"
         android:fontFamily="sans-serif-smallcaps"
         android:gravity="center"
         android:paddingHorizontal="16dp"
-        android:textSize="22sp"
+        android:textSize="16sp"
+        android:maxLines="2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,72 +55,61 @@
         android:id="@+id/ivIcon"
         android:layout_width="wrap_content"
         android:layout_height="85dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvName" />
 
-    <TextView
-        android:id="@+id/tvCutRecording"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="20dp"
-        android:text="Cut recording"
-        android:textAppearance="@style/mainTextButtons"
-        app:drawableEndCompat="@drawable/ic_playlists_arrow_expand"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivIcon" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:layout_marginEnd="10dp"
-        android:text="Keep original recording"
-        android:textAppearance="@style/dialogItemText"
-        app:layout_constraintEnd_toStartOf="@+id/switchKeepOriginal"
-        app:layout_constraintTop_toBottomOf="@+id/tvCutRecording" />
+        <TextView
+            android:id="@+id/tvSwitchOption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="25dp"
+            android:text="Keep original recording"
+            android:textAppearance="@style/dialogItemText"
+            app:layout_constraintEnd_toStartOf="@+id/switchKeepOriginal"
+            app:layout_constraintTop_toBottomOf="@+id/ivIcon" />
 
 
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/switchKeepOriginal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        app:trackTint="@color/switch_track_color"
-        app:thumbTint="@color/switch_thumb_color"
-        app:layout_constraintBottom_toBottomOf="@+id/textView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textView" />
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchKeepOriginal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:minHeight="48dp"
+            app:layout_constraintBottom_toBottomOf="@+id/tvSwitchOption"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvSwitchOption"
+            app:thumbTint="@color/switch_thumb_color"
+            app:trackTint="@color/switch_track_color" />
 
-    <com.google.android.material.slider.RangeSlider
-        android:id="@+id/rangeSlider"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:stepSize="1"
-        android:value="0"
-        android:valueFrom="0"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        <com.google.android.material.slider.RangeSlider
+            android:id="@+id/rangeSlider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:stepSize="1"
+            android:value="0"
+            android:valueFrom="0"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvSwitchOption" />
 
-    <TextView
-        android:id="@+id/tvTrim"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Finish"
-        android:visibility="gone"
-        android:textAppearance="@style/mainTextButtons"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rangeSlider" />
+        <TextView
+            android:id="@+id/tvProcessTrim"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Apply"
+            android:textAppearance="@style/dialogTextButtons"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rangeSlider" />
 
 
     <TextView
@@ -118,10 +117,10 @@
         android:layout_width="110dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="-50dp"
-        android:layout_marginBottom="95dp"
+        android:layout_marginBottom="15dp"
         android:text="00:00:00"
         android:textAppearance="@style/dialogCurrentValue"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/seekBar"
         app:layout_constraintStart_toStartOf="@+id/guideline2" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -136,14 +135,58 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="20dp"
         android:progressTint="@color/color_non_interactive"
         android:thumbTint="@color/color_non_interactive"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tvPlaybackSpeedTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <TextView
+        android:id="@+id/tvPlaybackSpeedTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:text="Play speed"
+        android:textAppearance="@style/mainTextTitle"
+        app:layout_constraintBottom_toTopOf="@+id/tvPlaybackSpeedValue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
 
+    <TextView
+        android:id="@+id/tvPlaybackSpeedValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="-23dp"
+        android:text="100%"
+        android:textAppearance="@style/dialogItemText"
+        app:layout_constraintBottom_toBottomOf="@+id/fabSpeedMinus"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="@+id/fabSpeedMinus" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabSpeedMinus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginBottom="40dp"
+        android:src="@drawable/playback_speed_minus"
+        app:backgroundTint="@color/floating_buttons"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabSpeedPlus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="40dp"
+        android:src="@drawable/playback_speed_plus"
+        app:backgroundTint="@color/floating_buttons"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,35 +6,31 @@
     android:layout_height="match_parent">
 
 
-
     <LinearLayout
-    android:id="@+id/llTag"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:paddingTop="16dp"
-    android:orientation="horizontal"
-    app:layout_constraintEnd_toStartOf="@+id/llName"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent">
-
-    <TextView
-
-        android:id="@+id/tvTag"
-        android:layout_width="wrap_content"
-        android:layout_height="44dp"
-        android:paddingStart="10dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="Tag"
-        android:textAppearance="@style/mainTextButtons"
-
-        />
-
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="wrap_content"
+        android:id="@+id/llTag"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_arrow_drop_down" />
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/toolbarGuide"
+        app:layout_constraintEnd_toStartOf="@+id/llName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+
+            android:id="@+id/tvTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingStart="10dp"
+            android:text="Tag"
+            android:textAppearance="@style/mainTextButtons"
+            app:drawableEndCompat="@drawable/ic_arrow_drop_down"
+            android:layout_marginEnd="8dp"
+            />
+
+
 
     </LinearLayout>
 
@@ -53,9 +49,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="-40dp"
-        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/swipeRefresh"
         app:layout_constraintEnd_toStartOf="@+id/tvSelectedCountry"
         app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintTop_toBottomOf="@id/toolbarGuide"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
@@ -65,13 +62,9 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:text="Name"
-            android:textAppearance="@style/mainTextButtons" />
+            android:textAppearance="@style/mainTextButtons"
+            app:drawableEndCompat="@drawable/ic_arrow_drop_down" />
 
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrow_drop_down" />
 
     </LinearLayout>
 
@@ -121,9 +114,9 @@
         android:id="@+id/tvResultMessage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="40dp"
         android:textAppearance="@style/dialogSearchText"
         android:textColor="@color/Separator"
-        android:layout_marginHorizontal="40dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -145,6 +138,13 @@
         app:backgroundTint="@color/floating_buttons"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/toolbarGuide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="60dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

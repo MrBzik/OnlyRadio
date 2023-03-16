@@ -94,7 +94,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         editPlaylistClickListener()
 
-//        endLoadingBarIfNeeded()
 
     }
 
@@ -118,49 +117,25 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         }
     }
 
-//    private fun endLoadingBarIfNeeded(){
-//        (activity as MainActivity).separatorAnimation.endLoadingAnim()
-//        (activity as MainActivity).separatorRightAnim.endLoadingAnim()
-//    }
 
     private fun editPlaylistClickListener(){
 
         bind.tvPlaylistEdit.setOnClickListener {
 
             var isDeletePlaylistCalled = false
-            var isCoverUpdateNeeded = false
-            var newImageUrl = ""
 
             val dialog =  EditPlaylistDialog (
                 requireContext(), listOfPlaylists,
                 currentPlaylistName,
                 currentPlaylistPosition,
-                databaseViewModel, pixabayViewModel, glide,
-             {
+                databaseViewModel, pixabayViewModel, glide
+            ) {
                 isDeletePlaylistCalled = it
-            }, { checkCoverUpdate, imageUrl ->
-                isCoverUpdateNeeded = checkCoverUpdate
-                newImageUrl = imageUrl
-                })
+            }
 
             dialog.show()
 
             dialog.setOnDismissListener {
-
-                if(isCoverUpdateNeeded){
-
-
-                    val view = bind.rvPlaylists
-                        .findViewHolderForAdapterPosition(currentPlaylistPosition)?.itemView?.
-                        findViewById<ImageView>(R.id.ivPlaylistCover)
-
-                    view?.let {
-                        glide
-                            .load(newImageUrl)
-                            .transition(DrawableTransitionOptions.withCrossFade())
-                            .into(it)
-                    }
-                }
 
                 if(isDeletePlaylistCalled){
 

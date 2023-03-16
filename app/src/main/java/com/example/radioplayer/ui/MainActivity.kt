@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -414,7 +415,7 @@ class MainActivity : AppCompatActivity() {
         val color = randColors.getColor()
         bindPlayer.tvPlaceholder.apply {
             text = char.toString().uppercase()
-            setTextColor(color)
+            setBackgroundColor(color)
             alpha = 0.6f
         }
 
@@ -489,6 +490,9 @@ class MainActivity : AppCompatActivity() {
 
                     }
                     is PlayingItem.FromRecordings -> {
+
+                        Log.d("CHECKTAGS", "main: ${ it.recording.id }")
+
                         mainViewModel.playOrToggleStation(rec = it.recording)
                     }
                 }

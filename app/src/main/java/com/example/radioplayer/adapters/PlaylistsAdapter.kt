@@ -145,7 +145,8 @@ class PlaylistsAdapter @Inject constructor(
         }
 
         override fun areContentsTheSame(oldItem: Playlist, newItem: Playlist): Boolean {
-            return oldItem.playlistName == newItem.playlistName
+            return oldItem.playlistName == newItem.playlistName &&
+                   oldItem.coverURI == newItem.coverURI
         }
     }
 

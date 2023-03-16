@@ -18,16 +18,18 @@
 
     <TextView
         android:id="@+id/tvPlaceholder"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:alpha="0.6"
         android:fontFamily="@font/ranchers"
         android:gravity="center"
-        android:layout_marginTop="9dp"
-        android:layout_marginStart="7dp"
+        android:layout_marginTop="5dp"
         android:text="D"
-        android:textColor="@color/default_text_color"
+        android:textColor="@color/black"
         android:textSize="40sp" />
+
+<!--    android:layout_marginTop="9dp"-->
+<!--    android:layout_marginStart="7dp"-->
 
 
     <LinearLayout

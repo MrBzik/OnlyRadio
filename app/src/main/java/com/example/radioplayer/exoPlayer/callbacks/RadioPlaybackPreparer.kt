@@ -7,6 +7,7 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import com.example.radioplayer.exoPlayer.RadioSource
+import com.example.radioplayer.utils.Constants.PLAY_WHEN_READY
 import com.example.radioplayer.utils.Constants.SEARCH_FLAG
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
@@ -19,7 +20,7 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 class RadioPlaybackPreparer (
 
     private val radioSource: RadioSource,
-    private val playerPrepared : (MediaMetadataCompat?, flag: Int) -> Unit,
+    private val playerPrepared : (MediaMetadataCompat?, flag: Int, playWhenReady : Boolean) -> Unit,
     private val onCommand : (String, Bundle?) -> Unit
         ) : MediaSessionConnector.PlaybackPreparer {
 
@@ -46,8 +47,12 @@ class RadioPlaybackPreparer (
 
         var flag = 666
 
+        var isToPlay = true
+
         extras?.let {
             flag = it.getInt(SEARCH_FLAG, 0)
+             isToPlay = it.getBoolean(PLAY_WHEN_READY, true)
+
         }
 
 
@@ -74,7 +79,7 @@ class RadioPlaybackPreparer (
                          }
                     }
 
-            playerPrepared(itemToPlay, flag)
+            playerPrepared(itemToPlay, flag, isToPlay)
 //        }
 
     }

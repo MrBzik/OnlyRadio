@@ -4,6 +4,7 @@ package com.example.radioplayer.exoPlayer
 import android.content.SharedPreferences
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.entities.RadioStation
@@ -51,7 +52,7 @@ class RadioSource @Inject constructor(
     suspend fun getAllTags() = radioApi.getAllTags()
 
     suspend fun insertRecording(recording : Recording) = radioDAO.insertRecording(recording)
-//    suspend fun deleteRecording(recId : String) = radioDAO.deleteRecording(recId)
+    suspend fun deleteRecording(recId : String) = radioDAO.deleteRecording(recId)
 
 
     suspend fun getStationsInDate(limit: Int, offset: Int, initialDate: String): DateWithStations {
@@ -79,6 +80,8 @@ class RadioSource @Inject constructor(
 
     }
 
+    val isRecordingUpdated : MutableLiveData<Boolean> = MutableLiveData()
+
 
     fun handleRecordingsUpdates(
         listOfRecordings : List<Recording>
@@ -95,7 +98,7 @@ class RadioSource @Inject constructor(
             recordings = listOfRecordings.map { recording ->
                 createMediaMetadataCompatFromRecording(recording)
             }.toMutableList()
-
+            isRecordingUpdated.postValue(true)
     }
 
 

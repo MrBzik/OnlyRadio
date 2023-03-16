@@ -9,8 +9,8 @@
     <ImageView
         android:id="@+id/ivItemImage"
         android:layout_marginTop="7dp"
-        android:layout_width="69dp"
-        android:layout_height="69dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         />
 
 
@@ -26,8 +26,8 @@
         android:layout_marginStart="69dp"
         android:paddingStart="0dp"
         android:paddingEnd="0dp"
-        android:progress="100"
-        android:visibility="gone"
+       android:visibility="gone"
+
         />
 
 

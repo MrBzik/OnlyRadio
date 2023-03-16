@@ -103,7 +103,7 @@ class RadioDatabaseAdapter @Inject constructor(
                 val color = randColors.getColor()
 
                 tvPlaceholder.text = char.toString().uppercase()
-                tvPlaceholder.setTextColor(color)
+                tvPlaceholder.setBackgroundColor(color)
                 tvPlaceholder.alpha = 0.6f
             }
 
