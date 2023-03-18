@@ -4,13 +4,13 @@
 
     <item
         android:id="@+id/mi_radioSearchFragment"
-        android:title="Search"
+        android:title=" Search"
 
         />
 
     <item
         android:id="@+id/mi_favStationsFragment"
-        android:title="Favoured"
+        android:title="Fav."
        />
 
 
@@ -23,5 +23,10 @@
         android:id="@+id/mi_recordingsFragment"
         android:title="Rec."
         />
+
+    <item
+        android:id="@+id/mi_settingsFragment"
+        android:title="Options"/>
+
 
 </menu>

@@ -131,13 +131,18 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             if(noResult){
                 bind.tvResultMessage.apply {
+
+                    val tagExact = if(mainViewModel.isTagExact) "(Exact)" else "(Not exact)"
+                    val nameExact = if(mainViewModel.isNameExact) "(Exact)" else "(Not exact)"
+
+
                     val tag = mainViewModel.lastSearchTag.ifBlank { "not selected" }
 
                     val name = mainViewModel.lastSearchName.ifBlank { "not selected" }
 
                     val country = mainViewModel.searchFullCountryName.ifBlank { "not selected" }
 
-                    val message = "No results for\n\nname: $name\ntag: $tag\ncountry: $country"
+                    val message = "No results for\n\n\nname $nameExact: $name\n\ntag $tagExact: $tag\n\ncountry: $country"
                     text = message
 
                 }
@@ -293,37 +298,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         }
     }
 
-//
-//    private fun setChildrenAttachListener(){
-//
-//        bind.rvSearchStations.addOnChildAttachStateChangeListener(object : RecyclerView.OnChildAttachStateChangeListener{
-//            override fun onChildViewAttachedToWindow(view: View) {
-//
-//            }
-//
-//            override fun onChildViewDetachedFromWindow(view: View) {
-//
-//            }
-//        })
-//
-//    }
-
-
-//    private fun setAnimationListener(){
-//
-//        bind.rvSearchStations.layoutAnimationListener = object : Animation.AnimationListener{
-//            override fun onAnimationStart(animation: Animation?) {
-//
-//            }
-//
-//            override fun onAnimationEnd(animation: Animation?) {
-//            }
-//
-//            override fun onAnimationRepeat(animation: Animation?) {
-//            }
-//        }
-//
-//    }
 
 
     private fun subscribeToStationsFlow(){
@@ -380,7 +354,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         bind.llName.setOnClickListener {
             bind.tvName.isPressed = true
-            NameDialog(requireContext(), bind.tvName, mainViewModel).show()
+            NameDialog(requireContext(), mainViewModel).show()
 
         }
 

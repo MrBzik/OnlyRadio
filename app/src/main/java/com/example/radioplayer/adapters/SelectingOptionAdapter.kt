@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.radioplayer.R
 import com.example.radioplayer.databinding.ItemTextBinding
 
-class SelectingOptionAdapter(private val listOfOptions : List<String>) :
+class SelectingOptionAdapter(var listOfOptions : List<String>) :
     RecyclerView.Adapter<SelectingOptionAdapter.OptionHolder>() {
 
     class OptionHolder (val bind : ItemTextBinding) : RecyclerView.ViewHolder(bind.root)

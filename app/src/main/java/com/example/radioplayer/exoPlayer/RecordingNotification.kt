@@ -7,11 +7,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.example.radioplayer.R
 import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
 import com.example.radioplayer.utils.Constants.RECORDING_CHANNEL_ID
+import com.example.radioplayer.utils.Constants.RECORDING_NOTIFICATION_ID
 
 class RecordingNotification (
     private val context : Context,
@@ -20,7 +22,7 @@ class RecordingNotification (
 
     fun showNotification(){
 
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =  NotificationManagerCompat.from(context)
 
         val stopRecordingIntent = PendingIntent.getService(
             context, 7, Intent(context, RadioService::class.java).also {
@@ -39,7 +41,8 @@ class RecordingNotification (
                 stopRecordingIntent
             ).build()
 
-         notificationManager.notify(7, notification)
+         notificationManager.notify(RECORDING_NOTIFICATION_ID, notification)
+
 
     }
 

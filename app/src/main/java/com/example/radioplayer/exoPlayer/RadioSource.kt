@@ -4,7 +4,6 @@ package com.example.radioplayer.exoPlayer
 import android.content.SharedPreferences
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.entities.RadioStation
@@ -56,7 +55,7 @@ class RadioSource @Inject constructor(
 
 
     suspend fun getStationsInDate(limit: Int, offset: Int, initialDate: String): DateWithStations {
-        val response = radioDAO.getStationsInDate(limit, offset)
+        val response = radioDAO.getStationsInAllDates(limit, offset)
         val date = response.date.date
         if (date == initialDate) {
             stationsFromHistory = response.radioStations.map { station ->
@@ -157,23 +156,35 @@ class RadioSource @Inject constructor(
     private var currentUrlIndex = 0
 
     suspend fun getRadioStationsSource(
-        country: String = "", tag: String = "", name: String = "", offset: Int = 0, pageSize: Int
+        country: String = "", tag: String = "", isTagExact : Boolean,
+        name: String = "", isNameExact : Boolean,
+        offset: Int = 0, pageSize: Int
+
     ): RadioStations? {
 
+        val tagExact = if(tag.isBlank()) false else isTagExact
+        val nameExact = if(name.isBlank()) false else isNameExact
 
         val response = try {
 
             if(tag == "" && name == "" && country == ""){
-                radioApi.getTopVotedStations(offset = offset, limit = pageSize,
+                radioApi.getTopVotedStations(
+                    offset = offset, limit = pageSize,
                     url =  "${validBaseUrl}$API_RADIO_TOP_VOTE_SEARCH_URL"
                 )
             } else {
                 if(country != "") {
-                    radioApi.searchRadio(country = country, tag = tag, name = name, offset = offset, limit = pageSize,
+                    radioApi.searchRadio(
+                        country = country, tag = tag, tagExact = tagExact,
+                        name = name, nameExact = nameExact,
+                        offset = offset, limit = pageSize,
                         url = "${validBaseUrl}$API_RADIO_SEARCH_URL"
                     )
                 } else {
-                    radioApi.searchRadioWithoutCountry(tag = tag, name = name, offset = offset, limit = pageSize,
+                    radioApi.searchRadioWithoutCountry(
+                        tag = tag, tagExact = tagExact,
+                        name = name, nameExact = nameExact,
+                        offset = offset, limit = pageSize,
                         url = "${validBaseUrl}$API_RADIO_SEARCH_URL"
                     )
                 }
@@ -191,7 +202,8 @@ class RadioSource @Inject constructor(
                         else {
                             currentUrlIndex ++
                             validBaseUrl = listOfUrls[i]
-                            return getRadioStationsSource(country, tag, name, offset, pageSize)
+                            return getRadioStationsSource(
+                                country, tag, isTagExact, name, isNameExact, offset, pageSize)
                         }
                     }
                 }

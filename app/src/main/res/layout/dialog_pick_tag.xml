@@ -14,10 +14,33 @@
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:gravity="center_vertical"
-        android:text="Select a tag"
+        android:text="Tag :"
         android:textAppearance="@style/dialogTitleText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvSwitchSearchExact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:text="Exact match"
+        android:textAppearance="@style/dialogItemText"
+        app:layout_constraintBottom_toBottomOf="@+id/switchMatchExact"
+        app:layout_constraintEnd_toStartOf="@+id/switchMatchExact"
+        app:layout_constraintTop_toTopOf="@+id/switchMatchExact" />
+
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchMatchExact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:thumbTint="@color/switch_thumb_color"
+        app:trackTint="@color/switch_track_color" />
 
 
     <EditText

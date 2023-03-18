@@ -1,5 +1,7 @@
 package com.example.radioplayer.adapters
 
+import android.annotation.SuppressLint
+import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,12 +12,19 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.databinding.ItemRecordingWithSeekbarBinding
 import com.example.radioplayer.exoPlayer.RadioService
+import com.example.radioplayer.ui.animations.fadeOut
+import com.example.radioplayer.utils.RandomColors
 import com.example.radioplayer.utils.Utils
 import org.w3c.dom.Text
 import java.text.DateFormat
@@ -27,14 +36,50 @@ class RecordingsAdapter @Inject constructor(
     private val glideFactory : DrawableCrossFadeFactory
 ) : RecyclerView.Adapter<RecordingsAdapter.RecordingItemHolder>() {
 
+    private val randColors = RandomColors()
+
     class RecordingItemHolder (val bind : ItemRecordingWithSeekbarBinding) : RecyclerView.ViewHolder(bind.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecordingItemHolder {
-       return RecordingItemHolder(
+       val holder = RecordingItemHolder(
            ItemRecordingWithSeekbarBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
             )
        )
+
+        holder.itemView.setOnClickListener {
+
+            val recording = differ.currentList[holder.absoluteAdapterPosition]
+
+            onItemClickListener?.let { click ->
+                click(recording)
+
+                if(playingRecordingId != recording.id) {
+
+                    previousSeekbar?.let{
+                        it.setOnSeekBarChangeListener(null)
+                        it.visibility = View.GONE
+                    }
+                    previousTvTime?.text = Utils.timerFormat(previousTvTimeValue)
+
+                    holder.bind.apply {
+
+                        seekBar.max = recording.durationMills.toInt()
+                        seekBar.progress = 0
+                        previousSeekbar = seekBar
+                        previousTvTime = tvDuration
+                        previousTvTimeValue = recording.durationMills
+
+                        itemSeekbarHandler?.let { handler ->
+
+                            handler(seekBar, tvDuration, true)
+                        }
+                    }
+                }
+            }
+        }
+
+        return holder
     }
 
     private fun convertLongToDate(time : Long) : String{
@@ -43,7 +88,7 @@ class RecordingsAdapter @Inject constructor(
         return format.format(date)
     }
 
-    override fun onBindViewHolder(holder: RecordingItemHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecordingItemHolder, @SuppressLint("RecyclerView") position: Int) {
 
         val recording = listOfRecordings[position]
 
@@ -52,11 +97,58 @@ class RecordingsAdapter @Inject constructor(
             tvPrimary.text = recording.name
             tvSecondary.text = convertLongToDate(recording.timeStamp)
 
-            glide
-                .load(recording.iconUri)
-                .placeholder(R.drawable.ic_radio_default)
-                .transition(withCrossFade(glideFactory))
-                .into(ivItemImage)
+            val color = randColors.getColor()
+            tvPlaceholder.setBackgroundColor(color)
+            tvPlaceholder.alpha = 0.6f
+
+
+            if(recording.iconUri.isBlank()) {
+
+                ivItemImage.visibility = View.GONE
+
+            } else {
+
+                glide
+                    .load(recording.iconUri)
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+
+                            return true
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+
+                            if(dataSource?.name == "REMOTE"){
+
+                                tvPlaceholder.fadeOut(300, 0.6f, position){ pos ->
+                                    if(pos != holder.bindingAdapterPosition) {
+                                        tvPlaceholder.alpha = 0.6f
+                                    }
+                                }
+
+                            }
+                            else {
+
+                                tvPlaceholder.alpha = 0f
+                            }
+                            ivItemImage.visibility = View.VISIBLE
+                            return false
+                        }
+                    })
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(ivItemImage)
+            }
 
 
             if(recording.id == playingRecordingId){
@@ -74,33 +166,6 @@ class RecordingsAdapter @Inject constructor(
             } else {
                 seekBar.visibility = View.GONE
                 tvDuration.text = Utils.timerFormat(recording.durationMills)
-            }
-
-            root.setOnClickListener {
-
-                onItemClickListener?.let { click ->
-                    click(recording)
-
-                    if(playingRecordingId == recording.id) {/*DO NOTHING*/}
-                    else {
-
-                        previousSeekbar?.let{
-                            it.setOnSeekBarChangeListener(null)
-                            it.visibility = View.GONE
-                        }
-                        previousTvTime?.text = Utils.timerFormat(previousTvTimeValue)
-
-                        seekBar.max = recording.durationMills.toInt()
-                        previousSeekbar = seekBar
-                        previousTvTime = tvDuration
-                        previousTvTimeValue = recording.durationMills
-
-                        itemSeekbarHandler?.let { handler ->
-
-                                handler(seekBar, tvDuration, true)
-                            }
-                        }
-                    }
                 }
             }
         }

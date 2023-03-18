@@ -66,6 +66,7 @@ class MainViewModel @Inject constructor(
 
        val currentSongTitle = RadioService.currentSongTitle
 
+        var isInitialLaunchOfTheApp = true
 
 
     init {
@@ -133,6 +134,12 @@ class MainViewModel @Inject constructor(
        var lastSearchTag = searchPreferences.getString(SEARCH_PREF_TAG, "")?: ""
        var searchFullCountryName = searchPreferences.getString(SEARCH_FULL_COUNTRY_NAME, "")?: ""
 
+       var isTagExact = false
+       var isNameExact = false
+
+       var wasTagExact = false
+       var wasNameExact = false
+
 
     private val searchBy : MutableLiveData<Boolean> = MutableLiveData()
 
@@ -190,7 +197,9 @@ class MainViewModel @Inject constructor(
                        pageSize = limit,
                        country = lastSearchCountry,
                        tag = lastSearchTag,
-                       name = lastSearchName
+                       isTagExact = isTagExact,
+                       name = lastSearchName,
+                       isNameExact = isNameExact
                    )
 
                    if(isNewSearch && response?.size == 0){
@@ -262,14 +271,18 @@ class MainViewModel @Inject constructor(
         if(
             lastSearchName == searchParamName.value &&
             lastSearchTag == searchParamTag.value &&
-            lastSearchCountry == searchParamCountry.value
+            lastSearchCountry == searchParamCountry.value &&
+            wasTagExact == isTagExact &&
+            wasNameExact == isNameExact
+
         ) return
 
          isNewSearch = true
          lastSearchName = searchParamName.value ?: ""
          lastSearchTag = searchParamTag.value ?: ""
          lastSearchCountry = searchParamCountry.value ?: ""
-
+         wasTagExact = isTagExact
+         wasNameExact = isNameExact
 
          if(hasInternetConnection.value == true){
 

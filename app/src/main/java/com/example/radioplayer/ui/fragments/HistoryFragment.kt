@@ -2,30 +2,32 @@ package com.example.radioplayer.ui.fragments
 
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
+import android.util.Log
 import android.view.View
+import android.widget.AdapterView
+import android.widget.Spinner
+import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
+import com.example.radioplayer.adapters.HistoryDatesAdapter
 import com.example.radioplayer.adapters.PagingHistoryAdapter
+import com.example.radioplayer.data.local.entities.HistoryDate
 import com.example.radioplayer.databinding.FragmentHistoryBinding
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
-import com.example.radioplayer.ui.dialogs.HistorySettingsDialog
-import com.example.radioplayer.ui.dialogs.HistoryWarningDialog
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
+import com.example.radioplayer.utils.SpinnerExt
 import com.example.radioplayer.utils.Utils.fromDateToString
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.sql.Date
+import java.text.DateFormat
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -37,8 +39,12 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private var currentDate = ""
 
+    private lateinit var datesAdapter : HistoryDatesAdapter
+
     @Inject
     lateinit var glide : RequestManager
+
+    private val dateFormat = DateFormat.getDateInstance()
 
     @Inject
     lateinit var historyAdapter: PagingHistoryAdapter
@@ -56,50 +62,133 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         subscribeToHistory()
 
-        showSelectedHistoryOption()
+        setDatesSpinnerSelectListener()
 
-        historySettingsClickListener()
+        observeListOfDates()
 
-        setOnSaveOptionsClickListener()
+        setTvSelectDateClickListener()
 
-//        setLayoutAnimationController()
+//        setSpinnerOpenCloseObserver()
 
-//        setRecyclerChildrenAttachListener()
-    }
-
-    private fun setLayoutAnimationController (){
-
-        bind.rvHistory.layoutAnimation = (activity as MainActivity).layoutAnimationController
+    setSpinnerOpenCloseListener()
 
     }
 
-    private fun setRecyclerChildrenAttachListener(){
 
-        bind.rvHistory.addOnChildAttachStateChangeListener(object :RecyclerView.OnChildAttachStateChangeListener{
-            var check = true
-            override fun onChildViewAttachedToWindow(view: View) {
-                if(check){
-                    bind.rvHistory.apply {
-                        post{
-                            startLayoutAnimation()
-                        }
-                    }
-                }
-                check = false
+    private fun setSpinnerOpenCloseListener(){
+
+        bind.spinnerDates.setSpinnerEventsListener( object : SpinnerExt.OnSpinnerEventsListener{
+            override fun onSpinnerOpened(spinner: Spinner?) {
+               bind.tvSelectDate.
+                   setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_playlists_arrow_shrink,0)
             }
-            override fun onChildViewDetachedFromWindow(view: View) {
 
+            override fun onSpinnerClosed(spinner: Spinner?) {
+                bind.tvSelectDate.
+                setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_playlists_arrow_expand,0)
             }
         })
 
+
     }
 
 
-    private fun showSelectedHistoryOption(){
+    private fun setTvSelectDateClickListener(){
 
-       val option = databaseViewModel.getHistoryOptionsPref()
+        bind.tvSelectDate.setOnClickListener {
 
-        bind.tvCurrentMode.text = option
+            bind.spinnerDates.performClick()
+        }
+    }
+
+    private fun setupDatesSpinner(list : List<HistoryDate>){
+
+        datesAdapter = HistoryDatesAdapter(list, requireContext())
+        bind.spinnerDates.adapter = datesAdapter
+        datesAdapter.selectedColor = ContextCompat.getColor(requireContext(), R.color.color_non_interactive)
+    }
+
+
+    private fun observeListOfDates(){
+
+        databaseViewModel.listOfDates.observe(viewLifecycleOwner){
+
+            val testFull = mutableListOf<HistoryDate>()
+
+            testFull.addAll(it)
+
+            val sublist = listOf(
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+
+            )
+
+            testFull.addAll(sublist)
+
+            setupDatesSpinner(testFull)
+
+            val pos = testFull.indexOfFirst { historyDate ->
+                historyDate.time == databaseViewModel.selectedDate
+            }
+
+            datesAdapter.selectedItemPosition = pos
+            setSliderHeaderText(databaseViewModel.selectedDate)
+
+            if(pos == -1)
+                bind.spinnerDates.setSelection(0)
+            else
+                bind.spinnerDates.setSelection(pos+1)
+        }
+    }
+
+
+    private fun setDatesSpinnerSelectListener(){
+
+        bind.spinnerDates.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+
+               val item = datesAdapter.getItem(position) as HistoryDate
+                databaseViewModel.selectedDate = item.time
+                datesAdapter.selectedItemPosition = position
+
+                setSliderHeaderText(item.time)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+
+    }
+
+    private fun setSliderHeaderText(time : Long){
+        if(time == 0L) bind.tvSliderHeader.text = "History: All"
+        else bind.tvSliderHeader.text = dateFormat.format(time)
     }
 
     private fun observePlaybackState(){
@@ -123,57 +212,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             }
         }
     }
-
-
-    private fun setOnSaveOptionsClickListener(){
-
-        bind.tvSaveOption.setOnClickListener {
-
-            val previousOption = databaseViewModel.getHistoryOptionsPref()
-            val newOption = bind.tvCurrentMode.text.toString()
-            val prevVal = databaseViewModel.getDatesValueOfPref(previousOption)
-            val newVal = databaseViewModel.getDatesValueOfPref(newOption)
-
-             if (prevVal <= newVal) {
-
-                 saveNewOption(newOption)
-
-             } else {
-                HistoryWarningDialog(requireContext()){
-                    saveNewOption(newOption)
-                        databaseViewModel.compareDatesWithPrefAndCLeanIfNeeded(null)
-
-                }.show()
-             }
-        }
-    }
-
-    private fun saveNewOption(newOption : String){
-
-        databaseViewModel.setHistoryOptionsPref(newOption)
-        bind.tvSaveOption.isVisible = false
-        Snackbar.make(
-            (activity as MainActivity).findViewById(R.id.rootLayout),
-            "Option was saved",
-            Snackbar.LENGTH_SHORT).show()
-
-    }
-
-    private fun historySettingsClickListener(){
-
-        bind.tvHistorySettings.setOnClickListener {
-
-            HistorySettingsDialog(requireContext()){ newOption ->
-
-                bind.tvCurrentMode.text = newOption
-
-                bind.tvSaveOption.isVisible = newOption != databaseViewModel.getHistoryOptionsPref()
-
-            }.show()
-
-        }
-    }
-
 
 
     private fun setupRecyclerView (){

@@ -13,7 +13,6 @@ import com.example.radioplayer.ui.viewmodels.MainViewModel
 
 class NameDialog (
     requireContext : Context,
-    private val textView: TextView,
     private val mainViewModel: MainViewModel
 
 ) : AppCompatDialog(requireContext) {
@@ -32,23 +31,31 @@ class NameDialog (
         window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
         window?.setGravity(Gravity.TOP)
 
-        bind.tvNameOfRadioStation.apply {
-            if(textView.text != "Name") {
-                isVisible = true
-                text = textView.text
-            }
+        setEditText()
+
+        setButtonsClickListeners()
+
+        setSwitchMatchExactListener()
+
+
+    }
+
+    private fun setSwitchMatchExactListener(){
+
+        bind.switchMatchExact.isChecked = mainViewModel.isNameExact
+
+        bind.switchMatchExact.setOnCheckedChangeListener { _, isChecked ->
+
+            mainViewModel.isNameExact = isChecked
         }
+    }
 
 
-        bind.etNewName.requestFocus()
-
-        window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
-
+    private fun setButtonsClickListeners(){
 
         bind.tvClearName.setOnClickListener {
 
             mainViewModel.searchParamName.postValue("")
-
 
             dismiss()
         }
@@ -61,13 +68,19 @@ class NameDialog (
             if(newName.isNotBlank()){
                 mainViewModel.searchParamName.postValue(newName)
             }
-
-                dismiss()
+            dismiss()
         }
-
 
     }
 
+    private fun setEditText(){
+
+        bind.etNewName.setText(mainViewModel.searchParamName.value)
+
+        bind.etNewName.requestFocus()
+
+        window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+    }
 
     override fun onStop() {
         super.onStop()

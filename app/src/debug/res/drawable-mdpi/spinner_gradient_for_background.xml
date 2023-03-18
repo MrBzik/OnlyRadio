@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
-    <item>
-        <shape >
-            <solid android:color="@color/main_background"/>
-                <stroke
-                    android:width="2dp"
-                    android:color="@color/Separator"/>
-        </shape>
-    </item>
+
 
     <item>
         <shape>
@@ -18,7 +11,16 @@
                 android:angle="90"/>
         </shape>
     </item>
-
+    <item>
+        <inset android:insetTop="60dp" android:insetBottom="50dp">
+            <shape >
+                <solid android:color="@color/main_background"/>
+                <stroke
+                    android:width="2dp"
+                    android:color="@color/Separator"/>
+            </shape>
+        </inset>
+    </item>
 
 
 </layer-list>

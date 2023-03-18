@@ -17,6 +17,7 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -38,6 +39,7 @@ import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
 import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_CURRENT_PLAYING_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.RECORDING_CHANNEL_ID
+import com.example.radioplayer.utils.Constants.RECORDING_NOTIFICATION_ID
 
 import com.example.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
@@ -49,9 +51,11 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.audio.AacUtil
 import com.google.android.exoplayer2.audio.AudioProcessor
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
+import com.google.android.exoplayer2.extractor.ts.AdtsReader
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
@@ -292,7 +296,9 @@ class RadioService : MediaBrowserServiceCompat() {
 
             if(it.action == COMMAND_STOP_RECORDING) {
 
-                Log.d("CHECKTAGS", "got message")
+                stopRecording()
+
+                NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
             }
         }
 
@@ -418,6 +424,8 @@ class RadioService : MediaBrowserServiceCompat() {
         }
         override fun onStopRecording(record: IExoRecord.Record) {
 
+            NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
+
             timer.cancel()
             isConverterWorking = true
             radioSource.exoRecordState.postValue(false)
@@ -532,6 +540,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
 //            Log.d("CHECKTAGS", "$sampleRate, $channels")
 
+
             recSampleRate = if(sampleRate == 22050 && format?.sampleMimeType == "audio/mp4a-latm" ||
                 sampleRate == 24000 && format?.sampleMimeType == "audio/mp4a-latm"
                     ) {
@@ -544,7 +553,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
             Log.d("CHECKTAGS", "rec in : $recChannelsCount, $recSampleRate")
 
-//            exoRecord.exoRecordProcessor.configure(AudioProcessor.AudioFormat(sampleRate, channels,  C.ENCODING_PCM_16BIT))
+            exoRecord.exoRecordProcessor.configure(AudioProcessor.AudioFormat(sampleRate, channels,  C.ENCODING_PCM_16BIT))
 
             exoRecord.startRecording()
         }

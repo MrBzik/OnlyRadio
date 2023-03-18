@@ -25,8 +25,14 @@ interface RadioApi {
             @Query("tag")
             tag : String,
 
+            @Query("tagExact")
+            tagExact : Boolean,
+
             @Query("name")
             name : String = "",
+
+            @Query("nameExact")
+            nameExact : Boolean,
 
             @Query("limit")
             limit : Int = PAGE_SIZE,
@@ -53,8 +59,14 @@ interface RadioApi {
         @Query("tag")
         tag : String,
 
+        @Query("tagExact")
+        tagExact : Boolean,
+
         @Query("name")
         name : String = "",
+
+        @Query("nameExact")
+        nameExact : Boolean,
 
         @Query("limit")
         limit : Int = PAGE_SIZE,

@@ -1,6 +1,7 @@
 package com.example.radioplayer.ui.dialogs
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 
 import android.view.Gravity
@@ -16,20 +17,13 @@ import com.example.radioplayer.databinding.DialogRecordingSettingsBinding
 
 import com.example.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
 
-const val REC_LOWEST = "Very light"
-const val REC_LOW = "Light"
-const val REC_MEDIUM = "Medium"
-const val REC_NORMAL = "Normal"
-const val REC_ABOVE_AVERAGE = "Above normal"
-const val REC_HIGH = "High"
-const val REC_VERY_HIGH = "Very high"
-const val REC_SUPER = "Super high"
-const val REC_ULTRA = "Ultra high"
-const val REC_MAXIMUM = "Maximum"
 
 
 class RecordingSettingsDialog (
-    private val requireContext : Context
+    private val listOfOptions : List<String>,
+    private val recordingQualityPref : SharedPreferences,
+    private val requireContext : Context,
+    private val updateTvValue : () -> Unit
     )
     : AppCompatDialog(requireContext) {
 
@@ -38,13 +32,6 @@ class RecordingSettingsDialog (
 
     private var newOption : Int? = null
 
-    private val recordingQualityPref = requireContext.getSharedPreferences(RECORDING_QUALITY_PREF, Context.MODE_PRIVATE)
-
-    private val listOfOptions = listOf(
-       REC_LOWEST, REC_LOW, REC_MEDIUM, REC_NORMAL, REC_ABOVE_AVERAGE, REC_HIGH, REC_VERY_HIGH,
-        REC_SUPER, REC_ULTRA, REC_MAXIMUM
-
-    )
 
     private lateinit var optionsAdapter : SelectingOptionAdapter
 
@@ -75,8 +62,8 @@ class RecordingSettingsDialog (
             newOption?.let {
 
                 val newValue = (it+1).toFloat() /10
-                recordingQualityPref.edit().putFloat(RECORDING_QUALITY_PREF, newValue).apply()
-
+                recordingQualityPref.edit().putFloat(RECORDING_QUALITY_PREF, newValue).commit()
+                updateTvValue()
             }
 
             dismiss()

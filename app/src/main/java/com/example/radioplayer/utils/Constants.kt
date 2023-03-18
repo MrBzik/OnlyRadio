@@ -24,6 +24,7 @@ object Constants {
     const val CHANNEL_ID = "radio"
 
     const val RECORDING_CHANNEL_ID = "recording channel"
+    const val RECORDING_NOTIFICATION_ID = 7
 
 
 
@@ -55,11 +56,12 @@ object Constants {
 
 
     const val HISTORY_OPTIONS = "History options"
-    const val HISTORY_ONE_DAY = "one day"
-    const val HISTORY_3_DATES = "3 dates"
-    const val HISTORY_7_DATES = "7 dates"
-    const val HISTORY_30_DATES = "30 dates"
-    const val HISTORY_NEVER_CLEAN = "never clean"
+    const val HISTORY_ONE_DAY = 1
+    const val HISTORY_3_DATES = 3
+    const val HISTORY_7_DATES = 7
+    const val HISTORY_15_DATES = 15
+    const val HISTORY_30_DATES = 30
+    const val HISTORY_NEVER_CLEAN = 666
 
 
     const val SEARCH_PREF_TAG = "search preferences tag"

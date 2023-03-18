@@ -1,7 +1,11 @@
 package com.example.radioplayer.ui
 
 import android.annotation.SuppressLint
+import android.app.UiModeManager
+import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -15,6 +19,7 @@ import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import androidx.transition.Fade
 import androidx.transition.Slide
@@ -53,17 +58,11 @@ class MainActivity : AppCompatActivity() {
     val mainViewModel : MainViewModel by viewModels()
     val databaseViewModel : DatabaseViewModel by viewModels()
 
-
     lateinit var bind : ActivityMainBinding
-
-
     lateinit var bindPlayer : StubPlayerActivityMainBinding
-
     private var isStubPlayerBindInflated = false
 
-
-
-    val separatorAnimation : LoadingAnim by lazy { LoadingAnim(this,
+    private val separatorAnimation : LoadingAnim by lazy { LoadingAnim(this,
         bind.viewSeparatorStart, bind.viewSeparatorEnd,
         bind.separatorLowest, bind.separatorSecond) }
 
@@ -73,9 +72,7 @@ class MainActivity : AppCompatActivity() {
 
     fun endSeparatorsLoadAnim(){
         separatorAnimation.endLoadingAnim()
-
     }
-
 
 
     private val animationIn : Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.fall_down) }
@@ -94,22 +91,24 @@ class MainActivity : AppCompatActivity() {
     private var currentPlayingItem : PlayingItem? = null
 
 
-    private  val radioSearchFragment : RadioSearchFragment by lazy { RadioSearchFragment() }
-    private  val favStationsFragment : FavStationsFragment by lazy { FavStationsFragment() }
-    private  val historyFragment : HistoryFragment by lazy { HistoryFragment() }
-    private  val recordingsFragment : RecordingsFragment by lazy { RecordingsFragment() }
-    private  val stationDetailsFragment : StationDetailsFragment by lazy { StationDetailsFragment().apply {
+    private val radioSearchFragment : RadioSearchFragment by lazy { RadioSearchFragment() }
+    private val favStationsFragment : FavStationsFragment by lazy { FavStationsFragment() }
+    private val historyFragment : HistoryFragment by lazy { HistoryFragment() }
+    private val recordingsFragment : RecordingsFragment by lazy { RecordingsFragment() }
+    private val settingsFragment : SettingsFragment by lazy { SettingsFragment() }
+
+
+    private val stationDetailsFragment : StationDetailsFragment by lazy { StationDetailsFragment().apply {
         enterTransition = Slide(Gravity.BOTTOM)
         exitTransition = Slide(Gravity.BOTTOM)
         }
     }
 
-    private  val recordingDetailsFragment : RecordingDetailsFragment by lazy { RecordingDetailsFragment().apply {
+    private val recordingDetailsFragment : RecordingDetailsFragment by lazy { RecordingDetailsFragment().apply {
         enterTransition = Slide(Gravity.BOTTOM)
         exitTransition = Slide(Gravity.BOTTOM)
          }
     }
-
 
 
     override fun onBackPressed() {
@@ -122,8 +121,6 @@ class MainActivity : AppCompatActivity() {
             handleNavigationToFragments(null)
         }
     }
-
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -151,8 +148,19 @@ class MainActivity : AppCompatActivity() {
 
         setOnBottomNavItemReselect()
 
+        refreshSeparators()
 
     }
+
+
+    private fun refreshSeparators(){
+        if(!mainViewModel.isInitialLaunchOfTheApp){
+            separatorAnimation.refresh()
+        }
+
+    }
+
+
 
     private fun observeInternetConnection() {
 
@@ -165,13 +173,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupInitialNavigation(){
 
+        if(mainViewModel.isInitialLaunchOfTheApp){
 
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.flFragment, radioSearchFragment)
-            addToBackStack(null)
-            commit()
+            supportFragmentManager.beginTransaction().apply {
+                replace(R.id.flFragment, radioSearchFragment)
+                addToBackStack(null)
+                commit()
+            }
+            mainViewModel.isInitialLaunchOfTheApp = false
         }
-
     }
 
     private fun observeNewStation(){
@@ -363,6 +373,15 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            R.id.mi_settingsFragment -> {
+                settingsFragment.exitTransition = null
+                supportFragmentManager.beginTransaction().apply {
+                    setCustomAnimations(R.anim.blank_anim, android.R.anim.fade_out)
+                    replace(R.id.flFragment, settingsFragment)
+                    addToBackStack(null)
+                    commit()
+                }
+            }
 
         }
 
@@ -397,34 +416,52 @@ class MainActivity : AppCompatActivity() {
 
                 recordingsFragment.exitTransition = Fade()
             }
+
+            R.id.mi_settingsFragment -> {
+
+                settingsFragment.exitTransition = Fade()
+            }
         }
     }
 
     private val randColors = RandomColors()
 
-    private fun setTvPlaceHolderLetter(name : String){
+    private fun setTvPlaceHolderLetter(name : String, isRecording : Boolean){
 
-        var char = 'X'
+        val color = randColors.getColor()
 
-        for(l in name.indices){
-            if(name[l].isLetter()){
-                char = name[l]
-                break
+        if(isRecording){
+
+            bindPlayer.tvPlaceholder.apply {
+                text = "Rec."
+                setTextColor(color)
+                alpha = 0.6f
+                textSize = 28f
+            }
+        } else {
+
+            var char = 'X'
+
+            for(l in name.indices){
+                if(name[l].isLetter()){
+                    char = name[l]
+                    break
+                }
+            }
+
+            bindPlayer.tvPlaceholder.apply {
+                text = char.toString().uppercase()
+                setTextColor(color)
+                alpha = 0.6f
+                textSize = 40f
             }
         }
-        val color = randColors.getColor()
-        bindPlayer.tvPlaceholder.apply {
-            text = char.toString().uppercase()
-            setBackgroundColor(color)
-            alpha = 0.6f
-        }
-
-
     }
 
     private fun updateImage(playingItem : PlayingItem){
 
         var name = ""
+        var isRecording = false
 
         val newImage = when (playingItem) {
             is PlayingItem.FromRadio -> {
@@ -432,6 +469,7 @@ class MainActivity : AppCompatActivity() {
                 playingItem.radioStation.favicon
             }
             is PlayingItem.FromRecordings -> {
+                isRecording = true
                 bindPlayer.tvStationTitle.text = "From recordings"
                 name = playingItem.recording.name
                 playingItem.recording.iconUri
@@ -441,7 +479,7 @@ class MainActivity : AppCompatActivity() {
 
             if(newImage.isNullOrBlank()){
                 bindPlayer.ivCurrentStationImage.visibility = View.GONE
-                setTvPlaceHolderLetter(name)
+                setTvPlaceHolderLetter(name, isRecording)
 
             } else {
 
@@ -458,7 +496,7 @@ class MainActivity : AppCompatActivity() {
                         ): Boolean {
 
                             bindPlayer.ivCurrentStationImage.visibility = View.GONE
-                            setTvPlaceHolderLetter(name)
+                            setTvPlaceHolderLetter(name, isRecording)
                             return true
                         }
 

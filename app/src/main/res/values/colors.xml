@@ -14,6 +14,7 @@
     <color name="floating_buttons">#DADADA</color>
     <color name="color_interactive">#FFFFFFFF</color>
     <color name="color_changed_on_interaction">#FC2E20</color>
+    <color name="color_warning_text">#FC2E20</color>
     <color name="transparent">#00000000</color>
     <color name="regular_text_color">#0C0C0C</color>
     <color name="search_text_color">#000000</color>
@@ -24,6 +25,8 @@
     <color name="selected_station_playing">#FF80AB</color>
     <color name="selected_station_paused">#FFB8D0</color>
     <color name="default_text_color">#000000</color>
+    <color name="dialog_title_color">#000000</color>
+
     <color name="selected_text_color">#ff0</color>
     <color name="seekbar_text_style">#FF80AB</color>
     <color name="selected_genre_color">#ff0</color>

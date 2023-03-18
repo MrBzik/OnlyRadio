@@ -12,7 +12,6 @@
     </style>
 
 
-
     <style name="mainTextTitle" parent="android:Widget.TextView">
         <item name="android:textColor">@color/color_non_interactive</item>
         <item name="android:textSize">18sp</item>
@@ -42,14 +41,14 @@
     <style name="dialogTitleText" parent="android:Widget.TextView">
         <item name="android:textSize">20sp</item>
         <item name ="android:textStyle">bold</item>
-        <item name="android:textColor">@color/Separator</item>
+        <item name="android:textColor">@color/dialog_title_color</item>
         <item name="android:fontFamily">serif-monospace</item>
     </style>
 
     <style name="dialogWarningTitleText" parent="android:Widget.TextView">
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">18sp</item>
         <item name ="android:textStyle">bold</item>
-        <item name="android:textColor">@color/color_changed_on_interaction</item>
+        <item name="android:textColor">@color/color_warning_text</item>
         <item name="android:fontFamily">serif-monospace</item>
     </style>
 

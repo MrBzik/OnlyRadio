@@ -25,6 +25,7 @@
         android:layout_height="130dp"
         android:layout_gravity="bottom"
         android:visibility="gone"
+        android:elevation="-1dp"
         android:background="@color/main_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivArrowBackToFav"
@@ -56,31 +57,10 @@
         android:textAppearance="@style/mainTextTitle"
         app:layout_constraintEnd_toStartOf="@+id/tvPlaylistsExpand"
         app:layout_constraintStart_toEndOf="@+id/tvPlaylistEdit"
-
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/ivArrowPlaylistsExpand"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/ic_playlists_arrow_expand"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
 
         />
 
-    <ImageView
-        android:id="@+id/ivArrowPlaylistsShrink"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/ic_playlists_arrow_shrink"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-
-        />
 
     <TextView
         android:id="@+id/tvPlaylistEdit"
@@ -93,8 +73,7 @@
         android:layout_marginStart="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-
-        />
+        app:drawableEndCompat="@drawable/ic_arrow_drop_down" />
 
 
     <TextView
@@ -102,7 +81,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="24dp"
         android:text="Playlists"
         android:textAppearance="@style/mainTextButtons"
         app:layout_constraintEnd_toEndOf="parent"

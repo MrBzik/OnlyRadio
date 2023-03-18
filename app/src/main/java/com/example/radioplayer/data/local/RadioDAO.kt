@@ -104,7 +104,14 @@ interface  RadioDAO {
 
     @Transaction
     @Query("SELECT * FROM HistoryDate ORDER BY time DESC LIMIT :limit OFFSET :offset")
-    suspend fun getStationsInDate(limit: Int, offset : Int) : DateWithStations
+    suspend fun getStationsInAllDates(limit: Int, offset : Int) : DateWithStations
+
+    @Transaction
+    @Query("SELECT * FROM HistoryDate WHERE date =:date LIMIT 1")
+    suspend fun getStationsInOneDate(date : String) : DateWithStations
+
+    @Query("SELECT * FROM HistoryDate ORDER BY time DESC")
+    fun getListOfDates() : LiveData<List<HistoryDate>>
 
 
     // For database RadioStations cleaning

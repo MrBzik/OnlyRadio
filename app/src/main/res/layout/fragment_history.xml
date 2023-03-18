@@ -14,52 +14,52 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:background="@color/toolbar"
-
         />
 
     <TextView
-        android:id="@+id/tvCurrentMode"
+        android:id="@+id/tvSliderHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
         android:layout_marginTop="16dp"
-        android:text="last 3 dates"
+        android:text="History: All"
+        android:layout_marginStart="10dp"
         android:textAppearance="@style/mainTextTitle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+       />
 
-    <TextView
-        android:id="@+id/tvSaveOption"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_marginTop="16dp"
-        android:text="Save"
-        android:textAppearance="@style/mainTextButtons"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+    <com.example.radioplayer.utils.SpinnerExt
+        android:id="@+id/spinnerDates"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:popupBackground="@drawable/spinner_gradient_for_background"
+        android:background="@null"
+        android:elevation="-1dp"
+        android:popupElevation="-2dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="@id/guidelineMiddle"
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineMiddle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_percent="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/tvHistorySettings"
+        android:id="@+id/tvSelectDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Settings"
+        android:text="Select date"
         android:textAppearance="@style/mainTextButtons"
-        app:layout_constraintEnd_toStartOf="@+id/ivArrowSettings"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/ivArrowSettings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/ic_arrow_drop_down"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:drawableEndCompat="@drawable/ic_playlists_arrow_expand" />
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -67,7 +67,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="60dp"
-        android:elevation="-1dp"
+        android:elevation="-2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

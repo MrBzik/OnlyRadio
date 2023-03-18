@@ -14,6 +14,7 @@
     <color name="floating_buttons">#121111</color>
     <color name="color_interactive">#FDB750</color>
     <color name="color_changed_on_interaction">#FC2E20</color>
+    <color name="color_warning_text">#99FC2E20</color>
     <color name="transparent">#00000000</color>
     <color name="regular_text_color">#808080</color>
     <color name="search_text_color">#989696</color>
@@ -24,6 +25,7 @@
     <color name="selected_station_playing">#1E1B1B</color>
     <color name="selected_station_paused">#1E1B1B</color>
     <color name="default_text_color">#FFFFFFFF</color>
+    <color name="dialog_title_color">#AA4D06</color>
     <color name="selected_text_color">#ff0</color>
     <color name="seekbar_text_style">#99698E03</color>
     <color name="selected_genre_color">#99FFFF00</color>

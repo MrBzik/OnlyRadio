@@ -22,6 +22,7 @@ import com.example.radioplayer.databinding.FragmentStationDetailsBinding
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.dialogs.AddStationToPlaylistDialog
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
+import com.example.radioplayer.utils.RandomColors
 import com.example.radioplayer.utils.Utils
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -197,6 +198,28 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         }
     }
 
+    private val randColors = RandomColors()
+
+    private fun setTvPlaceHolderLetter(name : String,){
+
+        val color = randColors.getColor()
+
+            var char = 'X'
+
+            for(l in name.indices){
+                if(name[l].isLetter()){
+                    char = name[l]
+                    break
+                }
+            }
+
+            bind.tvPlaceholder.apply {
+                text = char.toString().uppercase()
+                setTextColor(color)
+                alpha = 0.6f
+        }
+    }
+
 
     private fun updateUiForRadioStation(station : RadioStation){
 
@@ -212,30 +235,44 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
             bind.tvName.text = station.name
 
-            glide
-                .load(station.favicon)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .listener(object : RequestListener<Drawable>{
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        return false
-                    }
+            if(station.favicon.isNullOrBlank()){
 
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                       return false
-                    }
-                })
-                .into(bind.ivIcon)
+                bind.ivIcon.visibility = View.INVISIBLE
+                setTvPlaceHolderLetter(station.name?: "")
+
+            } else {
+
+                glide
+                    .load(station.favicon)
+                    .listener(object : RequestListener<Drawable>{
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+
+                            bind.ivIcon.visibility = View.INVISIBLE
+                            setTvPlaceHolderLetter(station.name ?: "")
+                            return true
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            return false
+                        }
+                    })
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(bind.ivIcon)
+
+            }
+
+
 
             if(!station.language.isNullOrBlank()){
                 bind.tvLanguage.isVisible = true

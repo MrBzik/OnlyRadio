@@ -4,10 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:minHeight="460dp"
-    android:padding="16dp"
     android:background="@drawable/dialog_gradient_for_background"
-    >
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/tvTitle"
@@ -19,17 +17,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ListView
-        android:id="@+id/listViewOptions"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvListOfOptions"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="20dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginStart="30dp"
-        app:layout_constraintBottom_toTopOf="@+id/tvBack"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/tvWarning"
         app:layout_constraintTop_toBottomOf="@+id/tvTitle"
         tools:layout_editor_absoluteX="16dp" />
 
+
+    <TextView
+        android:id="@+id/tvWarning"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="20dp"
+        android:text="Saving this option may result in cleaning current history"
+        android:textAppearance="@style/dialogWarningTitleText"
+        app:layout_constraintBottom_toTopOf="@+id/tvAccept"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
     <TextView
@@ -44,6 +55,16 @@
         app:layout_constraintStart_toStartOf="parent" />
 
 
+    <TextView
+        android:id="@+id/tvAccept"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:text="@string/dialog_accept_button"
+        android:textAppearance="@style/dialogTextButtons"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

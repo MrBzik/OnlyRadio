@@ -159,10 +159,18 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             isPlaylistsVisible = it
 
             bind.rvPlaylists.isVisible = it
-
-            bind.ivArrowPlaylistsShrink.isVisible = it
-            bind.ivArrowPlaylistsExpand.isVisible = !it
+            
             bind.ivArrowBackToFav.isVisible = it && !isInFavouriteTab
+
+
+                bind.tvPlaylistsExpand.apply {
+                    if(it){
+                        setCompoundDrawablesWithIntrinsicBounds(0,0, R.drawable.ic_playlists_arrow_shrink, 0)
+                    } else {
+                        setCompoundDrawablesWithIntrinsicBounds(0,0, R.drawable.ic_playlists_arrow_expand, 0)
+                    }
+                }
+
 
         }
     }

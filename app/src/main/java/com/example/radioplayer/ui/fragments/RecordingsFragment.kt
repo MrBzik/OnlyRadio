@@ -56,22 +56,12 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
         observePlayingItem()
 
-
         observePlayerPosition()
 
-        setupSettingClickListener()
 
     }
 
-    private fun setupSettingClickListener(){
 
-        bind.tvRecordingSettings.setOnClickListener {
-
-            RecordingSettingsDialog(requireContext()).show()
-
-        }
-
-    }
 
     val animator = ValueAnimator().apply {
         duration = 500
@@ -126,11 +116,9 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
                     seekbar.progress = position.toInt()
                     setTvRecordingPlayingTime(position)
                 }
-
             }
             setSeekbarChangeListener(seekbar)
         }
-
     }
 
 
@@ -183,6 +171,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
     private fun setAdapterClickListener(){
 
         recordingsAdapter.setOnClickListener { recording ->
+            animator.cancel()
             mainViewModel.playOrToggleStation(
                 rec = recording,
                 searchFlag = SEARCH_FROM_RECORDINGS

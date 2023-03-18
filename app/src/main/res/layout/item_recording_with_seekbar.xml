@@ -8,11 +8,24 @@
 
     <ImageView
         android:id="@+id/ivItemImage"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="11dp"
         android:layout_width="65dp"
         android:layout_height="65dp"
         />
 
+
+    <TextView
+        android:id="@+id/tvPlaceholder"
+        android:text="Rec."
+        android:layout_marginTop="11dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:fontFamily="@font/ranchers"
+        android:gravity="center"
+        android:alpha="0.6"
+        android:textColor="@color/black"
+        android:textSize="28sp"
+        />
 
     <SeekBar
         android:id="@+id/seekBar"
@@ -23,10 +36,10 @@
         android:progressDrawable="@drawable/seekbar"
         android:background="@null"
         android:layout_marginTop="7dp"
-        android:layout_marginStart="69dp"
+        android:layout_marginStart="65dp"
         android:paddingStart="0dp"
         android:paddingEnd="0dp"
-       android:visibility="gone"
+        android:visibility="gone"
 
         />
 

@@ -18,14 +18,11 @@ import com.example.radioplayer.data.local.relations.StationDateCrossRef
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.repositories.DatabaseRepository
-import com.example.radioplayer.utils.Constants.HISTORY_30_DATES
-import com.example.radioplayer.utils.Constants.HISTORY_3_DATES
-import com.example.radioplayer.utils.Constants.HISTORY_7_DATES
 import com.example.radioplayer.utils.Constants.HISTORY_NEVER_CLEAN
-import com.example.radioplayer.utils.Constants.HISTORY_ONE_DAY
 import com.example.radioplayer.utils.Constants.HISTORY_OPTIONS
 import com.example.radioplayer.utils.Utils.fromDateToString
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
@@ -106,7 +103,6 @@ class DatabaseViewModel @Inject constructor(
 
      var stationsInPlaylist = Transformations.switchMap(
         currentPlaylistName) { playlistName ->
-//                Log.d("CHECKTAGS", "in playlist")
                 repository.subscribeToStationsInPlaylist(playlistName)
         }
 
@@ -218,6 +214,9 @@ class DatabaseViewModel @Inject constructor(
 
     // For RecyclerView
 
+    val listOfDates = repository.getListOfDates
+
+    var selectedDate = 0L
 
     private suspend fun getStationsInDate(limit: Int, offset: Int): List<StationWithDateModel> {
 
@@ -240,6 +239,7 @@ class DatabaseViewModel @Inject constructor(
 
     private val updateHistory : MutableLiveData<Boolean> = MutableLiveData(true)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val historyFlow = updateHistory.asFlow()
         .flatMapLatest {
             stationsHistoryFlow()
@@ -275,14 +275,14 @@ class DatabaseViewModel @Inject constructor(
 
     private val editor = historyOptionsPref.edit()
 
-    fun getHistoryOptionsPref() : String {
+    fun getHistoryOptionsPref() : Int {
 
-        return historyOptionsPref.getString(HISTORY_OPTIONS, HISTORY_NEVER_CLEAN).toString()
+        return historyOptionsPref.getInt(HISTORY_OPTIONS, HISTORY_NEVER_CLEAN)
     }
 
-    fun setHistoryOptionsPref(newOption : String) {
+    fun setHistoryOptionsPref(newOption : Int) {
 
-        editor.putString(HISTORY_OPTIONS, newOption)
+        editor.putInt(HISTORY_OPTIONS, newOption)
         editor.commit()
     }
 
@@ -298,14 +298,13 @@ class DatabaseViewModel @Inject constructor(
 
         if(pref == HISTORY_NEVER_CLEAN) return@launch
 
-        val prefValue = getDatesValueOfPref(pref)
 
         val numberOfDatesInDB =  repository.getNumberOfDates()
 
-        if(prefValue >= numberOfDatesInDB) return@launch
+        if(pref >= numberOfDatesInDB) return@launch
         else {
             isCleanUpNeeded = true
-            val numberOfDatesToDelete = numberOfDatesInDB - prefValue
+            val numberOfDatesToDelete = numberOfDatesInDB - pref
             val deleteList = repository.getDatesToDelete(numberOfDatesToDelete)
 
             deleteList.forEach {
@@ -318,17 +317,6 @@ class DatabaseViewModel @Inject constructor(
     }
 
 
-    fun getDatesValueOfPref(pref : String) : Int {
-
-       return when (pref){
-            HISTORY_ONE_DAY -> 1
-            HISTORY_3_DATES -> 3
-            HISTORY_7_DATES -> 7
-            HISTORY_30_DATES -> 30
-            else -> 666
-        }
-
-    }
 
 
     // Cleaning up database

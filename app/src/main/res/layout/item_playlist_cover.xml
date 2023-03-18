@@ -19,6 +19,7 @@
         android:textSize="13sp"
         android:fontFamily="@font/aldrich"
         android:gravity="center"
+        android:text="cover"
         android:maxLines="2"
         android:ellipsize="end"
         android:textAlignment="center"

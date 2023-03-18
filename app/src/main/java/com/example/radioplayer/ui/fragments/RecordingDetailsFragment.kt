@@ -4,7 +4,6 @@ package com.example.radioplayer.ui.fragments
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import androidx.core.view.isVisible
@@ -21,7 +20,6 @@ import com.example.radioplayer.databinding.FragmentRecordingDetailsBinding
 import com.example.radioplayer.exoPlayer.RadioService
 
 import com.example.radioplayer.ui.dialogs.RenameRecordingDialog
-import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.Utils
 
@@ -74,7 +72,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
         setRangeSeekbarListener()
 
-        setTrimmingAudioButton()
+        setTrimmingProcesserButton()
 
         observeRecordingPlaylistUpdate()
 
@@ -102,7 +100,9 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
         bind.rangeSlider.isVisible = isVisible
         bind.tvProcessTrim.isVisible = isVisible && isTvTrimProcessVisible
 
-        bind.ivIcon.isVisible = !isVisible
+        if(isVisible) bind.ivIcon.visibility = View.GONE
+            else bind.ivIcon.visibility = View.VISIBLE
+
 
         bind.tvCutExpander.apply {
             if(isVisible)
@@ -129,7 +129,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
         }
 
         bind.fabSpeedPlus.setOnClickListener {
-            if(RadioService.playbackSpeed < 300){
+            if(RadioService.playbackSpeed < 400){
                 RadioService.playbackSpeed += 10
                 mainViewModel.updatePlaybackSpeed()
                 updatePlaybackSpeedDisplayValue()
@@ -216,7 +216,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
     }
 
 
-    private fun setTrimmingAudioButton(){
+    private fun setTrimmingProcesserButton(){
 
         bind.tvProcessTrim.setOnClickListener {
             if(!isTrimmerWorking){
@@ -387,14 +387,17 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
     private fun updateUiForRecording(recording: Recording){
 
         bind.tvName.text = recording.name
-        glide
-            .load(recording.iconUri)
-            .transition(DrawableTransitionOptions.withCrossFade())
-            .into(bind.ivIcon)
 
+        if(recording.iconUri.isBlank()){
+            bind.ivIcon.visibility = View.GONE
+        } else {
+
+            glide
+                .load(recording.iconUri)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(bind.ivIcon)
+        }
     }
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -83,10 +83,12 @@ class DatabaseRepository @Inject constructor(
     suspend fun insertStationDateCrossRef(stationDateCrossRef: StationDateCrossRef)
         = radioDAO.insertStationDateCrossRef(stationDateCrossRef)
 
+    val getListOfDates = radioDAO.getListOfDates()
+
     // For recyclerView
 
     suspend fun getStationsInDate(limit : Int, offset : Int)
-         = radioDAO.getStationsInDate(limit, offset)
+         = radioDAO.getStationsInAllDates(limit, offset)
 
 
 

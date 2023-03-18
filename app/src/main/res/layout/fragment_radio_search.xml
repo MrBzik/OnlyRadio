@@ -9,30 +9,41 @@
     <LinearLayout
         android:id="@+id/llTag"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/toolbarGuide"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toStartOf="@+id/llName"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginEnd="8dp"
+        >
 
         <TextView
 
             android:id="@+id/tvTag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
+            android:ellipsize="middle"
             android:maxLines="1"
-            android:paddingStart="10dp"
+            android:layout_marginStart="10dp"
             android:text="Tag"
             android:textAppearance="@style/mainTextButtons"
-            app:drawableEndCompat="@drawable/ic_arrow_drop_down"
-            android:layout_marginEnd="8dp"
+
             />
+
+
+            <ImageView
+                android:id="@+id/ivArrowTag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_arrow_drop_down"
+              />
 
 
 
     </LinearLayout>
+
+
 
 
     <androidx.constraintlayout.widget.Guideline
@@ -47,13 +58,15 @@
     <LinearLayout
         android:id="@+id/llName"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginStart="-40dp"
-        app:layout_constraintBottom_toTopOf="@+id/swipeRefresh"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toStartOf="@+id/tvSelectedCountry"
         app:layout_constraintStart_toStartOf="@+id/guideline3"
         app:layout_constraintTop_toBottomOf="@id/toolbarGuide"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginEnd="8dp"
+        >
 
         <TextView
             android:id="@+id/tvName"
@@ -63,7 +76,16 @@
             android:maxLines="1"
             android:text="Name"
             android:textAppearance="@style/mainTextButtons"
-            app:drawableEndCompat="@drawable/ic_arrow_drop_down" />
+
+            />
+
+        <ImageView
+            android:id="@+id/ivArrowName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_arrow_drop_down"
+            />
+
 
 
     </LinearLayout>
@@ -76,17 +98,18 @@
         android:layout_marginTop="16dp"
         android:text="Country"
         android:textAppearance="@style/mainTextButtons"
-        app:layout_constraintEnd_toStartOf="@+id/ivArrowCountry"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:drawableEndCompat="@drawable/ic_arrow_drop_down"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/ivArrowCountry"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/ic_arrow_drop_down"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+<!--    <ImageView-->
+<!--        android:id="@+id/ivArrowCountry"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:src="@drawable/ic_arrow_drop_down"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout

@@ -13,7 +13,6 @@
         <scale android:scaleWidth="100%">
             <shape android:shape="rectangle">
                 <size android:height="69dp"/>
-                <solid android:color="@color/seekbar_text_style"/>
                 <gradient android:startColor="@color/seekbar_text_style"
                     android:endColor="@color/main_background"
                     android:angle="90"/>

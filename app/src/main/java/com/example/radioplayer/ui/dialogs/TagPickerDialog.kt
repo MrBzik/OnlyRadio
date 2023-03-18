@@ -44,19 +44,36 @@ class TagPickerDialog (
         setupAdapterClickListener()
         setEditTextAdapterFilter()
         handleKeyboardToggle()
+        setSwitchExactMatch()
 
     }
+
+    private fun setSwitchExactMatch(){
+
+        bind.switchMatchExact.isChecked = mainViewModel.isTagExact
+
+        bind.switchMatchExact.setOnCheckedChangeListener { _, isChecked ->
+
+            mainViewModel.isTagExact = isChecked
+        }
+
+    }
+
 
     private fun handleKeyboardToggle (){
         observeKeyboardState(bind.root, {
             bind.tvBack.visibility = View.GONE
             bind.tvClearSelection.visibility = View.GONE
             bind.tvTitle.visibility = View.GONE
+            bind.tvSwitchSearchExact.visibility = View.GONE
+            bind.switchMatchExact.visibility = View.GONE
 
         }, {
             bind.tvBack.visibility = View.VISIBLE
             bind.tvClearSelection.visibility = View.VISIBLE
             bind.tvTitle.visibility = View.VISIBLE
+            bind.tvSwitchSearchExact.visibility = View.VISIBLE
+            bind.switchMatchExact.visibility = View.VISIBLE
             bind.editText.clearFocus()
 
         }, {
