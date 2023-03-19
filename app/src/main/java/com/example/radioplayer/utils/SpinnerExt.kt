@@ -75,8 +75,8 @@ class SpinnerExt(context : Context, attr : AttributeSet?) : AppCompatSpinner(con
     override fun getWindowVisibleDisplayFrame(outRect: Rect?) {
 
         outRect?.set(outRect.left, outRect.top - 120, outRect.right, outRect.bottom)
-
-
     }
+
+
 
 }

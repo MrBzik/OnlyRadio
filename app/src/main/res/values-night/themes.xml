@@ -22,4 +22,10 @@
     </style>
 
 
+    <style name="listPopupWindow" parent="Widget.AppCompat.Spinner">
+        <item name="android:popupAnimationStyle">@null</item>
+        <item name="android:popupEnterTransition">@null</item>
+    </style>
+
+
 </resources>

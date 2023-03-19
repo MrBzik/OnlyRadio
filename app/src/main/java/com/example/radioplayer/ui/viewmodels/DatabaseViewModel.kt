@@ -9,6 +9,8 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.radioplayer.adapters.datasources.HistoryDataSource
 import com.example.radioplayer.adapters.datasources.HistoryDateLoader
+import com.example.radioplayer.adapters.datasources.HistoryOneDateLoader
+import com.example.radioplayer.adapters.datasources.HistoryOneDateSource
 import com.example.radioplayer.adapters.models.StationWithDateModel
 import com.example.radioplayer.data.local.entities.HistoryDate
 import com.example.radioplayer.data.local.entities.Playlist
@@ -18,7 +20,7 @@ import com.example.radioplayer.data.local.relations.StationDateCrossRef
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.repositories.DatabaseRepository
-import com.example.radioplayer.utils.Constants.HISTORY_NEVER_CLEAN
+import com.example.radioplayer.utils.Constants.HISTORY_3_DATES
 import com.example.radioplayer.utils.Constants.HISTORY_OPTIONS
 import com.example.radioplayer.utils.Utils.fromDateToString
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -208,7 +210,7 @@ class DatabaseViewModel @Inject constructor(
         }
 
         repository.insertStationDateCrossRef(StationDateCrossRef(stationID, update))
-        updateHistory.postValue(true)
+//        updateHistory.postValue(true)
     }
 
 
@@ -237,16 +239,46 @@ class DatabaseViewModel @Inject constructor(
         return stationsWithDate
     }
 
-    private val updateHistory : MutableLiveData<Boolean> = MutableLiveData(true)
+    private suspend fun getStationsInOneDate(time : Long) : List<StationWithDateModel> {
+
+        val response = radioSource.getStationsInOneDate(time)
+
+        val stationsWithDate: MutableList<StationWithDateModel> = mutableListOf()
+
+        response.radioStations.reversed().forEach {
+            stationsWithDate.add(StationWithDateModel.Station(it))
+        }
+        return stationsWithDate
+    }
+
+
+
+
+     val updateHistory : MutableLiveData<Boolean> = MutableLiveData(true)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val historyFlow = updateHistory.asFlow()
-        .flatMapLatest {
+        .flatMapLatest { if(it)
             stationsHistoryFlow()
+            else stationsHistoryOneDateFlow()
         }.cachedIn(viewModelScope)
 
 
+    private fun stationsHistoryOneDateFlow() : Flow<PagingData<StationWithDateModel>> {
+        val loader : HistoryOneDateLoader = {
+            getStationsInOneDate(selectedDate)
+        }
 
+        return Pager(
+            config = PagingConfig(
+                pageSize = 10,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                HistoryOneDateSource(loader)
+            }
+        ).flow
+    }
 
 
     private fun stationsHistoryFlow() : Flow<PagingData<StationWithDateModel>> {
@@ -277,7 +309,7 @@ class DatabaseViewModel @Inject constructor(
 
     fun getHistoryOptionsPref() : Int {
 
-        return historyOptionsPref.getInt(HISTORY_OPTIONS, HISTORY_NEVER_CLEAN)
+        return historyOptionsPref.getInt(HISTORY_OPTIONS, HISTORY_3_DATES)
     }
 
     fun setHistoryOptionsPref(newOption : Int) {
@@ -296,7 +328,7 @@ class DatabaseViewModel @Inject constructor(
 
         val pref = getHistoryOptionsPref()
 
-        if(pref == HISTORY_NEVER_CLEAN) return@launch
+//        if(pref == HISTORY_NEVER_CLEAN) return@launch
 
 
         val numberOfDatesInDB =  repository.getNumberOfDates()
@@ -312,7 +344,7 @@ class DatabaseViewModel @Inject constructor(
                 repository.deleteDate(it)
             }
         }
-            updateHistory.postValue(true)
+//            updateHistory.postValue(true)
 
     }
 

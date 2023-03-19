@@ -28,6 +28,9 @@
         app:layout_constraintTop_toTopOf="parent"
        />
 
+
+
+
     <com.example.radioplayer.utils.SpinnerExt
         android:id="@+id/spinnerDates"
         android:layout_width="0dp"
@@ -35,10 +38,12 @@
         android:popupBackground="@drawable/spinner_gradient_for_background"
         android:background="@null"
         android:elevation="-1dp"
-        android:popupElevation="-2dp"
+        android:popupElevation="-20dp"
+        style="@style/listPopupWindow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="@id/guidelineMiddle"
         app:layout_constraintTop_toTopOf="parent"
+
         />
 
     <androidx.constraintlayout.widget.Guideline

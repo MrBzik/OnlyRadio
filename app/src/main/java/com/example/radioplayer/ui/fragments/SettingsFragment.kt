@@ -28,8 +28,9 @@ const val HISTORY_STRING_ONE_DAY = "One day"
 const val HISTORY_STRING_3_DATES = "3 dates"
 const val HISTORY_STRING_7_DATES = "7 dates"
 const val HISTORY_STRING_15_DATES = "15 dates"
+const val HISTORY_STRING_21_DATES = "21 date"
 const val HISTORY_STRING_30_DATES = "30 dates"
-const val HISTORY_STRING_NEVER_CLEAN = "Never clean"
+
 
 
 
@@ -48,7 +49,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
     private val listOfHistoryOptions : List<String> by lazy { listOf(
         HISTORY_STRING_ONE_DAY, HISTORY_STRING_3_DATES, HISTORY_STRING_7_DATES,
-        HISTORY_STRING_15_DATES, HISTORY_STRING_30_DATES, HISTORY_STRING_NEVER_CLEAN)
+        HISTORY_STRING_15_DATES, HISTORY_STRING_21_DATES, HISTORY_STRING_30_DATES)
     }
 
 
@@ -96,8 +97,8 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
             3 -> HISTORY_STRING_3_DATES
             7 -> HISTORY_STRING_7_DATES
             15 -> HISTORY_STRING_15_DATES
-            30 -> HISTORY_STRING_30_DATES
-            else -> HISTORY_STRING_NEVER_CLEAN
+            21 -> HISTORY_STRING_21_DATES
+            else -> HISTORY_STRING_30_DATES
         }
 
     }

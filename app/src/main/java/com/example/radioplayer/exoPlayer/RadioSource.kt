@@ -71,6 +71,16 @@ class RadioSource @Inject constructor(
         return response
     }
 
+    suspend fun getStationsInOneDate(time : Long) : DateWithStations {
+        val response = radioDAO.getStationsInOneDate(time)
+        stationsFromHistory = response.radioStations.map{ station ->
+            stationToMediaMetadataCompat(station)
+        }.toMutableList()
+        return response
+    }
+
+
+
     fun createMediaItemsFromDB(listOfStations : List<RadioStation>){
 
         stationsFavoured = listOfStations.map { station ->

@@ -60,8 +60,9 @@ object Constants {
     const val HISTORY_3_DATES = 3
     const val HISTORY_7_DATES = 7
     const val HISTORY_15_DATES = 15
+    const val HISTORY_21_DATES = 21
     const val HISTORY_30_DATES = 30
-    const val HISTORY_NEVER_CLEAN = 666
+
 
 
     const val SEARCH_PREF_TAG = "search preferences tag"

@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.HistoryDatesAdapter
@@ -46,6 +47,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private val dateFormat = DateFormat.getDateInstance()
 
+    private var isInitialLoad = true
+
     @Inject
     lateinit var historyAdapter: PagingHistoryAdapter
 
@@ -71,6 +74,36 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 //        setSpinnerOpenCloseObserver()
 
     setSpinnerOpenCloseListener()
+
+        setRvChildrenAttachListener()
+
+    }
+
+    private fun setRvChildrenAttachListener(){
+
+        bind.rvHistory.apply {
+
+            addOnChildAttachStateChangeListener(object : RecyclerView.OnChildAttachStateChangeListener{
+
+                override fun onChildViewAttachedToWindow(view: View) {
+                    if(isInitialLoad){
+
+
+                        scheduleLayoutAnimation()
+
+                        isInitialLoad = false
+
+                    }
+
+                }
+
+                override fun onChildViewDetachedFromWindow(view: View) {
+
+                }
+            })
+
+
+        }
 
     }
 
@@ -106,6 +139,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         datesAdapter = HistoryDatesAdapter(list, requireContext())
         bind.spinnerDates.adapter = datesAdapter
         datesAdapter.selectedColor = ContextCompat.getColor(requireContext(), R.color.color_non_interactive)
+
+
+
     }
 
 
@@ -120,31 +156,31 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             val sublist = listOf(
                 HistoryDate("18 of March, 2023", System.currentTimeMillis()),
                 HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
 
             )
 
-            testFull.addAll(sublist)
+//            testFull.addAll(sublist)
 
             setupDatesSpinner(testFull)
 
@@ -178,6 +214,19 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 datesAdapter.selectedItemPosition = position
 
                 setSliderHeaderText(item.time)
+
+                if(position == 0)
+                    databaseViewModel.updateHistory.postValue(true)
+                 else
+                    databaseViewModel.updateHistory.postValue(false)
+
+                isInitialLoad = true
+
+//                bind.rvHistory.apply {
+//                    post{
+//                        scheduleLayoutAnimation()
+//                    }
+//                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -225,6 +274,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             setHasFixedSize(true)
 
+            itemAnimator = null
+
             historyAdapter.apply {
                 defaultTextColor = ContextCompat.getColor(requireContext(), R.color.default_text_color)
                 selectedTextColor = ContextCompat.getColor(requireContext(), R.color.selected_text_color)
@@ -238,11 +289,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             layoutAnimation = (activity as MainActivity).layoutAnimationController
 
-            post {
-                    scheduleLayoutAnimation()
-                }
-
-
+//            post {
+//                    scheduleLayoutAnimation()
+//                }
 
         }
 

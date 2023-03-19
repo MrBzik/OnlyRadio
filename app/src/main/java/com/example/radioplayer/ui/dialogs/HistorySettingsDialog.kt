@@ -2,25 +2,19 @@ package com.example.radioplayer.ui.dialogs
 
 import android.content.Context
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
-import android.widget.ArrayAdapter
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatDialog
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.radioplayer.R
 import com.example.radioplayer.adapters.SelectingOptionAdapter
 import com.example.radioplayer.databinding.DialogHistorySettingsBinding
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.utils.Constants.HISTORY_15_DATES
+import com.example.radioplayer.utils.Constants.HISTORY_21_DATES
 import com.example.radioplayer.utils.Constants.HISTORY_30_DATES
 import com.example.radioplayer.utils.Constants.HISTORY_3_DATES
 import com.example.radioplayer.utils.Constants.HISTORY_7_DATES
-import com.example.radioplayer.utils.Constants.HISTORY_NEVER_CLEAN
 import com.example.radioplayer.utils.Constants.HISTORY_ONE_DAY
 
 
@@ -93,8 +87,8 @@ class HistorySettingsDialog (
             1 -> HISTORY_3_DATES
             2 -> HISTORY_7_DATES
             3 -> HISTORY_15_DATES
-            4 -> HISTORY_30_DATES
-           else -> HISTORY_NEVER_CLEAN
+            4 -> HISTORY_21_DATES
+           else -> HISTORY_30_DATES
 
         }
 

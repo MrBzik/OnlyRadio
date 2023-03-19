@@ -78,6 +78,10 @@
     </style>
 
 
+
+
+
+
 <!--    <style name="genresOpened" parent="android:Widget.TextView">-->
 <!--        <item name="android:textColor">@color/selected_text_color</item>-->
 <!--        <item name="android:fontFamily">@font/aldrich</item>-->
