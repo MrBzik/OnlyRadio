@@ -9,12 +9,12 @@
 
     <ImageView
         android:id="@+id/ivArrowBackToFav"
-        android:visibility="gone"
         android:layout_width="40dp"
         android:layout_height="130dp"
+        android:background="@color/main_background"
         android:elevation="-1dp"
         android:src="@drawable/ic_back_to_fav_playlist"
-        android:background="@color/main_background"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/rvPlaylists"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/rvPlaylists" />
@@ -24,25 +24,35 @@
         android:layout_width="0dp"
         android:layout_height="130dp"
         android:layout_gravity="bottom"
-        android:visibility="gone"
-        android:elevation="-1dp"
         android:background="@color/main_background"
+        android:elevation="-1dp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivArrowBackToFav"
-        app:layout_constraintTop_toBottomOf="@id/viewToolbar"
-        />
+        app:layout_constraintTop_toBottomOf="@id/viewToolbar" />
 
     <View
         android:id="@+id/viewToolbar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:background="@color/toolbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/toolbar"
 
         />
+
+    <TextView
+        android:id="@+id/tvFavouredTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"
+        android:text="Favoured"
+        android:textAppearance="@style/mainTextTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tvPlaylistName"
@@ -50,9 +60,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:ellipsize="end"
-        android:paddingHorizontal="8dp"
-        android:maxLines="1"
         android:gravity="center"
+        android:maxLines="1"
+        android:paddingHorizontal="8dp"
         android:text="playlist name"
         android:textAppearance="@style/mainTextTitle"
         app:layout_constraintEnd_toStartOf="@+id/tvPlaylistsExpand"
@@ -66,14 +76,13 @@
         android:id="@+id/tvPlaylistEdit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="16dp"
-        android:text="Edit"
-        android:visibility="gone"
+        android:text="Edit:"
         android:textAppearance="@style/mainTextButtons"
-        android:layout_marginStart="8dp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:drawableEndCompat="@drawable/ic_arrow_drop_down" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <TextView
@@ -89,7 +98,6 @@
         />
 
 
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvFavStations"
         android:layout_width="match_parent"
@@ -102,6 +110,20 @@
         app:layout_constraintTop_toBottomOf="@+id/rvPlaylists"
         app:layout_constraintVertical_bias="0.5" />
 
+    <TextView
+        android:id="@+id/tvMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/dialogSearchText"
+        android:textColor="@color/Separator"
+        android:visibility="gone"
+        android:text="Nothing here yet"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

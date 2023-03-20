@@ -4,11 +4,9 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.media.MediaExtractor
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
@@ -22,9 +20,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.media.MediaBrowserServiceCompat
-import com.arthenica.ffmpegkit.FFmpegKit
 import com.bumptech.glide.RequestManager
-import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlaybackPreparer
@@ -37,7 +33,8 @@ import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
 import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
 
 import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_CURRENT_PLAYING_ITEM
-import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_PLAYBACK_SPEED
+import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
+import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_REC_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.RECORDING_CHANNEL_ID
 import com.example.radioplayer.utils.Constants.RECORDING_NOTIFICATION_ID
 
@@ -51,21 +48,17 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.audio.AacUtil
 import com.google.android.exoplayer2.audio.AudioProcessor
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
-import com.google.android.exoplayer2.extractor.ts.AdtsReader
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dev.brookmg.exorecord.lib.ExoRecord
 import dev.brookmg.exorecord.lib.IExoRecord
 import dev.brookmg.exorecordogg.ExoRecordOgg
 import kotlinx.coroutines.*
-import java.io.File
 import java.util.*
 import javax.inject.Inject
 
@@ -129,14 +122,9 @@ class RadioService : MediaBrowserServiceCompat() {
         val currentSongTitle = MutableLiveData<String>()
         val recordingPlaybackPosition = MutableLiveData<Long>()
         val recordingDuration = MutableLiveData<Long>()
-        var playbackSpeed = 100
+        var playbackSpeedRec = 100
+        var playbackSpeedRadio = 100
     }
-
-
-    private val recQualityPref : SharedPreferences by lazy{
-        this.application.getSharedPreferences(RECORDING_QUALITY_PREF, Context.MODE_PRIVATE)
-    }
-
 
 
     private var recSampleRate = 0
@@ -254,16 +242,28 @@ class RadioService : MediaBrowserServiceCompat() {
                     exoPlayer.clearMediaItems()
                 }
 
-                COMMAND_UPDATE_PLAYBACK_SPEED -> {
+                COMMAND_UPDATE_REC_PLAYBACK_SPEED -> {
 
                     val isToPlay = isPlaybackStatePlaying
                     exoPlayer.stop()
-                    val newValue = playbackSpeed.toFloat()/100
+                    val newValue = playbackSpeedRec.toFloat()/100
                     val params = PlaybackParameters(newValue, newValue)
                     exoPlayer.playbackParameters = params
                     exoPlayer.prepare()
-                    if(isToPlay){
-                        exoPlayer.play()
+                    exoPlayer.playWhenReady = isToPlay
+                }
+
+                COMMAND_UPDATE_RADIO_PLAYBACK_SPEED -> {
+
+                    if(!isFromRecording){
+                        val isToPlay = isPlaybackStatePlaying
+                        exoPlayer.stop()
+                        val newValue = playbackSpeedRadio.toFloat()/100
+                        val params = PlaybackParameters(newValue, newValue)
+                        exoPlayer.playbackParameters = params
+                        exoPlayer.prepare()
+                        exoPlayer.playWhenReady = isToPlay
+
                     }
                 }
             }
@@ -306,13 +306,6 @@ class RadioService : MediaBrowserServiceCompat() {
     }
 
 
-//    class RecordingNotificationReceiver : BroadcastReceiver(){
-//
-//        override fun onReceive(context: Context?, intent: Intent?) {
-//            Log.d("CHECKTAGS", "receiver got message")
-//        }
-//
-//    }
 
     private fun createRecordingNotificationChannel(){
 
@@ -327,8 +320,6 @@ class RadioService : MediaBrowserServiceCompat() {
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
-
-
     }
 
 
@@ -430,8 +421,9 @@ class RadioService : MediaBrowserServiceCompat() {
             isConverterWorking = true
             radioSource.exoRecordState.postValue(false)
 
-                val setting = recQualityPref.getFloat(RECORDING_QUALITY_PREF, 0.4f)
-                Log.d("CHECKTAGS", setting.toString())
+            val recQualityPref = this@RadioService.application.getSharedPreferences(RECORDING_QUALITY_PREF, Context.MODE_PRIVATE)
+            val setting = recQualityPref.getFloat(RECORDING_QUALITY_PREF, 0.4f)
+            Log.d("CHECKTAGS", setting.toString())
 
 //                val wavFilePath = this@RadioService.filesDir.absolutePath + File.separator + record.filePath
 //                val output = this@RadioService.filesDir.absolutePath + File.separator + record.filePath.split(".").first() + ".ogg"
@@ -609,13 +601,11 @@ class RadioService : MediaBrowserServiceCompat() {
                  .createMediaSource(mediaItem)
          }
 
-         if(!isFromRecordings){
 
-             val params = PlaybackParameters(1f, 1f)
-             exoPlayer.playbackParameters = params
-
-             playbackSpeed = 100
-         }
+         val playbackSpeed = (if(isFromRecordings) playbackSpeedRec
+                             else playbackSpeedRadio).toFloat()/100
+         val params = PlaybackParameters(playbackSpeed, playbackSpeed)
+         exoPlayer.playbackParameters = params
 
          exoPlayer.setMediaSource(mediaSource)
          exoPlayer.prepare()

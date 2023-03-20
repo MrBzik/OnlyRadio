@@ -163,6 +163,12 @@ class TagPickerDialog (
                 itemCount = tagsListByGenre.size
 
             }
+
+            TAG_BY_SUB_GENRE -> {
+                tagsList.addAll(position+1, tagsListBySubGenre)
+                itemCount = tagsListBySubGenre.size
+            }
+
             TAG_BY_MINDFUL -> {
                 tagsList.addAll(position+1, tagsListMindful)
                 itemCount = tagsListMindful.size
@@ -226,6 +232,13 @@ class TagPickerDialog (
                 itemCount = tagsListByGenre.size
 
             }
+
+            TAG_BY_SUB_GENRE -> {
+                tagsList.removeAll(tagsListBySubGenre)
+                itemCount = tagsListBySubGenre.size
+
+            }
+
             TAG_BY_MINDFUL -> {
                 tagsList.removeAll(tagsListMindful)
                 itemCount = tagsListMindful.size

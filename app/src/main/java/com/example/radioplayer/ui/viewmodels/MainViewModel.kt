@@ -4,9 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.provider.MediaStore.Audio.Radio
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
-import android.util.Log
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
@@ -25,12 +23,14 @@ import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
 import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
 
 import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_CURRENT_PLAYING_ITEM
-import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_PLAYBACK_SPEED
+import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
+import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_REC_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.FAB_POSITION_X
 import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
 import com.example.radioplayer.utils.Constants.PLAY_WHEN_READY
+import com.example.radioplayer.utils.Constants.SEARCH_BTN_PREF
 
 import com.example.radioplayer.utils.Constants.SEARCH_FLAG
 import com.example.radioplayer.utils.Constants.SEARCH_FULL_COUNTRY_NAME
@@ -174,7 +174,7 @@ class MainViewModel @Inject constructor(
        var fabX = 0f
        var fabY = 0f
 
-       var fabPref: SharedPreferences = app.getSharedPreferences("FabPref", Context.MODE_PRIVATE)
+       var fabPref: SharedPreferences = app.getSharedPreferences(SEARCH_BTN_PREF, Context.MODE_PRIVATE)
        var isFabMoved = fabPref.getBoolean(IS_FAB_UPDATED, false)
        var isFabUpdated = false
        init {
@@ -213,16 +213,22 @@ class MainViewModel @Inject constructor(
 
                        listOfStations = it.map { station ->
 
+                           val country = if(station.country.contains("Of America", ignoreCase = true)) "USA"
+                                         else if(station.country.contains("Britain")) "England"
+                                         else station.country
+
+
                            RadioStation(
                                favicon = station.favicon,
                                name = station.name,
                                stationuuid = station.stationuuid,
-                               country = station.country,
+                               country = country,
                                url = station.url_resolved,
                                homepage = station.homepage,
                                tags = station.tags,
                                language = station.language,
-                               favouredAt = 0
+                               favouredAt = 0,
+                               state = station.state
                            )
                        }
                    }
@@ -359,6 +365,10 @@ class MainViewModel @Inject constructor(
         var isRadioTrueRecordingFalse = true
 
 
+        fun updateRadioPlaybackSpeed(){
+        radioServiceConnection.sendCommand(COMMAND_UPDATE_RADIO_PLAYBACK_SPEED, null)
+        }
+
 
         // ExoRecord
 
@@ -379,8 +389,8 @@ class MainViewModel @Inject constructor(
         val isRecordingUpdated = radioSource.isRecordingUpdated
 
 
-        fun updatePlaybackSpeed(){
-            radioServiceConnection.sendCommand(COMMAND_UPDATE_PLAYBACK_SPEED, null)
+        fun updateRecPlaybackSpeed(){
+            radioServiceConnection.sendCommand(COMMAND_UPDATE_REC_PLAYBACK_SPEED, null)
         }
 
         var isCutExpanded = false

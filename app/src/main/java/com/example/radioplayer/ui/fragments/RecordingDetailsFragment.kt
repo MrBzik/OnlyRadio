@@ -120,18 +120,18 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
         bind.fabSpeedMinus.setOnClickListener {
 
-            if(RadioService.playbackSpeed > 10){
-                RadioService.playbackSpeed -= 10
-                mainViewModel.updatePlaybackSpeed()
+            if(RadioService.playbackSpeedRec > 10){
+                RadioService.playbackSpeedRec -= 10
+                mainViewModel.updateRecPlaybackSpeed()
                 updatePlaybackSpeedDisplayValue()
             }
 
         }
 
         bind.fabSpeedPlus.setOnClickListener {
-            if(RadioService.playbackSpeed < 400){
-                RadioService.playbackSpeed += 10
-                mainViewModel.updatePlaybackSpeed()
+            if(RadioService.playbackSpeedRec < 400){
+                RadioService.playbackSpeedRec += 10
+                mainViewModel.updateRecPlaybackSpeed()
                 updatePlaybackSpeedDisplayValue()
             }
         }
@@ -139,7 +139,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
 
     private fun updatePlaybackSpeedDisplayValue(){
-        bind.tvPlaybackSpeedValue.text = "${RadioService.playbackSpeed}%"
+        bind.tvPlaybackSpeedValue.text = "${RadioService.playbackSpeedRec}%"
     }
 
 

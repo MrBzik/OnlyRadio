@@ -36,7 +36,9 @@ object Constants {
     const val COMMAND_START_RECORDING = "start exoRecord recording"
     const val COMMAND_STOP_RECORDING = "stop exoRecord recording"
     const val COMMAND_REMOVE_CURRENT_PLAYING_ITEM = "remove playing item from exoplayer"
-    const val COMMAND_UPDATE_PLAYBACK_SPEED = "update playback speed"
+    const val COMMAND_UPDATE_REC_PLAYBACK_SPEED = "update recordings playback speed"
+    const val COMMAND_UPDATE_RADIO_PLAYBACK_SPEED = "update radio playback speed"
+
 
 
 
@@ -75,9 +77,15 @@ object Constants {
     const val FAB_POSITION_X = "FAB_POSITION_X"
     const val FAB_POSITION_Y = "FAB_POSITION_Y"
     const val IS_FAB_UPDATED = "IS_FAB_UPDATED"
+    const val SEARCH_BTN_PREF = "search button position pref"
 
     //Recording preferences
 
     const val RECORDING_QUALITY_PREF = "recording quality pref"
+
+    // DarkMode pref
+
+    const val DARK_MODE_PREF = "dark mode on or off"
+
 
 }

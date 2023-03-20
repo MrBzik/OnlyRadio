@@ -77,12 +77,17 @@ class PagingRadioAdapter @Inject constructor(
 
             tvPrimary.text = station.name
             tvSecondary.apply {
-                if(station.country?.isNotBlank() == true){
-                    visibility = View.VISIBLE
-                    text = station.country
-                }
+                if(station.country.isNullOrBlank() && station.state.isNullOrBlank())
+                    visibility = View.GONE
 
-                else visibility = View.GONE
+                else {
+                visibility = View.VISIBLE
+
+                 val state = if(station.state?.isBlank() == true) ""
+                                else "${station.state}, "
+                text = "$state${station.country}"
+
+                }
             }
 
 

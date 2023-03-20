@@ -18,46 +18,41 @@
         />
 
     <TextView
+        android:id="@+id/tvRecTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="20dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:textAppearance="@style/mainTextTitle"
+        android:text="Recordings"/>
+
+
+
+    <TextView
         android:id="@+id/tvEnableDeleting"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Swipe-delete: "
-        android:layout_marginStart="8dp"
+        android:layout_height="60dp"
+        android:gravity="center_vertical"
+        android:layout_marginEnd="20dp"
+        android:text="Swipe-delete"
         android:textAppearance="@style/mainTextButtons"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tvDeleteOption"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="off"
-        android:textAppearance="@style/mainTextTitle"
-        app:layout_constraintStart_toEndOf="@+id/tvEnableDeleting"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-
-
-    <TextView
-        android:id="@+id/tvRecordingSettings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Settings"
-        android:textAppearance="@style/mainTextButtons"
-        app:layout_constraintEnd_toStartOf="@+id/ivArrowSettings"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/ivArrowSettings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/ic_arrow_drop_down"
+        android:textColor="@color/color_interactive"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+<!--    <TextView-->
+<!--        android:id="@+id/tvDeleteOption"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:text="off"-->
+<!--        android:textAppearance="@style/mainTextTitle"-->
+<!--        app:layout_constraintStart_toEndOf="@+id/tvEnableDeleting"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
+
+
 
 
     <androidx.recyclerview.widget.RecyclerView

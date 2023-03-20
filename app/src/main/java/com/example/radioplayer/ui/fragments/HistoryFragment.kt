@@ -9,6 +9,7 @@ import android.widget.Spinner
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
@@ -47,10 +48,16 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private val dateFormat = DateFormat.getDateInstance()
 
-    private var isInitialLoad = true
+    private var isInitialLoad = false
+
 
     @Inject
     lateinit var historyAdapter: PagingHistoryAdapter
+
+    companion object{
+
+       var isNewHistoryQuery = true
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -71,41 +78,39 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         setTvSelectDateClickListener()
 
-//        setSpinnerOpenCloseObserver()
+        setSpinnerOpenCloseListener()
 
-    setSpinnerOpenCloseListener()
-
-        setRvChildrenAttachListener()
+        setAdapterLoadStateListener()
 
     }
 
-    private fun setRvChildrenAttachListener(){
 
-        bind.rvHistory.apply {
+    private fun setAdapterLoadStateListener(){
 
-            addOnChildAttachStateChangeListener(object : RecyclerView.OnChildAttachStateChangeListener{
+        historyAdapter.addLoadStateListener {
 
-                override fun onChildViewAttachedToWindow(view: View) {
-                    if(isInitialLoad){
+            if (it.refresh is LoadState.Loading ||
+                it.append is LoadState.Loading)
+
+            {
 
 
-                        scheduleLayoutAnimation()
+            }
 
-                        isInitialLoad = false
+            else {
+                Log.d("CHECKTAGS", "animate")
 
+                if(isInitialLoad){
+                    bind.rvHistory.apply {
+                        scrollToPosition(0)
+                        startLayoutAnimation()
                     }
-
+                    isInitialLoad = false
                 }
-
-                override fun onChildViewDetachedFromWindow(view: View) {
-
-                }
-            })
-
-
+            }
         }
-
     }
+
 
 
     private fun setSpinnerOpenCloseListener(){
@@ -139,8 +144,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         datesAdapter = HistoryDatesAdapter(list, requireContext())
         bind.spinnerDates.adapter = datesAdapter
         datesAdapter.selectedColor = ContextCompat.getColor(requireContext(), R.color.color_non_interactive)
-
-
 
     }
 
@@ -210,17 +213,31 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             ) {
 
                val item = datesAdapter.getItem(position) as HistoryDate
-                databaseViewModel.selectedDate = item.time
+
                 datesAdapter.selectedItemPosition = position
 
                 setSliderHeaderText(item.time)
 
-                if(position == 0)
-                    databaseViewModel.updateHistory.postValue(true)
-                 else
-                    databaseViewModel.updateHistory.postValue(false)
 
-                isInitialLoad = true
+                if(databaseViewModel.selectedDate != item.time){
+
+                    isInitialLoad = true
+
+                    databaseViewModel.selectedDate = item.time
+
+                    if(position == 0){
+                        databaseViewModel.updateHistory.postValue(true)
+                        isNewHistoryQuery = true
+                    }
+                    else
+                        databaseViewModel.updateHistory.postValue(false)
+                } else {
+
+                    isInitialLoad = false
+                }
+
+
+
 
 //                bind.rvHistory.apply {
 //                    post{
@@ -335,6 +352,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     override fun onDestroyView() {
         super.onDestroyView()
+        isNewHistoryQuery = true
         bind.rvHistory.adapter = null
         _bind = null
     }

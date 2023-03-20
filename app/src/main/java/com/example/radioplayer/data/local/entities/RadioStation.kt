@@ -18,7 +18,9 @@ data class RadioStation (
     val tags : String?,
     val language : String?,
     @ColumnInfo(name = "favouredAt", defaultValue = "0")
-    val favouredAt : Long
+    val favouredAt : Long,
+    @ColumnInfo(name = "state", defaultValue = "")
+    val state : String?
         )
 
 /*  version 9 - 10 :

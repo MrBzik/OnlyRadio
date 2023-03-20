@@ -4,12 +4,12 @@ import com.example.radioplayer.adapters.models.TagWithGenre
 
 const val TAG_BY_PERIOD = "-BY PERIOD-"
 const val TAG_BY_GENRE = "-POPULAR GENRES-"
+const val TAG_BY_SUB_GENRE = "-CROSS & SUBGENRES-"
 const val TAG_BY_MINDFUL = "-MINDFULNESS-"
-const val TAG_BY_ORIGIN = "-REGIONAL-"
+const val TAG_BY_ORIGIN = "-BY ORIGIN-"
 const val TAG_BY_TALK = "-TALK, NEWS, etc-"
 const val TAG_BY_RELIGION = "-RELIGION-"
 const val TAG_BY_OTHER = "-OTHER-"
-
 const val TAG_BY_CLASSIC = "-ART, CLASSICAL-"
 const val TAG_BY_EXPERIMENTAL = "-EXPERIMENTAL-"
 const val TAG_BY_SPECIAL = "-SPECIAL-"
@@ -20,15 +20,13 @@ val tagsListSpecial = setOf(
     TagWithGenre.Tag("charts"),
     TagWithGenre.Tag("classic hits"),
     TagWithGenre.Tag("contemporary hits"),
+    TagWithGenre.Tag("dance top40"),
     TagWithGenre.Tag("dj"),
     TagWithGenre.Tag("freeform"),
     TagWithGenre.Tag("hits"),
     TagWithGenre.Tag("mix"),
-    TagWithGenre.Tag("music for study"),
     TagWithGenre.Tag("no ads"),
     TagWithGenre.Tag("top"),
-    TagWithGenre.Tag("workout")
-
 )
 
 
@@ -37,13 +35,24 @@ val byPeriodTagsSimple = setOf("30s", "40s",
 "oldies", "oldschool", "old time radio", "retro")
 
 val tagsListByPeriod = setOf(
-    TagWithGenre.Tag("30s"), TagWithGenre.Tag("40s"), TagWithGenre.Tag("50s"),
-    TagWithGenre.Tag("60s"), TagWithGenre.Tag("70s"), TagWithGenre.Tag("80s"),
-    TagWithGenre.Tag("90s"), TagWithGenre.Tag("00s"), TagWithGenre.Tag("10s"),
-    TagWithGenre.Tag("decades"), TagWithGenre.Tag("golden"),
+    TagWithGenre.Tag("20s"),
+    TagWithGenre.Tag("30s"),
+    TagWithGenre.Tag("40s"),
+    TagWithGenre.Tag("50s"),
+    TagWithGenre.Tag("60s"),
+    TagWithGenre.Tag("70s"),
+    TagWithGenre.Tag("80s"),
+    TagWithGenre.Tag("90s"),
+    TagWithGenre.Tag("00s"),
+    TagWithGenre.Tag("10s"),
+    TagWithGenre.Tag("decades"),
+    TagWithGenre.Tag("golden"),
     TagWithGenre.Tag("goldies"),
-    TagWithGenre.Tag("nostalgia"), TagWithGenre.Tag("oldies"),
-    TagWithGenre.Tag("oldschool"), TagWithGenre.Tag("old time radio"), TagWithGenre.Tag("retro")
+    TagWithGenre.Tag("nostalgia"),
+    TagWithGenre.Tag("oldies"),
+    TagWithGenre.Tag("oldschool"),
+    TagWithGenre.Tag("old time radio"),
+    TagWithGenre.Tag("retro")
 )
 
 val byGenreTagsSimple = setOf(
@@ -66,39 +75,34 @@ val byGenreTagsSimple = setOf(
 
 
 val tagsListByGenre = setOf(
+
     TagWithGenre.Tag("acoustic"),
     TagWithGenre.Tag("adult contemporary"),
-    TagWithGenre.Tag("adult album alternative"),
     TagWithGenre.Tag("alternative"),
     TagWithGenre.Tag("bass"),
     TagWithGenre.Tag("beat"),
-    TagWithGenre.Tag("black metal"),
     TagWithGenre.Tag("blues"),
     TagWithGenre.Tag("boogie"),
-    TagWithGenre.Tag("classic rock"),
     TagWithGenre.Tag("club"),
     TagWithGenre.Tag("conservative"),
     TagWithGenre.Tag("country"),
     TagWithGenre.Tag("covers"),
     TagWithGenre.Tag("dance"),
-    TagWithGenre.Tag("death metal"),
     TagWithGenre.Tag("disco"),
     TagWithGenre.Tag("drum and bass"),
     TagWithGenre.Tag("dubstep"),
     TagWithGenre.Tag("eclectic"),
     TagWithGenre.Tag("edm"),
     TagWithGenre.Tag("electro"),
+    TagWithGenre.Tag("eurodance"),
     TagWithGenre.Tag("folk"),
     TagWithGenre.Tag("funk"),
     TagWithGenre.Tag("garage"),
+    TagWithGenre.Tag("gothic"),
     TagWithGenre.Tag("groove"),
     TagWithGenre.Tag("guitar"),
-    TagWithGenre.Tag("hardcore"),
-    TagWithGenre.Tag("hardstyle"),
-    TagWithGenre.Tag("heavy metal"),
     TagWithGenre.Tag("hip-hop"),
     TagWithGenre.Tag("hiphop"),
-    TagWithGenre.Tag("hot adult contemporary"),
     TagWithGenre.Tag("house"),
     TagWithGenre.Tag("independent"),
     TagWithGenre.Tag("indie"),
@@ -119,21 +123,64 @@ val tagsListByGenre = setOf(
     TagWithGenre.Tag("remixes"),
     TagWithGenre.Tag("rnb"),
     TagWithGenre.Tag("rock"),
+    TagWithGenre.Tag("rock'n'roll"),
     TagWithGenre.Tag("romance"),
     TagWithGenre.Tag("schlager"),
-    TagWithGenre.Tag("soft adult contemporary"),
-    TagWithGenre.Tag("soft rock"),
     TagWithGenre.Tag("synth"),
     TagWithGenre.Tag("swing"),
     TagWithGenre.Tag("techno"),
     TagWithGenre.Tag("urban"),
-    TagWithGenre.Tag("vocal")
+    TagWithGenre.Tag("vocal"),
+
+)
+
+val tagsListBySubGenre = setOf(
+    TagWithGenre.Tag("acid jazz"),
+    TagWithGenre.Tag("adult album alternative"),
+    TagWithGenre.Tag("alternative rock"),
+    TagWithGenre.Tag("art rock"),
+    TagWithGenre.Tag("black metal"),
+    TagWithGenre.Tag("blues rock"),
+    TagWithGenre.Tag("classic dance"),
+    TagWithGenre.Tag("classic jazz"),
+    TagWithGenre.Tag("classic rock"),
+    TagWithGenre.Tag("club dance"),
+    TagWithGenre.Tag("christian rock"),
+    TagWithGenre.Tag("country rock"),
+    TagWithGenre.Tag("death metal"),
+    TagWithGenre.Tag("electronic dance music"),
+    TagWithGenre.Tag("electro house"),
+    TagWithGenre.Tag("folk rock"),
+    TagWithGenre.Tag("free jazz"),
+    TagWithGenre.Tag("glam rock"),
+    TagWithGenre.Tag("gothic rock"),
+    TagWithGenre.Tag("hard rock"),
+    TagWithGenre.Tag("heavy metal"),
+    TagWithGenre.Tag("heavy rock"),
+    TagWithGenre.Tag("hot adult contemporary"),
+    TagWithGenre.Tag("indie rock"),
+    TagWithGenre.Tag("jazz fusion"),
+    TagWithGenre.Tag("modern rock"),
+    TagWithGenre.Tag("nu-jazz"),
+    TagWithGenre.Tag("piano jazz"),
+    TagWithGenre.Tag("progressive rock"),
+    TagWithGenre.Tag("punk rock"),
+    TagWithGenre.Tag("rhythm and blues"),
+    TagWithGenre.Tag("slow rock"),
+    TagWithGenre.Tag("smooth jazz"),
+    TagWithGenre.Tag("soft adult contemporary"),
+    TagWithGenre.Tag("soft rock"),
+    TagWithGenre.Tag("symphonic metal"),
+    TagWithGenre.Tag("symphonic rock"),
+    TagWithGenre.Tag("synthwave"),
+    TagWithGenre.Tag("vocal jazz")
 )
 
 val tagsListExperimental = setOf(
     TagWithGenre.Tag("avant-garde"),
     TagWithGenre.Tag("experimental"),
-    TagWithGenre.Tag("gothic"),
+    TagWithGenre.Tag("hardstyle"),
+    TagWithGenre.Tag("hardcore"),
     TagWithGenre.Tag("industrial"),
     TagWithGenre.Tag("lo-fi"),
     TagWithGenre.Tag("noise"),
@@ -141,6 +188,7 @@ val tagsListExperimental = setOf(
     TagWithGenre.Tag("psychedelic"),
     TagWithGenre.Tag("psychill"),
     TagWithGenre.Tag("psytrance"),
+    TagWithGenre.Tag("stoner"),
     TagWithGenre.Tag("trance"),
     TagWithGenre.Tag("trip hop"),
     TagWithGenre.Tag("underground")
@@ -160,7 +208,8 @@ val tagsListClassics = setOf(
     TagWithGenre.Tag("piano"),
     TagWithGenre.Tag("musica clasica romantica"),
     TagWithGenre.Tag("symphony"),
-    TagWithGenre.Tag("symphonic metal"),
+    TagWithGenre.Tag("violin"),
+
 
 )
 
@@ -213,21 +262,31 @@ val tagsListByOrigin = setOf(
     TagWithGenre.Tag("bollywood"),
     TagWithGenre.Tag("caribbean"),
     TagWithGenre.Tag("celtic"),
+    TagWithGenre.Tag("dancehall"),
+    TagWithGenre.Tag("deutschrock"),
     TagWithGenre.Tag("ethnic"),
     TagWithGenre.Tag("flamenco"),
+    TagWithGenre.Tag("folklore"),
     TagWithGenre.Tag("greek"),
+    TagWithGenre.Tag("greek folk"),
     TagWithGenre.Tag("grupera"),
     TagWithGenre.Tag("grupero"),
     TagWithGenre.Tag("indian music"),
+    TagWithGenre.Tag("italo dance"),
+    TagWithGenre.Tag("kurdish folk music"),
     TagWithGenre.Tag("latin"),
+    TagWithGenre.Tag("latin jazz"),
     TagWithGenre.Tag("méxico"),
     TagWithGenre.Tag("moi merino"),
     TagWithGenre.Tag("regional"),
+    TagWithGenre.Tag("romanian folk"),
     TagWithGenre.Tag("romántica"),
+    TagWithGenre.Tag("russian rock"),
     TagWithGenre.Tag("salsa"),
     TagWithGenre.Tag("spanish"),
     TagWithGenre.Tag("traditional"),
     TagWithGenre.Tag("tropical"),
+    TagWithGenre.Tag("viking"),
 )
 
 
@@ -247,6 +306,7 @@ val tagsListByTalk = setOf(
     TagWithGenre.Tag("comedy"),
     TagWithGenre.Tag("commercial"),
     TagWithGenre.Tag("community"),
+    TagWithGenre.Tag("conservative talk"),
     TagWithGenre.Tag("conspiracy theories"),
     TagWithGenre.Tag("culture"),
     TagWithGenre.Tag("economics"),
@@ -273,11 +333,12 @@ val tagsListByTalk = setOf(
     TagWithGenre.Tag("science"),
     TagWithGenre.Tag("soccer"),
     TagWithGenre.Tag("social"),
-    TagWithGenre.Tag("soundtrack"),
     TagWithGenre.Tag("speech"),
     TagWithGenre.Tag("sport"),
+    TagWithGenre.Tag("sports talk"),
     TagWithGenre.Tag("storytelling"),
     TagWithGenre.Tag("talk"),
+    TagWithGenre.Tag("talk & speech"),
     TagWithGenre.Tag("traffic"),
     TagWithGenre.Tag("travel"),
     TagWithGenre.Tag("tv")
@@ -291,6 +352,7 @@ val tagsListReligion = setOf(
     TagWithGenre.Tag("bible"),
     TagWithGenre.Tag("catholic"),
     TagWithGenre.Tag("christian"),
+    TagWithGenre.Tag("christian talk"),
     TagWithGenre.Tag("christmas"),
     TagWithGenre.Tag("gospel"),
     TagWithGenre.Tag("islamic"),
@@ -310,13 +372,15 @@ val tagsListOther = setOf(
     TagWithGenre.Tag("kids"),
     TagWithGenre.Tag("lifestyle"),
     TagWithGenre.Tag("multicultural"),
+    TagWithGenre.Tag("music for study"),
     TagWithGenre.Tag("national"),
     TagWithGenre.Tag("patriot"),
     TagWithGenre.Tag("singer-songwriter"),
+    TagWithGenre.Tag("soundtrack"),
     TagWithGenre.Tag("student"),
     TagWithGenre.Tag("surf music"),
-    TagWithGenre.Tag("university")
-
+    TagWithGenre.Tag("university"),
+    TagWithGenre.Tag("workout")
 )
 
 val QUEEN = "Exclusive Radio – Queen"

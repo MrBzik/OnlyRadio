@@ -218,7 +218,7 @@ class DatabaseViewModel @Inject constructor(
 
     val listOfDates = repository.getListOfDates
 
-    var selectedDate = 0L
+    var selectedDate = -1L
 
     private suspend fun getStationsInDate(limit: Int, offset: Int): List<StationWithDateModel> {
 
@@ -254,7 +254,7 @@ class DatabaseViewModel @Inject constructor(
 
 
 
-     val updateHistory : MutableLiveData<Boolean> = MutableLiveData(true)
+     val updateHistory : MutableLiveData<Boolean> = MutableLiveData()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val historyFlow = updateHistory.asFlow()

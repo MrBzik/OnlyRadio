@@ -7,9 +7,14 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
+import com.example.radioplayer.R
 import com.example.radioplayer.databinding.FragmentSettingsBinding
+import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.dialogs.HistorySettingsDialog
 import com.example.radioplayer.ui.dialogs.RecordingSettingsDialog
+import com.example.radioplayer.utils.Constants.DARK_MODE_PREF
+import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
 
 
@@ -28,7 +33,7 @@ const val HISTORY_STRING_ONE_DAY = "One day"
 const val HISTORY_STRING_3_DATES = "3 dates"
 const val HISTORY_STRING_7_DATES = "7 dates"
 const val HISTORY_STRING_15_DATES = "15 dates"
-const val HISTORY_STRING_21_DATES = "21 date"
+const val HISTORY_STRING_21_DATES = "21 dates"
 const val HISTORY_STRING_30_DATES = "30 dates"
 
 
@@ -40,6 +45,10 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
     private val recordingQualityPref : SharedPreferences by lazy {
         requireContext().getSharedPreferences(RECORDING_QUALITY_PREF, Context.MODE_PRIVATE)
+    }
+
+    private val darkModePref : SharedPreferences by lazy{
+        requireContext().getSharedPreferences(DARK_MODE_PREF, Context.MODE_PRIVATE)
     }
 
     private val listOfRecOptions : List<String> by lazy { listOf(
@@ -58,15 +67,94 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         getInitialUiMode()
 
+        getInitialNightModePref()
+
         getInitialHistoryOptionValue()
 
         setSwitchNightModeListener()
+
+        setSwitchNightModePrefListener()
 
         setupRecSettingClickListener()
 
         updateRecordingSettingValue()
 
         historySettingsClickListener()
+
+        setSearchBtnResetListener()
+
+        setPlaybackSpeedButtons()
+    }
+
+
+    private fun setPlaybackSpeedButtons(){
+
+        updatePlaybackSpeedDisplayValue()
+
+        bind.fabSpeedMinus.setOnClickListener {
+
+            if(RadioService.playbackSpeedRadio > 10){
+                RadioService.playbackSpeedRadio -= 10
+                mainViewModel.updateRadioPlaybackSpeed()
+                updatePlaybackSpeedDisplayValue()
+            }
+
+        }
+
+        bind.fabSpeedPlus.setOnClickListener {
+            if(RadioService.playbackSpeedRadio < 200){
+                RadioService.playbackSpeedRadio += 10
+                mainViewModel.updateRadioPlaybackSpeed()
+                updatePlaybackSpeedDisplayValue()
+            }
+        }
+    }
+
+
+    private fun updatePlaybackSpeedDisplayValue(){
+        bind.tvPlaybackSpeedValue.text = "${RadioService.playbackSpeedRadio}%"
+    }
+
+    private fun setSearchBtnResetListener(){
+
+        mainViewModel.apply {
+            if(isFabUpdated || isFabMoved){
+                bind.tvSearchBtnReset
+                    .setTextColor(ContextCompat.getColor(requireContext(), R.color.color_interactive))
+            }
+
+        }
+
+        bind.tvSearchBtnReset.setOnClickListener {
+
+            mainViewModel.apply {
+                isFabMoved = false
+                isFabUpdated = false
+                fabPref.edit().putBoolean(IS_FAB_UPDATED, false).apply()
+            }
+
+            bind.tvSearchBtnReset
+                .setTextColor(ContextCompat.getColor(requireContext(), R.color.selected_station_paused))
+
+        }
+    }
+
+
+    private fun setSwitchNightModePrefListener(){
+
+        bind.switchNightModePref.setOnCheckedChangeListener { _, isChecked ->
+
+                darkModePref.edit().putBoolean(DARK_MODE_PREF, isChecked).apply()
+
+        }
+
+    }
+
+    private fun getInitialNightModePref(){
+
+        val isChecked = darkModePref.getBoolean(DARK_MODE_PREF, false)
+
+        bind.switchNightModePref.isChecked = isChecked
 
     }
 

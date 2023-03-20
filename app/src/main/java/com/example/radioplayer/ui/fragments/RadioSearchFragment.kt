@@ -68,6 +68,9 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                 add(TagWithGenre.Genre(TAG_BY_GENRE))
                 addAll(tagsListByGenre)
 
+                add(TagWithGenre.Genre(TAG_BY_SUB_GENRE))
+                addAll(tagsListBySubGenre)
+
                 add(TagWithGenre.Genre(TAG_BY_CLASSIC))
                 addAll(tagsListClassics)
 

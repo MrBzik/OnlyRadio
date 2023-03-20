@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="History: All"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="20dp"
         android:textAppearance="@style/mainTextTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

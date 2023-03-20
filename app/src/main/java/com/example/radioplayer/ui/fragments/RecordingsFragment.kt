@@ -6,6 +6,7 @@ import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.SeekBar
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -212,13 +213,16 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
     private fun setToggleItemDeletion(){
 
         bind.tvEnableDeleting.setOnClickListener {
+
+            isDeletingEnabled = !isDeletingEnabled
+
             if(!isDeletingEnabled){
-                isDeletingEnabled = true
-                bind.tvDeleteOption.text = "on"
+
+                bind.tvEnableDeleting.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_changed_on_interaction))
                 itemTouchHelper.attachToRecyclerView(bind.rvRecordings)
             } else {
-                isDeletingEnabled = false
-                bind.tvDeleteOption.text = "off"
+
+                bind.tvEnableDeleting.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_interactive))
                 itemTouchHelper.attachToRecyclerView(null)
             }
         }

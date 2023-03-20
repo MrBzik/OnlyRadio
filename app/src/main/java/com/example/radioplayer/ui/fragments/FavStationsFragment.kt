@@ -270,15 +270,21 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         observeFavOrPlaylistState()
 
+        observeStations()
+
+        observeUnfilteredPlaylist()
+
+    }
+
+    private fun observeStations(){
+
         databaseViewModel.observableListOfStations.observe(viewLifecycleOwner){
 
+            bind.tvMessage.isVisible = it.isEmpty()
 
             mainAdapter.listOfStations = it
 
         }
-
-        observeUnfilteredPlaylist()
-
     }
 
     private fun observeUnfilteredPlaylist(){
@@ -321,25 +327,23 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             bind.tvPlaylistEdit.isVisible = !it
 
-
             isInFavouriteTab = it
 
 
             if(it){
-                bind.tvPlaylistName.text = ""
-//                    getString(R.string.Favoured)
+               bind.tvPlaylistName.text = ""
 
+               bind.tvFavouredTitle.visibility = View.VISIBLE
 
-
-                searchFlag = SEARCH_FROM_FAVOURITES
+               searchFlag = SEARCH_FROM_FAVOURITES
 
             } else{
 
                 searchFlag = SEARCH_FROM_PLAYLIST
-
+                bind.tvFavouredTitle.visibility = View.GONE
 
             }
-            bind.tvPlaylistName.requestLayout()
+
         }
 
     }
