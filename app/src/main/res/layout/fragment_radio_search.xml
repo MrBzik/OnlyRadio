@@ -5,45 +5,66 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <LinearLayout
-        android:id="@+id/llTag"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:orientation="horizontal"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toStartOf="@+id/llName"
+    <View
+        android:id="@+id/viewToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/toolbar_bg_protected"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginEnd="8dp"
-        >
+        />
+
+
+
+    <ImageView
+        android:id="@+id/ivTag"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/t"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-
             android:id="@+id/tvTag"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ellipsize="middle"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
             android:maxLines="1"
             android:layout_marginStart="10dp"
             android:text="Tag"
             android:textAppearance="@style/mainTextButtons"
-
+            app:layout_constraintEnd_toStartOf="@+id/ivName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             />
 
-
-            <ImageView
-                android:id="@+id/ivArrowTag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_arrow_drop_down"
-              />
-
-
-
-    </LinearLayout>
+        <View
+            android:id="@+id/viewTagBox"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toStartOf="@id/ivName"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
 
 
+
+
+    <ImageView
+        android:id="@+id/ivName"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="-12dp"
+        android:src="@drawable/n"
+        app:layout_constraintEnd_toEndOf="@id/guideline3"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <androidx.constraintlayout.widget.Guideline
@@ -55,40 +76,44 @@
         app:layout_constraintGuide_percent="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/llName"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="-40dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toStartOf="@+id/tvSelectedCountry"
-        app:layout_constraintStart_toStartOf="@+id/guideline3"
-        app:layout_constraintTop_toBottomOf="@id/toolbarGuide"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginEnd="8dp"
-        >
 
         <TextView
             android:id="@+id/tvName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
             android:text="Name"
+            android:layout_marginStart="-15dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
             android:textAppearance="@style/mainTextButtons"
-
-            />
-
-        <ImageView
-            android:id="@+id/ivArrowName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrow_drop_down"
+            app:layout_constraintEnd_toStartOf="@+id/ivCountry"
+            app:layout_constraintStart_toStartOf="@+id/guideline3"
+            app:layout_constraintTop_toBottomOf="@id/toolbarGuide"
+            app:layout_constraintTop_toTopOf="parent"
             />
 
 
+    <View
+        android:id="@+id/viewNameBox"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toStartOf="@id/ivCountry"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/ivName"/>
 
-    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/ivCountry"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="14dp"
+        android:src="@drawable/c"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <TextView
@@ -96,11 +121,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Country"
+        android:layout_marginEnd="15dp"
         android:textAppearance="@style/mainTextButtons"
         app:layout_constraintEnd_toEndOf="parent"
-        app:drawableEndCompat="@drawable/ic_arrow_drop_down"
         app:layout_constraintTop_toTopOf="parent" />
+
+
+    <View
+        android:id="@+id/viewCountryBox"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/ivCountry"/>
+
+
+<!--    app:drawableEndCompat="@drawable/ic_arrow_drop_down"-->
 
 <!--    <ImageView-->
 <!--        android:id="@+id/ivArrowCountry"-->

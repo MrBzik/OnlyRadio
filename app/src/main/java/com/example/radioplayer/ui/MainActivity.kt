@@ -95,7 +95,10 @@ class MainActivity : AppCompatActivity() {
     private val favStationsFragment : FavStationsFragment by lazy { FavStationsFragment() }
     private val historyFragment : HistoryFragment by lazy { HistoryFragment() }
     private val recordingsFragment : RecordingsFragment by lazy { RecordingsFragment() }
-    private val settingsFragment : SettingsFragment by lazy { SettingsFragment() }
+    private val settingsFragment : SettingsFragment by lazy { SettingsFragment().apply {
+//        enterTransition = Fade()
+        }
+    }
 
 
     private val stationDetailsFragment : StationDetailsFragment by lazy { StationDetailsFragment().apply {

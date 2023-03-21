@@ -213,9 +213,12 @@ class MainViewModel @Inject constructor(
 
                        listOfStations = it.map { station ->
 
-                           val country = if(station.country.contains("Of America", ignoreCase = true)) "USA"
-                                         else if(station.country.contains("Britain")) "England"
-                                         else station.country
+                           val country = when (station.countrycode) {
+                               "US" -> "USA"
+                               "GB" -> "UK"
+                               "RU" -> "Russia"
+                               else -> station.country
+                           }
 
 
                            RadioStation(

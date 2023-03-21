@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="mainTextTitle" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/color_non_interactive</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">@font/aldrich</item>
+    </style>
+
+
+    <style name="bottomNavTextActive" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/color_non_interactive</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">sans-serif-smallcaps</item>
+    </style>
+    <style name="bottomNavTextInactive" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/regular_text_color</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">sans-serif-smallcaps</item>
+    </style>
+
+
+
+</resources>

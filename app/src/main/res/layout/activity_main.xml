@@ -5,41 +5,29 @@
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.MainActivity"
     android:background="@color/main_background"
+    tools:context=".ui.MainActivity"
 
     >
 
 
-
   <View
       android:id="@+id/viewSeparatorStart"
-      android:layout_width="2dp"
+      android:layout_width="@dimen/sideSeparators"
       android:layout_height="0dp"
-      android:layout_marginStart="5dp"
+      android:layout_marginStart="@dimen/sideSeparatorsMargin"
       android:background="@drawable/gradient_for_separators"
       app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/toolbar"
+      app:layout_constraintTop_toBottomOf="@+id/guidelineToolbar"
       app:layout_constraintVertical_bias="0.5" />
 
-
-  <View
-      android:id="@+id/toolbar"
-      android:layout_width="match_parent"
-      android:layout_height="60dp"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0.5"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="@id/flFragment"
-      android:background="@color/toolbar"
-      />
 
   <FrameLayout
       android:id="@+id/flFragment"
       android:layout_width="match_parent"
       android:layout_height="0dp"
-      android:layout_marginStart="10dp"
+      android:layout_marginStart="7dp"
       android:layout_marginEnd="7dp"
       app:layout_constraintBottom_toTopOf="@id/stubPlayer"
       app:layout_constraintEnd_toEndOf="parent"
@@ -49,6 +37,7 @@
       app:layout_constraintVertical_bias="0.5"
 
       />
+
   <ImageView
       android:id="@+id/ivNoInternet"
       android:layout_width="wrap_content"
@@ -61,29 +50,17 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"
       app:layout_constraintVertical_bias="0.5" />
+
   <View
       android:id="@+id/viewSeparatorEnd"
-      android:layout_width="2dp"
+      android:layout_width="@dimen/sideSeparators"
       android:layout_height="0dp"
-      android:layout_marginEnd="5dp"
+      android:layout_marginEnd="@dimen/sideSeparatorsMargin"
       android:background="@drawable/gradient_for_separators"
       app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/toolbar"
+      app:layout_constraintTop_toBottomOf="@+id/guidelineToolbar"
       app:layout_constraintVertical_bias="0.5" />
-
-
-  <ViewStub
-      android:id="@+id/stubPlayer"
-      android:layout_width="match_parent"
-      android:layout_height="65dp"
-      android:inflatedId="@+id/stubPlayer"
-      android:layout="@layout/stub_player_activity_main"
-
-      app:layout_constraintBottom_toTopOf="@id/separatorSecond"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent" />
-
 
   <View
       android:id="@+id/separatorSecond"
@@ -92,30 +69,49 @@
       android:background="@drawable/gradient_for_separators"
       app:layout_constraintBottom_toTopOf="@id/bottomNavigationView" />
 
-
-  <com.google.android.material.bottomnavigation.BottomNavigationView
-      android:id="@+id/bottomNavigationView"
+  <ViewStub
+      android:id="@+id/stubPlayer"
       android:layout_width="match_parent"
-      android:layout_height="48dp"
-      android:background="@color/toolbar"
-      android:paddingHorizontal="5dp"
-      app:itemPaddingBottom="18dp"
-      app:labelVisibilityMode="labeled"
-      app:itemTextAppearanceActive="@style/bottomNavTextActive"
-      app:itemTextAppearanceInactive="@style/bottomNavTextInactive"
-      app:layout_constraintBottom_toTopOf="@id/separatorLowest"
+      android:layout_height="65dp"
+      android:layout_marginBottom="@dimen/bottomNavMargin"
+      android:inflatedId="@+id/stubPlayer"
+      android:layout="@layout/stub_player_activity_main"
+      app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0.5"
-      app:layout_constraintStart_toStartOf="parent"
-      app:menu="@menu/bottom_nav_menu" />
+      app:layout_constraintStart_toStartOf="parent" />
+
 
   <View
       android:id="@+id/separatorLowest"
       android:layout_width="match_parent"
       android:layout_height="2dp"
-      android:background="@drawable/gradient_for_separators"
-      app:layout_constraintBottom_toBottomOf="parent"
       android:layout_marginHorizontal="50dp"
-      />
+      android:background="@drawable/gradient_for_separators"
+      app:layout_constraintBottom_toBottomOf="parent" />
+
+  <com.google.android.material.bottomnavigation.BottomNavigationView
+      android:id="@+id/bottomNavigationView"
+      android:layout_width="match_parent"
+      android:layout_height="48dp"
+      android:layout_marginBottom="@dimen/bottomNavMargin"
+      app:itemBackground="@drawable/bottom_nav_item_bg"
+
+      app:itemPaddingBottom="18dp"
+      app:itemTextAppearanceActive="@style/bottomNavTextActive"
+      app:itemTextAppearanceInactive="@style/bottomNavTextInactive"
+      app:labelVisibilityMode="labeled"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.5"
+      app:layout_constraintStart_toStartOf="parent"
+      app:menu="@menu/bottom_nav_menu" />
+
+  <androidx.constraintlayout.widget.Guideline
+      android:id="@+id/guidelineToolbar"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      app:layout_constraintGuide_begin="60dp" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

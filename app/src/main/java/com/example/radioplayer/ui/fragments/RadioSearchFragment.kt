@@ -348,25 +348,23 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private fun setSearchToolbar() {
 
-        bind.llTag.setOnClickListener {
-            bind.tvTag.isPressed = true
+        bind.viewTagBox.setOnClickListener {
+            bind.tvTag.isPressed = bind.tvTag.isVisible
+            bind.ivTag.isPressed = bind.ivTag.isVisible
             TagPickerDialog(requireContext(), mainViewModel).show()
         }
 
-
-
-        bind.llName.setOnClickListener {
-            bind.tvName.isPressed = true
+        bind.viewNameBox.setOnClickListener {
+            bind.tvName.isPressed = bind.tvName.isVisible
+            bind.ivName.isPressed = bind.ivName.isVisible
             NameDialog(requireContext(), mainViewModel).show()
-
         }
 
-        bind.tvSelectedCountry.setOnClickListener {
-
+        bind.viewCountryBox.setOnClickListener {
+            bind.tvSelectedCountry.isPressed = bind.tvSelectedCountry.isVisible
+            bind.ivCountry.isPressed = bind.ivCountry.isVisible
             CountryPickerDialog(requireContext(), mainViewModel).show()
-
         }
-
     }
 
 
@@ -396,17 +394,39 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         mainViewModel.searchParamTag.observe(viewLifecycleOwner){
 
-             bind.tvTag.text = if (it == "") "Tag" else it
-
+            if(it.isBlank()){
+                bind.ivTag.visibility = View.VISIBLE
+                bind.tvTag.visibility = View.INVISIBLE
+            } else {
+                bind.tvTag.text = it
+                bind.ivTag.visibility = View.INVISIBLE
+                bind.tvTag.visibility = View.VISIBLE
+            }
         }
 
         mainViewModel.searchParamName.observe(viewLifecycleOwner){
-            bind.tvName.text = if (it == "") "Name" else it
+
+            if(it.isBlank()){
+                bind.ivName.visibility = View.VISIBLE
+                bind.tvName.visibility = View.INVISIBLE
+            } else {
+                bind.tvName.text = it
+                bind.ivName.visibility = View.INVISIBLE
+                bind.tvName.visibility = View.VISIBLE
+            }
         }
 
         mainViewModel.searchParamCountry.observe(viewLifecycleOwner){
 
-           bind.tvSelectedCountry.text = if (it == "") "Country" else it
+            if(it.isBlank()){
+                bind.ivCountry.visibility = View.VISIBLE
+                bind.tvSelectedCountry.visibility = View.INVISIBLE
+            } else {
+
+                bind.tvSelectedCountry.text = it
+                bind.tvSelectedCountry.visibility = View.VISIBLE
+                bind.ivCountry.visibility = View.INVISIBLE
+            }
         }
     }
 

@@ -17,16 +17,21 @@ const val TAG_BY_SPECIAL = "-SPECIAL-"
 val listOfTagsSimple = listOf("charts", "hits", "top")
 
 val tagsListSpecial = setOf(
+    TagWithGenre.Tag("adult top 40"),
     TagWithGenre.Tag("charts"),
     TagWithGenre.Tag("classic hits"),
     TagWithGenre.Tag("contemporary hits"),
     TagWithGenre.Tag("dance top40"),
-    TagWithGenre.Tag("dj"),
+    TagWithGenre.Tag("dj mixes"),
+    TagWithGenre.Tag("dj sets"),
     TagWithGenre.Tag("freeform"),
     TagWithGenre.Tag("hits"),
-    TagWithGenre.Tag("mix"),
     TagWithGenre.Tag("no ads"),
-    TagWithGenre.Tag("top"),
+    TagWithGenre.Tag("top 100"),
+    TagWithGenre.Tag("top 40"),
+    TagWithGenre.Tag("top charts"),
+    TagWithGenre.Tag("top hits"),
+
 )
 
 
