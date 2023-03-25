@@ -311,6 +311,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     private fun setAddToPlaylistClickListener(){
 
         bind.tvAddToPlaylist.setOnClickListener {
+
             AddStationToPlaylistDialog(
                 requireContext(), listOfPlaylists, databaseViewModel, pixabayViewModel, glide
             ) { playlistName ->

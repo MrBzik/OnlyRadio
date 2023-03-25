@@ -1,6 +1,7 @@
 package com.example.radioplayer.utils
 
 
+import android.util.Log
 import android.view.View
 
 
@@ -28,6 +29,8 @@ object KeyboardObserver {
                 isFirstRun = false
             } else{
                 if(fullScreenSize > view.height && !lastEmition){
+
+
                     lastEmition = true
                     view.post {
                         whenKeyboardOpen()

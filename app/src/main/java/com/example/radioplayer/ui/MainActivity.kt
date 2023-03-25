@@ -1,5 +1,6 @@
 package com.example.radioplayer.ui
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.UiModeManager
 import android.content.Context
@@ -7,6 +8,8 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.StateListDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -20,6 +23,7 @@ import android.view.animation.LayoutAnimationController
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.transition.Fade
 import androidx.transition.Slide
@@ -48,6 +52,7 @@ import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
 import com.example.radioplayer.utils.RandomColors
+import com.example.radioplayer.utils.Utils
 
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -60,7 +65,7 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var bind : ActivityMainBinding
     lateinit var bindPlayer : StubPlayerActivityMainBinding
-    private var isStubPlayerBindInflated = false
+     var isStubPlayerBindInflated = false
 
     private val separatorAnimation : LoadingAnim by lazy { LoadingAnim(this,
         bind.viewSeparatorStart, bind.viewSeparatorEnd,
@@ -90,15 +95,19 @@ class MainActivity : AppCompatActivity() {
 
     private var currentPlayingItem : PlayingItem? = null
 
+    companion object{
+        var uiMode = 0
+        var flHeight = 0
+
+    }
+
+
 
     private val radioSearchFragment : RadioSearchFragment by lazy { RadioSearchFragment() }
     private val favStationsFragment : FavStationsFragment by lazy { FavStationsFragment() }
     private val historyFragment : HistoryFragment by lazy { HistoryFragment() }
     private val recordingsFragment : RecordingsFragment by lazy { RecordingsFragment() }
-    private val settingsFragment : SettingsFragment by lazy { SettingsFragment().apply {
-//        enterTransition = Fade()
-        }
-    }
+    private val settingsFragment : SettingsFragment by lazy { SettingsFragment() }
 
 
     private val stationDetailsFragment : StationDetailsFragment by lazy { StationDetailsFragment().apply {
@@ -140,6 +149,7 @@ class MainActivity : AppCompatActivity() {
 
         window.navigationBarColor = ContextCompat.getColor(this, R.color.toolbar)
 
+        uiMode = this.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
 
         setupInitialNavigation()
 
@@ -153,7 +163,81 @@ class MainActivity : AppCompatActivity() {
 
         refreshSeparators()
 
+        handleSeparatorsVisibilityForUiMode()
+
+
+
+            bind.root.doOnLayout {
+                flHeight = bind.flFragment.height
+            }
+
+
     }
+
+
+    private fun handleSeparatorsVisibilityForUiMode(){
+
+        if(uiMode == Configuration.UI_MODE_NIGHT_NO){
+            bind.viewSeparatorStart.visibility = View.GONE
+            bind.viewSeparatorEnd.visibility = View.GONE
+            bind.separatorSecond.visibility = View.GONE
+            bind.separatorLowest.visibility = View.GONE
+        }
+
+    }
+
+
+    fun smoothDayNightFadeOut(isNightMode : Boolean){
+        if(isStubPlayerBindInflated)
+            bindPlayer.root.slideAnim(500, 0, R.anim.fade_out_anim)
+
+        bind.bottomNavigationView.slideAnim(500, 0, R.anim.fade_out_anim)
+        bind.viewSeparatorStart.slideAnim(500, 0, R.anim.fade_out_anim)
+        bind.viewSeparatorEnd.slideAnim(500, 0, R.anim.fade_out_anim)
+        bind.separatorSecond.slideAnim(500, 0, R.anim.fade_out_anim)
+        bind.separatorLowest.slideAnim(500, 0, R.anim.fade_out_anim)
+
+        if(!isNightMode){
+
+            val colorAnimator = ValueAnimator.ofArgb(Color.WHITE, Color.BLACK)
+            colorAnimator.addUpdateListener {
+                bind.root.setBackgroundColor(it.animatedValue as Int)
+                window.navigationBarColor = it.animatedValue as Int
+                window.statusBarColor = it.animatedValue as Int
+            }
+            colorAnimator.duration = 500
+            colorAnimator.start()
+
+        }
+    }
+
+    fun smoothDayNightFadeIn(isNightMode: Boolean){
+        if(isStubPlayerBindInflated)
+            bindPlayer.root.slideAnim(700, 0, R.anim.fade_in_anim)
+
+        bind.bottomNavigationView.slideAnim(700, 0, R.anim.fade_in_anim)
+        bind.viewSeparatorStart.slideAnim(700, 0, R.anim.fade_in_anim)
+        bind.viewSeparatorEnd.slideAnim(700, 0, R.anim.fade_in_anim)
+        bind.separatorSecond.slideAnim(700, 0, R.anim.fade_in_anim)
+        bind.separatorLowest.slideAnim(700, 0, R.anim.fade_in_anim)
+
+        if(!isNightMode){
+
+
+
+
+
+            val colorAnimator = ValueAnimator.ofArgb(Color.BLACK, Color.WHITE)
+            colorAnimator.addUpdateListener {
+                bind.root.setBackgroundColor(it.animatedValue as Int)
+                window.navigationBarColor = it.animatedValue as Int
+                window.statusBarColor = it.animatedValue as Int
+            }
+            colorAnimator.duration = 700
+            colorAnimator.start()
+        }
+    }
+
 
 
     private fun refreshSeparators(){
@@ -183,6 +267,13 @@ class MainActivity : AppCompatActivity() {
                 addToBackStack(null)
                 commit()
             }
+
+            if(uiMode == Configuration.UI_MODE_NIGHT_NO) {
+                window.navigationBarColor = ContextCompat.getColor(this, R.color.nav_bar_search_fragment)
+                window.statusBarColor = ContextCompat.getColor(this, R.color.nav_bar_search_fragment)
+            }
+
+
             mainViewModel.isInitialLaunchOfTheApp = false
         }
     }
@@ -326,6 +417,8 @@ class MainActivity : AppCompatActivity() {
 
         val menuItem = bind.bottomNavigationView.selectedItemId
 
+
+
         if((item?.itemId ?: menuItem) != R.id.mi_radioSearchFragment){
             endSeparatorsLoadAnim()
         }
@@ -342,6 +435,13 @@ class MainActivity : AppCompatActivity() {
                     addToBackStack(null)
                     commit()
                 }
+
+                if(uiMode == Configuration.UI_MODE_NIGHT_NO){
+                    window.navigationBarColor = ContextCompat.getColor(this, R.color.nav_bar_search_fragment)
+                    window.statusBarColor = ContextCompat.getColor(this, R.color.nav_bar_search_fragment)
+                }
+
+
             }
             R.id.mi_favStationsFragment -> {
 
@@ -353,6 +453,13 @@ class MainActivity : AppCompatActivity() {
                     addToBackStack(null)
                     commit()
                 }
+
+                if(uiMode == Configuration.UI_MODE_NIGHT_NO){
+                    window.navigationBarColor = ContextCompat.getColor(this, R.color.nav_bar_fav_fragment)
+                    window.statusBarColor = ContextCompat.getColor(this, R.color.nav_bar_fav_fragment)
+                }
+
+
             }
             R.id.mi_historyFragment -> {
 
@@ -363,6 +470,13 @@ class MainActivity : AppCompatActivity() {
                     addToBackStack(null)
                     commit()
                 }
+
+                if(uiMode == Configuration.UI_MODE_NIGHT_NO){
+                    window.navigationBarColor = ContextCompat.getColor(this, R.color.nav_bar_history_frag)
+                    window.statusBarColor = ContextCompat.getColor(this, R.color.nav_bar_history_frag)
+                }
+
+
             }
 
             R.id.mi_recordingsFragment -> {
@@ -374,16 +488,38 @@ class MainActivity : AppCompatActivity() {
                     addToBackStack(null)
                     commit()
                 }
+
+                if(uiMode == Configuration.UI_MODE_NIGHT_NO){
+                    window.navigationBarColor = ContextCompat.getColor(this, R.color.nav_bar_rec_frag)
+                    window.statusBarColor = ContextCompat.getColor(this, R.color.nav_bar_rec_frag)
+                }
+
             }
 
             R.id.mi_settingsFragment -> {
                 settingsFragment.exitTransition = null
                 supportFragmentManager.beginTransaction().apply {
-                    setCustomAnimations(R.anim.blank_anim, android.R.anim.fade_out)
+                    setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                     replace(R.id.flFragment, settingsFragment)
                     addToBackStack(null)
                     commit()
                 }
+
+                if(uiMode == Configuration.UI_MODE_NIGHT_NO){
+                    val color = ContextCompat.getColor(this, R.color.nav_bar_options_frag)
+
+                    window.navigationBarColor = color
+                    window.statusBarColor = color
+                }
+
+
+
+
+
+//                val drawable = bindPlayer.root.background as GradientDrawable
+//                drawable.mutate()
+//                drawable.setStroke(4,color)
+
             }
 
         }
@@ -569,6 +705,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+
 
 
 

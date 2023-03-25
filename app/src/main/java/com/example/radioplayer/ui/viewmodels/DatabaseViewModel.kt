@@ -22,6 +22,7 @@ import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.utils.Constants.HISTORY_3_DATES
 import com.example.radioplayer.utils.Constants.HISTORY_OPTIONS
+import com.example.radioplayer.utils.Utils
 import com.example.radioplayer.utils.Utils.fromDateToString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -39,6 +40,15 @@ class DatabaseViewModel @Inject constructor(
         private val radioSource: RadioSource
 ) : AndroidViewModel(app) {
 
+
+
+//    val navBarHeight : Int by lazy {
+//        Utils.getNavigationBarHeight(getApplication())
+//    }
+//
+//    val statusBarHeight : Int by lazy {
+//        Utils.getStatusBarHeight(getApplication())
+//    }
 
 
     val isStationFavoured: MutableLiveData<Boolean> = MutableLiveData()

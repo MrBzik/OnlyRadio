@@ -39,7 +39,7 @@ android {
         }
 
 //        debug {
-//            minifyEnabled true
+////            minifyEnabled true
 //            debuggable false
 //        }
     }

@@ -246,6 +246,12 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             pagingRadioAdapter.apply {
                 defaultTextColor = ContextCompat.getColor(requireContext(), R.color.default_text_color)
                 selectedTextColor = ContextCompat.getColor(requireContext(), R.color.selected_text_color)
+
+                defaultSecondaryTextColor = ContextCompat.getColor(requireContext(), R.color.default_secondary_text_color)
+                selectedSecondaryTextColor = ContextCompat.getColor(requireContext(), R.color.selected_secondary_text_color)
+
+                alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
+
             }
 
             itemAnimator = null
@@ -348,23 +354,37 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private fun setSearchToolbar() {
 
-        bind.viewTagBox.setOnClickListener {
-            bind.tvTag.isPressed = bind.tvTag.isVisible
-            bind.ivTag.isPressed = bind.ivTag.isVisible
-            TagPickerDialog(requireContext(), mainViewModel).show()
+        bind.llTag.setOnClickListener {
+
+            bind.tvTag.isPressed = true
+           TagPickerDialog(requireContext(), mainViewModel).show()
         }
 
-        bind.viewNameBox.setOnClickListener {
-            bind.tvName.isPressed = bind.tvName.isVisible
-            bind.ivName.isPressed = bind.ivName.isVisible
-            NameDialog(requireContext(), mainViewModel).show()
+
+
+        bind.llName.setOnClickListener {
+            bind.tvName.isPressed = true
+            NameDialog(requireContext(), mainViewModel
+                ).show()
+
         }
 
         bind.viewCountryBox.setOnClickListener {
-            bind.tvSelectedCountry.isPressed = bind.tvSelectedCountry.isVisible
+
             bind.ivCountry.isPressed = bind.ivCountry.isVisible
-            CountryPickerDialog(requireContext(), mainViewModel).show()
+            bind.tvSelectedCountry.isPressed = bind.tvSelectedCountry.isVisible
+            CountryPickerDialog(requireContext(), mainViewModel
+            ).show()
+
         }
+
+
+//        bind.tvSelectedCountry.setOnClickListener {
+//
+//            CountryPickerDialog(requireContext(), mainViewModel).show()
+//
+//        }
+
     }
 
 
@@ -388,47 +408,36 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     }
 
 
-
-
     private fun setSearchParamsObservers(){
 
         mainViewModel.searchParamTag.observe(viewLifecycleOwner){
 
-            if(it.isBlank()){
-                bind.ivTag.visibility = View.VISIBLE
-                bind.tvTag.visibility = View.INVISIBLE
-            } else {
-                bind.tvTag.text = it
-                bind.ivTag.visibility = View.INVISIBLE
-                bind.tvTag.visibility = View.VISIBLE
-            }
+            bind.tvTag.text = if (it == "") "Tag" else it
+
         }
 
         mainViewModel.searchParamName.observe(viewLifecycleOwner){
-
-            if(it.isBlank()){
-                bind.ivName.visibility = View.VISIBLE
-                bind.tvName.visibility = View.INVISIBLE
-            } else {
-                bind.tvName.text = it
-                bind.ivName.visibility = View.INVISIBLE
-                bind.tvName.visibility = View.VISIBLE
-            }
+            bind.tvName.text = if (it == "") "Name" else it
         }
 
         mainViewModel.searchParamCountry.observe(viewLifecycleOwner){
 
             if(it.isBlank()){
-                bind.ivCountry.visibility = View.VISIBLE
-                bind.tvSelectedCountry.visibility = View.INVISIBLE
-            } else {
 
+                bind.tvSelectedCountry.visibility = View.INVISIBLE
+                bind.ivCountry.visibility = View.VISIBLE
+            } else {
                 bind.tvSelectedCountry.text = it
                 bind.tvSelectedCountry.visibility = View.VISIBLE
                 bind.ivCountry.visibility = View.INVISIBLE
+
             }
+
+//            bind.tvSelectedCountry.text = if (it == "") "Country" else it
         }
     }
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()

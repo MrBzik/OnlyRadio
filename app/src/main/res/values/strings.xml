@@ -11,5 +11,6 @@
     <string name="dialog_accept_button">Accept</string>
     <string name="dialog_clear_selection">Clear selection</string>
     <string name="Favoured">Favoured</string>
+    <string name="text_placeholder_alpha">0.6</string>
 
 </resources>

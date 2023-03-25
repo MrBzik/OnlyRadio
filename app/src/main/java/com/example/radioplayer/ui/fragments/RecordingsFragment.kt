@@ -1,6 +1,8 @@
 package com.example.radioplayer.ui.fragments
 
 import android.animation.ValueAnimator
+import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.animation.LinearInterpolator
@@ -59,6 +61,18 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
         observePlayerPosition()
 
+        setToolbar()
+
+    }
+
+    private fun setToolbar(){
+        val mode = this.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+
+        if(mode == Configuration.UI_MODE_NIGHT_NO){
+            bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_recordings)
+        } else {
+            bind.viewToolbar.setBackgroundColor(Color.BLACK)
+        }
 
     }
 
@@ -198,6 +212,8 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
             edgeEffectFactory = BounceEdgeEffectFactory()
             setHasFixedSize(true)
             setToggleItemDeletion()
+
+            recordingsAdapter.alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
 
             layoutAnimation = (activity as MainActivity).layoutAnimationController
 

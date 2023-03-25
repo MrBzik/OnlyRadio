@@ -9,7 +9,6 @@
         android:id="@+id/viewToolbar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@drawable/toolbar_bg_two_items_protected"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,18 +40,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-<!--    <TextView-->
-<!--        android:id="@+id/tvDeleteOption"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="16dp"-->
-<!--        android:text="off"-->
-<!--        android:textAppearance="@style/mainTextTitle"-->
-<!--        app:layout_constraintStart_toEndOf="@+id/tvEnableDeleting"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
-
-
-
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvRecordings"
@@ -60,6 +47,8 @@
         android:layout_height="0dp"
         android:layout_marginTop="60dp"
         android:elevation="-1dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="7dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

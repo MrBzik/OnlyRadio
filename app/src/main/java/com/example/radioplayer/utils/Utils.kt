@@ -1,11 +1,48 @@
 package com.example.radioplayer.utils
 
-import android.util.Log
-import java.lang.StringBuilder
+import android.content.Context
+import android.content.res.Configuration
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 object Utils {
+
+     fun getNavigationBarHeight(context : Context): Int {
+        val resources = context.resources
+
+        val resName = if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            "navigation_bar_height"
+        } else {
+            "navigation_bar_height_landscape"
+        }
+
+        val id: Int = resources.getIdentifier(resName, "dimen", "android")
+
+        return if (id > 0) {
+            resources.getDimensionPixelSize(id)
+        } else {
+            0
+        }
+    }
+
+
+    fun getStatusBarHeight(context: Context): Int {
+
+        val resources = context.resources
+
+        val resName = if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            "status_bar_height"
+        } else {
+            "status_bar_height_landscape"
+        }
+
+        var result = 0
+        val resourceId: Int = context.resources.getIdentifier(resName, "dimen", "android")
+        if (resourceId > 0) {
+            result = context.resources.getDimensionPixelSize(resourceId)
+        }
+        return result
+    }
 
 
     fun fromDateToString (calendar: Calendar) : String {

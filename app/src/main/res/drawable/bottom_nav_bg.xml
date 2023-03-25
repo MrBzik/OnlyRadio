@@ -24,37 +24,38 @@
                 android:startY="0"
                 android:type="linear">
 
-                <item
-                    android:color="#4DAB47BC"
-                    android:offset="0.0" />
+
+<!--                <item-->
+<!--                    android:color="#4DFFFFFF"-->
+<!--                    android:offset="0" />-->
 
                 <item
-                    android:color="#99AB47BC"
+                    android:color="@color/nav_bar_search_fragment"
                     android:offset="0.228" />
                 <item
-                    android:color="#99EF476F"
+                    android:color="@color/nav_bar_fav_fragment"
                     android:offset="0.231" />
                 <item
-                    android:color="#99EF476F"
+                    android:color="@color/nav_bar_fav_fragment"
                     android:offset="0.419" />
                 <item
-                    android:color="#9906D6A0"
+                    android:color="@color/nav_bar_history_frag"
                     android:offset="0.422" />
                 <item
-                    android:color="#9906D6A0"
+                    android:color="@color/nav_bar_history_frag"
                     android:offset="0.610" />
                 <item
-                    android:color="#99118AB2"
+                    android:color="@color/nav_bar_rec_frag"
                     android:offset="0.613" />
                 <item
-                    android:color="#99118AB2"
+                    android:color="@color/nav_bar_rec_frag"
                     android:offset="0.801" />
                 <item
-                    android:color="#B3AB47BC"
+                    android:color="@color/nav_bar_options_frag"
                     android:offset="0.804" />
-                <item
-                    android:color="#4DAB47BC"
-                    android:offset="1.0" />
+<!--                <item-->
+<!--                    android:color="#4DFFFFFF"-->
+<!--                    android:offset="1.0" />-->
             </gradient>
         </aapt:attr>
     </path>

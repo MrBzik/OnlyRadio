@@ -13,23 +13,14 @@ import com.example.radioplayer.ui.viewmodels.MainViewModel
 
 class NameDialog (
     requireContext : Context,
-    private val mainViewModel: MainViewModel
-
-) : AppCompatDialog(requireContext) {
-
-
-    private var _bind : DialogPickNameBinding? = null
-    private val bind get() = _bind!!
+    private val mainViewModel: MainViewModel) : BaseDialog<DialogPickNameBinding>(
+    requireContext,
+    DialogPickNameBinding::inflate
+    ) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        _bind = DialogPickNameBinding.inflate(layoutInflater)
-
         super.onCreate(savedInstanceState)
-        setContentView(bind.root)
-
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
-        window?.setGravity(Gravity.TOP)
 
         setEditText()
 

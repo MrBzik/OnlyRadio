@@ -11,6 +11,8 @@ import androidx.core.content.ContextCompat
 import com.example.radioplayer.R
 import com.example.radioplayer.databinding.FragmentSettingsBinding
 import com.example.radioplayer.exoPlayer.RadioService
+import com.example.radioplayer.ui.MainActivity
+import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.HistorySettingsDialog
 import com.example.radioplayer.ui.dialogs.RecordingSettingsDialog
 import com.example.radioplayer.utils.Constants.DARK_MODE_PREF
@@ -61,6 +63,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         HISTORY_STRING_15_DATES, HISTORY_STRING_21_DATES, HISTORY_STRING_30_DATES)
     }
 
+    private var isNightMode = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -84,12 +87,36 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         setSearchBtnResetListener()
 
         setPlaybackSpeedButtons()
+
+        setLinkClickListener()
+
+        animateDayNightTransition()
+
+
     }
+
+
+
+
+    private fun animateDayNightTransition(){
+
+        if(mainViewModel.isSmoothTransitionNeeded){
+            bind.root.slideAnim(700, 0, R.anim.fade_in_anim)
+
+            (activity as MainActivity).smoothDayNightFadeIn(isNightMode)
+
+            mainViewModel.isSmoothTransitionNeeded = false
+        }
+
+    }
+
 
 
     private fun setPlaybackSpeedButtons(){
 
         updatePlaybackSpeedDisplayValue()
+        updatePlaybackPitchDisplayValue()
+        updateLinkIcon()
 
         bind.fabSpeedMinus.setOnClickListener {
 
@@ -108,11 +135,58 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
                 updatePlaybackSpeedDisplayValue()
             }
         }
+
+        bind.fabPitchMinus.setOnClickListener {
+
+            if(RadioService.playbackPitchRadio > 10){
+                RadioService.playbackPitchRadio -= 10
+                mainViewModel.updateRadioPlaybackPitch()
+                updatePlaybackPitchDisplayValue()
+            }
+        }
+
+        bind.fabPitchPlus.setOnClickListener {
+            if(RadioService.playbackPitchRadio < 200){
+                RadioService.playbackPitchRadio += 10
+                mainViewModel.updateRadioPlaybackPitch()
+                updatePlaybackPitchDisplayValue()
+            }
+        }
+    }
+
+
+    private fun setLinkClickListener(){
+        bind.ivLink.setOnClickListener {
+            RadioService.isSpeedPitchLinked = !RadioService.isSpeedPitchLinked
+            updateLinkIcon()
+        }
+    }
+
+
+    private fun updateLinkIcon(){
+
+        bind.ivLink.apply {
+            if(RadioService.isSpeedPitchLinked)
+                setImageResource(R.drawable.link)
+            else setImageResource(R.drawable.link_off)
+        }
     }
 
 
     private fun updatePlaybackSpeedDisplayValue(){
-        bind.tvPlaybackSpeedValue.text = "${RadioService.playbackSpeedRadio}%"
+
+        bind.tvPlaybackSpeedTitle.text = "speed : ${RadioService.playbackSpeedRadio}%"
+        if(RadioService.isSpeedPitchLinked)
+            bind.tvPlaybackPitchTitle.text = "pitch : ${RadioService.playbackSpeedRadio}%"
+
+    }
+
+    private fun updatePlaybackPitchDisplayValue(){
+
+        bind.tvPlaybackPitchTitle.text = "pitch : ${RadioService.playbackPitchRadio}%"
+        if(RadioService.isSpeedPitchLinked)
+            bind.tvPlaybackSpeedTitle.text = "speed : ${RadioService.playbackPitchRadio}%"
+
     }
 
     private fun setSearchBtnResetListener(){
@@ -282,13 +356,33 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         bind.switchNightMode.setOnCheckedChangeListener { _, isChecked ->
 
-            if(isChecked){
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+//            (activity as MainActivity).bind.root.slideAnim(500, 0, R.anim.fade_out_anim)
 
-            } else{
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
-            }
+            mainViewModel.isSmoothTransitionNeeded = true
+
+           bind.root.slideAnim(500, 0, R.anim.fade_out_anim)
+
+            (activity as MainActivity).smoothDayNightFadeOut(isNightMode)
+
+                bind.root.postDelayed({
+
+
+                    if(isChecked){
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+
+//                        (activity as MainActivity).bind.root.setBackgroundColor(Color.BLACK)
+
+
+
+                    } else{
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
+//                        (activity as MainActivity).bind.root.setBackgroundColor(Color.WHITE)
+                    }
+
+                }, 500)
+
         }
     }
 
@@ -297,9 +391,26 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
        val mode = requireContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
 
         when(mode){
-            Configuration.UI_MODE_NIGHT_YES -> bind.switchNightMode.isChecked = true
-            Configuration.UI_MODE_NIGHT_NO -> bind.switchNightMode.isChecked = false
+            Configuration.UI_MODE_NIGHT_YES -> {
+                bind.switchNightMode.isChecked = true
+                isNightMode = true
+            }
+
+            Configuration.UI_MODE_NIGHT_NO -> {
+                bind.switchNightMode.isChecked = false
+                isNightMode = false
+            }
         }
+    }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+
+
+        _bind = null
+
     }
 
 }

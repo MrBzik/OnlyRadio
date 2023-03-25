@@ -14,19 +14,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tvSettingsTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginStart="20dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"
+        android:text="Options"
         android:textAppearance="@style/mainTextTitle"
-        android:text="Options"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <TextView
@@ -93,13 +92,13 @@
         android:id="@+id/tvHistorySettingValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
         android:textAppearance="@style/dialogItemText"
         android:textColor="@color/interactive_option_color"
-        android:layout_marginEnd="10dp"
+        app:drawableEndCompat="@drawable/option_open_menu"
         app:layout_constraintBottom_toBottomOf="@+id/tvHistorySettingTitle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvHistorySettingTitle"
-        app:drawableEndCompat="@drawable/option_open_menu" />
+        app:layout_constraintTop_toTopOf="@+id/tvHistorySettingTitle" />
 
 
     <TextView
@@ -117,13 +116,13 @@
         android:id="@+id/tvRecordingSettingsValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
         android:textAppearance="@style/dialogItemText"
         android:textColor="@color/interactive_option_color"
-        android:layout_marginEnd="10dp"
+        app:drawableEndCompat="@drawable/option_open_menu"
         app:layout_constraintBottom_toBottomOf="@+id/tvRecordingSettingTitle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvRecordingSettingTitle"
-        app:drawableEndCompat="@drawable/option_open_menu" />
+        app:layout_constraintTop_toTopOf="@+id/tvRecordingSettingTitle" />
 
 
     <TextView
@@ -151,54 +150,53 @@
         android:id="@+id/tvSearchBtnReset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/dialogItemText"
         android:layout_marginEnd="10dp"
-        android:textColor="@color/selected_station_paused"
         android:text="Reset position"
+        android:textAppearance="@style/dialogItemText"
+        android:textColor="@color/selected_station_paused"
         app:layout_constraintBottom_toBottomOf="@+id/tvSearchBtnTitle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvSearchBtnTitle"
-        />
+        app:layout_constraintTop_toTopOf="@+id/tvSearchBtnTitle" />
 
-    <TextView
-        android:id="@+id/tvSearchHint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="20dp"
-        android:text="(Also: Swipe-Up for searches)*"
-        android:fontFamily="@font/aldrich"
-        android:textSize="13sp"
-        android:textColor="@color/Separator"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivButtonsSearch"
-         />
+        <TextView
+            android:id="@+id/tvSearchHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="20dp"
+            android:text="(Also: Swipe-Up for searches)*"
+            android:fontFamily="@font/aldrich"
+            android:textSize="13sp"
+            android:textColor="@color/Separator"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivButtonsSearch"
+             />
 
-    <TextView
-        android:id="@+id/tvPlaybackSpeedHint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginBottom="10dp"
-        android:fontFamily="@font/aldrich"
-        android:text="(Rec. speed is set separately in Details)*"
-        android:textColor="@color/Separator"
-        android:textSize="13sp"
-        app:layout_constraintBottom_toTopOf="@+id/tvPlaybackSpeedTitle"
-        app:layout_constraintStart_toStartOf="parent" />
+        <TextView
+            android:id="@+id/tvPlaybackSpeedHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/aldrich"
+            android:text="(Rec. speed is set separately in Details)*"
+            android:textColor="@color/Separator"
+            android:textSize="13sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvSearchHint" />
 
 
     <TextView
         android:id="@+id/tvPlaybackSpeedTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:text="Radio play speed"
-        android:textAppearance="@style/mainTextTitle"
-        app:layout_constraintBottom_toTopOf="@+id/tvPlaybackSpeedValue"
+        android:layout_marginTop="10dp"
+        android:text="speed : 100%"
+        android:textAppearance="@style/dialogItemText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvPlaybackSpeedHint" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineHorizontal"
@@ -207,39 +205,82 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5" />
 
-    <TextView
-        android:id="@+id/tvPlaybackSpeedValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="-23dp"
-        android:text="100%"
-        android:textAppearance="@style/dialogItemText"
-        app:layout_constraintBottom_toBottomOf="@+id/fabSpeedMinus"
-        app:layout_constraintStart_toStartOf="@+id/guidelineHorizontal"
-        app:layout_constraintTop_toTopOf="@+id/fabSpeedMinus" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabSpeedMinus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginStart="30dp"
-        android:layout_marginBottom="40dp"
         android:src="@drawable/playback_speed_minus"
         app:backgroundTint="@color/floating_buttons"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:fabCustomSize="30dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvPlaybackSpeedTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvPlaybackSpeedTitle" />
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabSpeedPlus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginEnd="30dp"
-        android:layout_marginBottom="40dp"
         android:src="@drawable/playback_speed_plus"
         app:backgroundTint="@color/floating_buttons"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:fabCustomSize="30dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvPlaybackSpeedTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvPlaybackSpeedTitle" />
+
+
+    <ImageView
+        android:id="@+id/ivLink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/link"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvPlaybackSpeedTitle" />
+
+
+    <TextView
+        android:id="@+id/tvPlaybackPitchTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="pitch : 100%"
+        android:textAppearance="@style/dialogItemText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivLink" />
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabPitchMinus"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="30dp"
+        android:src="@drawable/playback_speed_minus"
+        app:backgroundTint="@color/floating_buttons"
+        app:fabCustomSize="30dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvPlaybackPitchTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvPlaybackPitchTitle" />
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabPitchPlus"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="30dp"
+        android:src="@drawable/playback_speed_plus"
+        app:backgroundTint="@color/floating_buttons"
+        app:fabCustomSize="30dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvPlaybackPitchTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvPlaybackPitchTitle" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

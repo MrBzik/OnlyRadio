@@ -4,12 +4,16 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.TypedValue
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDialog
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.adapters.FilterCountriesAdapter
+import com.example.radioplayer.databinding.DialogHistorySettingsBinding
 import com.example.radioplayer.databinding.DialogPickCountryBinding
 import com.example.radioplayer.ui.fragments.RadioSearchFragment
 import com.example.radioplayer.ui.viewmodels.MainViewModel
@@ -19,25 +23,30 @@ import com.example.radioplayer.utils.listOfCountries
 
 class CountryPickerDialog(
    private val requireContext : Context,
-    private val mainViewModel: MainViewModel
-   )
-    : AppCompatDialog(requireContext) {
+   private val mainViewModel: MainViewModel
+)
+    : BaseDialog<DialogPickCountryBinding>(
+    requireContext,
+    DialogPickCountryBinding::inflate
+    ) {
+
+
+
+//    private var _bind : DialogPickCountryBinding? = null
+//    private val bind get() = _bind!!
 
     private val countries = listOfCountries
-
-    private var _bind : DialogPickCountryBinding? = null
-    private val bind get() = _bind!!
 
     lateinit var countryAdapter : FilterCountriesAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        _bind = DialogPickCountryBinding.inflate(layoutInflater)
+//        _bind = DialogPickCountryBinding.inflate(layoutInflater)
+
 
         super.onCreate(savedInstanceState)
-        setContentView(bind.root)
 
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
+//        setContentView(bind.root)
 
         setupRecyclerView()
 
@@ -47,26 +56,32 @@ class CountryPickerDialog(
 
         handleKeyboardToggle()
 
-
         filterCountriesOnEditTextListener()
 
+        adjustDialogHeight(bind.clCountryPickDialog)
 
 
 
     }
 
     private fun handleKeyboardToggle (){
+
         KeyboardObserver.observeKeyboardState(bind.root, {
 
             bind.tvBack.visibility = View.GONE
             bind.tvClearSelection.visibility = View.GONE
             bind.tvTitle.visibility = View.GONE
 
+
         }, {
+
             bind.tvBack.visibility = View.VISIBLE
             bind.tvClearSelection.visibility = View.VISIBLE
             bind.tvTitle.visibility = View.VISIBLE
             bind.editText.clearFocus()
+
+
+
 
         }, { bind.editText.requestFocus() })
     }

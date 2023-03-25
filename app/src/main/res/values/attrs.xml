@@ -3,5 +3,14 @@
     <dimen name="bottomNavMargin">0dp</dimen>
     <dimen name="sideSeparators">7dp</dimen>
     <dimen name="sideSeparatorsMargin">0dp</dimen>
+    <dimen name="low_separators_elevation">0dp</dimen>
+    <integer name="radio_text_placeholder_alpha">10</integer>
+
+    <dimen name="player_view_height">65dp</dimen>
+    <dimen name="player_view_padding">0dp</dimen>
+    <dimen name="player_view_bottom_margin">5dp</dimen>
+
+    <dimen name="stub_player_margin_horizontal">8dp</dimen>
+
 
 </resources>

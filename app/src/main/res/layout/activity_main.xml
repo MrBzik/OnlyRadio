@@ -11,24 +11,13 @@
     >
 
 
-  <View
-      android:id="@+id/viewSeparatorStart"
-      android:layout_width="@dimen/sideSeparators"
-      android:layout_height="0dp"
-      android:layout_marginStart="@dimen/sideSeparatorsMargin"
-      android:background="@drawable/gradient_for_separators"
-      app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/guidelineToolbar"
-      app:layout_constraintVertical_bias="0.5" />
+
 
 
   <FrameLayout
       android:id="@+id/flFragment"
       android:layout_width="match_parent"
       android:layout_height="0dp"
-      android:layout_marginStart="7dp"
-      android:layout_marginEnd="7dp"
       app:layout_constraintBottom_toTopOf="@id/stubPlayer"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintHorizontal_bias="0.5"
@@ -52,6 +41,17 @@
       app:layout_constraintVertical_bias="0.5" />
 
   <View
+      android:id="@+id/viewSeparatorStart"
+      android:layout_width="@dimen/sideSeparators"
+      android:layout_height="0dp"
+      android:layout_marginStart="@dimen/sideSeparatorsMargin"
+      android:background="@drawable/gradient_for_separators"
+      app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/guidelineToolbar"
+      app:layout_constraintVertical_bias="0.5" />
+
+  <View
       android:id="@+id/viewSeparatorEnd"
       android:layout_width="@dimen/sideSeparators"
       android:layout_height="0dp"
@@ -66,16 +66,19 @@
       android:id="@+id/separatorSecond"
       android:layout_width="match_parent"
       android:layout_height="2dp"
+      android:elevation="@dimen/low_separators_elevation"
+      android:layout_marginBottom="-2dp"
       android:background="@drawable/gradient_for_separators"
       app:layout_constraintBottom_toTopOf="@id/bottomNavigationView" />
 
   <ViewStub
       android:id="@+id/stubPlayer"
       android:layout_width="match_parent"
-      android:layout_height="65dp"
-      android:layout_marginBottom="@dimen/bottomNavMargin"
+      android:layout_height="@dimen/player_view_height"
       android:inflatedId="@+id/stubPlayer"
+      android:layout_marginBottom="@dimen/player_view_bottom_margin"
       android:layout="@layout/stub_player_activity_main"
+      android:layout_marginHorizontal="@dimen/stub_player_margin_horizontal"
       app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent" />
@@ -85,6 +88,7 @@
       android:id="@+id/separatorLowest"
       android:layout_width="match_parent"
       android:layout_height="2dp"
+      android:elevation="@dimen/low_separators_elevation"
       android:layout_marginHorizontal="50dp"
       android:background="@drawable/gradient_for_separators"
       app:layout_constraintBottom_toBottomOf="parent" />
@@ -92,11 +96,10 @@
   <com.google.android.material.bottomnavigation.BottomNavigationView
       android:id="@+id/bottomNavigationView"
       android:layout_width="match_parent"
-      android:layout_height="48dp"
-      android:layout_marginBottom="@dimen/bottomNavMargin"
-      app:itemBackground="@drawable/bottom_nav_item_bg"
-
-      app:itemPaddingBottom="18dp"
+      android:layout_height="52dp"
+      android:background="@drawable/bottom_nav_bg"
+      app:itemBackground="@null"
+      app:itemPaddingBottom="21dp"
       app:itemTextAppearanceActive="@style/bottomNavTextActive"
       app:itemTextAppearanceInactive="@style/bottomNavTextInactive"
       app:labelVisibilityMode="labeled"
@@ -105,6 +108,9 @@
       app:layout_constraintHorizontal_bias="0.5"
       app:layout_constraintStart_toStartOf="parent"
       app:menu="@menu/bottom_nav_menu" />
+
+
+<!--  app:itemBackground="@drawable/bottom_nav_item_bg"-->
 
   <androidx.constraintlayout.widget.Guideline
       android:id="@+id/guidelineToolbar"

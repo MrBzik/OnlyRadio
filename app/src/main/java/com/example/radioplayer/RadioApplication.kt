@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Debug
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.utils.Constants
@@ -31,6 +32,7 @@ class RadioApplication : Application() {
         val isDarkMode = darkModePref.getBoolean(Constants.DARK_MODE_PREF, false)
 
         if(isDarkMode){
+
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         }
 

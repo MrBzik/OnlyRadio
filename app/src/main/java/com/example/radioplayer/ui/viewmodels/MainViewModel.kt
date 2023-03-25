@@ -23,6 +23,7 @@ import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
 import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
 
 import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_CURRENT_PLAYING_ITEM
+import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_REC_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.FAB_POSITION_X
@@ -66,7 +67,9 @@ class MainViewModel @Inject constructor(
 
        val currentSongTitle = RadioService.currentSongTitle
 
-        var isInitialLaunchOfTheApp = true
+       var isInitialLaunchOfTheApp = true
+
+       var isSmoothTransitionNeeded = false
 
 
     init {
@@ -369,7 +372,11 @@ class MainViewModel @Inject constructor(
 
 
         fun updateRadioPlaybackSpeed(){
-        radioServiceConnection.sendCommand(COMMAND_UPDATE_RADIO_PLAYBACK_SPEED, null)
+            radioServiceConnection.sendCommand(COMMAND_UPDATE_RADIO_PLAYBACK_SPEED, null)
+        }
+
+        fun updateRadioPlaybackPitch(){
+            radioServiceConnection.sendCommand(COMMAND_UPDATE_RADIO_PLAYBACK_PITCH, null)
         }
 
 

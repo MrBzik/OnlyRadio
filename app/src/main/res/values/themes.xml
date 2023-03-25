@@ -10,10 +10,18 @@
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">#3E69AC</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">@color/toolbar</item>
+        <item name="android:statusBarColor">@color/white</item>
+
+
 
         <!-- Customize your theme here. -->
     </style>
+
+
+    <style name="dialog" parent="Theme.AppCompat.Light.Dialog">
+
+    </style>
+
 
      <style name="splashScreenTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
          <item name="android:windowBackground">@drawable/splash_screen</item>

@@ -292,3 +292,96 @@ package com.example.radioplayer.utils
 //        Log.d("CHECKTAGS", builder5.toString())
 //
 //    }
+
+//
+//<?xml version="1.0" encoding="utf-8"?>
+//<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+//xmlns:app="http://schemas.android.com/apk/res-auto"
+//xmlns:tools="http://schemas.android.com/tools"
+//android:layout_width="match_parent"
+//android:layout_height="match_parent"
+//app:cardCornerRadius="15dp"
+//app:strokeWidth="3dp"
+//app:strokeColor="@color/dialog_cardview_border"
+//
+//>
+//
+//<LinearLayout
+//android:layout_width="match_parent"
+//android:layout_height="wrap_content"
+//android:layout_marginTop="20dp"
+//android:paddingHorizontal="16dp"
+//android:layout_marginBottom="90dp"
+//android:orientation="vertical">
+//
+//<TextView
+//android:id="@+id/tvTitle"
+//android:layout_width="match_parent"
+//android:layout_height="wrap_content"
+//android:textAlignment="center"
+//android:text="Select playlist or create new"
+//android:textAppearance="@style/dialogTitleText"
+///>
+//
+//<TextView
+//android:id="@+id/tvHint"
+//android:layout_width="match_parent"
+//android:layout_height="wrap_content"
+//android:textAlignment="center"
+//android:text="(Also: use DragAndDrop in Favoured tab)*"
+//android:fontFamily="@font/aldrich"
+//android:textSize="13sp"
+//android:textColor="@color/Separator"
+///>
+//
+//<androidx.recyclerview.widget.RecyclerView
+//android:layout_marginTop="16dp"
+//android:id="@+id/rvPlaylists"
+//android:layout_width="wrap_content"
+//android:layout_height="match_parent"
+//android:layout_gravity="center"
+///>
+//
+//</LinearLayout>
+//
+//
+//
+//<TextView
+//android:id="@+id/tvMessageNoPlaylists"
+//android:layout_width="match_parent"
+//android:layout_height="match_parent"
+//android:text="No playlists yet"
+//android:gravity="center"
+//android:visibility="gone"
+//android:textColor="@color/color_non_interactive"
+//android:textSize="22sp"
+//app:layout_constraintBottom_toBottomOf="parent"
+//app:layout_constraintEnd_toEndOf="parent"
+//app:layout_constraintStart_toStartOf="parent"
+//app:layout_constraintTop_toTopOf="parent" />
+//
+//
+//<TextView
+//android:id="@+id/tvBack"
+//android:layout_width="wrap_content"
+//android:layout_height="wrap_content"
+//android:layout_marginStart="36dp"
+//android:layout_marginBottom="36dp"
+//android:text="@string/dialog_back_button"
+//android:layout_gravity="bottom|start"
+//android:textAppearance="@style/dialogTextButtons"
+///>
+//
+//<TextView
+//android:id="@+id/tvCreateNewPlaylist"
+//android:layout_width="wrap_content"
+//android:layout_height="wrap_content"
+//android:layout_marginEnd="36dp"
+//android:layout_marginBottom="36dp"
+//android:layout_gravity="bottom|end"
+//android:text="@string/dialog_create_playlist"
+//android:textAppearance="@style/dialogTextButtons"
+///>
+//
+//
+//</com.google.android.material.card.MaterialCardView>

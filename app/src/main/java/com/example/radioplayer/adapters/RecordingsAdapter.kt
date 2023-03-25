@@ -99,7 +99,7 @@ class RecordingsAdapter @Inject constructor(
 
             val color = randColors.getColor()
             tvPlaceholder.setBackgroundColor(color)
-            tvPlaceholder.alpha = 0.6f
+            tvPlaceholder.alpha = alpha
 
 
             if(recording.iconUri.isBlank()) {
@@ -131,9 +131,9 @@ class RecordingsAdapter @Inject constructor(
 
                             if(dataSource?.name == "REMOTE"){
 
-                                tvPlaceholder.fadeOut(300, 0.6f, position){ pos ->
+                                tvPlaceholder.fadeOut(300, alpha, position){ pos ->
                                     if(pos != holder.bindingAdapterPosition) {
-                                        tvPlaceholder.alpha = 0.6f
+                                        tvPlaceholder.alpha = alpha
                                     }
                                 }
 
@@ -170,6 +170,8 @@ class RecordingsAdapter @Inject constructor(
             }
         }
 
+
+    var alpha = 0.1f
 
     var playingRecordingId = ""
 

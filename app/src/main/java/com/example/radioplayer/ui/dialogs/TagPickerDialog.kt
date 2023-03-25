@@ -1,18 +1,24 @@
 package com.example.radioplayer.ui.dialogs
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
+import android.util.TypedValue
 import android.view.*
 import androidx.appcompat.app.AppCompatDialog
 import androidx.core.content.ContextCompat
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.FilterTagsAdapter
 import com.example.radioplayer.adapters.models.TagWithGenre
 import com.example.radioplayer.databinding.DialogPickTagBinding
+import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.fragments.RadioSearchFragment
 import com.example.radioplayer.ui.fragments.RadioSearchFragment.Companion.tagsList
 import com.example.radioplayer.ui.viewmodels.MainViewModel
@@ -21,23 +27,20 @@ import com.example.radioplayer.utils.KeyboardObserver.observeKeyboardState
 
 class TagPickerDialog (
     private val requireContext : Context,
-    private val mainViewModel: MainViewModel
-    )
-    : AppCompatDialog(requireContext) {
+    private val mainViewModel: MainViewModel,
+)
+    : BaseDialog<DialogPickTagBinding>(
+    requireContext,
+    DialogPickTagBinding::inflate,
 
-    private var _bind : DialogPickTagBinding? = null
-    private val bind get() = _bind!!
+) {
 
     private lateinit var tagAdapter : FilterTagsAdapter
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        _bind = DialogPickTagBinding.inflate(layoutInflater)
-
         super.onCreate(savedInstanceState)
-        setContentView(bind.root)
-
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
 
         setupRecyclerView()
         setupButtons()
@@ -46,7 +49,9 @@ class TagPickerDialog (
         handleKeyboardToggle()
         setSwitchExactMatch()
 
+        adjustDialogHeight(bind.clTagPickDialog)
     }
+
 
     private fun setSwitchExactMatch(){
 
@@ -81,6 +86,7 @@ class TagPickerDialog (
 
         })
     }
+
 
 
     private fun setupRecyclerView(){
@@ -320,11 +326,6 @@ class TagPickerDialog (
 
     }
 
-
     private var isOpen : MutableLiveData<Boolean> = MutableLiveData()
-
-
-
-
 
 }

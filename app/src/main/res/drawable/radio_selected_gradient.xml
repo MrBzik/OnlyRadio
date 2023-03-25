@@ -1,20 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
-        <shape >
-            <solid android:color="@color/main_background"/>
-
-        </shape>
-    </item>
 
 
-
-    <item>
-        <shape >
-            <gradient
-                    android:endColor="@color/selected_station_playing"
-                android:startColor="@color/main_background"
-                />
-        </shape>
-    </item>
-</layer-list>
+ <shape  xmlns:android="http://schemas.android.com/apk/res/android">
+     <gradient
+             android:endColor="@color/selected_station_playing"
+         android:startColor="@color/main_background"
+         />
+ </shape>

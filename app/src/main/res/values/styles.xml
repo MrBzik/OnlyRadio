@@ -48,7 +48,7 @@
 
     <style name="dialogTextButtons" parent="android:Widget.TextView">
         <item name="android:fontFamily">sans-serif-smallcaps</item>
-        <item name="android:textColor">@color/interactive_text_color</item>
+        <item name="android:textColor">#1A237E</item>
         <item name="android:textSize">18sp</item>
         <item name ="android:letterSpacing">0.1</item>
         <item name ="android:textStyle">bold</item>
@@ -57,7 +57,7 @@
     <style name="dialogTitleText" parent="android:Widget.TextView">
         <item name="android:textSize">20sp</item>
         <item name ="android:textStyle">bold</item>
-        <item name="android:textColor">@color/dialog_title_color</item>
+        <item name="android:textColor">#311B92</item>
         <item name="android:fontFamily">serif-monospace</item>
     </style>
 

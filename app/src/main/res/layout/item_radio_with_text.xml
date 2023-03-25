@@ -20,12 +20,12 @@
         android:id="@+id/tvPlaceholder"
         android:layout_width="65dp"
         android:layout_height="65dp"
-        android:alpha="0.6"
+
         android:fontFamily="@font/ranchers"
         android:gravity="center"
         android:layout_marginTop="5dp"
         android:text="D"
-        android:textColor="@color/black"
+        android:textColor="@color/main_background"
         android:textSize="40sp" />
 
 
@@ -45,9 +45,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:text="some name that is "
+
             android:textColor="@color/default_text_color"
-            android:alpha="0.7"
             android:fontFamily="sans-serif-smallcaps"
             android:gravity="center|start"
             android:maxLines="2"
@@ -59,8 +58,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="middle"
             android:fontFamily="@font/aldrich"
-            android:textColor="@color/default_text_color"
-            android:alpha="0.5"
+            android:textColor="@color/default_secondary_text_color"
             android:maxLines="1"
             android:textSize="14sp"
             />

@@ -8,7 +8,7 @@
     <color name="black">#000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="ChosenGreen">#004D40</color>
-    <color name="color_non_interactive">#FFFFFF</color>
+    <color name="color_non_interactive">#311B92</color>
 
     <color name="grayColor">#635D5D</color>
     <color name="floating_buttons">#DADADA</color>
@@ -21,21 +21,45 @@
 
     <color name= "main_background">#FFFFFF</color>
     <color name="toolbar">#FFFFFF</color>
-    <color name="Separator">#FFFFFF</color>
+    <color name="Separator">#000000</color>
 
     <color name="text_interactive_shadow">#000000</color>
     <color name="arrows_for_text_buttons">#FFFDE7</color>
 
-    <color name="selected_station_playing">#FF80AB</color>
-    <color name="selected_station_paused">#FFB8D0</color>
-    <color name="default_text_color">#000000</color>
+    <color name="selected_station_playing">#CE93D8</color>
+    <color name="selected_station_paused">#E1BEE7</color>
+
+    <color name="default_text_color">#1A237E</color>
+    <color name="selected_text_color">#4A148C</color>
+
+    <color name="default_secondary_text_color">#000000</color>
+    <color name="selected_secondary_text_color">#311B92</color>
+
     <color name="dialog_title_color">#000000</color>
 
-    <color name="selected_text_color">#ff0</color>
+
     <color name="seekbar_text_style">#FF80AB</color>
     <color name="selected_genre_color">#ff0</color>
     <color name="unselected_genre_color">#000000</color>
     <color name="option_selected">#698E03</color>
     <color name="switch_track_selected">#99698E03</color>
     <color name="switch_track_unselected">#80DADADA</color>
+
+
+<!--    Navigation bar colors -->
+
+
+    <color name="nav_bar_search_fragment">#C5CAE9</color>
+    <color name="nav_bar_fav_fragment">#B2DFDB</color>
+    <color name="nav_bar_history_frag">#E1BEE7</color>
+    <color name="nav_bar_rec_frag">#BBDEFB</color>
+    <color name="nav_bar_options_frag">#D1C4E9</color>
+
+
+
+    <color name="dialog_cardview_border">#3F51B5</color>
+
+
+
+
 </resources>

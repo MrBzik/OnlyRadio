@@ -24,9 +24,15 @@
     <color name="toolbar">#FF000000</color>
     <color name="selected_station_playing">#1E1B1B</color>
     <color name="selected_station_paused">#1E1B1B</color>
-    <color name="default_text_color">#FFFFFFFF</color>
+
+    <color name="default_text_color">#B3FFFFFF</color>
+    <color name="default_secondary_text_color">#80FFFFFF</color>
+
+    <color name="selected_text_color">#CCFFFF00</color>
+    <color name="selected_secondary_text_color">#80FFFF00</color>
+
     <color name="dialog_title_color">#AA4D06</color>
-    <color name="selected_text_color">#ff0</color>
+
     <color name="seekbar_text_style">#99698E03</color>
     <color name="selected_genre_color">#99FFFF00</color>
     <color name="unselected_genre_color">#80FFFFFF</color>

@@ -2,9 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/clCountryPickDialog"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:minHeight="600dp"
+    android:layout_height="match_parent"
     android:paddingHorizontal="16dp"
     android:background="@drawable/dialog_gradient_for_background"
     android:animateLayoutChanges="true"
@@ -20,18 +20,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
     <EditText
         android:id="@+id/editText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Search country..."
+        android:hint="Type country name..."
         android:inputType="text|textNoSuggestions"
         android:textColor="@color/search_text_color"
         android:backgroundTint="@color/Separator"
         android:textCursorDrawable="@drawable/cursor_color"
         android:textAppearance="@style/dialogSearchText"
-        android:paddingTop="10dp"
+
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -43,10 +42,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/tvClearSelection"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/tvBack"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText" />
+        app:layout_constraintTop_toBottomOf="@+id/editText"
+
+        />
+
+
 
 
     <TextView

@@ -1,72 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="65dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="15dp"
+    app:strokeColor="@color/dialog_cardview_border"
+    app:strokeWidth="2dp"
     >
-
 
     <ImageView
         android:id="@+id/ivCurrentStationImage"
         android:layout_width="65dp"
         android:layout_height="65dp"
-        android:layout_marginStart="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        />
 
     <TextView
         android:id="@+id/tvPlaceholder"
         android:layout_width="65dp"
         android:layout_height="65dp"
-        android:layout_marginStart="10dp"
         android:fontFamily="@font/ranchers"
         android:text="D"
-        android:textColor="@color/black"
+        android:textColor="@color/main_background"
         android:textSize="40sp"
-        android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        android:gravity="center" />
 
     <TextView
         android:id="@+id/tvStationTitle"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="60dp"
         android:ellipsize="marquee"
         android:marqueeRepeatLimit="marquee_forever"
         android:fontFamily="sans-serif-smallcaps"
         android:paddingHorizontal="8dp"
         android:paddingTop="8dp"
+        android:text="Some awesome title"
+        android:layout_marginStart="75dp"
+        android:layout_marginEnd="60dp"
         android:focusable="true"
         android:maxLines="1"
         android:focusableInTouchMode="true"
         android:textSize="14sp"
-        android:layout_marginStart="75dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/ivTogglePlayCurrentStation"
-        app:layout_constraintStart_toStartOf="parent" />
+        />
+
+
 
     <TextView
         android:id="@+id/tvExpandHideText"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="4dp"
-        android:layout_marginBottom="8dp"
         android:text="@string/Expand"
         android:textAppearance="@style/mainTextButtons"
-        app:layout_constraintBottom_toBottomOf="@+id/tvStationTitle"
-        app:layout_constraintEnd_toStartOf="@+id/ivTogglePlayCurrentStation" />
+        android:layout_marginTop="36dp"
+        android:gravity="end"
+        android:layout_marginEnd="64dp"
+        />
 
     <ImageView
         android:id="@+id/ivTogglePlayCurrentStation"
         android:layout_width="60dp"
         android:layout_height="65dp"
+        android:layout_marginEnd="@dimen/player_view_bottom_margin"
         android:src="@drawable/ic_play_pause"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_gravity="end"
+        />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</com.google.android.material.card.MaterialCardView>

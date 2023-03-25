@@ -104,7 +104,7 @@ class RadioDatabaseAdapter @Inject constructor(
 
                 tvPlaceholder.text = char.toString().uppercase()
                 tvPlaceholder.setBackgroundColor(color)
-                tvPlaceholder.alpha = 0.6f
+                tvPlaceholder.alpha = alpha
             }
 
             if(station.favicon.isNullOrBlank()) {
@@ -136,9 +136,9 @@ class RadioDatabaseAdapter @Inject constructor(
 
                             if(dataSource?.name == "REMOTE"){
 
-                                tvPlaceholder.fadeOut(300, 0.6f, position){ pos ->
+                                tvPlaceholder.fadeOut(300, alpha, position){ pos ->
                                     if(pos != holder.bindingAdapterPosition) {
-                                        tvPlaceholder.alpha = 0.6f
+                                        tvPlaceholder.alpha = alpha
                                     }
                                 }
 
@@ -166,6 +166,11 @@ class RadioDatabaseAdapter @Inject constructor(
 
     var defaultTextColor = 0
     var selectedTextColor = 0
+    var defaultSecondaryTextColor = 0
+    var selectedSecondaryTextColor = 0
+
+    var alpha = 0.1f
+
     var currentRadioStationName : String? = null
     var currentPlaybackState = false
     private var previousItemHolder : RadioItemHolder? = null
@@ -174,8 +179,8 @@ class RadioDatabaseAdapter @Inject constructor(
         bind.apply {
             radioItemRootLayout.setBackgroundResource(R.color.main_background)
             tvPrimary.setTextColor(defaultTextColor)
-            tvPrimary.alpha = 0.7f
-            tvSecondary.setTextColor(defaultTextColor)
+
+            tvSecondary.setTextColor(defaultSecondaryTextColor)
         }
     }
 
@@ -184,16 +189,16 @@ class RadioDatabaseAdapter @Inject constructor(
             bind.apply {
                 radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
                 tvPrimary.setTextColor(selectedTextColor)
-                tvPrimary.alpha = 0.9f
-                tvSecondary.setTextColor(selectedTextColor)
+
+                tvSecondary.setTextColor(selectedSecondaryTextColor)
             }
 
         } else {
             bind.apply {
                 radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
                 tvPrimary.setTextColor(defaultTextColor)
-                tvPrimary.alpha = 0.7f
-                tvSecondary.setTextColor(defaultTextColor)
+
+                tvSecondary.setTextColor(defaultSecondaryTextColor)
             }
 
         }
