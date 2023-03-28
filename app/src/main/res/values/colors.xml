@@ -11,12 +11,12 @@
     <color name="color_non_interactive">#311B92</color>
 
     <color name="grayColor">#635D5D</color>
-    <color name="floating_buttons">#DADADA</color>
+    <color name="floating_buttons">#FFFFFF</color>
     <color name="color_interactive">#FFFFFFFF</color>
     <color name="color_changed_on_interaction">#FC2E20</color>
     <color name="color_warning_text">#FC2E20</color>
     <color name="transparent">#00000000</color>
-    <color name="regular_text_color">#0C0C0C</color>
+    <color name="regular_text_color">#000000</color>
     <color name="search_text_color">#000000</color>
 
     <color name= "main_background">#FFFFFF</color>
@@ -37,9 +37,11 @@
 
     <color name="dialog_title_color">#000000</color>
 
+    <color name="apply_option_text">#4A148C</color>
+
 
     <color name="seekbar_text_style">#FF80AB</color>
-    <color name="selected_genre_color">#ff0</color>
+    <color name="selected_genre_color">#4A148C</color>
     <color name="unselected_genre_color">#000000</color>
     <color name="option_selected">#698E03</color>
     <color name="switch_track_selected">#99698E03</color>
@@ -50,6 +52,8 @@
 
 
     <color name="nav_bar_search_fragment">#C5CAE9</color>
+    <color name="status_bar_search_fragment">#CC9FA8DA</color>
+
     <color name="nav_bar_fav_fragment">#B2DFDB</color>
     <color name="nav_bar_history_frag">#E1BEE7</color>
     <color name="nav_bar_rec_frag">#BBDEFB</color>

@@ -1,5 +1,7 @@
 package com.example.radioplayer.ui.fragments
 
+import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
 import android.util.Log
@@ -7,6 +9,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.Spinner
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
@@ -24,6 +27,7 @@ import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.SpinnerExt
+import com.example.radioplayer.utils.TextViewOutlined
 import com.example.radioplayer.utils.Utils.fromDateToString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -82,6 +86,24 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         setAdapterLoadStateListener()
 
+        setToolbar()
+
+    }
+
+
+    private fun setToolbar(){
+
+        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
+            bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_history)
+            val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_history_frag)
+
+            (activity as MainActivity).apply {
+                window.navigationBarColor = color
+                window.statusBarColor = color
+            }
+        } else {
+            bind.viewToolbar.setBackgroundColor(Color.BLACK)
+        }
     }
 
 
@@ -117,12 +139,15 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         bind.spinnerDates.setSpinnerEventsListener( object : SpinnerExt.OnSpinnerEventsListener{
             override fun onSpinnerOpened(spinner: Spinner?) {
-               bind.tvSelectDate.
+
+
+
+                (bind.tvSelectDate as TextViewOutlined).
                    setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_playlists_arrow_shrink,0)
             }
 
             override fun onSpinnerClosed(spinner: Spinner?) {
-                bind.tvSelectDate.
+                (bind.tvSelectDate as TextViewOutlined).
                 setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_playlists_arrow_expand,0)
             }
         })
@@ -136,6 +161,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         bind.tvSelectDate.setOnClickListener {
 
             bind.spinnerDates.performClick()
+
+            it.isPressed = true
         }
     }
 

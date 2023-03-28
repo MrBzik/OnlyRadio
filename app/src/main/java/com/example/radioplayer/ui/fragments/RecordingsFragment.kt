@@ -66,14 +66,18 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
     }
 
     private fun setToolbar(){
-        val mode = this.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
 
-        if(mode == Configuration.UI_MODE_NIGHT_NO){
+        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
             bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_recordings)
+            val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_rec_frag)
+
+            (activity as MainActivity).apply {
+                window.navigationBarColor = color
+                window.statusBarColor = color
+            }
         } else {
             bind.viewToolbar.setBackgroundColor(Color.BLACK)
         }
-
     }
 
 

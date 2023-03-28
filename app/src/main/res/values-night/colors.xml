@@ -31,6 +31,8 @@
     <color name="selected_text_color">#CCFFFF00</color>
     <color name="selected_secondary_text_color">#80FFFF00</color>
 
+    <color name="apply_option_text">#FDB750</color>
+
     <color name="dialog_title_color">#AA4D06</color>
 
     <color name="seekbar_text_style">#99698E03</color>

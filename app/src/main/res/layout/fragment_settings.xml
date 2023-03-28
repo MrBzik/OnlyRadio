@@ -10,7 +10,6 @@
         android:id="@+id/viewToolbar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@drawable/toolbar_bg_protected"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,6 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="16dp"
+
         android:text="Options"
         android:textAppearance="@style/mainTextTitle"
         app:layout_constraintStart_toStartOf="parent"
@@ -281,6 +281,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/tvPlaybackPitchTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tvPlaybackPitchTitle" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

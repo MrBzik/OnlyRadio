@@ -1,6 +1,6 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
-    android:width="360dp"
+    android:width="50dp"
     android:height="50dp"
     android:viewportWidth="360"
     android:viewportHeight="208">
@@ -12,24 +12,22 @@
                 android:startX="0"
                 android:startY="0"
                 android:type="linear"
-
                 >
 
-
                 <item
 
-                    android:color="#C5CAE9"
+                    android:color="#66BBDEFB"
                     android:offset="0.0" />
                 <item
-                    android:color="#CCC5CAE9"
-                    android:offset="0.480" />
+                    android:color="#66BBDEFB"
+                    android:offset="0.472" />
 
 
                 <item
-                    android:color="#E6C5CAE9"
-                    android:offset="0.483" />
+                    android:color="#BBDEFB"
+                    android:offset="0.475" />
                 <item
-                    android:color="#C5CAE9"
+                    android:color="#BBDEFB"
                     android:offset="1" />
 
 

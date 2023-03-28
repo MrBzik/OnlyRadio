@@ -1,5 +1,7 @@
 package com.example.radioplayer.ui.fragments
 
+import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcelable
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE
@@ -8,6 +10,7 @@ import android.view.DragEvent
 import android.view.View
 import android.view.animation.Animation
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
@@ -39,8 +42,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     FragmentRadioSearchBinding::inflate
 ) {
 
-
-    private val allTags = listOfTagsSimple
 
     private var isNewSearchForAnimations = true
 
@@ -123,7 +124,31 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         observeNoResultDetector()
 
-//        setAnimationListener()
+        setToolbar()
+    }
+
+
+    private fun setToolbar(){
+
+        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
+            bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_search)
+            val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_search_fragment)
+            val statusBar = ContextCompat.getColor(requireContext(), R.color.status_bar_search_fragment)
+
+            (activity as MainActivity).apply {
+                window.navigationBarColor = color
+                window.statusBarColor = statusBar
+            }
+
+            bind.tvSeparatorFirst.visibility = View.GONE
+            bind.tvSeparatorSecond.visibility = View.GONE
+
+
+        }
+
+        else {
+            bind.viewToolbar.setBackgroundColor(Color.BLACK)
+        }
     }
 
 
@@ -180,8 +205,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
 
     private fun getFabSearchPositionIfNeeded(){
-        bind.fabInitiateSearch.post{
-            if (mainViewModel.isFabMoved) {
+        bind.fabInitiateSearch.doOnLayout {
+            if (mainViewModel.isFabMoved || mainViewModel.isFabUpdated) {
                 bind.fabInitiateSearch.x = mainViewModel.fabX
                 bind.fabInitiateSearch.y = mainViewModel.fabY
             }
@@ -354,37 +379,23 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private fun setSearchToolbar() {
 
-        bind.llTag.setOnClickListener {
-
-            bind.tvTag.isPressed = true
+        bind.tvTag.setOnClickListener {
            TagPickerDialog(requireContext(), mainViewModel).show()
         }
 
 
 
-        bind.llName.setOnClickListener {
-            bind.tvName.isPressed = true
-            NameDialog(requireContext(), mainViewModel
-                ).show()
+        bind.tvName.setOnClickListener {
+
+            NameDialog(requireContext(), mainViewModel).show()
 
         }
 
-        bind.viewCountryBox.setOnClickListener {
+        bind.tvSelectedCountry.setOnClickListener {
 
-            bind.ivCountry.isPressed = bind.ivCountry.isVisible
-            bind.tvSelectedCountry.isPressed = bind.tvSelectedCountry.isVisible
-            CountryPickerDialog(requireContext(), mainViewModel
-            ).show()
+            CountryPickerDialog(requireContext(), mainViewModel).show()
 
         }
-
-
-//        bind.tvSelectedCountry.setOnClickListener {
-//
-//            CountryPickerDialog(requireContext(), mainViewModel).show()
-//
-//        }
-
     }
 
 
@@ -422,18 +433,21 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         mainViewModel.searchParamCountry.observe(viewLifecycleOwner){
 
-            if(it.isBlank()){
 
-                bind.tvSelectedCountry.visibility = View.INVISIBLE
-                bind.ivCountry.visibility = View.VISIBLE
-            } else {
-                bind.tvSelectedCountry.text = it
-                bind.tvSelectedCountry.visibility = View.VISIBLE
-                bind.ivCountry.visibility = View.INVISIBLE
+            bind.tvSelectedCountry.text = if (it == "") "Country" else it
 
-            }
+//            if(it.isBlank()){
+//
+//                bind.tvSelectedCountry.visibility = View.INVISIBLE
+//                bind.ivCountry.visibility = View.VISIBLE
+//            } else {
+//                bind.tvSelectedCountry.text = it
+//                bind.tvSelectedCountry.visibility = View.VISIBLE
+//                bind.ivCountry.visibility = View.INVISIBLE
+//
+//            }
 
-//            bind.tvSelectedCountry.text = if (it == "") "Country" else it
+
         }
     }
 

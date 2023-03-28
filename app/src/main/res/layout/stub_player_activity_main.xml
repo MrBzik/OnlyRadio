@@ -4,9 +4,14 @@
     android:layout_height="65dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardCornerRadius="15dp"
-    app:strokeColor="@color/dialog_cardview_border"
-    app:strokeWidth="2dp"
+    android:elevation="8dp"
+    app:cardElevation="4dp"
+
     >
+
+<!--    app:strokeColor="@color/dialog_cardview_border"-->
+<!--    app:strokeWidth="2dp"-->
+<!--    -->
 
     <ImageView
         android:id="@+id/ivCurrentStationImage"
@@ -31,9 +36,9 @@
         android:ellipsize="marquee"
         android:marqueeRepeatLimit="marquee_forever"
         android:fontFamily="sans-serif-smallcaps"
+        android:textAppearance="@style/main_player_shadow"
         android:paddingHorizontal="8dp"
         android:paddingTop="8dp"
-        android:text="Some awesome title"
         android:layout_marginStart="75dp"
         android:layout_marginEnd="60dp"
         android:focusable="true"
@@ -49,8 +54,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/Expand"
-        android:textAppearance="@style/mainTextButtons"
+        android:textAppearance="@style/main_player_shadow"
         android:layout_marginTop="36dp"
+        android:textSize="18sp"
+        android:fontFamily="@font/aldrich"
         android:gravity="end"
         android:layout_marginEnd="64dp"
         />

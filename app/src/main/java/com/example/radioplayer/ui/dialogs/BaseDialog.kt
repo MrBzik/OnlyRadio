@@ -1,6 +1,7 @@
 package com.example.radioplayer.ui.dialogs
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.*
@@ -15,6 +16,7 @@ import com.example.radioplayer.R
 import com.example.radioplayer.databinding.DialogPickTagBinding
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.slideAnim
+import com.google.android.material.card.MaterialCardView
 
 abstract class BaseDialog<VB : ViewBinding> (
     private val requireContext : Context,
@@ -80,12 +82,9 @@ abstract class BaseDialog<VB : ViewBinding> (
             requireContext.resources.displayMetrics
         ).toInt()
 
-
-//
-//         val bottomMargin = navBarHeight + dp8*2
-//
-//        val topMargin = statusBarHeight + dp8*2
-
+         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
+             window?.setDimAmount(0.15f)
+         }
 
 
 

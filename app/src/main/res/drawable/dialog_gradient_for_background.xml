@@ -1,26 +1,53 @@
-<?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Drop Shadow Stack -->
     <item>
-        <shape >
-            <corners android:radius="15dp"/>
-            <solid android:color="#FFFFFF"/>
-                <stroke
-                    android:width="2dp"
-                    android:color="@color/dialog_cardview_border"/>
+        <shape>
+            <padding
+                android:bottom="1dp"
+                android:left="1dp"
+                android:right="1dp"
+                android:top="1dp" />
+
+            <solid android:color="#00CCCCCC" />
+
+            <corners android:radius="15dp" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <padding
+                android:bottom="1dp"
+                android:left="1dp"
+                android:right="1dp"
+                android:top="1dp" />
+
+            <solid android:color="#10CCCCCC" />
+
+            <corners android:radius="15dp" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <padding
+                android:bottom="1dp"
+                android:left="1dp"
+                android:right="1dp"
+                android:top="1dp" />
+
+            <solid android:color="#20CCCCCC" />
+
+            <corners android:radius="15dp" />
         </shape>
     </item>
 
-<!--    <item>-->
-<!--        <shape>-->
-<!--            <gradient-->
-<!--                android:centerColor="@color/transparent"-->
-<!--                android:startColor="#14AA4D06"-->
-<!--                android:endColor="@color/main_background"-->
-<!--                android:angle="90"/>-->
-<!--        </shape>-->
-<!--    </item>-->
+    <!-- Background -->
+    <item>
+        <shape>
+            <solid android:color="@android:color/white" />
 
-
-
+            <corners android:radius="15dp" />
+        </shape>
+    </item>
 </layer-list>
-

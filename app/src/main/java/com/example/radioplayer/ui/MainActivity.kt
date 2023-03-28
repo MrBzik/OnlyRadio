@@ -39,6 +39,7 @@ import com.example.radioplayer.databinding.ActivityMainBinding
 import com.example.radioplayer.databinding.StubPlayerActivityMainBinding
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
+import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
 import com.example.radioplayer.ui.animations.LoadingAnim
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.fragments.*
@@ -188,25 +189,41 @@ class MainActivity : AppCompatActivity() {
 
 
     fun smoothDayNightFadeOut(isNightMode : Boolean){
-        if(isStubPlayerBindInflated)
-            bindPlayer.root.slideAnim(500, 0, R.anim.fade_out_anim)
 
-        bind.bottomNavigationView.slideAnim(500, 0, R.anim.fade_out_anim)
-        bind.viewSeparatorStart.slideAnim(500, 0, R.anim.fade_out_anim)
-        bind.viewSeparatorEnd.slideAnim(500, 0, R.anim.fade_out_anim)
-        bind.separatorSecond.slideAnim(500, 0, R.anim.fade_out_anim)
-        bind.separatorLowest.slideAnim(500, 0, R.anim.fade_out_anim)
+        AlphaFadeOutAnim(1f, 500).apply {
+
+            if(isStubPlayerBindInflated)
+                startAnim(bindPlayer.root)
+
+                startAnim(bind.bottomNavigationView)
+                startAnim(bind.viewSeparatorStart)
+                startAnim(bind.viewSeparatorEnd)
+                startAnim(bind.separatorSecond)
+                startAnim(bind.separatorLowest)
+
+        }
 
         if(!isNightMode){
 
             val colorAnimator = ValueAnimator.ofArgb(Color.WHITE, Color.BLACK)
             colorAnimator.addUpdateListener {
                 bind.root.setBackgroundColor(it.animatedValue as Int)
-                window.navigationBarColor = it.animatedValue as Int
-                window.statusBarColor = it.animatedValue as Int
             }
             colorAnimator.duration = 500
             colorAnimator.start()
+
+
+            val colorFrom = ContextCompat.getColor(this, R.color.nav_bar_options_frag)
+
+            val barsColorAnimator = ValueAnimator.ofArgb(colorFrom, Color.BLACK)
+            barsColorAnimator.addUpdateListener { value ->
+                window.navigationBarColor = value.animatedValue as Int
+                window.statusBarColor = value.animatedValue as Int
+            }
+            barsColorAnimator.duration = 500
+            barsColorAnimator.start()
+
+
 
         }
     }
@@ -224,17 +241,25 @@ class MainActivity : AppCompatActivity() {
         if(!isNightMode){
 
 
-
-
-
             val colorAnimator = ValueAnimator.ofArgb(Color.BLACK, Color.WHITE)
             colorAnimator.addUpdateListener {
-                bind.root.setBackgroundColor(it.animatedValue as Int)
-                window.navigationBarColor = it.animatedValue as Int
-                window.statusBarColor = it.animatedValue as Int
+                bind.rootLayout.setBackgroundColor(it.animatedValue as Int)
             }
             colorAnimator.duration = 700
             colorAnimator.start()
+
+            val colorTo = ContextCompat.getColor(this, R.color.nav_bar_options_frag)
+
+            val barsColorAnimator = ValueAnimator.ofArgb(Color.BLACK, colorTo)
+            barsColorAnimator.addUpdateListener { value ->
+                window.navigationBarColor = value.animatedValue as Int
+                window.statusBarColor = value.animatedValue as Int
+            }
+            barsColorAnimator.duration = 700
+            barsColorAnimator.start()
+
+
+
         }
     }
 
@@ -266,11 +291,6 @@ class MainActivity : AppCompatActivity() {
                 replace(R.id.flFragment, radioSearchFragment)
                 addToBackStack(null)
                 commit()
-            }
-
-            if(uiMode == Configuration.UI_MODE_NIGHT_NO) {
-                window.navigationBarColor = ContextCompat.getColor(this, R.color.nav_bar_search_fragment)
-                window.statusBarColor = ContextCompat.getColor(this, R.color.nav_bar_search_fragment)
             }
 
 
@@ -337,16 +357,14 @@ class MainActivity : AppCompatActivity() {
         if(title.equals("NULL", ignoreCase = true) || title.isBlank()){
             bindPlayer.tvStationTitle.apply {
                 text = "Playing: no info"
-                setTextColor(Color.WHITE)
-                alpha = 0.6f
+                setTextColor(ContextCompat.getColor(this@MainActivity,R.color.regular_text_color))
             }
         } else {
 
             bindPlayer.tvStationTitle.apply {
 
                 text = title
-                setTextColor(Color.YELLOW)
-                alpha = 1f
+                setTextColor(ContextCompat.getColor(this@MainActivity,R.color.selected_text_color))
 
             }
         }
@@ -436,11 +454,6 @@ class MainActivity : AppCompatActivity() {
                     commit()
                 }
 
-                if(uiMode == Configuration.UI_MODE_NIGHT_NO){
-                    window.navigationBarColor = ContextCompat.getColor(this, R.color.nav_bar_search_fragment)
-                    window.statusBarColor = ContextCompat.getColor(this, R.color.nav_bar_search_fragment)
-                }
-
 
             }
             R.id.mi_favStationsFragment -> {
@@ -454,10 +467,6 @@ class MainActivity : AppCompatActivity() {
                     commit()
                 }
 
-                if(uiMode == Configuration.UI_MODE_NIGHT_NO){
-                    window.navigationBarColor = ContextCompat.getColor(this, R.color.nav_bar_fav_fragment)
-                    window.statusBarColor = ContextCompat.getColor(this, R.color.nav_bar_fav_fragment)
-                }
 
 
             }
@@ -471,10 +480,6 @@ class MainActivity : AppCompatActivity() {
                     commit()
                 }
 
-                if(uiMode == Configuration.UI_MODE_NIGHT_NO){
-                    window.navigationBarColor = ContextCompat.getColor(this, R.color.nav_bar_history_frag)
-                    window.statusBarColor = ContextCompat.getColor(this, R.color.nav_bar_history_frag)
-                }
 
 
             }
@@ -489,10 +494,6 @@ class MainActivity : AppCompatActivity() {
                     commit()
                 }
 
-                if(uiMode == Configuration.UI_MODE_NIGHT_NO){
-                    window.navigationBarColor = ContextCompat.getColor(this, R.color.nav_bar_rec_frag)
-                    window.statusBarColor = ContextCompat.getColor(this, R.color.nav_bar_rec_frag)
-                }
 
             }
 
@@ -504,14 +505,6 @@ class MainActivity : AppCompatActivity() {
                     addToBackStack(null)
                     commit()
                 }
-
-                if(uiMode == Configuration.UI_MODE_NIGHT_NO){
-                    val color = ContextCompat.getColor(this, R.color.nav_bar_options_frag)
-
-                    window.navigationBarColor = color
-                    window.statusBarColor = color
-                }
-
 
 
 
@@ -683,21 +676,22 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.playbackState.observe(this){
 
             it?.let {
-                when{
+                    when{
                     it.isPlaying -> {
                         bindPlayer.ivTogglePlayCurrentStation
                             .setImageResource(R.drawable.ic_pause_play)
                         bindPlayer.tvStationTitle.apply {
-                            setTextColor(Color.YELLOW)
-                            alpha = 1f
+                            setTextColor(ContextCompat.getColor(this@MainActivity,R.color.selected_text_color))
+
                         }
                     }
                     it.isPlayEnabled -> {
                         bindPlayer.ivTogglePlayCurrentStation
                             .setImageResource(R.drawable.ic_play_pause)
                         bindPlayer.tvStationTitle.apply {
-                            setTextColor(Color.WHITE)
-                            alpha = 0.6f
+
+                            setTextColor(ContextCompat.getColor(this@MainActivity, R.color.regular_text_color))
+
                         }
 
                     }

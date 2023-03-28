@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/clFavFrag"
     android:animateLayoutChanges="true">
 
 <View
@@ -43,20 +44,25 @@
         android:id="@+id/viewToolbar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@drawable/toolbar_bg_protected"
+        android:background="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         />
 
+
+
+
     <TextView
         android:id="@+id/tvFavouredTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="16dp"
-        android:text="Favoured"
+        android:ellipsize="end"
+
+
         android:textAppearance="@style/mainTextTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -67,15 +73,13 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:ellipsize="end"
-        android:gravity="center"
         android:maxLines="1"
+        android:textAlignment="center"
         android:paddingHorizontal="8dp"
-        android:text="playlist name"
         android:textAppearance="@style/mainTextTitle"
-        app:layout_constraintEnd_toStartOf="@+id/tvPlaylistsExpand"
         app:layout_constraintStart_toEndOf="@+id/tvPlaylistEdit"
+        app:layout_constraintEnd_toStartOf="@+id/tvPlaylistsExpand"
         app:layout_constraintTop_toTopOf="parent"
-
         />
 
 
@@ -85,9 +89,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="16dp"
-        android:text="Edit:"
+
         android:textAppearance="@style/mainTextButtons"
-        android:visibility="gone"
+
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -133,6 +137,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5" />
+
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

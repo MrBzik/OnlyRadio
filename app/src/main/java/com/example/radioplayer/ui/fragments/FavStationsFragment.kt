@@ -1,13 +1,19 @@
 package com.example.radioplayer.ui.fragments
 
 
+import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
+import android.util.TypedValue
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updateMargins
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -325,7 +331,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             bind.ivArrowBackToFav.isVisible = !it && isPlaylistsVisible
 
-            bind.tvPlaylistEdit.isVisible = !it
 
             isInFavouriteTab = it
 
@@ -333,20 +338,80 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             if(it){
                bind.tvPlaylistName.text = ""
 
-               bind.tvFavouredTitle.visibility = View.VISIBLE
+                bind.tvPlaylistEdit.text = ""
+
+               bind.tvFavouredTitle.text = "Favoured"
 
                searchFlag = SEARCH_FROM_FAVOURITES
 
+
+                if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
+
+                    bind.tvPlaylistsExpand.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        startToStart = bind.guidelineMiddle!!.id
+                        endToEnd = bind.clFavFrag.id
+                        topToTop = bind.clFavFrag.id
+
+//                        val dp24 = TypedValue.applyDimension(
+//                            TypedValue.COMPLEX_UNIT_DIP,
+//                            24f,
+//                            requireContext().resources.displayMetrics
+//                        ).toInt()
+//
+//                       marginStart = dp24
+
+                    }
+                }
+
+
             } else{
 
+                bind.tvFavouredTitle.text = ""
+
+                if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
+
+                    bind.tvPlaylistsExpand.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        startToStart = bind.guideline66!!.id
+                        endToEnd = bind.clFavFrag.id
+                        topToTop = bind.clFavFrag.id
+                    }
+                }
+
+
+                bind.tvPlaylistEdit.text = "Edit"
+
                 searchFlag = SEARCH_FROM_PLAYLIST
-                bind.tvFavouredTitle.visibility = View.GONE
+
 
             }
+
+            setToolbar(it)
 
         }
 
     }
+
+
+    private fun setToolbar(isInFav : Boolean){
+
+        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
+
+            if(isInFav)
+                bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_fav)
+
+            else
+                bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_playlists)
+
+
+            val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_fav_fragment)
+
+            (activity as MainActivity).apply {
+                window.navigationBarColor = color
+                window.statusBarColor = color
+            }
+        }
+    }
+
 
 
     private fun observeListOfPlaylists (){

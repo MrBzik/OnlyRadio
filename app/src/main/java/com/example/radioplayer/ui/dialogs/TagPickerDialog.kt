@@ -49,6 +49,7 @@ class TagPickerDialog (
         handleKeyboardToggle()
         setSwitchExactMatch()
 
+
         adjustDialogHeight(bind.clTagPickDialog)
     }
 

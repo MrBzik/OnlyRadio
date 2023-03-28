@@ -12,8 +12,6 @@
         android:id="@+id/viewToolbar"
         android:layout_width="0dp"
         android:layout_height="60dp"
-
-        android:background="@drawable/toolbar_bg_protected"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,104 +19,88 @@
 
 
 
-    <LinearLayout
-        android:id="@+id/llTag"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:orientation="horizontal"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toStartOf="@+id/viewCountryBox"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginEnd="8dp"
-        >
-
         <TextView
-
             android:id="@+id/tvTag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginHorizontal="8dp"
             android:ellipsize="middle"
+            android:gravity="center"
             android:maxLines="1"
-            android:layout_marginStart="10dp"
             android:text="Tag"
             android:textAppearance="@style/mainTextButtons"
-
+            app:layout_constraintEnd_toStartOf="@+id/guideline33"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             />
 
 
-        <ImageView
-            android:id="@+id/ivArrowTag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrow_drop_down"
+
+
+
+    <TextView
+        android:id="@+id/tvSeparatorFirst"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_marginStart="-2dp"
+        android:gravity="center"
+        android:text="|"
+        android:textAppearance="@style/mainTextTitle"
+        app:layout_constraintStart_toStartOf="@id/guideline33"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvSeparatorSecond"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_marginStart="-2dp"
+        android:gravity="center"
+        android:text="|"
+        android:textAppearance="@style/mainTextTitle"
+        app:layout_constraintStart_toStartOf="@id/guideline66"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_marginHorizontal="8dp"
+            android:layout_gravity="center_horizontal"
+            android:ellipsize="middle"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="Name"
+            android:textAppearance="@style/mainTextButtons"
+            app:layout_constraintEnd_toEndOf="@id/guideline66"
+            app:layout_constraintStart_toStartOf="@id/guideline33"
+            app:layout_constraintTop_toTopOf="parent"
             />
-    </LinearLayout>
 
 
     <TextView
         android:id="@+id/tvSelectedCountry"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="-21dp"
-        android:layout_marginTop="16dp"
-        android:text="CT"
-        android:textAppearance="@style/mainTextButtons"
-        app:drawableEndCompat="@drawable/ic_arrow_drop_down"
-        app:layout_constraintStart_toStartOf="@id/guidelineMiddle"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
-    <ImageView
-        android:id="@+id/ivCountry"
-        android:layout_width="40dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="-20dp"
-        android:layout_marginTop="10dp"
-        android:src="@drawable/flagzz"
-        app:layout_constraintStart_toEndOf="@id/guidelineMiddle"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/viewCountryBox"
-        android:layout_width="44dp"
+        android:layout_width="0dp"
         android:layout_height="60dp"
-        android:layout_marginStart="-23dp"
-        app:layout_constraintStart_toStartOf="@id/guidelineMiddle"
+        android:gravity="center"
+        android:text="Country"
+        android:textAppearance="@style/mainTextButtons"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline66"
         app:layout_constraintTop_toTopOf="parent" />
 
 
-
-    <LinearLayout
-        android:id="@+id/llName"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:gravity="end"
-        >
-
-        <TextView
-            android:id="@+id/tvName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="middle"
-            android:maxLines="1"
-            android:text="Name"
-            android:textAppearance="@style/mainTextButtons"
-
-            />
-
-        <ImageView
-            android:id="@+id/ivArrowName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrow_drop_down"
-            />
-    </LinearLayout>
-
-
+    <!--    <ImageView-->
+    <!--        android:id="@+id/ivCountry"-->
+    <!--        android:layout_width="40dp"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="-20dp"-->
+    <!--        android:layout_marginTop="10dp"-->
+    <!--        android:src="@drawable/flagzz"-->
+    <!--        android:visibility="invisible"-->
+    <!--        app:layout_constraintStart_toEndOf="@id/guidelineMiddle"-->
+    <!--        app:layout_constraintTop_toTopOf="parent" />-->
 
 
     <!--    <ImageView-->
@@ -131,13 +113,12 @@
     <!--        app:layout_constraintTop_toTopOf="parent" />-->
 
 
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="60dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="60dp"
         android:backgroundTint="@color/floating_buttons"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -191,12 +172,29 @@
         app:layout_constraintGuide_begin="60dp" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guidelineMiddle"
+        android:id="@+id/guideline33"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5"
-        app:layout_constraintGuide_begin="60dp" />
+        app:layout_constraintGuide_percent="0.33" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline66"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.66" />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/middle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

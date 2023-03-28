@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
+import android.util.Log
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
@@ -179,6 +180,7 @@ class MainViewModel @Inject constructor(
 
        var fabPref: SharedPreferences = app.getSharedPreferences(SEARCH_BTN_PREF, Context.MODE_PRIVATE)
        var isFabMoved = fabPref.getBoolean(IS_FAB_UPDATED, false)
+
        var isFabUpdated = false
        init {
             if(isFabMoved){

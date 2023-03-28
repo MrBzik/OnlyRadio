@@ -11,7 +11,6 @@
         android:id="@+id/viewToolbar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@drawable/toolbar_bg_two_items_protected"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,12 +20,13 @@
     <TextView
         android:id="@+id/tvSliderHeader"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_height="60dp"
+        android:gravity="center"
         android:text="History: All"
-        android:layout_marginStart="20dp"
+
         android:textAppearance="@style/mainTextTitle"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guidelineTitle"
         app:layout_constraintTop_toTopOf="parent"
        />
 
@@ -40,16 +40,24 @@
         android:popupBackground="@drawable/spinner_gradient_for_background"
         android:background="@null"
         android:elevation="-1dp"
-        android:popupElevation="-20dp"
         style="@style/listPopupWindow"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/guidelineMiddle"
+        app:layout_constraintEnd_toEndOf="@id/guidelineTitle"
         app:layout_constraintTop_toTopOf="parent"
 
         />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guidelineMiddle"
+        android:id="@+id/guidelineTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_percent="0.472"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineMid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -57,13 +65,15 @@
         app:layout_constraintGuide_percent="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
+    <com.example.radioplayer.utils.TextViewOutlined
         android:id="@+id/tvSelectDate"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:layout_marginStart="24dp"
         android:text="Select date"
         android:textAppearance="@style/mainTextButtons"
+        app:layout_constraintStart_toStartOf="@id/guidelineMid"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:drawableEndCompat="@drawable/ic_playlists_arrow_expand" />

@@ -4,7 +4,9 @@ package com.example.radioplayer.ui.fragments
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
@@ -12,6 +14,7 @@ import com.example.radioplayer.R
 import com.example.radioplayer.databinding.FragmentSettingsBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.MainActivity
+import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.HistorySettingsDialog
 import com.example.radioplayer.ui.dialogs.RecordingSettingsDialog
@@ -92,15 +95,38 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         animateDayNightTransition()
 
+        setToolbar()
 
     }
 
+
+
+    private fun setToolbar(){
+
+        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
+            bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_settings)
+
+            val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_options_frag)
+
+            if(!mainViewModel.isSmoothTransitionNeeded){
+
+            (activity as MainActivity).apply {
+                window.navigationBarColor = color
+                window.statusBarColor = color
+                }
+            }
+
+        } else {
+            bind.viewToolbar.setBackgroundColor(Color.BLACK)
+        }
+    }
 
 
 
     private fun animateDayNightTransition(){
 
         if(mainViewModel.isSmoothTransitionNeeded){
+
             bind.root.slideAnim(700, 0, R.anim.fade_in_anim)
 
             (activity as MainActivity).smoothDayNightFadeIn(isNightMode)
@@ -194,7 +220,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         mainViewModel.apply {
             if(isFabUpdated || isFabMoved){
                 bind.tvSearchBtnReset
-                    .setTextColor(ContextCompat.getColor(requireContext(), R.color.color_interactive))
+                    .setTextColor(ContextCompat.getColor(requireContext(), R.color.apply_option_text))
             }
 
         }
@@ -356,12 +382,13 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         bind.switchNightMode.setOnCheckedChangeListener { _, isChecked ->
 
-//            (activity as MainActivity).bind.root.slideAnim(500, 0, R.anim.fade_out_anim)
-
-
             mainViewModel.isSmoothTransitionNeeded = true
 
-           bind.root.slideAnim(500, 0, R.anim.fade_out_anim)
+//           bind.root.slideAnim(500, 0, R.anim.fade_out_anim)
+
+            val fadeAnim = AlphaFadeOutAnim(1f, 500)
+            fadeAnim.startAnim(bind.root)
+
 
             (activity as MainActivity).smoothDayNightFadeOut(isNightMode)
 
@@ -374,8 +401,8 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 //                        (activity as MainActivity).bind.root.setBackgroundColor(Color.BLACK)
 
 
-
                     } else{
+
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
 //                        (activity as MainActivity).bind.root.setBackgroundColor(Color.WHITE)

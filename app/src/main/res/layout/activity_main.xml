@@ -100,6 +100,9 @@
       android:background="@drawable/bottom_nav_bg"
       app:itemBackground="@null"
       app:itemPaddingBottom="21dp"
+      app:itemIconSize="40dp"
+
+      app:itemIconTint="@color/bottom_nav_icons"
       app:itemTextAppearanceActive="@style/bottomNavTextActive"
       app:itemTextAppearanceInactive="@style/bottomNavTextInactive"
       app:labelVisibilityMode="labeled"

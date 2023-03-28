@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <item
+        android:id="@+id/mi_radioSearchFragment"
+        android:title=""
+        android:icon="@drawable/ic_new_radio_search"
+        />
+
+    <item
+        android:id="@+id/mi_favStationsFragment"
+        android:icon="@drawable/bottom_ic_fav"
+        android:title=""
+
+        />
+
+
+    <item
+        android:id="@+id/mi_historyFragment"
+        android:title=""
+        android:icon="@drawable/bottom_ic_history"
+        />
+
+    <item
+        android:id="@+id/mi_recordingsFragment"
+        android:title=""
+        android:icon="@drawable/bottom_ic_rec"
+        />
+
+    <item
+        android:id="@+id/mi_settingsFragment"
+        android:icon="@drawable/bottom_ic_settings"
+        android:title=""/>
+
+
+</menu>
