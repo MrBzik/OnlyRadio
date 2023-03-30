@@ -93,8 +93,6 @@ class MainViewModel @Inject constructor(
     }
 
 
-
-
     var hasInternetConnection : MutableLiveData<Boolean> = MutableLiveData(false)
 
     private fun setConnectivityObserver() {

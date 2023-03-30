@@ -61,7 +61,7 @@ class TextViewOutlined(context : Context, attrs : AttributeSet?) : AppCompatText
 
     override fun onDraw(canvas: Canvas) {
 
-        Log.d("CHECKTAGS", "onDraw")
+//        Log.d("CHECKTAGS", "onDraw")
 
         if (_strokeWidth > 0) {
             isDrawing = true
@@ -86,7 +86,7 @@ class TextViewOutlined(context : Context, attrs : AttributeSet?) : AppCompatText
     }
 
     override fun invalidate() {
-        Log.d("CHECKTAGS", "invalidate")
+//        Log.d("CHECKTAGS", "invalidate")
         if (isDrawing) return
         super.invalidate()
     }

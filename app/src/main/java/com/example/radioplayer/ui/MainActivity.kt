@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.transition.Fade
 import androidx.transition.Slide
 import com.bumptech.glide.RequestManager
@@ -56,6 +57,9 @@ import com.example.radioplayer.utils.RandomColors
 import com.example.radioplayer.utils.Utils
 
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -471,6 +475,13 @@ class MainActivity : AppCompatActivity() {
 
             }
             R.id.mi_historyFragment -> {
+
+//                if(databaseViewModel.selectedDate == 0L){
+//                    databaseViewModel.updateHistory.postValue(true)
+//                } else {
+//                    databaseViewModel.updateHistory.postValue(false)
+//                }
+
 
                 historyFragment.exitTransition = null
                 supportFragmentManager.beginTransaction().apply {

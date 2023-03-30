@@ -2,11 +2,9 @@ package com.example.radioplayer.ui.viewmodels
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.*
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import androidx.paging.*
 import com.example.radioplayer.adapters.datasources.HistoryDataSource
 import com.example.radioplayer.adapters.datasources.HistoryDateLoader
 import com.example.radioplayer.adapters.datasources.HistoryOneDateLoader
@@ -264,52 +262,100 @@ class DatabaseViewModel @Inject constructor(
 
 
 
-     val updateHistory : MutableLiveData<Boolean> = MutableLiveData(true)
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val historyFlow = updateHistory.asFlow()
-        .flatMapLatest {
+//     val updateHistory : MutableLiveData<Boolean> = MutableLiveData()
+//
+//    @OptIn(ExperimentalCoroutinesApi::class)
+//    val historyFlow = updateHistory.asFlow()
+//        .flatMapLatest {
 //            if(it)
-            stationsHistoryFlow()
+//            stationsHistoryFlow()
 //            else stationsHistoryOneDateFlow()
-        }.cachedIn(viewModelScope)
+//        }.cachedIn(viewModelScope)
 
 
-    private fun stationsHistoryOneDateFlow() : Flow<PagingData<StationWithDateModel>> {
-        val loader : HistoryOneDateLoader = {
-            getStationsInOneDate(selectedDate)
-        }
 
-        return Pager(
+
+    private val allHistoryLoader : HistoryDateLoader = { dateIndex ->
+        getStationsInDate(1, dateIndex)
+    }
+
+    private val oneDateHistoryLoader : HistoryOneDateLoader = {
+        getStationsInOneDate(selectedDate)
+    }
+
+
+
+
+
+
+    private var historyFlow : LiveData<PagingData<StationWithDateModel>>?  = null
+    private var oneDateHistoryFlow : LiveData<PagingData<StationWithDateModel>>?  = null
+
+
+    val observableHistory = MediatorLiveData<PagingData<StationWithDateModel>>()
+
+    val isOneDateCalled : MutableLiveData<Boolean> = MutableLiveData(false)
+
+    fun setHistoryLiveData(){
+
+        historyFlow = Pager(
             config = PagingConfig(
                 pageSize = 10,
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {
-                HistoryOneDateSource(loader)
+                HistoryDataSource(allHistoryLoader)
             }
-        ).flow
-    }
+        ).liveData.cachedIn(viewModelScope)
 
+        oneDateHistoryFlow = Transformations.switchMap(isOneDateCalled){
 
-    private fun stationsHistoryFlow() : Flow<PagingData<StationWithDateModel>> {
-        val loader : HistoryDateLoader = { dateIndex ->
-            getStationsInDate(1, dateIndex)
+               Pager(
+                    config = PagingConfig(
+                        pageSize = 10,
+                        enablePlaceholders = false
+                    ),
+                    pagingSourceFactory = {
+                        HistoryOneDateSource(oneDateHistoryLoader)
+                    }
+                ).liveData
+
         }
 
-        return Pager(
-            config = PagingConfig(
-                pageSize = 10,
-                enablePlaceholders = false
-            ),
-            pagingSourceFactory = {
-                HistoryDataSource(loader)
+
+
+        observableHistory.addSource(historyFlow!!) { history ->
+            if(selectedDate == 0L){
+                observableHistory.value = history
             }
-        ).flow
+        }
+
+        observableHistory.addSource(oneDateHistoryFlow!!) { history ->
+            if(selectedDate > 0L){
+                observableHistory.value = history
+            }
+        }
+
+    }
+
+    fun getAllHistory(){
+
+        historyFlow?.value?.let {
+            observableHistory.value = it
+        }
+
     }
 
 
+    fun cleanHistory(){
 
+        observableHistory.removeSource(historyFlow!!)
+        observableHistory.removeSource(oneDateHistoryFlow!!)
+
+        historyFlow = null
+        oneDateHistoryFlow = null
+
+    }
 
 
     // Handle history options and cleaning history

@@ -41,7 +41,7 @@ class HistoryDataSource(
             LoadResult.Page(
                 data = stations,
                 prevKey = if (dateIndex == 0) null else dateIndex - 1,
-                nextKey = dateIndex +1
+                nextKey = dateIndex +pagesLoaded
             )
 
         } catch (e: Exception) {

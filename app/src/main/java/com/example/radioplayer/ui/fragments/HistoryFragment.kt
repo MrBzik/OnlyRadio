@@ -13,6 +13,8 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
+import androidx.paging.PagingData
+import androidx.paging.map
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
@@ -57,8 +59,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     private var isInitialLoad = true
 
 
-    @Inject
-    lateinit var historyAdapter: PagingHistoryAdapter
+    private  var historyAdapter: PagingHistoryAdapter? = null
 
     companion object{
 
@@ -67,6 +68,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
 
         updateCurrentDate()
 
@@ -116,7 +118,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private fun setAdapterLoadStateListener(){
 
-        historyAdapter.addLoadStateListener {
+        historyAdapter?.addLoadStateListener {
 
             if (it.refresh is LoadState.Loading ||
                 it.append is LoadState.Loading)
@@ -235,11 +237,20 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                     databaseViewModel.selectedDate = item.time
 
                     if(position == 0){
-                        databaseViewModel.updateHistory.postValue(true)
-                        isNewHistoryQuery = true
+                        databaseViewModel.getAllHistory()
+                    } else {
+                        databaseViewModel.isOneDateCalled.postValue(true)
                     }
-                    else
-                        databaseViewModel.updateHistory.postValue(false)
+
+
+
+//
+//                    if(position == 0){
+//                        databaseViewModel.updateHistory.postValue(true)
+//                        isNewHistoryQuery = true
+//                    }
+//                    else
+//                        databaseViewModel.updateHistory.postValue(false)
                 }
             }
 
@@ -261,15 +272,15 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 when{
                     it.isPlaying -> {
-                        historyAdapter.currentPlaybackState = true
+                        historyAdapter?.currentPlaybackState = true
 
-                            historyAdapter.updateStationPlaybackState()
+                            historyAdapter?.updateStationPlaybackState()
 
                     }
                     it.isPlayEnabled -> {
-                        historyAdapter.currentPlaybackState = false
+                        historyAdapter?.currentPlaybackState = false
 
-                            historyAdapter.updateStationPlaybackState()
+                            historyAdapter?.updateStationPlaybackState()
 
                     }
                 }
@@ -283,6 +294,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         bind.rvHistory.apply {
 
+            historyAdapter = PagingHistoryAdapter(glide)
+
             adapter = historyAdapter
             layoutManager = LinearLayoutManager(requireContext())
             edgeEffectFactory = BounceEdgeEffectFactory()
@@ -291,7 +304,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             itemAnimator = null
 
-            historyAdapter.apply {
+            historyAdapter?.apply {
                 defaultTextColor = ContextCompat.getColor(requireContext(), R.color.default_text_color)
                 selectedTextColor = ContextCompat.getColor(requireContext(), R.color.selected_text_color)
 
@@ -317,26 +330,36 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     }
 
+
+
     private fun subscribeToHistory(){
 
-        viewLifecycleOwner.lifecycleScope.launch{
+        databaseViewModel.setHistoryLiveData()
 
+            databaseViewModel.observableHistory.observe(viewLifecycleOwner){
+                historyAdapter?.currentDate = currentDate
+                viewLifecycleOwner.lifecycleScope.launch{
 
-            databaseViewModel.historyFlow.collectLatest {
-
-                Log.d("CHECKTAGS", "collect")
-
-                historyAdapter.currentDate = currentDate
-                historyAdapter.submitData(it)
-
+                    Log.d("CHECKTAGS", "data")
+                historyAdapter?.submitData(it)
             }
+
+
+//            databaseViewModel.historyFlow.collectLatest {
+//
+//                Log.d("CHECKTAGS", "collect")
+//
+//                historyAdapter.currentDate = currentDate
+//                historyAdapter.submitData(it)
+//
+//            }
         }
 
     }
 
     private fun setupAdapterClickListener(){
 
-        historyAdapter.setOnClickListener {
+        historyAdapter?.setOnClickListener {
 
             mainViewModel.playOrToggleStation(it, SEARCH_FROM_HISTORY)
 
@@ -358,9 +381,12 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        databaseViewModel.cleanHistory()
         isNewHistoryQuery = true
         isInitialLoad = true
         bind.rvHistory.adapter = null
+        historyAdapter = null
         _bind = null
     }
 
