@@ -228,7 +228,7 @@ class DatabaseViewModel @Inject constructor(
 
     val listOfDates = repository.getListOfDates
 
-    var selectedDate = -1L
+    var selectedDate = 0L
 
     private suspend fun getStationsInDate(limit: Int, offset: Int): List<StationWithDateModel> {
 
@@ -264,13 +264,14 @@ class DatabaseViewModel @Inject constructor(
 
 
 
-     val updateHistory : MutableLiveData<Boolean> = MutableLiveData()
+     val updateHistory : MutableLiveData<Boolean> = MutableLiveData(true)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val historyFlow = updateHistory.asFlow()
-        .flatMapLatest { if(it)
+        .flatMapLatest {
+//            if(it)
             stationsHistoryFlow()
-            else stationsHistoryOneDateFlow()
+//            else stationsHistoryOneDateFlow()
         }.cachedIn(viewModelScope)
 
 

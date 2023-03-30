@@ -11,9 +11,6 @@
     >
 
 
-
-
-
   <FrameLayout
       android:id="@+id/flFragment"
       android:layout_width="match_parent"
@@ -66,19 +63,19 @@
       android:id="@+id/separatorSecond"
       android:layout_width="match_parent"
       android:layout_height="2dp"
-      android:elevation="@dimen/low_separators_elevation"
       android:layout_marginBottom="-2dp"
       android:background="@drawable/gradient_for_separators"
+      android:elevation="@dimen/low_separators_elevation"
       app:layout_constraintBottom_toTopOf="@id/bottomNavigationView" />
 
   <ViewStub
       android:id="@+id/stubPlayer"
       android:layout_width="match_parent"
       android:layout_height="@dimen/player_view_height"
-      android:inflatedId="@+id/stubPlayer"
-      android:layout_marginBottom="@dimen/player_view_bottom_margin"
-      android:layout="@layout/stub_player_activity_main"
       android:layout_marginHorizontal="@dimen/stub_player_margin_horizontal"
+      android:layout_marginBottom="@dimen/player_view_bottom_margin"
+      android:inflatedId="@+id/stubPlayer"
+      android:layout="@layout/stub_player_activity_main"
       app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent" />
@@ -88,9 +85,9 @@
       android:id="@+id/separatorLowest"
       android:layout_width="match_parent"
       android:layout_height="2dp"
-      android:elevation="@dimen/low_separators_elevation"
       android:layout_marginHorizontal="50dp"
       android:background="@drawable/gradient_for_separators"
+      android:elevation="@dimen/low_separators_elevation"
       app:layout_constraintBottom_toBottomOf="parent" />
 
   <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -99,10 +96,10 @@
       android:layout_height="52dp"
       android:background="@drawable/bottom_nav_bg"
       app:itemBackground="@null"
-      app:itemPaddingBottom="21dp"
       app:itemIconSize="40dp"
-
       app:itemIconTint="@color/bottom_nav_icons"
+
+      app:itemPaddingBottom="21dp"
       app:itemTextAppearanceActive="@style/bottomNavTextActive"
       app:itemTextAppearanceInactive="@style/bottomNavTextInactive"
       app:labelVisibilityMode="labeled"
@@ -113,7 +110,7 @@
       app:menu="@menu/bottom_nav_menu" />
 
 
-<!--  app:itemBackground="@drawable/bottom_nav_item_bg"-->
+  <!--  app:itemBackground="@drawable/bottom_nav_item_bg"-->
 
   <androidx.constraintlayout.widget.Guideline
       android:id="@+id/guidelineToolbar"
@@ -121,6 +118,14 @@
       android:layout_height="wrap_content"
       android:orientation="horizontal"
       app:layout_constraintGuide_begin="60dp" />
+
+  <View
+      android:id="@+id/viewHeight"
+      android:layout_width="1dp"
+      android:layout_height="0dp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

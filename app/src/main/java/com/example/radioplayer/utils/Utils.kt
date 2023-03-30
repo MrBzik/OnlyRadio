@@ -2,6 +2,8 @@ package com.example.radioplayer.utils
 
 import android.content.Context
 import android.content.res.Configuration
+import androidx.appcompat.widget.AppCompatSpinner
+import androidx.appcompat.widget.ListPopupWindow
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -118,5 +120,12 @@ object Utils {
     }
 
 
+
+    fun AppCompatSpinner.dismiss() {
+        val popup = AppCompatSpinner::class.java.getDeclaredField("mPopup")
+        popup.isAccessible = true
+        val listPopupWindow = popup.get(this) as ListPopupWindow
+        listPopupWindow.dismiss()
+    }
 
 }

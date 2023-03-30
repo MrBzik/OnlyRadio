@@ -61,7 +61,16 @@
 
 
 
-    <color name="dialog_cardview_border">#3F51B5</color>
+
+    <color name="text_button_search_tag">#283593</color>
+    <color name="text_button_search_name">#303F9F</color>
+    <color name="text_button_search_country">#3949AB</color>
+
+
+    <color name="text_button_fav">#00695C</color>
+    <color name="text_button_history">#6A1B9A</color>
+    <color name="text_button_rec">#1565C0</color>
+
 
 
 

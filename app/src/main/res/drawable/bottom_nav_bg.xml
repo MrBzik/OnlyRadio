@@ -31,10 +31,10 @@
 
                 <item
                     android:color="@color/nav_bar_search_fragment"
-                    android:offset="0.228" />
+                    android:offset="0.218" />
                 <item
                     android:color="@color/nav_bar_fav_fragment"
-                    android:offset="0.231" />
+                    android:offset="0.221" />
                 <item
                     android:color="@color/nav_bar_fav_fragment"
                     android:offset="0.419" />
@@ -43,16 +43,16 @@
                     android:offset="0.422" />
                 <item
                     android:color="@color/nav_bar_history_frag"
-                    android:offset="0.610" />
+                    android:offset="0.620" />
                 <item
                     android:color="@color/nav_bar_rec_frag"
-                    android:offset="0.613" />
+                    android:offset="0.623" />
                 <item
                     android:color="@color/nav_bar_rec_frag"
-                    android:offset="0.801" />
+                    android:offset="0.821" />
                 <item
                     android:color="@color/nav_bar_options_frag"
-                    android:offset="0.804" />
+                    android:offset="0.824" />
 <!--                <item-->
 <!--                    android:color="#4DFFFFFF"-->
 <!--                    android:offset="1.0" />-->

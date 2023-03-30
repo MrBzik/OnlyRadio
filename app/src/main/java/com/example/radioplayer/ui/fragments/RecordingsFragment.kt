@@ -23,6 +23,7 @@ import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.RecordingSettingsDialog
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
+import com.example.radioplayer.utils.TextViewOutlined
 import com.example.radioplayer.utils.Utils
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -75,6 +76,10 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
                 window.navigationBarColor = color
                 window.statusBarColor = color
             }
+
+            (bind.tvEnableDeleting as TextViewOutlined).isSingleColor = true
+
+
         } else {
             bind.viewToolbar.setBackgroundColor(Color.BLACK)
         }
@@ -238,11 +243,11 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
             if(!isDeletingEnabled){
 
-                bind.tvEnableDeleting.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_changed_on_interaction))
+                (bind.tvEnableDeleting as TextView).setTextColor(ContextCompat.getColor(requireContext(), R.color.color_changed_on_interaction))
                 itemTouchHelper.attachToRecyclerView(bind.rvRecordings)
             } else {
 
-                bind.tvEnableDeleting.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_interactive))
+                (bind.tvEnableDeleting as TextView).setTextColor(ContextCompat.getColor(requireContext(), R.color.text_button_rec))
                 itemTouchHelper.attachToRecyclerView(null)
             }
         }

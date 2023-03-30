@@ -1,5 +1,6 @@
 package com.example.radioplayer.adapters.datasources
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.radioplayer.adapters.models.StationWithDateModel
@@ -33,6 +34,7 @@ class HistoryDataSource(
 
                     pagesLoaded += 1
                  }
+
                 HistoryFragment.isNewHistoryQuery = false
             }
 

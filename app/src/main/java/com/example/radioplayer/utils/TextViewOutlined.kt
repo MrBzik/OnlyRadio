@@ -19,11 +19,16 @@ class TextViewOutlined(context : Context, attrs : AttributeSet?) : AppCompatText
 
 
 
-    private var _strokeColor = Color.BLACK
-    private var _strokeWidth = 1.5f
+//    private var _strokeColor = ContextCompat.getColor(context, R.color.outline_stroke)
 
-    val color = ContextCompat.getColor(context, R.color.interactive_text_color)
+    private var _strokeColor = Color.WHITE
+    private var _strokeWidth = 5f
 
+    var isSingleColor = false
+
+    var colors = intArrayOf(
+        0, 0
+    )
 
     fun setStrokeColor(color: Int) {
         _strokeColor = color
@@ -34,38 +39,43 @@ class TextViewOutlined(context : Context, attrs : AttributeSet?) : AppCompatText
     }
 
 
+    fun setColors(colorDefault : Int){
+
+        colors = intArrayOf(colorDefault, Color.RED)
+
+    }
 
 
     private var isDrawing = true
 
 
-
-    val colors = intArrayOf(
-        Color.RED,
-        Color.WHITE
+    private val states = arrayOf(
+        intArrayOf(-android.R.attr.state_pressed),
+        intArrayOf(android.R.attr.state_pressed)
     )
 
-    val states = arrayOf(
-        intArrayOf(android.R.attr.state_pressed),
-        intArrayOf(-android.R.attr.state_pressed)
-    )
-
-    val stateList = ColorStateList(states, colors)
+   private val stateList : ColorStateList by lazy {
+        ColorStateList(states, colors)
+    }
 
 
     override fun onDraw(canvas: Canvas) {
 
-        Log.d("CHECKTAGS", "draw")
+        Log.d("CHECKTAGS", "onDraw")
 
         if (_strokeWidth > 0) {
             isDrawing = true
-
+            val textColor = textColors.defaultColor
             setTextColor(_strokeColor)
             paint.strokeWidth = dpToPx(_strokeWidth)
             paint.style = Paint.Style.STROKE
             super.onDraw(canvas)
 
-            setTextColor(stateList)
+            if(isSingleColor)
+                setTextColor(textColor)
+            else
+                setTextColor(stateList)
+
             paint.strokeWidth = 0f
             paint.style = Paint.Style.FILL
             isDrawing = false
@@ -81,16 +91,9 @@ class TextViewOutlined(context : Context, attrs : AttributeSet?) : AppCompatText
         super.invalidate()
     }
 
-    override fun setCompoundDrawablesWithIntrinsicBounds(
-        left: Int,
-        top: Int,
-        right: Int,
-        bottom: Int
-    ) {
-        super.setCompoundDrawablesWithIntrinsicBounds(left, top, right, bottom)
-    }
 
-    fun dpToPx(dp: Float): Float {
+
+   private fun dpToPx(dp: Float): Float {
 
         return TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,

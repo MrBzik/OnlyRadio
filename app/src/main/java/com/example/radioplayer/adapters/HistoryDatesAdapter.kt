@@ -13,20 +13,25 @@ import java.util.*
 
 
 class HistoryDatesAdapter(
-    private val datesList : List<HistoryDate>,
+    var datesList : List<HistoryDate>,
     private val requireContext : Context ) : BaseAdapter(){
 
     override fun getCount(): Int {
-        return datesList.size +1
+        return datesList.size
     }
 
     override fun getItem(position: Int): Any {
 
-        return if(position == 0){
-            HistoryDate("History: All", 0)
-        } else {
-            datesList[position -1]
-        }
+        return datesList[position]
+
+
+
+//        return if(position == 0){
+//            HistoryDate("History: All", 0)
+//        } else {
+//            datesList[position -1]
+//        }
+
 
 
     }
@@ -43,13 +48,12 @@ class HistoryDatesAdapter(
 
        val textView = view.findViewById<TextView>(R.id.tvSpinnerDate)
 
+        val date = Date(datesList[position].time)
+
+
        if(position != 0){
 
-           val date = Date(datesList[position -1].time)
-
-           val res = format.format(date)
-
-           textView.text = res
+           textView.text = format.format(date)
 
            if(position == selectedItemPosition) textView.setTextColor(selectedColor)
 
@@ -58,8 +62,20 @@ class HistoryDatesAdapter(
            textView.text = "History: All"
             if(selectedItemPosition <=0){
                 textView.setTextColor(selectedColor)
+
             }
        }
+
+
+//        textView.setOnClickListener {
+//            dateClickListener?.let { click ->
+//                click(position, date.time)
+//
+//                selectedItemPosition = position
+//
+//            }
+//        }
+
 
         return view
     }
@@ -68,5 +84,11 @@ class HistoryDatesAdapter(
 
      var selectedItemPosition = 0
      var selectedColor = 0
+
+//    private var dateClickListener : ((position : Int, time : Long) -> Unit)? = null
+//
+//    fun setDateClickListener (listener : (position : Int, time : Long) -> Unit){
+//        dateClickListener = listener
+//    }
 
 }

@@ -28,8 +28,10 @@ import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.SpinnerExt
 import com.example.radioplayer.utils.TextViewOutlined
+import com.example.radioplayer.utils.Utils.dismiss
 import com.example.radioplayer.utils.Utils.fromDateToString
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.sql.Date
@@ -52,7 +54,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private val dateFormat = DateFormat.getDateInstance()
 
-    private var isInitialLoad = false
+    private var isInitialLoad = true
 
 
     @Inject
@@ -74,10 +76,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         setupAdapterClickListener()
 
-        subscribeToHistory()
-
-        setDatesSpinnerSelectListener()
-
         observeListOfDates()
 
         setTvSelectDateClickListener()
@@ -87,6 +85,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         setAdapterLoadStateListener()
 
         setToolbar()
+
+        subscribeToHistory()
+
 
     }
 
@@ -101,6 +102,12 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 window.navigationBarColor = color
                 window.statusBarColor = color
             }
+
+
+            (bind.tvSelectDate as TextViewOutlined).setColors(
+                ContextCompat.getColor(requireContext(), R.color.text_button_history)
+            )
+
         } else {
             bind.viewToolbar.setBackgroundColor(Color.BLACK)
         }
@@ -116,13 +123,12 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             {
 
-
             }
 
             else {
-                Log.d("CHECKTAGS", "animate")
 
                 if(isInitialLoad){
+
                     bind.rvHistory.apply {
                         scrollToPosition(0)
                         startLayoutAnimation()
@@ -140,19 +146,15 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         bind.spinnerDates.setSpinnerEventsListener( object : SpinnerExt.OnSpinnerEventsListener{
             override fun onSpinnerOpened(spinner: Spinner?) {
 
-
-
-                (bind.tvSelectDate as TextViewOutlined).
+                (bind.tvSelectDate as TextView).
                    setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_playlists_arrow_shrink,0)
             }
 
             override fun onSpinnerClosed(spinner: Spinner?) {
-                (bind.tvSelectDate as TextViewOutlined).
+                (bind.tvSelectDate as TextView).
                 setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_playlists_arrow_expand,0)
             }
         })
-
-
     }
 
 
@@ -175,56 +177,37 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     }
 
 
+
+
     private fun observeListOfDates(){
 
         databaseViewModel.listOfDates.observe(viewLifecycleOwner){
 
-            val testFull = mutableListOf<HistoryDate>()
+            val allHistory = HistoryDate("History: All", 0)
 
-            testFull.addAll(it)
+            val dates = it.toMutableList()
+            dates.add(0, allHistory)
 
-            val sublist = listOf(
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
-//                HistoryDate("18 of March, 2023", System.currentTimeMillis()),
+            setupDatesSpinner(dates)
 
-            )
-
-//            testFull.addAll(sublist)
-
-            setupDatesSpinner(testFull)
-
-            val pos = testFull.indexOfFirst { historyDate ->
+            val pos = dates.indexOfFirst { historyDate ->
                 historyDate.time == databaseViewModel.selectedDate
             }
 
             datesAdapter.selectedItemPosition = pos
             setSliderHeaderText(databaseViewModel.selectedDate)
 
-            if(pos == -1)
-                bind.spinnerDates.setSelection(0)
-            else
-                bind.spinnerDates.setSelection(pos+1)
+            bind.spinnerDates.setSelection(pos)
+
+//            if(pos <= 0) {
+//                databaseViewModel.updateHistory.postValue(true)
+//            } else {
+//                databaseViewModel.updateHistory.postValue(false)
+//            }
+
+
+            setDatesSpinnerSelectListener()
+
         }
     }
 
@@ -239,14 +222,13 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 id: Long
             ) {
 
-               val item = datesAdapter.getItem(position) as HistoryDate
-
-                datesAdapter.selectedItemPosition = position
-
-                setSliderHeaderText(item.time)
-
+                val item = datesAdapter.getItem(position) as HistoryDate
 
                 if(databaseViewModel.selectedDate != item.time){
+
+                    datesAdapter.selectedItemPosition = position
+
+                    setSliderHeaderText(item.time)
 
                     isInitialLoad = true
 
@@ -258,19 +240,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                     }
                     else
                         databaseViewModel.updateHistory.postValue(false)
-                } else {
-
-                    isInitialLoad = false
                 }
-
-
-
-
-//                bind.rvHistory.apply {
-//                    post{
-//                        scheduleLayoutAnimation()
-//                    }
-//                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -283,6 +253,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         if(time == 0L) bind.tvSliderHeader.text = "History: All"
         else bind.tvSliderHeader.text = dateFormat.format(time)
     }
+
 
     private fun observePlaybackState(){
         mainViewModel.playbackState.observe(viewLifecycleOwner){
@@ -350,7 +321,10 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         viewLifecycleOwner.lifecycleScope.launch{
 
+
             databaseViewModel.historyFlow.collectLatest {
+
+                Log.d("CHECKTAGS", "collect")
 
                 historyAdapter.currentDate = currentDate
                 historyAdapter.submitData(it)
@@ -385,6 +359,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     override fun onDestroyView() {
         super.onDestroyView()
         isNewHistoryQuery = true
+        isInitialLoad = true
         bind.rvHistory.adapter = null
         _bind = null
     }
