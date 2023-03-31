@@ -69,15 +69,17 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
     private fun setToolbar(){
 
         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
-            bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_recordings)
+            bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_recordings_vector)
+
             val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_rec_frag)
+            val colorStatus = ContextCompat.getColor(requireContext(), R.color.status_bar_rec_frag)
 
             (activity as MainActivity).apply {
                 window.navigationBarColor = color
-                window.statusBarColor = color
+                window.statusBarColor = colorStatus
             }
 
-            (bind.tvEnableDeleting as TextViewOutlined).isSingleColor = true
+//            (bind.tvEnableDeleting as TextViewOutlined).isSingleColor = true
 
 
         } else {
@@ -243,11 +245,11 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
             if(!isDeletingEnabled){
 
-                (bind.tvEnableDeleting as TextView).setTextColor(ContextCompat.getColor(requireContext(), R.color.color_changed_on_interaction))
+                bind.tvEnableDeleting.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_changed_on_interaction))
                 itemTouchHelper.attachToRecyclerView(bind.rvRecordings)
             } else {
 
-                (bind.tvEnableDeleting as TextView).setTextColor(ContextCompat.getColor(requireContext(), R.color.text_button_rec))
+                bind.tvEnableDeleting.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_button_rec))
                 itemTouchHelper.attachToRecyclerView(null)
             }
         }

@@ -141,31 +141,29 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                 window.statusBarColor = statusBar
             }
 
-            (bind.tvTag as TextViewOutlined).apply {
-                setColors(
-                    ContextCompat.getColor(requireContext(), R.color.text_button_search_tag)
-                )
-                setStrokeWidth(3.5f)
-            }
+//            (bind.tvTag as TextViewOutlined).apply {
+//                setColors(
+//                    ContextCompat.getColor(requireContext(), R.color.text_button_search_tag)
+//                )
+//                setStrokeWidth(3.5f)
+//            }
+//
+//            (bind.tvName as TextViewOutlined).apply {
+//                setColors(
+//                    ContextCompat.getColor(requireContext(), R.color.text_button_search_name)
+//                )
+//                setStrokeWidth(3.5f)
+//            }
+//
+//            (bind.tvSelectedCountry as TextViewOutlined).apply {
+//                setColors(
+//                    ContextCompat.getColor(requireContext(), R.color.text_button_search_country)
+//                )
+//                setStrokeWidth(3.5f)
+//            }
 
-            (bind.tvName as TextViewOutlined).apply {
-                setColors(
-                    ContextCompat.getColor(requireContext(), R.color.text_button_search_name)
-                )
-                setStrokeWidth(3.5f)
-            }
-
-
-
-            (bind.tvSelectedCountry as TextViewOutlined).apply {
-                setColors(
-                    ContextCompat.getColor(requireContext(), R.color.text_button_search_country)
-                )
-                setStrokeWidth(3.5f)
-            }
-
-            bind.tvSeparatorFirst.visibility = View.GONE
-            bind.tvSeparatorSecond.visibility = View.GONE
+//            bind.tvSeparatorFirst.visibility = View.GONE
+//            bind.tvSeparatorSecond.visibility = View.GONE
 
 
         }
@@ -447,18 +445,18 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         mainViewModel.searchParamTag.observe(viewLifecycleOwner){
 
-            (bind.tvTag as TextView).text = if (it == "") "Tag" else it
+            bind.tvTag.text = if (it == "") "Tag" else it
 
         }
 
         mainViewModel.searchParamName.observe(viewLifecycleOwner){
-            (bind.tvName as TextView).text = if (it == "") "Name" else it
+            bind.tvName.text = if (it == "") "Name" else it
         }
 
         mainViewModel.searchParamCountry.observe(viewLifecycleOwner){
 
 
-            (bind.tvSelectedCountry as TextView).text = if (it == "") "Country" else it
+            bind.tvSelectedCountry.text = if (it == "") "Country" else it
 
 //            if(it.isBlank()){
 //

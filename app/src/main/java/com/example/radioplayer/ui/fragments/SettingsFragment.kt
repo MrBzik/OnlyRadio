@@ -106,13 +106,14 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
             bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_settings)
 
-            val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_options_frag)
+            val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_settings_frag)
+            val colorStatus = ContextCompat.getColor(requireContext(), R.color.status_bar_settings_frag)
 
             if(!mainViewModel.isSmoothTransitionNeeded){
 
             (activity as MainActivity).apply {
                 window.navigationBarColor = color
-                window.statusBarColor = color
+                window.statusBarColor = colorStatus
                 }
             }
 

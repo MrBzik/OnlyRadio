@@ -97,18 +97,21 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     private fun setToolbar(){
 
         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
-            bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_history)
+            bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_history_vector)
+
             val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_history_frag)
+            val colorStatus = ContextCompat.getColor(requireContext(), R.color.status_bar_history_frag)
+
 
             (activity as MainActivity).apply {
                 window.navigationBarColor = color
-                window.statusBarColor = color
+                window.statusBarColor = colorStatus
             }
 
 
-            (bind.tvSelectDate as TextViewOutlined).setColors(
-                ContextCompat.getColor(requireContext(), R.color.text_button_history)
-            )
+//            (bind.tvSelectDate as TextViewOutlined).setColors(
+//                ContextCompat.getColor(requireContext(), R.color.text_button_history)
+//            )
 
         } else {
             bind.viewToolbar.setBackgroundColor(Color.BLACK)
@@ -334,9 +337,11 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private fun subscribeToHistory(){
 
-        databaseViewModel.setHistoryLiveData()
+        databaseViewModel.setHistoryLiveData(viewLifecycleOwner.lifecycleScope)
 
             databaseViewModel.observableHistory.observe(viewLifecycleOwner){
+
+
                 historyAdapter?.currentDate = currentDate
                 viewLifecycleOwner.lifecycleScope.launch{
 
@@ -349,7 +354,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 //
 //                Log.d("CHECKTAGS", "collect")
 //
-//                historyAdapter.currentDate = currentDate
+//
 //                historyAdapter.submitData(it)
 //
 //            }

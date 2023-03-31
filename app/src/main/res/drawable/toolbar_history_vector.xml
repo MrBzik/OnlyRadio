@@ -16,18 +16,18 @@
 
                 <item
 
-                    android:color="#80E1BEE7"
+                    android:color="#9FA8DA"
                     android:offset="0.0" />
                 <item
-                    android:color="#80E1BEE7"
+                    android:color="#9FA8DA"
                     android:offset="0.472" />
 
 
                 <item
-                    android:color="#E1BEE7"
+                    android:color="#3949AB"
                     android:offset="0.475" />
                 <item
-                    android:color="#E1BEE7"
+                    android:color="#3949AB"
                     android:offset="1" />
 
 

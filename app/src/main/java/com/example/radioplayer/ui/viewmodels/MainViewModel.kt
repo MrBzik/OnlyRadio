@@ -145,8 +145,6 @@ class MainViewModel @Inject constructor(
 
     private val searchBy : MutableLiveData<Boolean> = MutableLiveData()
 
-
-
     @OptIn(ExperimentalCoroutinesApi::class)
     val stationsFlow = searchBy.asFlow()
         .flatMapLatest {

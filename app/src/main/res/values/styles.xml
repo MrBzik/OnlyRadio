@@ -2,7 +2,7 @@
 <resources>
 
     <style name="mainTextButtons" parent="android:Widget.TextView">
-
+        <item name="android:textColor">@color/interactive_text_color</item>
         <item name="android:textSize">18sp</item>
         <item name="android:fontFamily">@font/aldrich</item>
 

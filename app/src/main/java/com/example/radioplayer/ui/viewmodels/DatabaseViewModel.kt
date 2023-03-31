@@ -23,6 +23,7 @@ import com.example.radioplayer.utils.Constants.HISTORY_OPTIONS
 import com.example.radioplayer.utils.Utils
 import com.example.radioplayer.utils.Utils.fromDateToString
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -289,6 +290,9 @@ class DatabaseViewModel @Inject constructor(
 
 
     private var historyFlow : LiveData<PagingData<StationWithDateModel>>?  = null
+
+
+
     private var oneDateHistoryFlow : LiveData<PagingData<StationWithDateModel>>?  = null
 
 
@@ -296,7 +300,7 @@ class DatabaseViewModel @Inject constructor(
 
     val isOneDateCalled : MutableLiveData<Boolean> = MutableLiveData(false)
 
-    fun setHistoryLiveData(){
+    fun setHistoryLiveData(lifecycle: CoroutineScope){
 
         historyFlow = Pager(
             config = PagingConfig(
@@ -306,7 +310,7 @@ class DatabaseViewModel @Inject constructor(
             pagingSourceFactory = {
                 HistoryDataSource(allHistoryLoader)
             }
-        ).liveData.cachedIn(viewModelScope)
+        ).liveData.cachedIn(lifecycle)
 
         oneDateHistoryFlow = Transformations.switchMap(isOneDateCalled){
 

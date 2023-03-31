@@ -404,10 +404,11 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
 
             val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_fav_fragment)
+            val statusColor = ContextCompat.getColor(requireContext(), R.color.status_bar_fav_fragment)
 
             (activity as MainActivity).apply {
                 window.navigationBarColor = color
-                window.statusBarColor = color
+                window.statusBarColor = statusColor
             }
         }
     }

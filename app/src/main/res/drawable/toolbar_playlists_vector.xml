@@ -15,28 +15,28 @@ android:viewportHeight="208">
             >
 
             <item
-                android:color="#CCB2DFDB"
+                android:color="#009688"
                 android:offset="0" />
             <item
-                android:color="#CCB2DFDB"
+                android:color="#009688"
                 android:offset="0.305" />
 
 
 
             <item
 
-                android:color="#66B2DFDB"
+                android:color="#B2DFDB"
                 android:offset="0.308" />
             <item
-                android:color="#66B2DFDB"
+                android:color="#B2DFDB"
                 android:offset="0.638" />
 
 
             <item
-                android:color="#B2DFDB"
+                android:color="#00897B"
                 android:offset="0.641" />
             <item
-                android:color="#B2DFDB"
+                android:color="#00897B"
                 android:offset="1" />
 
 

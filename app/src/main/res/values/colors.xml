@@ -13,7 +13,7 @@
     <color name="grayColor">#635D5D</color>
     <color name="floating_buttons">#FFFFFF</color>
     <color name="color_interactive">#FFFFFFFF</color>
-    <color name="color_changed_on_interaction">#FC2E20</color>
+    <color name="color_changed_on_interaction">#FF1000</color>
     <color name="color_warning_text">#FC2E20</color>
     <color name="transparent">#00000000</color>
     <color name="regular_text_color">#000000</color>
@@ -21,7 +21,7 @@
 
     <color name= "main_background">#FFFFFF</color>
     <color name="toolbar">#FFFFFF</color>
-    <color name="Separator">#000000</color>
+    <color name="Separator">#FF0000</color>
 
     <color name="text_interactive_shadow">#000000</color>
     <color name="arrows_for_text_buttons">#FFFDE7</color>
@@ -51,13 +51,23 @@
 <!--    Navigation bar colors -->
 
 
-    <color name="nav_bar_search_fragment">#C5CAE9</color>
-    <color name="status_bar_search_fragment">#CC9FA8DA</color>
+    <color name="nav_bar_search_fragment">#7E57C2</color>
+    <color name="status_bar_search_fragment">#5E35B1</color>
 
-    <color name="nav_bar_fav_fragment">#B2DFDB</color>
-    <color name="nav_bar_history_frag">#E1BEE7</color>
-    <color name="nav_bar_rec_frag">#BBDEFB</color>
-    <color name="nav_bar_options_frag">#D1C4E9</color>
+    <color name="nav_bar_fav_fragment">#26A69A</color>
+    <color name="status_bar_fav_fragment">#00897B</color>
+
+
+    <color name="nav_bar_history_frag">#5C6BC0</color>
+    <color name="status_bar_history_frag">#3949AB</color>
+
+
+    <color name="nav_bar_rec_frag">#26C6DA</color>
+    <color name="status_bar_rec_frag">#00ACC1</color>
+
+
+    <color name="nav_bar_settings_frag">#42A5F5</color>
+    <color name="status_bar_settings_frag">#1E88E5</color>
 
 
 
@@ -69,7 +79,7 @@
 
     <color name="text_button_fav">#00695C</color>
     <color name="text_button_history">#6A1B9A</color>
-    <color name="text_button_rec">#1565C0</color>
+    <color name="text_button_rec">#FFFFFF</color>
 
 
 

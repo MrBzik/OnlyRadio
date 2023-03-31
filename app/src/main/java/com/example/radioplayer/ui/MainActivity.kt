@@ -217,7 +217,7 @@ class MainActivity : AppCompatActivity() {
             colorAnimator.start()
 
 
-            val colorFrom = ContextCompat.getColor(this, R.color.nav_bar_options_frag)
+            val colorFrom = ContextCompat.getColor(this, R.color.nav_bar_settings_frag)
 
             val barsColorAnimator = ValueAnimator.ofArgb(colorFrom, Color.BLACK)
             barsColorAnimator.addUpdateListener { value ->
@@ -252,7 +252,7 @@ class MainActivity : AppCompatActivity() {
             colorAnimator.duration = 700
             colorAnimator.start()
 
-            val colorTo = ContextCompat.getColor(this, R.color.nav_bar_options_frag)
+            val colorTo = ContextCompat.getColor(this, R.color.nav_bar_settings_frag)
 
             val barsColorAnimator = ValueAnimator.ofArgb(Color.BLACK, colorTo)
             barsColorAnimator.addUpdateListener { value ->

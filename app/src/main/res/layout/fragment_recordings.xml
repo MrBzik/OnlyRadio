@@ -43,14 +43,13 @@
         app:layout_constraintGuide_percent="0.5"
         />
 
-    <com.example.radioplayer.utils.TextViewOutlined
+    <TextView
         android:id="@+id/tvEnableDeleting"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:gravity="center"
         android:text="Swipe-delete"
         android:textAppearance="@style/mainTextButtons"
-        android:textColor="@color/text_button_rec"
         app:layout_constraintStart_toStartOf="@id/guidelineMiddle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
