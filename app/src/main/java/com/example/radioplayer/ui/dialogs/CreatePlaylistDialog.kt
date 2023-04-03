@@ -38,10 +38,8 @@ class CreatePlaylistDialog (
    private val glide : RequestManager,
    private val insertStationInPlaylist : ((String) -> Unit)?
 
-) : AppCompatDialog(requireContext) {
-
-    private var _bind : DialogCreatePlaylistBinding? = null
-    private val bind get() = _bind!!
+) : BaseDialog<DialogCreatePlaylistBinding>
+    (requireContext, DialogCreatePlaylistBinding::inflate) {
 
     lateinit var imageAdapter : PagingPixabayAdapter
 
@@ -51,13 +49,7 @@ class CreatePlaylistDialog (
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        _bind = DialogCreatePlaylistBinding.inflate(layoutInflater)
-
         super.onCreate(savedInstanceState)
-        setContentView(bind.root)
-
-        window?.setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
 
         listOfPlaylistNames = listOfPlaylists.map{
             it.playlistName
@@ -78,13 +70,13 @@ class CreatePlaylistDialog (
 
         setAdapterItemClickListener()
 
-
-
-
         bind.tvBack.setOnClickListener {
 
             dismiss()
         }
+
+        adjustDialogHeight(bind.clDialogCreatePlaylist)
+
     }
 
 
@@ -93,12 +85,8 @@ class CreatePlaylistDialog (
 
         KeyboardObserver.observeKeyboardState(bind.root, {
             bind.tvTitle.visibility = View.GONE
-            bind.tvAccept.visibility = View.GONE
-            bind.tvBack.visibility = View.GONE
         },{
             bind.tvTitle.visibility = View.VISIBLE
-            bind.tvAccept.visibility = View.VISIBLE
-            bind.tvBack.visibility = View.VISIBLE
             bind.etSearchQuery.clearFocus()
             bind.etPlaylistName.clearFocus()
         }, {})

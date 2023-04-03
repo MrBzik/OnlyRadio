@@ -20,6 +20,7 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -132,7 +133,7 @@ class MainActivity : AppCompatActivity() {
 
         if(!isStubPlayerBindInflated) {
             this.moveTaskToBack(true)
-        } else if (bindPlayer.tvExpandHideText.text == resources.getString(R.string.Expand)) {
+        } else if ((bindPlayer.tvExpandHideText as TextView).text  == resources.getString(R.string.Expand)) {
             this.moveTaskToBack(true)
         } else {
             handleNavigationToFragments(null)
@@ -387,7 +388,7 @@ class MainActivity : AppCompatActivity() {
         bind.bottomNavigationView.setOnItemReselectedListener {
 
             if(isStubPlayerBindInflated){
-                if(bindPlayer.tvExpandHideText.text == resources.getString(R.string.Hide)){
+                if((bindPlayer.tvExpandHideText as TextView).text == resources.getString(R.string.Hide)){
                     handleNavigationToFragments(it)
                 }
             }
@@ -404,7 +405,7 @@ class MainActivity : AppCompatActivity() {
 
             if (event.action == MotionEvent.ACTION_DOWN){
 
-                if(bindPlayer.tvExpandHideText.text == resources.getString(R.string.Expand)) {
+                if((bindPlayer.tvExpandHideText as TextView).text == resources.getString(R.string.Expand)) {
 
                     putFadeOutForDetailsFragment()
                     endSeparatorsLoadAnim()
@@ -420,7 +421,7 @@ class MainActivity : AppCompatActivity() {
                         commit()
                     }
 
-                    bindPlayer.tvExpandHideText.setText(R.string.Hide)
+                    (bindPlayer.tvExpandHideText as TextView).setText(R.string.Hide)
 
                 }
 
@@ -529,7 +530,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         if(isStubPlayerBindInflated){
-            bindPlayer.tvExpandHideText.setText(R.string.Expand)
+            (bindPlayer.tvExpandHideText as TextView).setText(R.string.Expand)
 
         }
 

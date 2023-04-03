@@ -68,15 +68,11 @@ class CountryPickerDialog(
 
         KeyboardObserver.observeKeyboardState(bind.root, {
 
-            bind.tvBack.visibility = View.GONE
-            bind.tvClearSelection.visibility = View.GONE
             bind.tvTitle.visibility = View.GONE
 
 
         }, {
 
-            bind.tvBack.visibility = View.VISIBLE
-            bind.tvClearSelection.visibility = View.VISIBLE
             bind.tvTitle.visibility = View.VISIBLE
             bind.editText.clearFocus()
 

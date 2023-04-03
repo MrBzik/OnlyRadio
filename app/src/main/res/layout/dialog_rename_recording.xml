@@ -6,23 +6,28 @@
     android:layout_height="wrap_content"
     android:background="@drawable/dialog_gradient_for_background"
     android:minHeight="200dp"
-    android:padding="16dp"
+    android:paddingHorizontal="16dp"
     >
 
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineMarginTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="14dp" />
 
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginTop="@dimen/dialog_top_margin"
+        android:gravity="center_vertical"
         android:text="Rename recording"
         android:textAppearance="@style/dialogTitleText"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toTopOf="@id/guidelineMarginTop" />
 
 
     <com.google.android.material.textfield.TextInputLayout
@@ -30,9 +35,10 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
+        android:layout_marginTop="20dp"
         android:hint="Type new name"
         app:endIconMode="clear_text"
+        app:layout_constraintBottom_toTopOf="@+id/tvBack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,40 +46,38 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etNewName"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:inputType="text|textNoSuggestions"
             android:textAppearance="@style/dialogSearchText"
             android:textColor="@color/search_text_color"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-          />
+
+            />
 
     </com.google.android.material.textfield.TextInputLayout>
-
 
     <TextView
         android:id="@+id/tvBack"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="80dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="20dp"
+        android:gravity="center_vertical"
         android:text="@string/dialog_back_button"
         android:textAppearance="@style/dialogTextButtons"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout3" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 
     <TextView
         android:id="@+id/tvAccept"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_height="80dp"
         android:layout_marginEnd="20dp"
+        android:gravity="center_vertical"
         android:text="@string/dialog_accept_button"
         android:textAppearance="@style/dialogTextButtons"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout3" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

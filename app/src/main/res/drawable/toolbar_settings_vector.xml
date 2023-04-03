@@ -14,23 +14,22 @@
                 android:type="linear"
                 >
 
-                <item
 
-                    android:color="#BBDEFB"
+
+                <item
+                    android:color="#FFFFFF"
                     android:offset="0.0" />
                 <item
-                    android:color="#BBDEFB"
+                    android:color="#FFFFFF"
                     android:offset="0.472" />
 
 
                 <item
-                    android:color="#1E88E5"
+                    android:color="#5C7091"
                     android:offset="0.475" />
                 <item
-                    android:color="#1E88E5"
+                    android:color="#5C7091"
                     android:offset="1" />
-
-
 
             </gradient>
         </aapt:attr>

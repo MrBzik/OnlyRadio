@@ -43,7 +43,7 @@
         app:layout_constraintGuide_percent="0.5"
         />
 
-    <TextView
+    <com.example.radioplayer.utils.TextViewOutlined
         android:id="@+id/tvEnableDeleting"
         android:layout_width="0dp"
         android:layout_height="60dp"

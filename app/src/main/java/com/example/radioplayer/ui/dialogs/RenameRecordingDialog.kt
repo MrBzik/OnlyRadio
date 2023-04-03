@@ -18,29 +18,17 @@ class RenameRecordingDialog (
     private val oldName : String,
     private val handleResult : (String) -> Unit
 
-) : AppCompatDialog(requireContext) {
-
-
-    private var _bind : DialogRenameRecordingBinding? = null
-    private val bind get() = _bind!!
+) : BaseDialog<DialogRenameRecordingBinding>
+    (requireContext, DialogRenameRecordingBinding::inflate) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        _bind = DialogRenameRecordingBinding.inflate(layoutInflater)
-
         super.onCreate(savedInstanceState)
-        setContentView(bind.root)
-
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
-        window?.setGravity(Gravity.TOP)
-
 
         bind.etNewName.setText(oldName)
 
         bind.etNewName.requestFocus()
 
         window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
-
 
         bind.tvBack.setOnClickListener {
 

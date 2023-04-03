@@ -98,7 +98,6 @@
       app:itemBackground="@null"
       app:itemIconSize="40dp"
       app:itemIconTint="@color/bottom_nav_icons"
-
       app:itemPaddingBottom="21dp"
       app:itemTextAppearanceActive="@style/bottomNavTextActive"
       app:itemTextAppearanceInactive="@style/bottomNavTextInactive"

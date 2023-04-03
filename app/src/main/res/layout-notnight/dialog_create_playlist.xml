@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/clDialogEditPlaylist"
+    android:id="@+id/clDialogCreatePlaylist"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingHorizontal="8dp"
@@ -10,51 +10,48 @@
     android:animateLayoutChanges="true"
     >
 
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineMarginTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="18dp" />
+
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:gravity="center_vertical"
         android:layout_marginStart="8dp"
-        android:text="Edit playlist"
+        android:text="Create playlist"
         android:textAppearance="@style/dialogTitleText"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
-
-    <TextView
-        android:id="@+id/tvDelete"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:gravity="center_vertical"
-        android:layout_marginEnd="16dp"
-        android:fontFamily="@font/carrois_gothic_sc"
-        android:text="Delete"
-        android:textAppearance="@style/dialogTextButtons"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toTopOf="@id/guidelineMarginTop" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="8dp"
-        android:hint="New playlist name..."
-        app:layout_constraintStart_toStartOf="parent"
+        android:hint="Playlist name..."
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:endIconMode="clear_text"
         app:layout_constraintEnd_toStartOf="@+id/ivSelectedImage"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvTitle">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etPlaylistName"
+            android:textAppearance="@style/dialogSearchText"
+            android:textColor="@color/search_text_color"
+            android:maxLines="1"
+            android:inputType="text|textNoSuggestions"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:inputType="text|textNoSuggestions"
-            android:maxLines="1"
-            android:textAppearance="@style/dialogSearchText"
-            android:textColor="@color/search_text_color" />
+            android:minHeight="48dp"
+            />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -69,6 +66,7 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         app:endIconMode="clear_text"
         app:layout_constraintEnd_toStartOf="@+id/ivSelectedImage"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
 
@@ -76,10 +74,11 @@
             android:id="@+id/etSearchQuery"
             android:textAppearance="@style/dialogSearchText"
             android:textColor="@color/search_text_color"
+            android:maxLines="1"
             android:inputType="text|textNoSuggestions"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            />
+            android:minHeight="48dp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -99,6 +98,7 @@
         android:layout_width="300dp"
         android:layout_height="0dp"
         android:layout_marginTop="15dp"
+        android:elevation="1dp"
         app:layout_constraintBottom_toTopOf="@+id/tvBack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -112,12 +112,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
+        android:elevation="2dp"
         android:indeterminateTint="@color/color_non_interactive"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 
     <TextView
         android:id="@+id/tvBack"
@@ -141,6 +143,7 @@
         android:textAppearance="@style/dialogTextButtons"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

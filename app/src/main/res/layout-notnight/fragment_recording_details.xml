@@ -8,32 +8,49 @@
     android:layout_marginHorizontal="8dp"
     >
 
-
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCutExpander"
+        android:layout_width="170dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:backgroundTint="@color/white"
+        android:elevation="10dp"
+        app:cornerRadius="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tvCutExpander"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginEnd="5dp"
+        android:elevation="15dp"
         android:text="Cut recording"
         android:textAppearance="@style/mainTextButtons"
-        app:drawableEndCompat="@drawable/ic_playlists_arrow_expand"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textColor="@color/text_button"
+        app:drawableEndCompat="@drawable/ic_arrow_expand_rec"
+        app:layout_constraintBottom_toBottomOf="@id/btnCutExpander"
+        app:layout_constraintEnd_toEndOf="@+id/btnCutExpander"
+        app:layout_constraintTop_toTopOf="@id/btnCutExpander" />
 
 
-    <TextView
+
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/tvRename"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="20dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:backgroundTint="@color/white"
+        android:elevation="10dp"
         android:text="Rename"
         android:textAppearance="@style/mainTextButtons"
+        android:textColor="@color/text_button"
+        app:cornerRadius="10dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <TextView
@@ -46,6 +63,8 @@
         android:paddingHorizontal="16dp"
         android:textSize="16sp"
         android:maxLines="2"
+        android:textStyle="bold"
+        android:textColor="@color/selected_text_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -62,54 +81,54 @@
         app:layout_constraintTop_toBottomOf="@+id/tvName" />
 
 
-        <TextView
-            android:id="@+id/tvSwitchOption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_marginTop="25dp"
-            android:text="Keep original recording"
-            android:textAppearance="@style/dialogItemText"
-            app:layout_constraintEnd_toStartOf="@+id/switchKeepOriginal"
-            app:layout_constraintTop_toBottomOf="@+id/ivIcon" />
+    <TextView
+        android:id="@+id/tvSwitchOption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="25dp"
+        android:text="Keep original recording"
+        android:textAppearance="@style/dialogItemText"
+        app:layout_constraintEnd_toStartOf="@+id/switchKeepOriginal"
+        app:layout_constraintTop_toBottomOf="@+id/ivIcon" />
 
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/switchKeepOriginal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:minHeight="48dp"
-            app:layout_constraintBottom_toBottomOf="@+id/tvSwitchOption"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tvSwitchOption"
-            app:thumbTint="@color/switch_thumb_color"
-            app:trackTint="@color/switch_track_color" />
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchKeepOriginal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:minHeight="48dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvSwitchOption"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvSwitchOption"
+        app:thumbTint="@color/switch_thumb_color"
+        app:trackTint="@color/switch_track_color" />
 
-        <com.google.android.material.slider.RangeSlider
-            android:id="@+id/rangeSlider"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:stepSize="1"
-            android:value="0"
-            android:valueFrom="0"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvSwitchOption" />
+    <com.google.android.material.slider.RangeSlider
+        android:id="@+id/rangeSlider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:stepSize="1"
+        android:value="0"
+        android:valueFrom="0"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvSwitchOption" />
 
-        <TextView
-            android:id="@+id/tvProcessTrim"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Apply"
-            android:textAppearance="@style/dialogTextButtons"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/rangeSlider" />
+    <TextView
+        android:id="@+id/tvProcessTrim"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Apply"
+        android:textAppearance="@style/dialogTextButtons"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rangeSlider" />
 
 
     <TextView

@@ -6,7 +6,6 @@
     android:layout_height="60dp"
     android:gravity="center_vertical"
     android:textAppearance="@style/dialogItemText"
-    android:text="some tag or setting"
     android:paddingStart="20dp"
     android:background="?android:attr/selectableItemBackground"
     >

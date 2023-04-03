@@ -19,23 +19,12 @@ class RemovePlaylistDialog(
     private val deletePlaylist : () -> Unit
 
 
-    ) : AppCompatDialog(requireContext) {
-
-    private var _bind : DialogDeletePlaylistBinding? = null
-    private val bind get() = _bind!!
-
-
-
+    ) : BaseDialog<DialogDeletePlaylistBinding>
+    (requireContext, DialogDeletePlaylistBinding::inflate) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        _bind = DialogDeletePlaylistBinding.inflate(layoutInflater)
-
         super.onCreate(savedInstanceState)
-        setContentView(bind.root)
-
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
-        window?.setGravity(Gravity.TOP)
 
         bind.tvNameOfPlaylist.text = currentPlaylist
 

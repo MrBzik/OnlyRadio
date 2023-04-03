@@ -2,11 +2,13 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/clAddStationToPlaylistDialog"
+    android:id="@+id/clTagPickDialog"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingHorizontal="16dp"
     android:background="@drawable/dialog_gradient_for_background"
-    android:paddingHorizontal="16dp">
+    android:animateLayoutChanges="true"
+    >
 
 
     <androidx.constraintlayout.widget.Guideline
@@ -14,59 +16,70 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="14dp" />
+        app:layout_constraintGuide_begin="18dp" />
 
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
-        android:layout_marginTop="@dimen/dialog_top_margin"
+        android:layout_height="50dp"
         android:gravity="center_vertical"
-        android:text="Select playlist or create new"
+        android:layout_marginStart="8dp"
+        android:text="Tag :"
         android:textAppearance="@style/dialogTitleText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/guidelineMarginTop" />
 
-
     <TextView
-        android:id="@+id/tvHint"
+        android:id="@+id/tvSwitchSearchExact"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/aldrich"
-        android:text="(Also: use DragAndDrop in Favoured tab)*"
-        android:textColor="@color/regular_text_color"
-        android:textSize="13sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+        android:layout_marginEnd="8dp"
+        android:text="Exact match"
+        android:textAppearance="@style/dialogItemText"
+        app:layout_constraintBottom_toBottomOf="@+id/switchMatchExact"
+        app:layout_constraintEnd_toStartOf="@+id/switchMatchExact"
+        app:layout_constraintTop_toTopOf="@+id/switchMatchExact" />
 
-    <TextView
-        android:id="@+id/tvMessageNoPlaylists"
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchMatchExact"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No playlists yet"
-        android:visibility="gone"
-        android:textColor="@color/color_non_interactive"
-        android:textSize="22sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="4dp"
+        android:minHeight="48dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvTitle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/tvTitle"
+        app:thumbTint="@color/switch_thumb_color"
+        app:trackTint="@color/switch_track_color" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvPlaylists"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/tvBack"
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Search tag..."
+        android:textAppearance="@style/dialogSearchText"
+        android:backgroundTint="@color/black"
+        android:textColor="@color/search_text_color"
+        android:textCursorDrawable="@drawable/cursor_color"
+        android:inputType="text|textNoSuggestions"
+        android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvHint" />
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:isScrollContainer="false"
+        app:layout_constraintBottom_toTopOf="@+id/tvClearSelection"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText" />
 
     <TextView
         android:id="@+id/tvBack"
@@ -79,16 +92,18 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+
     <TextView
-        android:id="@+id/tvCreateNewPlaylist"
+        android:id="@+id/tvClearSelection"
         android:layout_width="wrap_content"
         android:layout_height="80dp"
         android:layout_marginEnd="20dp"
         android:gravity="center_vertical"
-        android:text="@string/dialog_create_playlist"
+        android:text="@string/dialog_clear_selection"
         android:textAppearance="@style/dialogTextButtons"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

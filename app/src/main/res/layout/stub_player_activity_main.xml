@@ -36,7 +36,6 @@
         android:ellipsize="marquee"
         android:marqueeRepeatLimit="marquee_forever"
         android:fontFamily="sans-serif-smallcaps"
-        android:textAppearance="@style/main_player_shadow"
         android:paddingHorizontal="8dp"
         android:paddingTop="8dp"
         android:layout_marginStart="75dp"
@@ -48,19 +47,18 @@
         />
 
 
-
     <TextView
         android:id="@+id/tvExpandHideText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/Expand"
-        android:textAppearance="@style/main_player_shadow"
         android:layout_marginTop="36dp"
-        android:textSize="18sp"
-        android:fontFamily="@font/aldrich"
-        android:gravity="end"
         android:layout_marginEnd="64dp"
-        />
+
+            android:fontFamily="@font/aldrich"
+        android:gravity="end"
+        android:text="@string/Expand"
+        android:textColor="@color/default_text_color"
+        android:textSize="18sp" />
 
     <ImageView
         android:id="@+id/ivTogglePlayCurrentStation"

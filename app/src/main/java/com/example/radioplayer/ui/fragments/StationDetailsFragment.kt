@@ -224,9 +224,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     private fun updateUiForRadioStation(station : RadioStation){
 
             homepageUrl = station.homepage
-            if(!homepageUrl.isNullOrBlank()){
-                bind.tvHomePage.visibility = View.VISIBLE
-            }
+
 
 
             checkIfStationFavoured(station)

@@ -38,10 +38,8 @@ class EditPlaylistDialog (
     private val pixabayViewModel: PixabayViewModel,
     private val glide : RequestManager,
     private val deletePlaylist : (Boolean) -> Unit
-) : AppCompatDialog(requireContext) {
-
-    private var _bind : DialogEditPlaylistBinding? = null
-    private val bind get() = _bind!!
+) : BaseDialog<DialogEditPlaylistBinding>
+    (requireContext, DialogEditPlaylistBinding::inflate) {
 
     lateinit var imageAdapter : PagingPixabayAdapter
 
@@ -55,13 +53,7 @@ class EditPlaylistDialog (
 //    private var isFocusRequested = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        _bind = DialogEditPlaylistBinding.inflate(layoutInflater)
-
         super.onCreate(savedInstanceState)
-        setContentView(bind.root)
-
-        window?.setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
 
         listOfPlaylistNames = listOfPlaylists.map{
             it.playlistName
@@ -90,6 +82,9 @@ class EditPlaylistDialog (
         bind.tvBack.setOnClickListener {
             dismiss()
         }
+
+        adjustDialogHeight(bind.clDialogEditPlaylist)
+
     }
 
 
@@ -127,14 +122,12 @@ class EditPlaylistDialog (
         KeyboardObserver.observeKeyboardState(bind.root, {
             bind.tvTitle.visibility = View.GONE
             bind.tvDelete.visibility = View.GONE
-            bind.tvAccept.visibility = View.GONE
-            bind.tvBack.visibility = View.GONE
+
 //            isFocusHandlingNeeded = false
         },{
             bind.tvTitle.visibility = View.VISIBLE
             bind.tvDelete.visibility = View.VISIBLE
-            bind.tvAccept.visibility = View.VISIBLE
-            bind.tvBack.visibility = View.VISIBLE
+
 //            isFocusHandlingNeeded = true
             bind.etSearchQuery.clearFocus()
             bind.etPlaylistName.clearFocus()

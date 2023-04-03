@@ -3,6 +3,7 @@ package com.example.radioplayer.ui.fragments
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.SeekBar
@@ -18,6 +19,7 @@ import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.databinding.FragmentRecordingDetailsBinding
 import com.example.radioplayer.exoPlayer.RadioService
+import com.example.radioplayer.ui.MainActivity
 
 import com.example.radioplayer.ui.dialogs.RenameRecordingDialog
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
@@ -85,11 +87,18 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
         handleCutContainerVisibility(mainViewModel.isCutExpanded)
 
-        bind.tvCutExpander.setOnClickListener {
-            mainViewModel.isCutExpanded = !mainViewModel.isCutExpanded
+        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
+            bind.btnCutExpander?.setOnClickListener {
+                mainViewModel.isCutExpanded = !mainViewModel.isCutExpanded
 
-            handleCutContainerVisibility(mainViewModel.isCutExpanded)
+                handleCutContainerVisibility(mainViewModel.isCutExpanded)
+            }
+        } else {
+            bind.tvCutExpander.setOnClickListener {
+                mainViewModel.isCutExpanded = !mainViewModel.isCutExpanded
 
+                handleCutContainerVisibility(mainViewModel.isCutExpanded)
+            }
         }
     }
 
@@ -106,9 +115,9 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
         bind.tvCutExpander.apply {
             if(isVisible)
-                setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_playlists_arrow_shrink, 0)
+                setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_shrink_rec, 0)
             else
-                setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_playlists_arrow_expand, 0)
+                setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_expand_rec, 0)
         }
 
     }

@@ -25,10 +25,9 @@ class HistorySettingsDialog (
     private val databaseViewModel: DatabaseViewModel,
     private val handleChoice : (Int) -> Unit
     )
-    : AppCompatDialog(requireContext) {
+    : BaseDialog<DialogHistorySettingsBinding>
+    (requireContext, DialogHistorySettingsBinding::inflate) {
 
-    private var _bind : DialogHistorySettingsBinding? = null
-    private val bind get() = _bind!!
 
     private lateinit var historyOptionsAdapter : SelectingOptionAdapter
 
@@ -37,13 +36,8 @@ class HistorySettingsDialog (
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        _bind = DialogHistorySettingsBinding.inflate(layoutInflater)
-
         super.onCreate(savedInstanceState)
-        setContentView(bind.root)
 
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
-        window?.setGravity(Gravity.TOP)
 
         setupRecyclerView()
 
@@ -51,6 +45,7 @@ class HistorySettingsDialog (
 
         setButtonsClickListeners()
 
+        adjustDialogHeight(bind.clHistorySettingDialog)
 
     }
 

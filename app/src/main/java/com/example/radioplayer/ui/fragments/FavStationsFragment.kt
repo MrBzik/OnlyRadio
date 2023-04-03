@@ -9,6 +9,7 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -169,7 +170,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             bind.ivArrowBackToFav.isVisible = it && !isInFavouriteTab
 
 
-                bind.tvPlaylistsExpand.apply {
+            (bind.tvPlaylistsExpand as TextView).apply {
                     if(it){
                         setCompoundDrawablesWithIntrinsicBounds(0,0, R.drawable.ic_playlists_arrow_shrink, 0)
                     } else {
@@ -338,7 +339,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             if(it){
                bind.tvPlaylistName.text = ""
 
-                bind.tvPlaylistEdit.text = ""
+                (bind.tvPlaylistEdit as TextView).text = ""
 
                bind.tvFavouredTitle.text = "Favoured"
 
@@ -378,7 +379,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 }
 
 
-                bind.tvPlaylistEdit.text = "Edit"
+                (bind.tvPlaylistEdit as TextView).text = "Edit"
 
                 searchFlag = SEARCH_FROM_PLAYLIST
 
@@ -397,18 +398,18 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
 
             if(isInFav)
-                bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_fav)
+                bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_fav_vector)
 
             else
-                bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_playlists)
+                bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_playlists_vector)
 
 
             val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_fav_fragment)
-            val statusColor = ContextCompat.getColor(requireContext(), R.color.status_bar_fav_fragment)
+//            val statusColor = ContextCompat.getColor(requireContext(), R.color.status_bar_fav_fragment)
 
             (activity as MainActivity).apply {
                 window.navigationBarColor = color
-                window.statusBarColor = statusColor
+                window.statusBarColor = color
             }
         }
     }

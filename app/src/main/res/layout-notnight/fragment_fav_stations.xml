@@ -110,7 +110,7 @@
         />
 
 
-    <TextView
+    <com.example.radioplayer.utils.TextViewOutlined
         android:id="@+id/tvPlaylistEdit"
         android:layout_width="0dp"
         android:layout_height="60dp"
@@ -121,7 +121,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <TextView
+    <com.example.radioplayer.utils.TextViewOutlined
         android:id="@+id/tvPlaylistsExpand"
         android:layout_width="wrap_content"
         android:layout_height="60dp"

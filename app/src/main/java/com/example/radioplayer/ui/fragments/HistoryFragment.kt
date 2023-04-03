@@ -100,12 +100,12 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_history_vector)
 
             val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_history_frag)
-            val colorStatus = ContextCompat.getColor(requireContext(), R.color.status_bar_history_frag)
+//            val colorStatus = ContextCompat.getColor(requireContext(), R.color.status_bar_history_frag)
 
 
             (activity as MainActivity).apply {
                 window.navigationBarColor = color
-                window.statusBarColor = colorStatus
+                window.statusBarColor = color
             }
 
 

@@ -16,18 +16,18 @@
 
                 <item
 
-                    android:color="#B2DFDB"
+                    android:color="#FFFFFF"
                     android:offset="0.0" />
                 <item
-                    android:color="#B2DFDB"
+                    android:color="#FFFFFF"
                     android:offset="0.472" />
 
 
                 <item
-                    android:color="#00897B"
+                    android:color="#665C9E"
                     android:offset="0.475" />
                 <item
-                    android:color="#00897B"
+                    android:color="#665C9E"
                     android:offset="1" />
 
 
@@ -36,3 +36,20 @@
         </aapt:attr>
     </path>
 </vector>
+
+
+<!--<item-->
+
+<!--android:color="#4D218380"-->
+<!--android:offset="0.0" />-->
+<!--<item-->
+<!--android:color="#4D177E89"-->
+<!--android:offset="0.472" />-->
+
+
+<!--<item-->
+<!--android:color="#177e89"-->
+<!--android:offset="0.475" />-->
+<!--<item-->
+<!--android:color="#177e89"-->
+<!--android:offset="1" />-->

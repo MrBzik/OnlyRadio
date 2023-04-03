@@ -19,7 +19,7 @@
 
 
 
-    <TextView
+    <com.example.radioplayer.utils.TextViewOutlined
         android:id="@+id/tvTag"
         android:layout_width="0dp"
         android:layout_height="60dp"
@@ -39,7 +39,7 @@
 
 
 
-    <TextView
+    <com.example.radioplayer.utils.TextViewOutlined
         android:id="@+id/tvName"
         android:layout_width="0dp"
         android:layout_height="60dp"
@@ -56,7 +56,7 @@
         />
 
 
-    <TextView
+    <com.example.radioplayer.utils.TextViewOutlined
         android:id="@+id/tvSelectedCountry"
         android:layout_width="0dp"
         android:layout_height="60dp"

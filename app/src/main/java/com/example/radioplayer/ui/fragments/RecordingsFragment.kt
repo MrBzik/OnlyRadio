@@ -72,15 +72,15 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
             bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_recordings_vector)
 
             val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_rec_frag)
-            val colorStatus = ContextCompat.getColor(requireContext(), R.color.status_bar_rec_frag)
+//            val colorStatus = ContextCompat.getColor(requireContext(), R.color.status_bar_rec_frag)
 
             (activity as MainActivity).apply {
                 window.navigationBarColor = color
-                window.statusBarColor = colorStatus
+                window.statusBarColor = color
             }
 
-//            (bind.tvEnableDeleting as TextViewOutlined).isSingleColor = true
-
+            (bind.tvEnableDeleting as TextViewOutlined).isSingleColor = true
+            (bind.tvEnableDeleting as TextViewOutlined).setTextColor(Color.WHITE)
 
         } else {
             bind.viewToolbar.setBackgroundColor(Color.BLACK)
@@ -245,11 +245,11 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
             if(!isDeletingEnabled){
 
-                bind.tvEnableDeleting.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_changed_on_interaction))
+                (bind.tvEnableDeleting as TextView).setTextColor(ContextCompat.getColor(requireContext(), R.color.swipe_delete_on))
                 itemTouchHelper.attachToRecyclerView(bind.rvRecordings)
             } else {
 
-                bind.tvEnableDeleting.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_button_rec))
+                (bind.tvEnableDeleting as TextView).setTextColor(ContextCompat.getColor(requireContext(), R.color.swipe_delete_off))
                 itemTouchHelper.attachToRecyclerView(null)
             }
         }

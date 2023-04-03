@@ -2,11 +2,20 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/clHistorySettingDialog"
-    android:layout_width="wrap_content"
+    android:id="@+id/clCountryPickDialog"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:background="@drawable/dialog_gradient_for_background"
     android:paddingHorizontal="16dp">
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineMarginTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="18dp" />
 
     <TextView
         android:id="@+id/tvTitle"
@@ -14,37 +23,39 @@
         android:layout_height="50dp"
         android:layout_marginStart="8dp"
         android:gravity="center_vertical"
-        android:layout_marginTop="@dimen/dialog_top_margin"
-        android:text="Keep history of:"
+        android:text="Select a country"
         android:textAppearance="@style/dialogTitleText"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/guidelineMarginTop" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvListOfOptions"
+
+
+    <EditText
+        android:id="@+id/editText"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/tvWarning"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/black"
+        android:hint="Type country name..."
+        android:inputType="text|textNoSuggestions"
+        android:minHeight="48dp"
+        android:textAppearance="@style/dialogSearchText"
+        android:textColor="@color/search_text_color"
+        android:textCursorDrawable="@drawable/cursor_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
 
-
-    <TextView
-        android:id="@+id/tvWarning"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="20dp"
-        android:text="Saving this option may result in cleaning current history"
-        android:textAppearance="@style/dialogWarningTitleText"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/tvAccept"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCountries"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingStart="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/tvClearSelection"
+        app:layout_constraintEnd_toEndOf="@id/tvBack"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText" />
 
     <TextView
         android:id="@+id/tvBack"
@@ -57,17 +68,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-
     <TextView
-        android:id="@+id/tvAccept"
+        android:id="@+id/tvClearSelection"
         android:layout_width="wrap_content"
         android:layout_height="80dp"
         android:layout_marginEnd="20dp"
         android:gravity="center_vertical"
-        android:text="@string/dialog_accept_button"
+        android:text="@string/dialog_clear_selection"
         android:textAppearance="@style/dialogTextButtons"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

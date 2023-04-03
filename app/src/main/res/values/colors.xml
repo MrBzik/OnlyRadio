@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#AA4D06</color>
-    <color name="purple_500">#AA4D06</color>
-    <color name="purple_700">#AA4D06</color>
-    <color name="teal_200">#AA4D06</color>
-    <color name="teal_700">#AA4D06</color>
+    <color name="purple_200">#1A237E</color>
+    <color name="purple_500">#1A237E</color>
+    <color name="purple_700">#1A237E</color>
+    <color name="teal_200">#1A237E</color>
+    <color name="teal_700">#1A237E</color>
     <color name="black">#000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="ChosenGreen">#004D40</color>
@@ -12,9 +12,9 @@
 
     <color name="grayColor">#635D5D</color>
     <color name="floating_buttons">#FFFFFF</color>
-    <color name="color_interactive">#FFFFFFFF</color>
-    <color name="color_changed_on_interaction">#FF1000</color>
-    <color name="color_warning_text">#FC2E20</color>
+    <color name="color_interactive">#1A237E</color>
+    <color name="color_changed_on_interaction">#1B5E20</color>
+    <color name="color_warning_text">#B71C1C</color>
     <color name="transparent">#00000000</color>
     <color name="regular_text_color">#000000</color>
     <color name="search_text_color">#000000</color>
@@ -22,6 +22,9 @@
     <color name= "main_background">#FFFFFF</color>
     <color name="toolbar">#FFFFFF</color>
     <color name="Separator">#FF0000</color>
+
+    <color name="Cursor">#000000</color>
+
 
     <color name="text_interactive_shadow">#000000</color>
     <color name="arrows_for_text_buttons">#FFFDE7</color>
@@ -49,27 +52,34 @@
 
 
 <!--    Navigation bar colors -->
+<!--    #758EB7-->
+
+    <color name="nav_bar_search_fragment">#5571A1</color>
+<!--    <color name="status_bar_search_fragment">#5571A1</color>-->
+
+    <color name="nav_bar_fav_fragment">#665C9E</color>
+<!--    <color name="status_bar_fav_fragment">#665C9E</color>-->
 
 
-    <color name="nav_bar_search_fragment">#7E57C2</color>
-    <color name="status_bar_search_fragment">#5E35B1</color>
-
-    <color name="nav_bar_fav_fragment">#26A69A</color>
-    <color name="status_bar_fav_fragment">#00897B</color>
+    <color name="nav_bar_history_frag">#4F7489</color>
+<!--    <color name="status_bar_history_frag">#4F7489</color>-->
 
 
-    <color name="nav_bar_history_frag">#5C6BC0</color>
-    <color name="status_bar_history_frag">#3949AB</color>
+    <color name="nav_bar_rec_frag">#505796</color>
+<!--    <color name="status_bar_rec_frag">#505796</color>-->
 
 
-    <color name="nav_bar_rec_frag">#26C6DA</color>
-    <color name="status_bar_rec_frag">#00ACC1</color>
+    <color name="nav_bar_settings_frag">#5C7091  </color>
+<!--    <color name="status_bar_settings_frag">#5C7091  </color>-->
 
 
-    <color name="nav_bar_settings_frag">#42A5F5</color>
-    <color name="status_bar_settings_frag">#1E88E5</color>
+    #447592
 
+    #505796
 
+<!--DARK BLUE-->
+<!--    <color name="nav_bar_history_frag">#474973</color>-->
+<!--    <color name="status_bar_history_frag">#474973</color>-->
 
 
     <color name="text_button_search_tag">#283593</color>
@@ -79,8 +89,16 @@
 
     <color name="text_button_fav">#00695C</color>
     <color name="text_button_history">#6A1B9A</color>
-    <color name="text_button_rec">#FFFFFF</color>
 
+
+
+
+    <color name="text_button_rec">#1A237E</color>
+
+    <color name="swipe_delete_off">#FFFFFF</color>
+    <color name="swipe_delete_on">#ABFF17</color>
+
+    <color name="text_button">#1A237E</color>
 
 
 

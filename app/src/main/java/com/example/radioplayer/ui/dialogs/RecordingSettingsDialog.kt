@@ -25,10 +25,8 @@ class RecordingSettingsDialog (
     private val requireContext : Context,
     private val updateTvValue : () -> Unit
     )
-    : AppCompatDialog(requireContext) {
-
-    private var _bind : DialogRecordingSettingsBinding? = null
-    private val bind get() = _bind!!
+    : BaseDialog<DialogRecordingSettingsBinding>
+    (requireContext, DialogRecordingSettingsBinding::inflate) {
 
     private var newOption : Int? = null
 
@@ -36,11 +34,7 @@ class RecordingSettingsDialog (
     private lateinit var optionsAdapter : SelectingOptionAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        _bind = DialogRecordingSettingsBinding.inflate(layoutInflater)
-
         super.onCreate(savedInstanceState)
-        setContentView(bind.root)
 
         window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
 
@@ -51,6 +45,8 @@ class RecordingSettingsDialog (
         setAdapterClicklListener()
 
         setButtonsListeners()
+
+        adjustDialogHeight(bind.clRecordingSettingsDialog)
 
     }
 

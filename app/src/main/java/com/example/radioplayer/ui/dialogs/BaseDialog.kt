@@ -50,7 +50,7 @@ abstract class BaseDialog<VB : ViewBinding> (
 
         val bottomNanViewShift = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
-            14f,
+            20f,
             requireContext.resources.displayMetrics
         ).toInt()
 

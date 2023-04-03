@@ -10,6 +10,9 @@
     <color name="ChosenGreen">#004D40</color>
     <color name="color_non_interactive">#FD7F20</color>
     <color name="Separator">#AA4D06</color>
+
+    <color name="Cursor">#AA4D06</color>
+
     <color name="grayColor">#635D5D</color>
     <color name="floating_buttons">#121111</color>
     <color name="color_interactive">#FDB750</color>
@@ -44,5 +47,9 @@
 
 
     <color name="text_button_rec">#FDB750</color>
+
+    <color name="swipe_delete_off">#FDB750</color>
+    <color name="swipe_delete_on">#FC2E20</color>
+
 
 </resources>

@@ -13,5 +13,8 @@
     <dimen name="stub_player_margin_horizontal">8dp</dimen>
 
 
+    <dimen name="dialog_top_margin">18dp</dimen>
+
+
 
 </resources>

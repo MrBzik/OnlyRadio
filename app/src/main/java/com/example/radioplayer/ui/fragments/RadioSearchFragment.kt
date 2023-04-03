@@ -132,13 +132,13 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     private fun setToolbar(){
 
         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
-            bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_search)
+            bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_search_vector)
             val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_search_fragment)
-            val statusBar = ContextCompat.getColor(requireContext(), R.color.status_bar_search_fragment)
+//            val statusBar = ContextCompat.getColor(requireContext(), R.color.status_bar_search_fragment)
 
             (activity as MainActivity).apply {
                 window.navigationBarColor = color
-                window.statusBarColor = statusBar
+                window.statusBarColor = color
             }
 
 //            (bind.tvTag as TextViewOutlined).apply {
@@ -445,18 +445,18 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         mainViewModel.searchParamTag.observe(viewLifecycleOwner){
 
-            bind.tvTag.text = if (it == "") "Tag" else it
+            (bind.tvTag as TextView).text  = if (it == "") "Tag" else it
 
         }
 
         mainViewModel.searchParamName.observe(viewLifecycleOwner){
-            bind.tvName.text = if (it == "") "Name" else it
+            (bind.tvName as TextView).text = if (it == "") "Name" else it
         }
 
         mainViewModel.searchParamCountry.observe(viewLifecycleOwner){
 
 
-            bind.tvSelectedCountry.text = if (it == "") "Country" else it
+            (bind.tvSelectedCountry as TextView).text = if (it == "") "Country" else it
 
 //            if(it.isBlank()){
 //

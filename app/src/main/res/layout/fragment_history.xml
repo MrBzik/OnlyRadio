@@ -65,7 +65,7 @@
         app:layout_constraintGuide_percent="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
+    <com.example.radioplayer.utils.TextViewOutlined
         android:id="@+id/tvSelectDate"
         android:layout_width="wrap_content"
         android:layout_height="60dp"

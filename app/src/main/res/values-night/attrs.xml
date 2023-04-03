@@ -11,4 +11,7 @@
     <dimen name="player_view_bottom_margin">0dp</dimen>
 
     <dimen name="stub_player_margin_horizontal">0dp</dimen>
+
+    <dimen name="dialog_top_margin">0dp</dimen>
+
 </resources>

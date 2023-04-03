@@ -22,12 +22,12 @@ class TextViewOutlined(context : Context, attrs : AttributeSet?) : AppCompatText
 //    private var _strokeColor = ContextCompat.getColor(context, R.color.outline_stroke)
 
     private var _strokeColor = Color.WHITE
-    private var _strokeWidth = 5f
+    private var _strokeWidth = 0.4f
 
     var isSingleColor = false
 
     var colors = intArrayOf(
-        0, 0
+        Color.WHITE, Color.RED
     )
 
     fun setStrokeColor(color: Int) {
