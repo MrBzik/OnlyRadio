@@ -9,6 +9,10 @@ import com.example.radioplayer.exoPlayer.RadioService
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.metadata.Metadata
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class RadioPlayerEventListener (
     private val radioService : RadioService
@@ -30,6 +34,7 @@ class RadioPlayerEventListener (
 
             if(Build.VERSION.SDK_INT > 24) { radioService.stopForeground(STOP_FOREGROUND_DETACH)}
             else {radioService.stopForeground(false)}
+
             radioService.isForegroundService = false
         }
          else if(playbackState == Player.STATE_READY && playWhenReady){
@@ -44,6 +49,12 @@ class RadioPlayerEventListener (
 
     override fun onPlayerError(error: PlaybackException) {
         super.onPlayerError(error)
-        Toast.makeText(radioService, "Radio station does not respond", Toast.LENGTH_SHORT).show()
+
+        if(RadioService.isToReconnect){
+            radioService.exoPlayer.prepare()
+            Toast.makeText(radioService, "Reconnecting...", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(radioService, "Station not responding", Toast.LENGTH_SHORT).show()
+        }
     }
 }

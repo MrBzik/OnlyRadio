@@ -10,6 +10,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.example.radioplayer.R
+import com.example.radioplayer.bluetooth.AndroidBluetoothController
+import com.example.radioplayer.bluetooth.BluetoothController
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.RadioDB
 import com.example.radioplayer.data.remote.PixabayApi
@@ -33,6 +35,14 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    @Singleton
+    fun providesBluetoothController(@ApplicationContext app : Context) : BluetoothController{
+        return AndroidBluetoothController(app)
+
+    }
+
 
     @Provides
     @Singleton

@@ -4,9 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/main_background"
     android:layout_marginHorizontal="8dp"
-    >
+    android:background="@color/main_background">
 
 
     <com.google.android.material.button.MaterialButton
@@ -27,21 +26,62 @@
 
 
 
-    <TextView
-        android:id="@+id/tvSongTitle"
+
+    <LinearLayout
+        android:id="@+id/llSongTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="70dp"
-        android:fontFamily="sans-serif-smallcaps"
-        android:gravity="center"
-        android:paddingHorizontal="16dp"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="@color/selected_text_color"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"  />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="70dp"
+        android:paddingHorizontal="16dp"
+        >
+
+        <TextView
+
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.7"
+            android:fontFamily="sans-serif-smallcaps"
+            android:gravity="center"
+            android:text="Playing:"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/tvSongTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-smallcaps"
+            android:gravity="center"
+            android:layout_marginHorizontal="8dp"
+            android:text="No info now but  "
+            android:textColor="@color/selected_text_color"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            />
+
+        <ImageView
+           android:id="@+id/ivCopy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_copy"
+            android:layout_gravity="center_vertical"
+
+            />
+    </LinearLayout>
+
+
+
+
+
 
     <ImageView
         android:id="@+id/ivIcon"
@@ -51,7 +91,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvSongTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/llSongTitle" />
 
     <TextView
         android:id="@+id/tvPlaceholder"
@@ -65,15 +105,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvSongTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/llSongTitle" />
 
 
     <ScrollView
         android:id="@+id/svTvTags"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:paddingHorizontal="16dp"
         android:layout_marginVertical="20dp"
+        android:paddingHorizontal="16dp"
         app:layout_constraintBottom_toTopOf="@id/fabAddToFav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -90,28 +130,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-smallcaps"
-                android:textColor="@color/selected_text_color"
                 android:gravity="center"
-                android:textSize="20sp"
-                />
+                android:textColor="@color/selected_text_color"
+                android:textSize="20sp" />
 
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/tvHomePage"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
+                android:layout_gravity="center"
                 android:layout_marginTop="8dp"
                 android:backgroundTint="@color/white"
                 android:elevation="10dp"
                 android:text="Homepage"
-                android:layout_gravity="center"
                 android:textAppearance="@style/mainTextButtons"
                 android:textColor="@color/text_button"
                 app:cornerRadius="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                />
-
+                app:layout_constraintTop_toTopOf="parent" />
 
 
             <TextView
@@ -167,7 +204,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/fabRecording"
         app:layout_constraintStart_toEndOf="@+id/fabRecording"
         app:layout_constraintTop_toTopOf="@+id/fabRecording" />
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

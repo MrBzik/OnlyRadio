@@ -3,6 +3,7 @@ package com.example.radioplayer
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import android.media.MediaFormat
 import android.os.Debug
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
@@ -20,6 +21,7 @@ class RadioApplication : Application() {
 
 
         handleDarkMode()
+
 
     }
 

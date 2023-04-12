@@ -176,6 +176,8 @@ class PagingRadioAdapter @Inject constructor(
     var defaultSecondaryTextColor = 0
     var selectedSecondaryTextColor = 0
 
+    var separatorDefault = 0
+
     var alpha = 0.1f
 
     override fun onViewRecycled(holder: RadioItemHolder) {
@@ -190,6 +192,7 @@ class PagingRadioAdapter @Inject constructor(
             tvPrimary.setTextColor(defaultTextColor)
 
             tvSecondary.setTextColor(defaultSecondaryTextColor)
+            viewBottomSeparator?.setBackgroundColor(separatorDefault)
         }
     }
 
@@ -200,6 +203,8 @@ class PagingRadioAdapter @Inject constructor(
                tvPrimary.setTextColor(selectedTextColor)
 
                tvSecondary.setTextColor(selectedSecondaryTextColor)
+
+                viewBottomSeparator?.setBackgroundResource(R.color.station_bottom_separator_active)
             }
 
         } else {
@@ -208,6 +213,8 @@ class PagingRadioAdapter @Inject constructor(
                 tvPrimary.setTextColor(defaultTextColor)
 
                 tvSecondary.setTextColor(defaultSecondaryTextColor)
+
+                viewBottomSeparator?.setBackgroundResource(R.color.station_bottom_separator_selected)
             }
         }
     }

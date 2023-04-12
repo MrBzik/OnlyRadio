@@ -24,7 +24,7 @@ class HistoryDataSource(
             val stations = loader(dateIndex).toMutableList()
 
             if(HistoryFragment.isNewHistoryQuery){
-                while(stations.size < 9){
+                while(stations.size < 9 && HistoryFragment.numberOfDates < pagesLoaded){
 
                     val moreStations = loader(dateIndex+pagesLoaded)
 
@@ -33,7 +33,9 @@ class HistoryDataSource(
                     stations.addAll(moreStations)
 
                     pagesLoaded += 1
+
                  }
+
 
                 HistoryFragment.isNewHistoryQuery = false
             }

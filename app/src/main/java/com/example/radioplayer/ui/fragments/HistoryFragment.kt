@@ -64,6 +64,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     companion object{
 
        var isNewHistoryQuery = true
+       var numberOfDates = 0
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -73,6 +75,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         updateCurrentDate()
 
         setupRecyclerView()
+
+        setAdapterLoadStateListener()
 
         observePlaybackState()
 
@@ -84,11 +88,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         setSpinnerOpenCloseListener()
 
-        setAdapterLoadStateListener()
+
 
         setToolbar()
-
-        subscribeToHistory()
 
 
     }
@@ -188,6 +190,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         databaseViewModel.listOfDates.observe(viewLifecycleOwner){
 
+            numberOfDates = it.size
+
             val allHistory = HistoryDate("History: All", 0)
 
             val dates = it.toMutableList()
@@ -212,6 +216,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
 
             setDatesSpinnerSelectListener()
+
+            subscribeToHistory()
 
         }
     }
@@ -316,6 +322,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
 
+                separatorDefault = ContextCompat.getColor(requireContext(), R.color.station_bottom_separator_default)
+
                     mainViewModel.currentRadioStation.value?.let {
                         val id =  it.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)
                         currentRadioStationID = id
@@ -341,11 +349,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             databaseViewModel.observableHistory.observe(viewLifecycleOwner){
 
-
                 historyAdapter?.currentDate = currentDate
                 viewLifecycleOwner.lifecycleScope.launch{
 
-                    Log.d("CHECKTAGS", "data")
                 historyAdapter?.submitData(it)
             }
 

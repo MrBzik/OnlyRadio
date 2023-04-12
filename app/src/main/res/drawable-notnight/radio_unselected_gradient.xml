@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape  xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#0D000000"/>
-</shape>
+<layer-list  xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:height="75dp">
+    <shape>
+        <solid android:color="#0D606D83"/>
+    </shape>
+</item>
+<item
+    android:drawable="@drawable/ic_music_note_inactive"
+    android:gravity="end"
+    android:height="75dp"
+    android:width="75dp"
+    >
+</item>
+
+
+</layer-list>

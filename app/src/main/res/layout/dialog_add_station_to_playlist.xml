@@ -29,18 +29,18 @@
         app:layout_constraintTop_toTopOf="@id/guidelineMarginTop" />
 
 
-    <TextView
-        android:id="@+id/tvHint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/aldrich"
-        android:text="(Also: use DragAndDrop in Favoured tab)*"
-        android:textColor="@color/regular_text_color"
-        android:textSize="13sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+<!--    <TextView-->
+<!--        android:id="@+id/tvHint"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginStart="8dp"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:fontFamily="@font/aldrich"-->
+<!--        android:text="(Also: use DragAndDrop in Favoured tab)*"-->
+<!--        android:textColor="@color/regular_text_color"-->
+<!--        android:textSize="13sp"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />-->
 
     <TextView
         android:id="@+id/tvMessageNoPlaylists"
@@ -65,7 +65,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvHint" />
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
 
 
     <TextView

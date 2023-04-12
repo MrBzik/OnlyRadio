@@ -250,6 +250,7 @@ class PagingHistoryAdapter @Inject constructor(
 
     var alpha = 0.1f
 
+    var separatorDefault = 0
 
     private fun restoreState(bind: ItemRadioWithTextBinding){
         bind.apply {
@@ -257,6 +258,7 @@ class PagingHistoryAdapter @Inject constructor(
             tvPrimary.setTextColor(defaultTextColor)
 
             tvSecondary.setTextColor(defaultSecondaryTextColor)
+            viewBottomSeparator?.setBackgroundColor(separatorDefault)
         }
     }
 
@@ -268,14 +270,18 @@ class PagingHistoryAdapter @Inject constructor(
                 tvPrimary.setTextColor(selectedTextColor)
 
                 tvSecondary.setTextColor(selectedSecondaryTextColor)
+
+                viewBottomSeparator?.setBackgroundResource(R.color.station_bottom_separator_active)
             }
 
         } else {
             bind.apply {
-                radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
+                radioItemRootLayout.setBackgroundResource(R.drawable.radio_unselected_gradient)
                 tvPrimary.setTextColor(defaultTextColor)
 
                 tvSecondary.setTextColor(defaultSecondaryTextColor)
+
+                viewBottomSeparator?.setBackgroundResource(R.color.station_bottom_separator_selected)
             }
         }
     }

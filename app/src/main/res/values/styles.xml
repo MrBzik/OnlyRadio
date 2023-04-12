@@ -93,6 +93,11 @@
 
 
 
+    <style name="prefixText" parent="android:Widget.TextView">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/regular_text_color</item>
+        <item name="android:fontFamily">sans-serif-smallcaps</item>
+    </style>
 
 
 

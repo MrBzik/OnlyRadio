@@ -10,7 +10,7 @@ import android.widget.SeekBar
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 
-import com.arthenica.ffmpegkit.FFmpegKit
+//import com.arthenica.ffmpegkit.FFmpegKit
 
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -256,47 +256,47 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
         val command = arrayOf( "-ss", trimStart.toString(), "-i",
             oggFilePath, "-t", duration.toString(), "-c", "copy", output)
 
-       FFmpegKit.executeWithArgumentsAsync(command
-        ) { session ->
-
-           var message = ""
-
-            if(session.returnCode.isValueSuccess) {
-
-
-                val newRecording = Recording(
-                    id ="$currentTime.ogg",
-                    iconUri = rec.iconUri,
-                    timeStamp = currentTime,
-                    name = rec.name,
-                    durationMills = (duration*1000).toLong()
-                )
-
-                databaseViewModel.insertNewRecording(newRecording)
-                message = "Success!"
-
-
-                if(!switchPref){
-                    databaseViewModel.deleteRecording(rec.id)
-                    currentRecording = newRecording
-                    isRecordingToUpdate = true
-
-                }
-
-            } else if(session.returnCode.isValueError){
-
-                message = "Something went wrong!"
-
-            }
-
-           lifecycleScope.launch(Dispatchers.Main){
-               Snackbar.make(requireActivity().findViewById(R.id.rootLayout), message, Snackbar.LENGTH_SHORT).show()
-               isTrimmerWorking = false
-               bind.tvProcessTrim.visibility = View.GONE
-               isTvTrimProcessVisible = false
-           }
-          session.cancel()
-        }
+//       FFmpegKit.executeWithArgumentsAsync(command
+//        ) { session ->
+//
+//           var message = ""
+//
+//            if(session.returnCode.isValueSuccess) {
+//
+//
+//                val newRecording = Recording(
+//                    id ="$currentTime.ogg",
+//                    iconUri = rec.iconUri,
+//                    timeStamp = currentTime,
+//                    name = rec.name,
+//                    durationMills = (duration*1000).toLong()
+//                )
+//
+//                databaseViewModel.insertNewRecording(newRecording)
+//                message = "Success!"
+//
+//
+//                if(!switchPref){
+//                    databaseViewModel.deleteRecording(rec.id)
+//                    currentRecording = newRecording
+//                    isRecordingToUpdate = true
+//
+//                }
+//
+//            } else if(session.returnCode.isValueError){
+//
+//                message = "Something went wrong!"
+//
+//            }
+//
+//           lifecycleScope.launch(Dispatchers.Main){
+//               Snackbar.make(requireActivity().findViewById(R.id.rootLayout), message, Snackbar.LENGTH_SHORT).show()
+//               isTrimmerWorking = false
+//               bind.tvProcessTrim.visibility = View.GONE
+//               isTvTrimProcessVisible = false
+//           }
+//          session.cancel()
+//        }
     }
 
     private fun observeRecordingPlaylistUpdate(){

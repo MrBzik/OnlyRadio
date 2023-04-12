@@ -27,9 +27,9 @@
 <!--        <item name="android:navigationBarColor">#000000</item>-->
 <!--    </style>-->
 
-    <style name="splashScreenTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="splashScreenTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
         <item name="android:windowBackground">@drawable/splash_screen</item>
-        <item name="android:statusBarColor">@color/color_non_interactive</item>
+        <item name="android:statusBarColor">#FD7F20</item>
         <item name="android:navigationBarColor">@color/black</item>
     </style>
 

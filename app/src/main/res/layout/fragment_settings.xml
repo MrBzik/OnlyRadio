@@ -3,8 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
 
+    >
 
     <View
         android:id="@+id/viewToolbar"
@@ -20,8 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="16dp"
-
+        android:layout_marginTop="17dp"
         android:text="Options"
         android:textAppearance="@style/mainTextTitle"
         app:layout_constraintStart_toStartOf="parent"
@@ -29,259 +29,423 @@
 
 
     <TextView
-        android:id="@+id/tvNightMode"
+        android:id="@+id/tvSettingsTitleDay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="80dp"
-        android:text="Dark mode"
-        android:textAppearance="@style/dialogItemText"
+        android:layout_marginTop="17dp"
+        android:text="Options"
+        android:textAppearance="@style/mainTextTitle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/guidelineMiddle"
+        />
 
-
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/switchNightMode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:minHeight="48dp"
-        app:layout_constraintBottom_toBottomOf="@+id/tvNightMode"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvNightMode"
-        app:thumbTint="@color/switch_thumb_color"
-        app:trackTint="@color/switch_track_color" />
-
-    <TextView
-        android:id="@+id/tvNightModePref"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="30dp"
-        android:text="Dark mode on start"
-        android:textAppearance="@style/dialogItemText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvNightMode" />
-
-
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/switchNightModePref"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:minHeight="48dp"
-        app:layout_constraintBottom_toBottomOf="@+id/tvNightModePref"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvNightModePref"
-        app:thumbTint="@color/switch_thumb_color"
-        app:trackTint="@color/switch_track_color" />
-
-    <TextView
-        android:id="@+id/tvHistorySettingTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="30dp"
-        android:text="History option"
-        android:textAppearance="@style/dialogItemText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvNightModePref" />
-
-
-    <TextView
-        android:id="@+id/tvHistorySettingValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:textAppearance="@style/dialogItemText"
-        android:textColor="@color/interactive_option_color"
-        app:drawableEndCompat="@drawable/option_open_menu"
-        app:layout_constraintBottom_toBottomOf="@+id/tvHistorySettingTitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvHistorySettingTitle" />
-
-
-    <TextView
-        android:id="@+id/tvRecordingSettingTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="30dp"
-        android:text="Rec. quality"
-        android:textAppearance="@style/dialogItemText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvHistorySettingTitle" />
-
-    <TextView
-        android:id="@+id/tvRecordingSettingsValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:textAppearance="@style/dialogItemText"
-        android:textColor="@color/interactive_option_color"
-        app:drawableEndCompat="@drawable/option_open_menu"
-        app:layout_constraintBottom_toBottomOf="@+id/tvRecordingSettingTitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvRecordingSettingTitle" />
-
-
-    <TextView
-        android:id="@+id/tvSearchBtnTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:text="button"
-        android:textAppearance="@style/dialogItemText"
-        app:layout_constraintBottom_toBottomOf="@+id/ivButtonsSearch"
-        app:layout_constraintStart_toEndOf="@+id/ivButtonsSearch"
-        app:layout_constraintTop_toTopOf="@+id/ivButtonsSearch" />
-
-    <ImageView
-        android:id="@+id/ivButtonsSearch"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="30dp"
-        android:src="@drawable/ic_new_radio_search"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvRecordingSettingTitle" />
-
-    <TextView
-        android:id="@+id/tvSearchBtnReset"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:text="Reset position"
-        android:textAppearance="@style/dialogItemText"
-        android:textColor="@color/selected_station_paused"
-        app:layout_constraintBottom_toBottomOf="@+id/tvSearchBtnTitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvSearchBtnTitle" />
-
-        <TextView
-            android:id="@+id/tvSearchHint"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginStart="20dp"
-            android:text="(Also: Swipe-Up for searches)*"
-            android:fontFamily="@font/aldrich"
-            android:textSize="13sp"
-            android:textColor="@color/Separator"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ivButtonsSearch"
-             />
-
-        <TextView
-            android:id="@+id/tvPlaybackSpeedHint"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:fontFamily="@font/aldrich"
-            android:text="(Rec. speed is set separately in Details)*"
-            android:textColor="@color/Separator"
-            android:textSize="13sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvSearchHint" />
-
-
-    <TextView
-        android:id="@+id/tvPlaybackSpeedTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="speed : 100%"
-        android:textAppearance="@style/dialogItemText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvPlaybackSpeedHint" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guidelineHorizontal"
+        android:id="@+id/guidelineMiddle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5" />
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/viewToolbar"
+        app:layout_constraintBottom_toBottomOf="parent"
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabSpeedMinus"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="30dp"
-        android:src="@drawable/playback_speed_minus"
-        app:backgroundTint="@color/floating_buttons"
-        app:fabCustomSize="30dp"
-        app:layout_constraintBottom_toBottomOf="@+id/tvPlaybackSpeedTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvPlaybackSpeedTitle" />
+        >
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabSpeedPlus"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="30dp"
-        android:src="@drawable/playback_speed_plus"
-        app:backgroundTint="@color/floating_buttons"
-        app:fabCustomSize="30dp"
-        app:layout_constraintBottom_toBottomOf="@+id/tvPlaybackSpeedTitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvPlaybackSpeedTitle" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/fabPitchPlus"
+            />
 
 
-    <ImageView
-        android:id="@+id/ivLink"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:src="@drawable/link"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvPlaybackSpeedTitle" />
+
+            <TextView
+                android:id="@+id/tvCastAudio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:text="Cast audio"
+                android:textAppearance="@style/dialogItemText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
 
-    <TextView
-        android:id="@+id/tvPlaybackPitchTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="pitch : 100%"
-        android:textAppearance="@style/dialogItemText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivLink" />
+            <ImageView
+                android:id="@+id/ivCastAudio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_bluetooth_cast"
+                app:layout_constraintBottom_toBottomOf="@+id/tvCastAudio"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvCastAudio" />
 
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabPitchMinus"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="30dp"
-        android:src="@drawable/playback_speed_minus"
-        app:backgroundTint="@color/floating_buttons"
-        app:fabCustomSize="30dp"
-        app:layout_constraintBottom_toBottomOf="@+id/tvPlaybackPitchTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvPlaybackPitchTitle" />
+            <TextView
+                android:id="@+id/tvChangePlayers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="30dp"
+                android:text="Change player"
+                android:textAppearance="@style/dialogItemText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvCastAudio" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchChangePlayer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:minHeight="48dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvChangePlayers"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvChangePlayers"
+                app:thumbTint="@color/switch_thumb_color"
+                app:trackTint="@color/switch_track_color" />
 
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabPitchPlus"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="30dp"
-        android:src="@drawable/playback_speed_plus"
-        app:backgroundTint="@color/floating_buttons"
-        app:fabCustomSize="30dp"
-        app:layout_constraintBottom_toBottomOf="@+id/tvPlaybackPitchTitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvPlaybackPitchTitle" />
 
+            <TextView
+                android:id="@+id/tvReconnect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="30dp"
+                android:text="Reconnect to streams"
+                android:textAppearance="@style/dialogItemText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvChangePlayers" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchReconnect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:minHeight="48dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvReconnect"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvReconnect"
+                app:thumbTint="@color/switch_thumb_color"
+                app:trackTint="@color/switch_track_color" />
+
+
+
+            <TextView
+                android:id="@+id/tvNightMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="30dp"
+                android:text="Dark mode"
+                android:textAppearance="@style/dialogItemText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvReconnect" />
+
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchNightMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:minHeight="48dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvNightMode"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvNightMode"
+                app:thumbTint="@color/switch_thumb_color"
+                app:trackTint="@color/switch_track_color" />
+
+            <TextView
+                android:id="@+id/tvNightModePref"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="30dp"
+                android:text="Dark mode on start"
+                android:textAppearance="@style/dialogItemText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvNightMode" />
+
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchNightModePref"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:minHeight="48dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvNightModePref"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvNightModePref"
+                app:thumbTint="@color/switch_thumb_color"
+                app:trackTint="@color/switch_track_color" />
+
+
+            <TextView
+                android:id="@+id/tvForegroundPref"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="30dp"
+                android:text="@string/foreground_pref"
+                android:lineSpacingExtra="4dp"
+                android:textAppearance="@style/dialogItemText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/switchForegroundPref"
+                app:layout_constraintTop_toBottomOf="@+id/tvNightModePref" />
+
+            <TextView
+                android:id="@+id/tvForegroundPrefHint"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="6dp"
+                android:text="(By default: keep service if audio is playing)"
+                android:lineSpacingExtra="4dp"
+                android:textSize="13sp"
+                android:textAppearance="@style/dialogItemText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/switchForegroundPref"
+                app:layout_constraintTop_toBottomOf="@+id/tvForegroundPref" />
+
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchForegroundPref"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:minHeight="48dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvForegroundPref"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvForegroundPref"
+                app:thumbTint="@color/switch_thumb_color"
+                app:trackTint="@color/switch_track_color" />
+
+
+
+
+            <TextView
+                android:id="@+id/tvHistorySettingTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="30dp"
+                android:text="History option"
+                android:textAppearance="@style/dialogItemText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvForegroundPrefHint" />
+
+
+            <TextView
+                android:id="@+id/tvHistorySettingValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:textAppearance="@style/dialogItemText"
+                android:textColor="@color/interactive_option_color"
+                app:drawableEndCompat="@drawable/option_open_menu"
+                app:layout_constraintBottom_toBottomOf="@+id/tvHistorySettingTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvHistorySettingTitle" />
+
+
+            <TextView
+                android:id="@+id/tvRecordingSettingTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="30dp"
+                android:text="Rec. quality"
+                android:textAppearance="@style/dialogItemText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvHistorySettingTitle" />
+
+            <TextView
+                android:id="@+id/tvRecordingSettingsValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:textAppearance="@style/dialogItemText"
+                android:textColor="@color/interactive_option_color"
+                app:drawableEndCompat="@drawable/option_open_menu"
+                app:layout_constraintBottom_toBottomOf="@+id/tvRecordingSettingTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvRecordingSettingTitle" />
+
+
+            <TextView
+                android:id="@+id/tvSearchBtnTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="button"
+                android:textAppearance="@style/dialogItemText"
+                app:layout_constraintBottom_toBottomOf="@+id/ivButtonsSearch"
+                app:layout_constraintStart_toEndOf="@+id/ivButtonsSearch"
+                app:layout_constraintTop_toTopOf="@+id/ivButtonsSearch" />
+
+            <ImageView
+                android:id="@+id/ivButtonsSearch"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="30dp"
+                android:src="@drawable/ic_new_radio_search"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvRecordingSettingTitle" />
+
+            <TextView
+                android:id="@+id/tvSearchBtnReset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:text="Reset position"
+                android:textAppearance="@style/dialogItemText"
+                android:textColor="@color/selected_station_paused"
+                app:layout_constraintBottom_toBottomOf="@+id/tvSearchBtnTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvSearchBtnTitle" />
+
+            <TextView
+                android:id="@+id/tvSearchHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="20dp"
+                android:text="(Also: Swipe-Up for searches)*"
+                android:fontFamily="@font/aldrich"
+                android:textSize="13sp"
+                android:textColor="@color/default_secondary_text_color"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ivButtonsSearch"
+                />
+
+            <TextView
+                android:id="@+id/tvPlaybackSpeedHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/aldrich"
+                android:text="(Rec. speed is set separately in Details)*"
+                android:textColor="@color/default_secondary_text_color"
+                android:textSize="13sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvSearchHint" />
+
+
+            <TextView
+                android:id="@+id/tvPlaybackSpeedTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="speed : 100%"
+                android:textAppearance="@style/dialogItemText"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvPlaybackSpeedHint" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineHorizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5" />
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabSpeedMinus"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="30dp"
+                android:src="@drawable/playback_speed_minus"
+                app:backgroundTint="@color/floating_buttons"
+                app:fabCustomSize="30dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvPlaybackSpeedTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvPlaybackSpeedTitle" />
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabSpeedPlus"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="30dp"
+                android:src="@drawable/playback_speed_plus"
+                app:backgroundTint="@color/floating_buttons"
+                app:fabCustomSize="30dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvPlaybackSpeedTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvPlaybackSpeedTitle" />
+
+
+            <ImageView
+                android:id="@+id/ivLink"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:src="@drawable/link"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvPlaybackSpeedTitle" />
+
+
+            <TextView
+                android:id="@+id/tvPlaybackPitchTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="pitch : 100%"
+                android:textAppearance="@style/dialogItemText"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ivLink" />
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabPitchMinus"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="30dp"
+                android:src="@drawable/playback_speed_minus"
+                app:backgroundTint="@color/floating_buttons"
+                app:fabCustomSize="30dp"
+
+                app:layout_constraintBottom_toBottomOf="@+id/tvPlaybackPitchTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvPlaybackPitchTitle" />
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabPitchPlus"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="30dp"
+                android:src="@drawable/playback_speed_plus"
+                app:backgroundTint="@color/floating_buttons"
+                app:fabCustomSize="30dp"
+
+                app:layout_constraintBottom_toBottomOf="@+id/tvPlaybackPitchTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvPlaybackPitchTitle" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </ScrollView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

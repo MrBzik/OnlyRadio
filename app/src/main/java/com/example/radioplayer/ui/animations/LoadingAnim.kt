@@ -4,7 +4,6 @@ import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.view.View
-import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
@@ -16,10 +15,10 @@ class LoadingAnim(
     private val separator : View, private val separator2: View, private val separator3: View, private val separator4: View
 ) {
 
-   private val red = ContextCompat.getColor(context, com.example.radioplayer.R.color.color_changed_on_interaction)
-   private val orange = ContextCompat.getColor(context, com.example.radioplayer.R.color.Separator)
+   private val activeColor = ContextCompat.getColor(context, com.example.radioplayer.R.color.separatorLoad)
+   private val defaultColor = ContextCompat.getColor(context, com.example.radioplayer.R.color.Separator)
 
-   private val anim = ValueAnimator.ofObject(ArgbEvaluator(), orange, red)
+   private val anim = ValueAnimator.ofObject(ArgbEvaluator(), defaultColor, activeColor)
 
 
     fun startLoadingAnim() {
@@ -44,7 +43,7 @@ class LoadingAnim(
 
     fun refresh(){
             val colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-                orange, BlendModeCompat.XOR
+                defaultColor, BlendModeCompat.XOR
             )
             separator.background.colorFilter = colorFilter
             separator2.background.colorFilter = colorFilter
@@ -59,7 +58,7 @@ class LoadingAnim(
             val color = anim.animatedValue as Int
             anim.cancel()
 
-            val endAnim = ValueAnimator.ofObject(ArgbEvaluator(), color, orange)
+            val endAnim = ValueAnimator.ofObject(ArgbEvaluator(), color, defaultColor)
 
             endAnim.addUpdateListener {
 

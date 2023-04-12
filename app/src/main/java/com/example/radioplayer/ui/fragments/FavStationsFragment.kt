@@ -101,7 +101,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         editPlaylistClickListener()
 
-
     }
 
 
@@ -458,6 +457,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 selectedSecondaryTextColor = ContextCompat.getColor(requireContext(), R.color.selected_secondary_text_color)
 
                 alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
+
+                separatorDefault = ContextCompat.getColor(requireContext(), R.color.station_bottom_separator_default)
             }
 
             mainViewModel.currentRadioStation.value?.let {

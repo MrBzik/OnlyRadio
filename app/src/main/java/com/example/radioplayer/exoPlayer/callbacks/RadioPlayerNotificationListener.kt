@@ -2,6 +2,7 @@ package com.example.radioplayer.exoPlayer.callbacks
 
 import android.app.Notification
 import android.app.Service.STOP_FOREGROUND_REMOVE
+import android.bluetooth.BluetoothDevice
 import android.content.Intent
 import android.os.Build
 import android.util.Log
@@ -18,14 +19,11 @@ class RadioPlayerNotificationListener (
         super.onNotificationCancelled(notificationId, dismissedByUser)
 
         radioService.apply {
-
-
             stopForeground(STOP_FOREGROUND_REMOVE)
-
             isForegroundService = false
+
             stopSelf()
         }
-
     }
 
 

@@ -2,15 +2,19 @@ package com.example.radioplayer.dagger
 
 import android.app.Application
 import android.content.Context
+import android.media.AudioFormat
 import android.os.Handler
 import com.example.radioplayer.data.remote.RadioApi
 import com.example.radioplayer.utils.Constants
 import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.LoadControl
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.audio.AudioCapabilities
 import com.google.android.exoplayer2.audio.AudioCapabilities.DEFAULT_AUDIO_CAPABILITIES
+import com.google.android.exoplayer2.audio.AudioCapabilities.getCapabilities
 import com.google.android.exoplayer2.audio.AudioSink
 import com.google.android.exoplayer2.audio.DefaultAudioSink
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
@@ -52,9 +56,13 @@ object ServiceModule {
         renderersFactory: DefaultRenderersFactory
     ) = ExoPlayer.Builder(app, renderersFactory)
         .setAudioAttributes(audioAttributes, true)
-        .setPauseAtEndOfMediaItems(true)
         .setHandleAudioBecomingNoisy(true)
         .build()
+
+
+    //        .setLoadControl(DefaultLoadControl.Builder()
+//            .setBufferDurationsMs(1000, 1000, 50, 50)
+//            .build())
 
     @Provides
     @ServiceScoped
@@ -75,10 +83,10 @@ object ServiceModule {
             enableOffload: Boolean
         ): AudioSink? {
             return DefaultAudioSink.Builder()
-                .setAudioCapabilities(DEFAULT_AUDIO_CAPABILITIES)
+                .setAudioCapabilities(getCapabilities(app))
                 .setAudioProcessorChain(DefaultAudioSink
                     .DefaultAudioProcessorChain(exoRecord.exoRecordProcessor))
-                .setEnableFloatOutput(enableFloatOutput)
+                .setEnableFloatOutput(true)
                 .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
                 .build()
 
@@ -91,5 +99,6 @@ object ServiceModule {
         ExoRecord(app.applicationContext as Application)
 
 
+//            .setAudioCapabilities(AudioCapabilities(intArrayOf(22), 8))
 
 }

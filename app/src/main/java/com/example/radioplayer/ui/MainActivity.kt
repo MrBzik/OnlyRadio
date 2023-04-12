@@ -47,6 +47,7 @@ import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.fragments.*
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.FAB_POSITION_X
 import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
@@ -184,8 +185,8 @@ class MainActivity : AppCompatActivity() {
     private fun handleSeparatorsVisibilityForUiMode(){
 
         if(uiMode == Configuration.UI_MODE_NIGHT_NO){
-            bind.viewSeparatorStart.visibility = View.GONE
-            bind.viewSeparatorEnd.visibility = View.GONE
+//            bind.viewSeparatorStart.visibility = View.GONE
+//            bind.viewSeparatorEnd.visibility = View.GONE
             bind.separatorSecond.visibility = View.GONE
             bind.separatorLowest.visibility = View.GONE
         }
@@ -711,7 +712,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 
 
 

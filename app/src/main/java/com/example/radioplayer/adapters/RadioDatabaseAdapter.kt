@@ -169,6 +169,8 @@ class RadioDatabaseAdapter @Inject constructor(
     var defaultSecondaryTextColor = 0
     var selectedSecondaryTextColor = 0
 
+    var separatorDefault = 0
+
     var alpha = 0.1f
 
     var currentRadioStationName : String? = null
@@ -181,6 +183,8 @@ class RadioDatabaseAdapter @Inject constructor(
             tvPrimary.setTextColor(defaultTextColor)
 
             tvSecondary.setTextColor(defaultSecondaryTextColor)
+
+            viewBottomSeparator?.setBackgroundColor(separatorDefault)
         }
     }
 
@@ -191,14 +195,18 @@ class RadioDatabaseAdapter @Inject constructor(
                 tvPrimary.setTextColor(selectedTextColor)
 
                 tvSecondary.setTextColor(selectedSecondaryTextColor)
+
+                viewBottomSeparator?.setBackgroundResource(R.color.station_bottom_separator_active)
             }
 
         } else {
             bind.apply {
-                radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
+                radioItemRootLayout.setBackgroundResource(R.drawable.radio_unselected_gradient)
                 tvPrimary.setTextColor(defaultTextColor)
 
                 tvSecondary.setTextColor(defaultSecondaryTextColor)
+
+                viewBottomSeparator?.setBackgroundResource(R.color.station_bottom_separator_selected)
             }
 
         }

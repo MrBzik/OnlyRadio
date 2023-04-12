@@ -12,7 +12,7 @@ const val TAG_BY_RELIGION = "-RELIGION-"
 const val TAG_BY_OTHER = "-OTHER-"
 const val TAG_BY_CLASSIC = "-ART, CLASSICAL-"
 const val TAG_BY_EXPERIMENTAL = "-EXPERIMENTAL-"
-const val TAG_BY_SPECIAL = "-SPECIAL-"
+const val TAG_BY_SPECIAL = "-CHARTS, DJ, etc.-"
 
 val listOfTagsSimple = listOf("charts", "hits", "top")
 
@@ -51,7 +51,7 @@ val tagsListByPeriod = setOf(
     TagWithGenre.Tag("00s"),
     TagWithGenre.Tag("10s"),
     TagWithGenre.Tag("decades"),
-    TagWithGenre.Tag("golden"),
+    TagWithGenre.Tag("golden music"),
     TagWithGenre.Tag("goldies"),
     TagWithGenre.Tag("nostalgia"),
     TagWithGenre.Tag("oldies"),
@@ -106,7 +106,6 @@ val tagsListByGenre = setOf(
     TagWithGenre.Tag("gothic"),
     TagWithGenre.Tag("groove"),
     TagWithGenre.Tag("guitar"),
-    TagWithGenre.Tag("hip-hop"),
     TagWithGenre.Tag("hiphop"),
     TagWithGenre.Tag("house"),
     TagWithGenre.Tag("independent"),
@@ -150,7 +149,7 @@ val tagsListBySubGenre = setOf(
     TagWithGenre.Tag("classic jazz"),
     TagWithGenre.Tag("classic rock"),
     TagWithGenre.Tag("club dance"),
-    TagWithGenre.Tag("christian rock"),
+    TagWithGenre.Tag("chiptune"),
     TagWithGenre.Tag("country rock"),
     TagWithGenre.Tag("death metal"),
     TagWithGenre.Tag("electronic dance music"),
@@ -357,12 +356,13 @@ val tagsListReligion = setOf(
     TagWithGenre.Tag("bible"),
     TagWithGenre.Tag("catholic"),
     TagWithGenre.Tag("christian"),
+    TagWithGenre.Tag("christian praise&worship"),
+    TagWithGenre.Tag("christian rock"),
     TagWithGenre.Tag("christian talk"),
     TagWithGenre.Tag("christmas"),
     TagWithGenre.Tag("gospel"),
     TagWithGenre.Tag("islamic"),
-    TagWithGenre.Tag("religion"),
-    TagWithGenre.Tag("religious")
+    TagWithGenre.Tag("religion")
 )
 
 

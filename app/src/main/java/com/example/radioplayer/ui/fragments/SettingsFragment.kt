@@ -1,26 +1,44 @@
 package com.example.radioplayer.ui.fragments
 
 
+import android.Manifest
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.radioplayer.R
 import com.example.radioplayer.databinding.FragmentSettingsBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
 import com.example.radioplayer.ui.animations.slideAnim
+import com.example.radioplayer.ui.dialogs.BluetoothDialog
 import com.example.radioplayer.ui.dialogs.HistorySettingsDialog
 import com.example.radioplayer.ui.dialogs.RecordingSettingsDialog
+import com.example.radioplayer.ui.viewmodels.BluetoothViewModel
 import com.example.radioplayer.utils.Constants.DARK_MODE_PREF
+import com.example.radioplayer.utils.Constants.FOREGROUND_PREF
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
+import com.example.radioplayer.utils.Constants.RECONNECT_PREF
 import com.example.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 
 const val REC_LOWEST = "Very light"
@@ -40,8 +58,6 @@ const val HISTORY_STRING_7_DATES = "7 dates"
 const val HISTORY_STRING_15_DATES = "15 dates"
 const val HISTORY_STRING_21_DATES = "21 dates"
 const val HISTORY_STRING_30_DATES = "30 dates"
-
-
 
 
 class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
@@ -68,6 +84,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
     private var isNightMode = false
 
+    private val bluetoothViewModel : BluetoothViewModel by lazy{
+        ViewModelProvider(requireActivity())[BluetoothViewModel::class.java]
+    }
+
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -76,6 +98,10 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         getInitialNightModePref()
 
         getInitialHistoryOptionValue()
+
+        setReconnectButton()
+
+        setForegroundPrefButton()
 
         setSwitchNightModeListener()
 
@@ -97,8 +123,75 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         setToolbar()
 
+        setBluetoothDialog()
+
+        changePlayerBtn()
+
     }
 
+
+    private fun changePlayerBtn(){
+
+        bind.switchChangePlayer.setOnCheckedChangeListener { buttonView, isChecked ->
+
+            if(isChecked){
+
+                mainViewModel.changeToGoodPlayer()
+
+            }
+
+            else{
+                mainViewModel.changeToBadPlayer()
+            }
+
+        }
+
+
+
+    }
+
+    private fun setBluetoothDialog(){
+
+        bind.ivCastAudio.setOnClickListener {
+
+//            val bluetoothLauncher = registerForActivityResult(
+//                ActivityResultContracts.StartActivityForResult()
+//            ){}
+//
+//            val permissionLauncher = registerForActivityResult(
+//                ActivityResultContracts.RequestMultiplePermissions()
+//            ){ perms ->
+//
+//                val canEnableBluetooth = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//                    perms[Manifest.permission.BLUETOOTH_CONNECT] == true
+//                } else true
+//
+//                if(canEnableBluetooth && !isBluetoothEnabled){
+//                    bluetoothLauncher.launch(
+//                        Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+//                    )
+//                }
+//
+//             }
+//
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//                permissionLauncher.launch(
+//                    arrayOf(
+//                        Manifest.permission.BLUETOOTH_SCAN,
+//                        Manifest.permission.BLUETOOTH_CONNECT
+//                    )
+//                )
+//            }
+
+
+                BluetoothDialog(requireContext(), bluetoothViewModel).show()
+
+
+
+
+        }
+
+    }
 
 
     private fun setToolbar(){
@@ -108,6 +201,8 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
             val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_settings_frag)
 //            val colorStatus = ContextCompat.getColor(requireContext(), R.color.status_bar_settings_frag)
+
+            bind.tvSettingsTitle.visibility = View.GONE
 
             if(!mainViewModel.isSmoothTransitionNeeded){
 
@@ -119,9 +214,10 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         } else {
             bind.viewToolbar.setBackgroundColor(Color.BLACK)
+
+            bind.tvSettingsTitleDay.visibility = View.GONE
         }
     }
-
 
 
     private fun animateDayNightTransition(){
@@ -137,7 +233,37 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
     }
 
+    private fun setForegroundPrefButton(){
 
+        val foregroundPref = requireContext().getSharedPreferences(FOREGROUND_PREF, Context.MODE_PRIVATE)
+        val initialState = foregroundPref.getBoolean(FOREGROUND_PREF, false)
+
+        bind.switchForegroundPref.apply {
+            isChecked = initialState
+            setOnCheckedChangeListener { _, isChecked ->
+                foregroundPref.edit().putBoolean(FOREGROUND_PREF, isChecked).apply()
+            }
+        }
+    }
+
+
+
+    private fun setReconnectButton(){
+
+        val reconnectPref = requireContext().getSharedPreferences(RECONNECT_PREF, Context.MODE_PRIVATE)
+
+        val initialMode = reconnectPref.getBoolean(RECONNECT_PREF, true)
+
+        bind.switchReconnect.apply {
+            isChecked = initialMode
+
+            setOnCheckedChangeListener { _, isChecked ->
+
+                reconnectPref.edit().putBoolean(RECONNECT_PREF, isChecked).apply()
+                RadioService.isToReconnect = isChecked
+            }
+        }
+    }
 
     private fun setPlaybackSpeedButtons(){
 
@@ -376,7 +502,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
             }.show()
 
         }
-
     }
 
     private fun setSwitchNightModeListener(){

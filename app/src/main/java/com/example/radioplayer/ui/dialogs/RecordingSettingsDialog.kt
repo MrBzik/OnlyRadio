@@ -36,10 +36,6 @@ class RecordingSettingsDialog (
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
-
-        window?.setGravity(Gravity.TOP)
-
         setupRecyclerView()
 
         setAdapterClicklListener()

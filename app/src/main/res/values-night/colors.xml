@@ -16,10 +16,13 @@
     <color name="grayColor">#635D5D</color>
     <color name="floating_buttons">#121111</color>
     <color name="color_interactive">#FDB750</color>
+
+    <color name="color_icon">#FDB750</color>
+
     <color name="color_changed_on_interaction">#FC2E20</color>
     <color name="color_warning_text">#99FC2E20</color>
     <color name="transparent">#00000000</color>
-    <color name="regular_text_color">#808080</color>
+    <color name="regular_text_color">#80FFFFFF</color>
     <color name="search_text_color">#989696</color>
     <color name= "main_background">#FF000000</color>
     <color name="text_interactive_shadow">#FC2E20</color>

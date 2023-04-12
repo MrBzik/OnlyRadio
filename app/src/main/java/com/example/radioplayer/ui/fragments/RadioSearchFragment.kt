@@ -299,6 +299,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
                 alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
 
+                separatorDefault = ContextCompat.getColor(requireContext(), R.color.station_bottom_separator_default)
+
             }
 
             itemAnimator = null
@@ -340,7 +342,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                             isInitialLaunch = false
 
                         } else {
-                            alpha = 1f
+//                            alpha = 1f
                             scrollToPosition(0)
                             startLayoutAnimation()
 
@@ -364,9 +366,9 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
                 isNewSearchForAnimations = true
 
-                if(!isInitialLaunch){
-                    launchRecyclerOutAnim()
-                }
+//                if(!isInitialLaunch){
+//                    launchRecyclerOutAnim()
+//                }
                 showLoadingResultsMessage()
 
                 pagingRadioAdapter.submitData(it)
@@ -376,19 +378,19 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     }
 
 
-    private val alphaAnim = AlphaFadeOutAnim(1f, 100)
-
-    private fun launchRecyclerOutAnim(){
-
-        if(!bind.tvResultMessage.isVisible){
-
-            bind.rvSearchStations.apply {
-
-                alphaAnim.startAnim(this)
-
-            }
-        }
-    }
+//    private val alphaAnim = AlphaFadeOutAnim(1f, 100)
+//
+//    private fun launchRecyclerOutAnim(){
+//
+//        if(!bind.tvResultMessage.isVisible){
+//
+//            bind.rvSearchStations.apply {
+//
+//                alphaAnim.startAnim(this)
+//
+//            }
+//        }
+//    }
 
     private fun showLoadingResultsMessage(){
         bind.tvResultMessage.apply {
@@ -425,19 +427,28 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         bind.swipeRefresh.setOnRefreshListener {
 
-            mainViewModel.initiateNewSearch()
+           val check = mainViewModel.initiateNewSearch()
 
             bind.swipeRefresh.isRefreshing = false
 
+            clearAdapter(check)
         }
     }
 
     private fun listenSearchButton(){
 
         bind.fabInitiateSearch.setOnClickListener {
-            mainViewModel.initiateNewSearch()
+          val check =  mainViewModel.initiateNewSearch()
+            clearAdapter(check)
         }
+    }
 
+    private fun clearAdapter(check : Boolean){
+        if(check){
+            lifecycleScope.launch {
+                pagingRadioAdapter.submitData(PagingData.empty())
+            }
+        }
     }
 
 

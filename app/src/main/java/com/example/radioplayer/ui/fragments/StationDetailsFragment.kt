@@ -1,10 +1,14 @@
 package com.example.radioplayer.ui.fragments
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.RequestManager
@@ -48,6 +52,12 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     private var isFavoured = false
 
+    private var songTitle = ""
+
+    private val clipBoard : ClipboardManager? by lazy {
+        ContextCompat.getSystemService(requireContext(), ClipboardManager::class.java)
+    }
+
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -69,6 +79,8 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         setupRecordingButton()
 
         observeExoRecordState()
+
+        setTitleCopy()
 
     }
 
@@ -92,19 +104,35 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         mainViewModel.currentSongTitle.observe(viewLifecycleOwner){ title ->
 
-            if(title.equals("NULL", ignoreCase = true) || title.isBlank()){
-                bind.tvSongTitle.apply {
-                    text = "Playing: no info"
+            val withoutWalm = title.replace("WALMRadio.com", "")
 
-                }
+            songTitle = withoutWalm
+
+            if(title.equals("NULL", ignoreCase = true) || title.isBlank()){
+                bind.tvSongTitle.text = "No info"
+
+                bind.ivCopy.visibility = View.GONE
+
+
             } else {
-                bind.tvSongTitle.apply {
-                    text = "Playing: $title"
-                }
+                bind.tvSongTitle.text = withoutWalm
+
+                bind.ivCopy.visibility = View.VISIBLE
+
             }
         }
+    }
 
+    private fun setTitleCopy(){
+        bind.llSongTitle.setOnClickListener {
+            bind.ivCopy.isPressed = true
 
+            val clip = ClipData.newPlainText("label", songTitle)
+            clipBoard?.setPrimaryClip(clip)
+
+            Toast.makeText(requireContext(), "Title copied", Toast.LENGTH_SHORT).show()
+
+        }
     }
 
 

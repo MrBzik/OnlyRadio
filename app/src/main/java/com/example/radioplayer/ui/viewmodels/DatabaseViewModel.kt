@@ -289,7 +289,7 @@ class DatabaseViewModel @Inject constructor(
 
 
 
-    private var historyFlow : LiveData<PagingData<StationWithDateModel>>?  = null
+     var historyFlow : LiveData<PagingData<StationWithDateModel>>?  = null
 
 
 

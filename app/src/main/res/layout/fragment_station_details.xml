@@ -24,20 +24,56 @@
 
 
 
-    <TextView
-        android:id="@+id/tvSongTitle"
+    <LinearLayout
+        android:id="@+id/llSongTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="70dp"
-        android:fontFamily="sans-serif-smallcaps"
-        android:gravity="center"
-        android:paddingHorizontal="16dp"
-        android:textSize="16sp"
-        android:textColor="@color/default_text_color"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"  />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="70dp"
+        android:paddingHorizontal="16dp"
+        >
+
+        <TextView
+
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.7"
+            android:fontFamily="sans-serif-smallcaps"
+            android:gravity="center"
+            android:text="Playing:"
+            android:textColor="@color/regular_text_color"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/tvSongTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-smallcaps"
+            android:gravity="center"
+            android:layout_marginHorizontal="8dp"
+            android:text="No info now but  "
+            android:textColor="@color/selected_text_color"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            />
+
+        <ImageView
+            android:id="@+id/ivCopy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_copy"
+            android:layout_gravity="center_vertical"
+
+            />
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/ivIcon"
@@ -47,7 +83,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvSongTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/llSongTitle" />
 
     <TextView
         android:id="@+id/tvPlaceholder"
@@ -61,7 +97,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvSongTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/llSongTitle" />
 
 
     <ScrollView

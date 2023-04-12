@@ -40,6 +40,9 @@ object Constants {
     const val COMMAND_UPDATE_RADIO_PLAYBACK_SPEED = "update radio playback speed"
     const val COMMAND_UPDATE_RADIO_PLAYBACK_PITCH= "update radio playback pitch"
 
+    const val COMMAND_GOOD_PLAYER = "change to good player"
+    const val COMMAND_BAD_PLAYER = "change to bad player"
+
 
 
 
@@ -87,6 +90,11 @@ object Constants {
     // DarkMode pref
 
     const val DARK_MODE_PREF = "dark mode on or off"
+
+    const val RECONNECT_PREF = "reconnect on lost connection"
+
+    const val FOREGROUND_PREF = "pref for foreground on closing app"
+
 
 
 }

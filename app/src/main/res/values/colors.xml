@@ -13,7 +13,10 @@
     <color name="grayColor">#635D5D</color>
     <color name="floating_buttons">#FFFFFF</color>
     <color name="color_interactive">#1A237E</color>
-    <color name="color_changed_on_interaction">#1B5E20</color>
+
+    <color name="color_icon">#000000</color>
+
+    <color name="color_changed_on_interaction">#FC2E20</color>
     <color name="color_warning_text">#B71C1C</color>
     <color name="transparent">#00000000</color>
     <color name="regular_text_color">#000000</color>
@@ -21,7 +24,9 @@
 
     <color name= "main_background">#FFFFFF</color>
     <color name="toolbar">#FFFFFF</color>
-    <color name="Separator">#FF0000</color>
+    <color name="Separator">#FFFFFF</color>
+
+    <color name="separatorLoad">#FC2E20</color>
 
     <color name="Cursor">#000000</color>
 
@@ -99,6 +104,10 @@
     <color name="swipe_delete_on">#ABFF17</color>
 
     <color name="text_button">#1A237E</color>
+
+    <color name="station_bottom_separator_selected">#4D000000</color>
+    <color name="station_bottom_separator_active">#758EB7</color>
+    <color name="station_bottom_separator_default">#14000000</color>
 
 
 

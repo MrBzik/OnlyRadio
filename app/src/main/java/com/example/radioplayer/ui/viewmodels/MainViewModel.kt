@@ -18,6 +18,8 @@ import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.repositories.DatabaseRepository
+import com.example.radioplayer.utils.Constants.COMMAND_BAD_PLAYER
+import com.example.radioplayer.utils.Constants.COMMAND_GOOD_PLAYER
 
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
@@ -57,6 +59,8 @@ class MainViewModel @Inject constructor(
        val currentRadioStation = radioServiceConnection.currentRadioStation
        val networkError = radioServiceConnection.networkError
        val playbackState = radioServiceConnection.playbackState
+
+
        private var listOfStations = listOf<RadioStation>()
        var isNewSearch = true
        var isDelayNeededForServiceConnection = true
@@ -78,15 +82,23 @@ class MainViewModel @Inject constructor(
         currentRadioStation.value?.let {
             viewModelScope.launch {
                 val itemId = it.getString(METADATA_KEY_MEDIA_ID)
-                if(itemId.contains(".ogg")) {
-                    val item = repository.getCurrentRecording(itemId)
-                    newPlayingItem.postValue(PlayingItem.FromRecordings(item))
-                    isRadioTrueRecordingFalse = false
-                } else {
-                    val item = repository.getCurrentRadioStation(itemId)
-                    newPlayingItem.postValue(PlayingItem.FromRadio(item))
-                    isRadioTrueRecordingFalse = true
+
+                if(itemId != null){
+
+                    if(itemId.contains(".ogg")) {
+                        val item = repository.getCurrentRecording(itemId)
+                        newPlayingItem.postValue(PlayingItem.FromRecordings(item))
+                        isRadioTrueRecordingFalse = false
+                    } else {
+                        val item = repository.getCurrentRadioStation(itemId)
+                        newPlayingItem.postValue(PlayingItem.FromRadio(item))
+                        isRadioTrueRecordingFalse = true
+
+                    }
+
                 }
+
+
             }
         }
 
@@ -277,7 +289,7 @@ class MainViewModel @Inject constructor(
 
 
 
-    fun initiateNewSearch()  {
+    fun initiateNewSearch() : Boolean {
         if(
             lastSearchName == searchParamName.value &&
             lastSearchTag == searchParamTag.value &&
@@ -285,23 +297,39 @@ class MainViewModel @Inject constructor(
             wasTagExact == isTagExact &&
             wasNameExact == isNameExact
 
-        ) return
+        )
+            return false
 
-         isNewSearch = true
-         lastSearchName = searchParamName.value ?: ""
-         lastSearchTag = searchParamTag.value ?: ""
-         lastSearchCountry = searchParamCountry.value ?: ""
-         wasTagExact = isTagExact
-         wasNameExact = isNameExact
 
-         if(hasInternetConnection.value == true){
+            return true.also {
+                isNewSearch = true
+                lastSearchName = searchParamName.value ?: ""
+                lastSearchTag = searchParamTag.value ?: ""
+                lastSearchCountry = searchParamCountry.value ?: ""
+                wasTagExact = isTagExact
+                wasNameExact = isNameExact
 
-             searchBy.postValue(true)
+                if(hasInternetConnection.value == true){
 
-         } else {
-             wasSearchInterrupted = true
-         }
+                    searchBy.postValue(true)
+
+                } else {
+                    wasSearchInterrupted = true
+                }
+            }
+
+
+
     }
+
+        fun changeToGoodPlayer(){
+            radioServiceConnection.sendCommand(COMMAND_GOOD_PLAYER, null)
+        }
+
+    fun changeToBadPlayer(){
+        radioServiceConnection.sendCommand(COMMAND_BAD_PLAYER, null)
+    }
+
 
 
         fun seekTo(position : Long){
