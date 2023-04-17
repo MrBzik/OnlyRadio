@@ -301,6 +301,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
                 separatorDefault = ContextCompat.getColor(requireContext(), R.color.station_bottom_separator_default)
 
+                isNightMode = MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES
+
             }
 
             itemAnimator = null

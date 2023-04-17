@@ -238,66 +238,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
     }
 
 
-    private fun trimAudio(rec : Recording){
 
-        isTrimmerWorking = true
-
-        bind.tvProcessTrim.text = "Processing..."
-
-        val totalDuration = (rec.durationMills/1000).toInt()
-        val trimStart = bind.rangeSlider.values[0].toInt()
-        val trimEnd = totalDuration - bind.rangeSlider.values[1].toInt()
-        val duration = (rec.durationMills/1000).toInt() - trimEnd - trimStart
-        val oggFilePath = requireActivity().filesDir.absolutePath.toString() + "/" + rec.id
-
-        val currentTime = System.currentTimeMillis()
-        val output = requireActivity().filesDir.absolutePath.toString() + File.separator + currentTime + ".ogg"
-
-        val command = arrayOf( "-ss", trimStart.toString(), "-i",
-            oggFilePath, "-t", duration.toString(), "-c", "copy", output)
-
-//       FFmpegKit.executeWithArgumentsAsync(command
-//        ) { session ->
-//
-//           var message = ""
-//
-//            if(session.returnCode.isValueSuccess) {
-//
-//
-//                val newRecording = Recording(
-//                    id ="$currentTime.ogg",
-//                    iconUri = rec.iconUri,
-//                    timeStamp = currentTime,
-//                    name = rec.name,
-//                    durationMills = (duration*1000).toLong()
-//                )
-//
-//                databaseViewModel.insertNewRecording(newRecording)
-//                message = "Success!"
-//
-//
-//                if(!switchPref){
-//                    databaseViewModel.deleteRecording(rec.id)
-//                    currentRecording = newRecording
-//                    isRecordingToUpdate = true
-//
-//                }
-//
-//            } else if(session.returnCode.isValueError){
-//
-//                message = "Something went wrong!"
-//
-//            }
-//
-//           lifecycleScope.launch(Dispatchers.Main){
-//               Snackbar.make(requireActivity().findViewById(R.id.rootLayout), message, Snackbar.LENGTH_SHORT).show()
-//               isTrimmerWorking = false
-//               bind.tvProcessTrim.visibility = View.GONE
-//               isTvTrimProcessVisible = false
-//           }
-//          session.cancel()
-//        }
-    }
 
     private fun observeRecordingPlaylistUpdate(){
 
@@ -414,6 +355,69 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
         isTvTrimProcessVisible = false
         recordingCutterPref.edit().putBoolean(RECORDING_CUT_PREF, switchPref).apply()
         _bind = null
+    }
+
+
+
+    private fun trimAudio(rec : Recording){
+
+        isTrimmerWorking = true
+
+        bind.tvProcessTrim.text = "Processing..."
+
+        val totalDuration = (rec.durationMills/1000).toInt()
+        val trimStart = bind.rangeSlider.values[0].toInt()
+        val trimEnd = totalDuration - bind.rangeSlider.values[1].toInt()
+        val duration = (rec.durationMills/1000).toInt() - trimEnd - trimStart
+        val oggFilePath = requireActivity().filesDir.absolutePath.toString() + "/" + rec.id
+
+        val currentTime = System.currentTimeMillis()
+        val output = requireActivity().filesDir.absolutePath.toString() + File.separator + currentTime + ".ogg"
+
+        val command = arrayOf( "-ss", trimStart.toString(), "-i",
+            oggFilePath, "-t", duration.toString(), "-c", "copy", output)
+
+//       FFmpegKit.executeWithArgumentsAsync(command
+//        ) { session ->
+//
+//           var message = ""
+//
+//            if(session.returnCode.isValueSuccess) {
+//
+//
+//                val newRecording = Recording(
+//                    id ="$currentTime.ogg",
+//                    iconUri = rec.iconUri,
+//                    timeStamp = currentTime,
+//                    name = rec.name,
+//                    durationMills = (duration*1000).toLong()
+//                )
+//
+//                databaseViewModel.insertNewRecording(newRecording)
+//                message = "Success!"
+//
+//
+//                if(!switchPref){
+//                    databaseViewModel.deleteRecording(rec.id)
+//                    currentRecording = newRecording
+//                    isRecordingToUpdate = true
+//
+//                }
+//
+//            } else if(session.returnCode.isValueError){
+//
+//                message = "Something went wrong!"
+//
+//            }
+//
+//           lifecycleScope.launch(Dispatchers.Main){
+//               Snackbar.make(requireActivity().findViewById(R.id.rootLayout), message, Snackbar.LENGTH_SHORT).show()
+//               isTrimmerWorking = false
+//               bind.tvProcessTrim.visibility = View.GONE
+//               isTvTrimProcessVisible = false
+//           }
+//          session.cancel()
+//        }
     }
 
 

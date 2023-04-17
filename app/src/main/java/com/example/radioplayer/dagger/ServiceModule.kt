@@ -17,12 +17,9 @@ import com.google.android.exoplayer2.audio.AudioCapabilities.DEFAULT_AUDIO_CAPAB
 import com.google.android.exoplayer2.audio.AudioCapabilities.getCapabilities
 import com.google.android.exoplayer2.audio.AudioSink
 import com.google.android.exoplayer2.audio.DefaultAudioSink
+import com.google.android.exoplayer2.source.hls.HlsDataSourceFactory
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.upstream.BandwidthMeter
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
-import com.google.android.exoplayer2.upstream.DefaultDataSource
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.upstream.TransferListener
+import com.google.android.exoplayer2.upstream.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -57,12 +54,14 @@ object ServiceModule {
     ) = ExoPlayer.Builder(app, renderersFactory)
         .setAudioAttributes(audioAttributes, true)
         .setHandleAudioBecomingNoisy(true)
+        .setLoadControl(DefaultLoadControl.Builder()
+            .setBufferDurationsMs(20000, 20000, 50, 50)
+//            .setTargetBufferBytes(1024*500)
+            .build())
         .build()
 
 
-    //        .setLoadControl(DefaultLoadControl.Builder()
-//            .setBufferDurationsMs(1000, 1000, 50, 50)
-//            .build())
+
 
     @Provides
     @ServiceScoped
@@ -70,24 +69,35 @@ object ServiceModule {
         @ApplicationContext app : Context
     ) = DefaultDataSource.Factory(app)
 
+//    @Provides
+//    @ServiceScoped
+//    fun providesHlsDataSourceFactory(
+//        @ApplicationContext app : Context
+//    ) = HlsDataSourceFactory()
+
     @Provides
     @ServiceScoped
     fun providesRendersFactory(
         @ApplicationContext app : Context,
         exoRecord: ExoRecord
     ) = object : DefaultRenderersFactory(app){
+
+//        override fun setEnableAudioFloatOutput(enableFloatOutput: Boolean): DefaultRenderersFactory {
+//            return super.setEnableAudioFloatOutput(true)
+//        }
+
         override fun buildAudioSink(
             context: Context,
             enableFloatOutput: Boolean,
             enableAudioTrackPlaybackParams: Boolean,
             enableOffload: Boolean
-        ): AudioSink? {
+        ): AudioSink {
             return DefaultAudioSink.Builder()
                 .setAudioCapabilities(getCapabilities(app))
                 .setAudioProcessorChain(DefaultAudioSink
                     .DefaultAudioProcessorChain(exoRecord.exoRecordProcessor))
                 .setEnableFloatOutput(true)
-                .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
+                .setEnableAudioTrackPlaybackParams(true)
                 .build()
 
         }

@@ -6,10 +6,12 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.*
 import android.view.ViewGroup.LayoutParams
+import android.widget.ScrollView
 import androidx.appcompat.app.AppCompatDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.updateLayoutParams
+import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.example.radioplayer.R

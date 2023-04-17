@@ -18,14 +18,13 @@ import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.repositories.DatabaseRepository
-import com.example.radioplayer.utils.Constants.COMMAND_BAD_PLAYER
-import com.example.radioplayer.utils.Constants.COMMAND_GOOD_PLAYER
 
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
 import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
 
 import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_CURRENT_PLAYING_ITEM
+import com.example.radioplayer.utils.Constants.COMMAND_RESTART_PLAYER
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_REC_PLAYBACK_SPEED
@@ -244,7 +243,8 @@ class MainViewModel @Inject constructor(
                                tags = station.tags,
                                language = station.language,
                                favouredAt = 0,
-                               state = station.state
+                               state = station.state,
+                               bitrate = station.bitrate
                            )
                        }
                    }
@@ -322,14 +322,12 @@ class MainViewModel @Inject constructor(
 
     }
 
-        fun changeToGoodPlayer(){
-            radioServiceConnection.sendCommand(COMMAND_GOOD_PLAYER, null)
+
+
+
+        fun restartPlayer(){
+            radioServiceConnection.sendCommand(COMMAND_RESTART_PLAYER, null)
         }
-
-    fun changeToBadPlayer(){
-        radioServiceConnection.sendCommand(COMMAND_BAD_PLAYER, null)
-    }
-
 
 
         fun seekTo(position : Long){

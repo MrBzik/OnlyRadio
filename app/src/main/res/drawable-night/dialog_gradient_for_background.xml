@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+
+
     <item>
         <shape >
             <padding android:bottom="4dp"/>
+            <corners android:radius="4dp"/>
             <solid android:color="@color/main_background"/>
             <stroke
                 android:width="2dp"
@@ -10,8 +13,10 @@
         </shape>
     </item>
 
+
     <item>
         <shape>
+
             <gradient
                 android:centerColor="@color/transparent"
                 android:startColor="#14AA4D06"
@@ -19,7 +24,6 @@
                 android:angle="90"/>
         </shape>
     </item>
-
 
 
 </layer-list>

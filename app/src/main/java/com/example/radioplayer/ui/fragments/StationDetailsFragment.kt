@@ -104,18 +104,18 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         mainViewModel.currentSongTitle.observe(viewLifecycleOwner){ title ->
 
-            val withoutWalm = title.replace("WALMRadio.com", "")
-
-            songTitle = withoutWalm
 
             if(title.equals("NULL", ignoreCase = true) || title.isBlank()){
                 bind.tvSongTitle.text = "No info"
+
+                bind.tvSongTitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.default_text_color))
 
                 bind.ivCopy.visibility = View.GONE
 
 
             } else {
-                bind.tvSongTitle.text = withoutWalm
+                bind.tvSongTitle.text = title
+                bind.tvSongTitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.selected_text_color))
 
                 bind.ivCopy.visibility = View.VISIBLE
 

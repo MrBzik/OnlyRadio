@@ -74,7 +74,7 @@
 
     <style name="dialogItemText" parent="android:Widget.TextView">
         <item name="android:textSize">18sp</item>
-        <item name="android:textColor">@color/regular_text_color</item>
+        <item name="android:textColor">@color/unselected_genre_color</item>
         <item name="android:fontFamily">@font/aldrich</item>
     </style>
 

@@ -44,7 +44,7 @@ interface RadioApi {
             hidebroken : Boolean = true,
 
             @Query("order")
-            sortBy : String = "votes",
+            sortBy : String = "bitrate",
 
             @Query("reverse")
             isReversed : Boolean = true

@@ -605,26 +605,33 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateImage(playingItem : PlayingItem){
 
-        var name = ""
+        var newName = ""
         var isRecording = false
+        var newImage = ""
 
-        val newImage = when (playingItem) {
+        when (playingItem) {
             is PlayingItem.FromRadio -> {
-                name = playingItem.radioStation.name ?: "X"
-                playingItem.radioStation.favicon
+                playingItem.radioStation.apply {
+                    newName = name ?: "X"
+                    newImage = favicon ?: ""
+                    val bits = if(bitrate == 0) "??? kbps" else "$bitrate kbps"
+                    bindPlayer.tvBitrate.text = bits
+
+                }
             }
             is PlayingItem.FromRecordings -> {
                 isRecording = true
                 bindPlayer.tvStationTitle.text = "From recordings"
-                name = playingItem.recording.name
-                playingItem.recording.iconUri
+                bindPlayer.tvBitrate.text = ""
+                newName = playingItem.recording.name
+                newImage = playingItem.recording.iconUri
             }
         }
 
 
-            if(newImage.isNullOrBlank()){
+            if(newImage.isBlank()){
                 bindPlayer.ivCurrentStationImage.visibility = View.GONE
-                setTvPlaceHolderLetter(name, isRecording)
+                setTvPlaceHolderLetter(newName, isRecording)
 
             } else {
 
@@ -641,7 +648,7 @@ class MainActivity : AppCompatActivity() {
                         ): Boolean {
 
                             bindPlayer.ivCurrentStationImage.visibility = View.GONE
-                            setTvPlaceHolderLetter(name, isRecording)
+                            setTvPlaceHolderLetter(newName, isRecording)
                             return true
                         }
 
@@ -673,8 +680,6 @@ class MainActivity : AppCompatActivity() {
 
                     }
                     is PlayingItem.FromRecordings -> {
-
-                        Log.d("CHECKTAGS", "main: ${ it.recording.id }")
 
                         mainViewModel.playOrToggleStation(rec = it.recording)
                     }

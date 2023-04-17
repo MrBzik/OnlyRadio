@@ -9,10 +9,7 @@ import com.example.radioplayer.exoPlayer.RadioService
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.metadata.Metadata
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class RadioPlayerEventListener (
     private val radioService : RadioService
@@ -21,8 +18,13 @@ class RadioPlayerEventListener (
     override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
         super.onMediaMetadataChanged(mediaMetadata)
         radioService.radioNotificationManager.updateNotification()
-        RadioService.currentSongTitle.postValue(mediaMetadata.title.toString())
+
+        val withoutWalm = mediaMetadata.title.toString().replace("WALMRadio.com", "")
+
+        RadioService.currentSongTitle.postValue(withoutWalm)
     }
+
+
 
 
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
@@ -30,10 +32,10 @@ class RadioPlayerEventListener (
         super.onPlayWhenReadyChanged(playWhenReady, playbackState)
 
         if(playbackState == Player.STATE_READY && !playWhenReady) {
+
             radioService.isPlaybackStatePlaying = false
 
-            if(Build.VERSION.SDK_INT > 24) { radioService.stopForeground(STOP_FOREGROUND_DETACH)}
-            else {radioService.stopForeground(false)}
+            radioService.stopForeground(STOP_FOREGROUND_DETACH)
 
             radioService.isForegroundService = false
         }
@@ -44,13 +46,21 @@ class RadioPlayerEventListener (
 
          }
 
+//        else if(playbackState == Player.STATE_IDLE){
+//            Log.d("CHECKTAGS", "event")
+//            radioService.radioNotificationManager.removeNotification()
+//
+//        }
+
     }
+
+
 
 
     override fun onPlayerError(error: PlaybackException) {
         super.onPlayerError(error)
 
-        if(RadioService.isToReconnect){
+        if(RadioService.isToReconnect && radioService.exoPlayer.playWhenReady){
             radioService.exoPlayer.prepare()
             Toast.makeText(radioService, "Reconnecting...", Toast.LENGTH_SHORT).show()
         } else {

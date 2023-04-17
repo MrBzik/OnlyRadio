@@ -1,10 +1,8 @@
 package com.example.radioplayer.exoPlayer.callbacks
 
 import android.app.Notification
-import android.app.Service.STOP_FOREGROUND_REMOVE
-import android.bluetooth.BluetoothDevice
+import android.app.Service
 import android.content.Intent
-import android.os.Build
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.example.radioplayer.exoPlayer.RadioService
@@ -19,13 +17,28 @@ class RadioPlayerNotificationListener (
         super.onNotificationCancelled(notificationId, dismissedByUser)
 
         radioService.apply {
-            stopForeground(STOP_FOREGROUND_REMOVE)
+            Log.d("CHECKTAGS", "radio notification")
+
+
+            stopForeground(Service.STOP_FOREGROUND_REMOVE)
+
+
             isForegroundService = false
 
+
             stopSelf()
+
+
         }
     }
 
+
+//    @Suppress("DEPRECATION") // Deprecated for third party Services.
+//    fun <T> Context.isServiceForegrounded(service: Class<T>) =
+//        (getSystemService(ACTIVITY_SERVICE) as? ActivityManager)
+//            ?.getRunningServices(Integer.MAX_VALUE)
+//            ?.find { it.service.className == service.name }
+//            ?.foreground == true
 
 
     override fun onNotificationPosted(

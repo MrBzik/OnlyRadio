@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-        <item
-            android:drawable="@drawable/splash_screen_background"/>
+        <item>
+                <color android:color="@color/black"/>
+        </item>
 
         <item
-            android:drawable="@drawable/free_radio_text"
+            android:drawable="@drawable/splash_text_palms"
             android:gravity="center"
             />
 

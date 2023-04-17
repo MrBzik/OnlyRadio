@@ -20,7 +20,9 @@ data class RadioStation (
     @ColumnInfo(name = "favouredAt", defaultValue = "0")
     val favouredAt : Long,
     @ColumnInfo(name = "state", defaultValue = "")
-    val state : String?
+    val state : String?,
+    @ColumnInfo(name = "bitrate", defaultValue = "0")
+    val bitrate : Int?
         )
 
 /*  version 9 - 10 :

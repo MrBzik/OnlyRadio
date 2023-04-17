@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/clBufferSettingDialog"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/dialog_gradient_for_background"
+    android:paddingHorizontal="16dp">
+
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginStart="8dp"
+            android:gravity="center_vertical"
+            android:layout_marginTop="@dimen/dialog_top_margin"
+            android:text="Buffer settings"
+            android:textAppearance="@style/dialogTitleText"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <TextView
+            android:id="@+id/tvMainHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:fontFamily="@font/aldrich"
+            android:text="How much data to load in advance for smooth listening"
+            android:textColor="@color/default_secondary_text_color"
+            android:textSize="13sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+
+
+        <TextView
+            android:id="@+id/tvBufferInSecondsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:text="In seconds"
+            android:textAppearance="@style/dialogItemText"
+            android:textColor="@color/selected_genre_color"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvMainHint" />
+
+
+        <com.google.android.material.slider.RangeSlider
+            android:id="@+id/rangeSliderBufferInSeconds"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvBufferInSecondsTitle" />
+
+
+
+        <TextView
+            android:id="@+id/tvBufferInBytesTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:text="In kilobytes"
+            android:textColor="@color/selected_genre_color"
+            android:textAppearance="@style/dialogItemText"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rangeSliderBufferInSeconds" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchInBytes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            app:layout_constraintBottom_toBottomOf="@+id/tvBufferInBytesTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvBufferInBytesTitle"
+            app:thumbTint="@color/switch_thumb_color"
+            app:trackTint="@color/switch_track_color" />
+
+
+        <com.google.android.material.slider.RangeSlider
+            android:id="@+id/rangeSliderBufferInBytes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvBufferInBytesTitle" />
+
+
+        <TextView
+            android:id="@+id/tvBufferSizeHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/aldrich"
+            android:text="When enabled size of buffer will be as set in seconds or kilobytes depending on which value is smaller"
+            android:textColor="@color/default_secondary_text_color"
+            android:textSize="13sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rangeSliderBufferInBytes" />
+
+
+        <TextView
+            android:id="@+id/tvPlaybackBufferTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:text="To start playing audio"
+            android:textColor="@color/selected_genre_color"
+            android:textAppearance="@style/dialogItemText"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvBufferSizeHint" />
+
+
+        <com.google.android.material.slider.RangeSlider
+            android:id="@+id/rangeSliderPlaybackBuffer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvPlaybackBufferTitle" />
+
+
+        <TextView
+            android:id="@+id/tvLoadCallback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:text="Adaptive load controller"
+            android:textAppearance="@style/dialogItemText"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rangeSliderPlaybackBuffer" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchLoadController"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            app:layout_constraintBottom_toBottomOf="@+id/tvLoadCallback"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvLoadCallback"
+            app:thumbTint="@color/switch_thumb_color"
+            app:trackTint="@color/switch_track_color" />
+
+        <TextView
+            android:id="@+id/tvLoadCheckCallbackHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/aldrich"
+            android:text="Ensures buffer responsiveness to low settings. Use if smaller buffer is needed"
+            android:textColor="@color/default_secondary_text_color"
+            android:textSize="13sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvLoadCallback" />
+
+
+
+        <TextView
+            android:id="@+id/tvBack"
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            android:layout_marginStart="20dp"
+            android:gravity="center_vertical"
+            android:text="@string/dialog_back_button"
+            android:textAppearance="@style/dialogTextButtons"
+            app:layout_constraintTop_toBottomOf="@+id/tvLoadCheckCallbackHint"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
+        <TextView
+            android:id="@+id/tvAccept"
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            android:layout_marginEnd="20dp"
+            android:gravity="center_vertical"
+            android:text="@string/dialog_accept_button"
+            android:textAppearance="@style/dialogTextButtons"
+            app:layout_constraintTop_toBottomOf="@+id/tvLoadCheckCallbackHint"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

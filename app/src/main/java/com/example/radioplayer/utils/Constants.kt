@@ -40,8 +40,8 @@ object Constants {
     const val COMMAND_UPDATE_RADIO_PLAYBACK_SPEED = "update radio playback speed"
     const val COMMAND_UPDATE_RADIO_PLAYBACK_PITCH= "update radio playback pitch"
 
-    const val COMMAND_GOOD_PLAYER = "change to good player"
-    const val COMMAND_BAD_PLAYER = "change to bad player"
+    const val COMMAND_RESTART_PLAYER = "command to recreate player"
+
 
 
 
@@ -94,6 +94,20 @@ object Constants {
     const val RECONNECT_PREF = "reconnect on lost connection"
 
     const val FOREGROUND_PREF = "pref for foreground on closing app"
+
+
+    // Buffer pref
+
+    const val BUFFER_PREF = "buffer preferences"
+
+    const val BUFFER_SIZE_IN_MILLS = "buffer size in mills pref"
+
+    const val BUFFER_SIZE_IN_BYTES = "buffer size in bytes pref"
+    const val IS_TO_SET_BUFFER_IN_BYTES = "is to set target buffer in bytes"
+
+    const val BUFFER_FOR_PLAYBACK = "buffer size to start playback"
+
+    const val IS_ADAPTIVE_LOADER_TO_USE = "is to use adaptive loader"
 
 
 

@@ -3,35 +3,51 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="@dimen/player_view_height"
-    android:paddingVertical="@dimen/player_view_padding">
+    android:paddingBottom="2dp"
+
+    >
 
 
-    <ImageView
-        android:id="@+id/ivCurrentStationImage"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="65dp"
         android:layout_height="65dp"
         android:layout_marginStart="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintVertical_bias="0.5"
+        app:cardCornerRadius="15dp"
+        app:cardBackgroundColor="@color/black"
+
+        >
+
+        <ImageView
+            android:id="@+id/ivCurrentStationImage"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:src="@color/color_changed_on_interaction"
+            android:alpha="0.7"
+            />
+
+        <TextView
+            android:id="@+id/tvPlaceholder"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+
+            android:fontFamily="@font/ranchers"
+            android:text="D"
+            android:textColor="@color/main_background"
+            android:textSize="40sp"
+            android:gravity="center"
+            />
+    </com.google.android.material.card.MaterialCardView>
 
 
 
-    <TextView
-        android:id="@+id/tvPlaceholder"
-        android:layout_width="65dp"
-        android:layout_height="65dp"
-        android:layout_marginStart="8dp"
-        android:fontFamily="@font/ranchers"
-        android:text="D"
-        android:textColor="@color/main_background"
-        android:textSize="40sp"
-        android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+
+
+
+
 
     <TextView
         android:id="@+id/tvStationTitle"
@@ -48,6 +64,7 @@
         android:focusableInTouchMode="true"
         android:textSize="14sp"
         android:layout_marginStart="75dp"
+        android:text="some song title"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -57,11 +74,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="64dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="5dp"
         android:text="@string/Expand"
         android:textAppearance="@style/mainTextButtons"
-        app:layout_constraintBottom_toBottomOf="@+id/tvStationTitle"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tvBitrate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="83dp"
+        android:layout_marginBottom="5dp"
+        android:text="320/kbps"
+        android:textAppearance="@style/dialogItemText"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 
     <ImageView
         android:id="@+id/ivTogglePlayCurrentStation"

@@ -6,7 +6,7 @@
     <dimen name="low_separators_elevation">10dp</dimen>
     <integer name="radio_text_placeholder_alpha">6</integer>
 
-    <dimen name="player_view_height">65dp</dimen>
+    <dimen name="player_view_height">67dp</dimen>
     <dimen name="player_view_padding">0dp</dimen>
     <dimen name="player_view_bottom_margin">0dp</dimen>
 

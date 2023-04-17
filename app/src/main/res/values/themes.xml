@@ -25,7 +25,7 @@
 
      <style name="splashScreenTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
          <item name="android:windowBackground">@drawable/splash_screen</item>
-         <item name="android:statusBarColor">#FD7F20</item>
+         <item name="android:statusBarColor">@color/black</item>
          <item name="android:navigationBarColor">@color/black</item>
      </style>
 

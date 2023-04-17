@@ -7,14 +7,13 @@ import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.media.AudioFormat
+import android.media.audiofx.PresetReverb
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
-import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
@@ -28,8 +27,10 @@ import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlaybackPreparer
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerNotificationListener
-import com.example.radioplayer.utils.Constants.COMMAND_BAD_PLAYER
-import com.example.radioplayer.utils.Constants.COMMAND_GOOD_PLAYER
+import com.example.radioplayer.utils.Constants.BUFFER_FOR_PLAYBACK
+import com.example.radioplayer.utils.Constants.BUFFER_PREF
+import com.example.radioplayer.utils.Constants.BUFFER_SIZE_IN_BYTES
+import com.example.radioplayer.utils.Constants.BUFFER_SIZE_IN_MILLS
 
 import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
@@ -37,10 +38,12 @@ import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
 import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
 
 import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_CURRENT_PLAYING_ITEM
+import com.example.radioplayer.utils.Constants.COMMAND_RESTART_PLAYER
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_REC_PLAYBACK_SPEED
-import com.example.radioplayer.utils.Constants.FOREGROUND_PREF
+import com.example.radioplayer.utils.Constants.IS_ADAPTIVE_LOADER_TO_USE
+import com.example.radioplayer.utils.Constants.IS_TO_SET_BUFFER_IN_BYTES
 import com.example.radioplayer.utils.Constants.RECONNECT_PREF
 import com.example.radioplayer.utils.Constants.RECORDING_CHANNEL_ID
 import com.example.radioplayer.utils.Constants.RECORDING_NOTIFICATION_ID
@@ -51,15 +54,15 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.DefaultLoadControl.*
 import com.google.android.exoplayer2.audio.*
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
+import com.google.android.exoplayer2.upstream.DefaultAllocator
 import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.brookmg.exorecord.lib.ExoRecord
 import dev.brookmg.exorecord.lib.IExoRecord
 import dev.brookmg.exorecordogg.ExoRecordOgg
@@ -89,6 +92,11 @@ class RadioService : MediaBrowserServiceCompat() {
     lateinit var dataSourceFactory : Factory
 
     @Inject
+    lateinit var renderersFactory: DefaultRenderersFactory
+
+    @Inject
+    lateinit var audioAttributes: AudioAttributes
+
     lateinit var exoPlayer: ExoPlayer
 
     @Inject
@@ -136,16 +144,24 @@ class RadioService : MediaBrowserServiceCompat() {
     }
 
     companion object{
+
         val currentSongTitle = MutableLiveData<String>()
         val recordingPlaybackPosition = MutableLiveData<Long>()
         val recordingDuration = MutableLiveData<Long>()
-        var playbackSpeedRec = 100
 
+        var playbackSpeedRec = 100
         var playbackSpeedRadio = 100
         var playbackPitchRadio = 100
         var isSpeedPitchLinked = true
 
         var isToReconnect = true
+
+        var bufferSizeInMills = 0
+        var bufferSizeInBytes = 0
+        var bufferForPlayback = 0
+        var isToSetBufferInBytes = false
+        var isAdaptiveLoaderToUse = false
+
     }
 
 
@@ -162,10 +178,7 @@ class RadioService : MediaBrowserServiceCompat() {
     }
 
 
-//    fun providesAudioAttributes() = AudioAttributes.Builder()
-//        .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
-//        .setUsage(C.USAGE_MEDIA)
-//        .build()
+
 //
 //    fun providesLameRendersFactory() = object : DefaultRenderersFactory(this@RadioService){
 //        override fun buildAudioSink(
@@ -185,23 +198,8 @@ class RadioService : MediaBrowserServiceCompat() {
 //        }
 //    }
 
-//    fun providesCoolRendersFactory() = object : DefaultRenderersFactory(this@RadioService){
-//        override fun buildAudioSink(
-//            context: Context,
-//            enableFloatOutput: Boolean,
-//            enableAudioTrackPlaybackParams: Boolean,
-//            enableOffload: Boolean
-//        ): AudioSink {
-//            return DefaultAudioSink.Builder()
-//                .setAudioCapabilities(AudioCapabilities.getCapabilities(this@RadioService))
-//                .setAudioProcessorChain(DefaultAudioSink
-//                    .DefaultAudioProcessorChain(exoRecord.exoRecordProcessor))
-//                .setEnableFloatOutput(true)
-//                .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
-//                .build()
-//
-//        }
-//    }
+
+
 
 
 
@@ -216,16 +214,7 @@ class RadioService : MediaBrowserServiceCompat() {
 //    }
 //
 //
-//    private val goodExoPlayer : ExoPlayer by lazy{
-//
-//        ExoPlayer.Builder(this@RadioService, DefaultRenderersFactory(this@RadioService)
-//            .setEnableAudioFloatOutput(true))
-//            .setAudioAttributes(providesAudioAttributes(), true)
-//            .setHandleAudioBecomingNoisy(true)
-//            .build().apply {
-//                addListener(radioPlayerEventListener)
-//            }
-//    }
+
 
 
 
@@ -339,11 +328,11 @@ class RadioService : MediaBrowserServiceCompat() {
                 COMMAND_UPDATE_REC_PLAYBACK_SPEED -> {
 
                     val isToPlay = isPlaybackStatePlaying
-                    exoPlayer.stop()
+                    exoPlayer.pause()
                     val newValue = playbackSpeedRec.toFloat()/100
                     val params = PlaybackParameters(newValue, newValue)
                     exoPlayer.playbackParameters = params
-                    exoPlayer.prepare()
+//                    exoPlayer.prepare()
                     exoPlayer.playWhenReady = isToPlay
                 }
 
@@ -351,7 +340,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
                     if(!isFromRecording){
                         val isToPlay = isPlaybackStatePlaying
-                        exoPlayer.stop()
+                        exoPlayer.pause()
                         if(isSpeedPitchLinked){
                             playbackPitchRadio = playbackSpeedRadio
                         }
@@ -360,7 +349,7 @@ class RadioService : MediaBrowserServiceCompat() {
                             playbackPitchRadio.toFloat()/100
                         )
                         exoPlayer.playbackParameters = params
-                        exoPlayer.prepare()
+//                        exoPlayer.prepare()
                         exoPlayer.playWhenReady = isToPlay
                     }
                 }
@@ -369,7 +358,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
                     if(!isFromRecording){
                         val isToPlay = isPlaybackStatePlaying
-                        exoPlayer.stop()
+                        exoPlayer.pause()
                         if(isSpeedPitchLinked){
                             playbackSpeedRadio = playbackPitchRadio
                         }
@@ -378,35 +367,27 @@ class RadioService : MediaBrowserServiceCompat() {
                             playbackPitchRadio.toFloat()/100
                         )
                         exoPlayer.playbackParameters = params
-                        exoPlayer.prepare()
+//                        exoPlayer.prepare()
                         exoPlayer.playWhenReady = isToPlay
                     }
                 }
 
-//                COMMAND_GOOD_PLAYER -> {
-//
-//                    changeToGoodPlayer()
-//
-//                }
-//
-//                COMMAND_BAD_PLAYER -> {
-//
-//                    changeToBadPlayer()
-//                }
-
+                COMMAND_RESTART_PLAYER -> {
+                    recreateExoPlayer()
+                }
             }
         })
 
         mediaSessionConnector = MediaSessionConnector(mediaSession)
         mediaSessionConnector.setPlaybackPreparer(radioPlaybackPreparer)
         mediaSessionConnector.setQueueNavigator(RadioQueueNavigator())
-        mediaSessionConnector.setPlayer(exoPlayer)
+//        mediaSessionConnector.setPlayer(exoPlayer)
 
         radioPlayerEventListener = RadioPlayerEventListener(this)
 
-        exoPlayer.addListener(radioPlayerEventListener)
+//        exoPlayer.addListener(radioPlayerEventListener)
 
-        radioNotificationManager.showNotification(exoPlayer)
+//        radioNotificationManager.showNotification(exoPlayer)
 
         radioSource.subscribeToFavouredStations.observeForever(observerForDatabase)
         radioSource.allRecordingsLiveData.observeForever(observerForRecordings)
@@ -419,24 +400,61 @@ class RadioService : MediaBrowserServiceCompat() {
 
         Log.d("CHECKTAGS", "servie code")
 
-//        exoPlayer = defaultExoPlayer
-//        mediaSessionConnector.setPlayer(exoPlayer)
-//        radioNotificationManager.showNotification(exoPlayer)
+        initialCheckForBuffer()
+
+        exoPlayer = provideExoPlayer()
+        mediaSessionConnector.setPlayer(exoPlayer)
+        radioNotificationManager.showNotification(exoPlayer)
+
 
     }
 
-//    private fun changeToGoodPlayer(){
-//
-//        exoPlayer = goodExoPlayer
 
-//        exoPlayer.clearMediaItems()
-//        exoPlayer.stop()
-//
-//        mediaSessionConnector.setPlayer(exoPlayer)
-//
-//        defaultExoPlayer.stop()
-//        defaultExoPlayer.clearMediaItems()
-//    }
+    private fun initialCheckForBuffer(){
+        val buffPref = this@RadioService.getSharedPreferences(BUFFER_PREF, Context.MODE_PRIVATE)
+
+        bufferSizeInMills = buffPref.getInt(BUFFER_SIZE_IN_MILLS, DEFAULT_MAX_BUFFER_MS)
+        bufferSizeInBytes = buffPref.getInt(BUFFER_SIZE_IN_BYTES, DEFAULT_TARGET_BUFFER_BYTES)
+        bufferForPlayback = buffPref.getInt(BUFFER_FOR_PLAYBACK, DEFAULT_BUFFER_FOR_PLAYBACK_MS)
+        isToSetBufferInBytes = buffPref.getBoolean(IS_TO_SET_BUFFER_IN_BYTES, false)
+        isAdaptiveLoaderToUse = buffPref.getBoolean(IS_ADAPTIVE_LOADER_TO_USE, false)
+
+    }
+
+    private fun provideExoPlayer () : ExoPlayer {
+
+        val bites = if (!isToSetBufferInBytes) -1
+        else bufferSizeInBytes * 1024
+
+        return ExoPlayer.Builder(this@RadioService, renderersFactory)
+            .setAudioAttributes(audioAttributes, true)
+            .setHandleAudioBecomingNoisy(true)
+            .setLoadControl(DefaultLoadControl.Builder()
+                .setBufferDurationsMs(bufferSizeInMills, bufferSizeInMills, bufferForPlayback, 5000)
+                .setTargetBufferBytes(bites)
+                .build())
+            .build().apply {
+                addListener(radioPlayerEventListener)
+            }
+    }
+
+
+    private fun recreateExoPlayer(){
+
+        val isToPlay = exoPlayer.playWhenReady
+
+        exoPlayer.stop()
+        exoPlayer = provideExoPlayer()
+        mediaSessionConnector.setPlayer(exoPlayer)
+
+        currentStation?.let {
+
+            val uri = it.getString(METADATA_KEY_MEDIA_URI)
+
+            playFromUri(uri, isToPlay)
+        }
+
+    }
 
 
 //    private fun changeToBadPlayer(){
@@ -515,6 +533,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
         serviceScope.launch {
 
+
             while (true){
 
                 val format = exoPlayer.audioFormat
@@ -525,12 +544,36 @@ class RadioService : MediaBrowserServiceCompat() {
 
 //                Log.d("CHECKTAGS", "sampleRate: $sampleRate, channels: $channels")
 
+                Log.d("CHECKTAGS", exoPlayer.totalBufferedDuration.toString())
 
-                delay(7000)
+                delay(2000)
 
             }
 
         }
+
+
+
+        // FOR SKIPPING EXCLUSIVE AD
+
+//        serviceScope.launch {
+//
+//            exoPlayer.playbackParameters = PlaybackParameters(6f)
+//            exoPlayer.volume = 0f
+//
+//            while (true) {
+//
+//               delay(200)
+//
+//                if(exoPlayer.currentPosition > 5000)
+//                    break
+//
+//            }
+//
+//            exoPlayer.playbackParameters = PlaybackParameters(1f)
+//            exoPlayer.volume = 1f
+//
+//        }
 
 
 
@@ -767,6 +810,62 @@ class RadioService : MediaBrowserServiceCompat() {
        }
    }
 
+    private fun playFromUri (fromUri: String, playWhenReady : Boolean){
+
+        var uri = fromUri
+
+        if(isFromRecording){
+            val fileDir = this@RadioService.filesDir.path
+            uri = "$fileDir/$uri"
+        }
+
+        Log.d("CHECKTAGS", "uri is : $uri")
+
+        val lastPath = uri.toUri().lastPathSegment
+
+        val mediaItem = MediaItem.fromUri(uri.toUri())
+
+
+        val mediaSource = if(lastPath?.contains("m3u8") == true || lastPath?.contains("m3u") == true) {
+            Log.d("CHECKTAGS", "hls")
+            HlsMediaSource.Factory(dataSourceFactory)
+//                 .setAllowChunklessPreparation(true)
+                .createMediaSource(mediaItem)
+        } else {
+            ProgressiveMediaSource.Factory(dataSourceFactory)
+                .setContinueLoadingCheckIntervalBytes(1024*40)
+                .createMediaSource(mediaItem)
+        }
+
+
+        val playbackSpeed = (if(isFromRecording) playbackSpeedRec
+        else playbackSpeedRadio).toFloat()/100
+
+        val playbackPitch = if(isFromRecording) playbackSpeed
+        else playbackPitchRadio.toFloat()/100
+
+        val params = PlaybackParameters(playbackSpeed, playbackPitch)
+        exoPlayer.playbackParameters = params
+
+
+        val reverb = PresetReverb(1, exoPlayer.audioSessionId)
+
+        reverb.preset = PresetReverb.PRESET_LARGEHALL
+
+        reverb.enabled = true
+
+        exoPlayer.setAuxEffectInfo(AuxEffectInfo(reverb.id, 1.0f))
+
+        exoPlayer.setMediaSource(mediaSource)
+
+
+        exoPlayer.prepare()
+
+        exoPlayer.playWhenReady = playWhenReady
+
+
+    }
+
     private fun preparePlayer(
         playlist : List<MediaMetadataCompat>,
         itemToPlay : MediaMetadataCompat?,
@@ -776,95 +875,46 @@ class RadioService : MediaBrowserServiceCompat() {
 
         this.isFromRecording = isFromRecordings
 
-        var uri = try {
+        val uri = try {
             playlist[playlist.indexOf(itemToPlay)].getString(METADATA_KEY_MEDIA_URI)
         } catch (e : ArrayIndexOutOfBoundsException){
             ""
         }
 
-         if(isFromRecordings){
-             val fileDir = this@RadioService.filesDir.path
-             uri = "$fileDir/$uri"
-         }
+        playFromUri(uri, playNow)
 
-        Log.d("CHECKTAGS", "uri is : $uri")
-
-         val lastPath = uri.toUri().lastPathSegment
-
-         val mediaItem = MediaItem.fromUri(uri.toUri())
-
-         val mediaSource = if(lastPath?.contains("m3u8") == true || lastPath?.contains("m3u") == true) {
-             HlsMediaSource.Factory(dataSourceFactory)
-                 .createMediaSource(mediaItem)
-         } else {
-             ProgressiveMediaSource.Factory(dataSourceFactory)
-                 .createMediaSource(mediaItem)
-
-         }
-
-
-         val playbackSpeed = (if(isFromRecordings) playbackSpeedRec
-         else playbackSpeedRadio).toFloat()/100
-
-         val playbackPitch = if(isFromRecordings) playbackSpeed
-         else playbackPitchRadio.toFloat()/100
-
-         val params = PlaybackParameters(playbackSpeed, playbackPitch)
-         exoPlayer.playbackParameters = params
-
-         exoPlayer.setMediaSource(mediaSource)
-         exoPlayer.prepare()
-
-         exoPlayer.playWhenReady = playNow
 
       }
 
 
     override fun onTaskRemoved(rootIntent: Intent?) {
 
-        exoPlayer.pause()
         super.onTaskRemoved(rootIntent)
+//
+//            exoPlayer.clearMediaItems()
 
 
-
-            exoPlayer.stop()
-
-            exoPlayer.clearMediaItems()
 
 //        radioNotificationManager.removeNotification()
 
-//            releaseMediaSession()
+
+
+
+
+        if(!exoPlayer.isPlaying){
+
+            NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
+//            stopForeground(STOP_FOREGROUND_REMOVE)
 //
+//            isForegroundService = false
 //            stopSelf()
 
-//         if(!exoPlayer.isPlaying){
-
-
-//
-//             NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
-//             stopForeground(STOP_FOREGROUND_REMOVE)
-
-//        stopForeground(STOP_FOREGROUND_REMOVE)
-
-
-//         }
-
-    }
-
-//
-     fun releaseMediaSession() {
-        mediaSession.run {
-            release()
-
-                exoPlayer.removeListener(radioPlayerEventListener)
-                exoPlayer.release()
+            radioNotificationManager.removeNotification()
 
         }
-
-
-        stopSelf()
-
     }
+
+//
 
 
 
@@ -873,10 +923,9 @@ class RadioService : MediaBrowserServiceCompat() {
 //    }
 
 
+
+
     override fun onDestroy() {
-
-        super.onDestroy()
-
 
 
         mediaSession.run {
@@ -893,13 +942,9 @@ class RadioService : MediaBrowserServiceCompat() {
         exoPlayer.removeListener(radioPlayerEventListener)
         exoPlayer.release()
 
-        mediaSessionConnector.mediaSession.release()
-
-        mediaSessionConnector.setPlayer(null)
-
-
 
         serviceJob.cancel()
+
 
         serviceScope.cancel()
     }

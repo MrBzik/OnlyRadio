@@ -1,44 +1,31 @@
 package com.example.radioplayer.ui.fragments
 
 
-import android.Manifest
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.example.radioplayer.R
 import com.example.radioplayer.databinding.FragmentSettingsBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
 import com.example.radioplayer.ui.animations.slideAnim
-import com.example.radioplayer.ui.dialogs.BluetoothDialog
+import com.example.radioplayer.ui.dialogs.BufferSettingsDialog
 import com.example.radioplayer.ui.dialogs.HistorySettingsDialog
 import com.example.radioplayer.ui.dialogs.RecordingSettingsDialog
 import com.example.radioplayer.ui.viewmodels.BluetoothViewModel
+import com.example.radioplayer.utils.Constants.BUFFER_PREF
 import com.example.radioplayer.utils.Constants.DARK_MODE_PREF
-import com.example.radioplayer.utils.Constants.FOREGROUND_PREF
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.RECONNECT_PREF
 import com.example.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 
 const val REC_LOWEST = "Very light"
@@ -72,6 +59,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         requireContext().getSharedPreferences(DARK_MODE_PREF, Context.MODE_PRIVATE)
     }
 
+    private val bufferPref : SharedPreferences by lazy {
+        requireContext().getSharedPreferences(BUFFER_PREF, Context.MODE_PRIVATE)
+    }
+
+
+
     private val listOfRecOptions : List<String> by lazy { listOf(
         REC_LOWEST, REC_LOW, REC_MEDIUM, REC_NORMAL, REC_ABOVE_AVERAGE, REC_HIGH, REC_VERY_HIGH,
         REC_SUPER, REC_ULTRA, REC_MAXIMUM)
@@ -101,7 +94,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         setReconnectButton()
 
-        setForegroundPrefButton()
+//        setForegroundPrefButton()
 
         setSwitchNightModeListener()
 
@@ -123,36 +116,77 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         setToolbar()
 
-        setBluetoothDialog()
+//        setBluetoothDialog()
 
-        changePlayerBtn()
+        openAudioSettings()
+
+        setBufferSettingsClickListener()
+
 
     }
 
 
-    private fun changePlayerBtn(){
+    private fun setBufferSettingsClickListener(){
 
-        bind.switchChangePlayer.setOnCheckedChangeListener { buttonView, isChecked ->
 
-            if(isChecked){
+        bind.tvControlBufferValue.setOnClickListener {
 
-                mainViewModel.changeToGoodPlayer()
+            BufferSettingsDialog(requireContext(), bufferPref){ isPlayerToResturt ->
+
+                if(isPlayerToResturt){
+                    mainViewModel.restartPlayer()
+                }
+
+            }.show()
+
+        }
+    }
+
+
+
+    private fun openAudioSettings(){
+
+        bind.btnAudioSettings.setOnClickListener {
+
+            try{
+                val intent = Intent(Intent.ACTION_MAIN)
+                intent.setClassName("com.sec.android.app.soundalive", "com.sec.android.app.soundalive.SAControlPanelActivity")
+                startActivity(intent)
+            } catch (e: Exception){
+
+                val intent = Intent(android.provider.Settings.ACTION_SOUND_SETTINGS)
+                startActivity(intent)
 
             }
 
-            else{
-                mainViewModel.changeToBadPlayer()
-            }
 
         }
 
-
-
     }
 
-    private fun setBluetoothDialog(){
 
-        bind.ivCastAudio.setOnClickListener {
+//
+//    private fun changePlayerBtn(){
+//
+//        bind.switchChangePlayer.setOnCheckedChangeListener { buttonView, isChecked ->
+//
+//            if(isChecked){
+//
+//                mainViewModel.changeToGoodPlayer()
+//
+//            }
+//
+//            else{
+//                mainViewModel.changeToBadPlayer()
+//            }
+//
+//        }
+//
+//    }
+
+//    private fun setBluetoothDialog(){
+//
+//        bind.ivCastAudio.setOnClickListener {
 
 //            val bluetoothLauncher = registerForActivityResult(
 //                ActivityResultContracts.StartActivityForResult()
@@ -184,14 +218,14 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 //            }
 
 
-                BluetoothDialog(requireContext(), bluetoothViewModel).show()
-
-
-
-
-        }
-
-    }
+//                BluetoothDialog(requireContext(), bluetoothViewModel).show()
+//
+//
+//
+//
+//        }
+//
+//    }
 
 
     private fun setToolbar(){
@@ -232,19 +266,19 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         }
 
     }
-
-    private fun setForegroundPrefButton(){
-
-        val foregroundPref = requireContext().getSharedPreferences(FOREGROUND_PREF, Context.MODE_PRIVATE)
-        val initialState = foregroundPref.getBoolean(FOREGROUND_PREF, false)
-
-        bind.switchForegroundPref.apply {
-            isChecked = initialState
-            setOnCheckedChangeListener { _, isChecked ->
-                foregroundPref.edit().putBoolean(FOREGROUND_PREF, isChecked).apply()
-            }
-        }
-    }
+//
+//    private fun setForegroundPrefButton(){
+//
+//        val foregroundPref = requireContext().getSharedPreferences(FOREGROUND_PREF, Context.MODE_PRIVATE)
+//        val initialState = foregroundPref.getBoolean(FOREGROUND_PREF, false)
+//
+//        bind.switchForegroundPref.apply {
+//            isChecked = initialState
+//            setOnCheckedChangeListener { _, isChecked ->
+//                foregroundPref.edit().putBoolean(FOREGROUND_PREF, isChecked).apply()
+//            }
+//        }
+//    }
 
 
 
