@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_gradient_for_background">
+
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginTop="@dimen/dialog_top_margin"
+        android:gravity="center_vertical"
+        android:text="Search params"
+        android:textAppearance="@style/dialogTitleText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="5dp"
+        android:text="Order by"
+        android:textAppearance="@style/dialogItemText"
+        app:layout_constraintBottom_toBottomOf="@id/textInputLayoutOrder"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/textInputLayoutOrder" />
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayoutOrder"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="202dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle"
+        app:prefixTextAppearance="@style/dialogItemText"
+        app:prefixTextColor="@color/black"
+
+        >
+
+        <AutoCompleteTextView
+            android:id="@+id/actvOrder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+            android:inputType="none"
+            android:text="Votes"
+            android:textAlignment="viewEnd"
+            android:textAppearance="@style/dialogItemText"
+            android:textColor="@color/selected_genre_color" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <TextView
+        android:id="@+id/tvBitrateTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="28dp"
+        android:text="Bitrate"
+        android:textAppearance="@style/dialogItemText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayoutOrder" />
+
+
+    <TextView
+        android:id="@+id/tvBitrateHint"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:paddingHorizontal="8dp"
+        android:text="Low bitrate streams use less internet, while higher bitrate may result in better audio quality"
+        android:textAppearance="@style/hintText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvBitrateTitle"
+        app:layout_constraintTop_toTopOf="@+id/tvBitrateTitle" />
+
+
+    <com.google.android.material.slider.RangeSlider
+        android:id="@+id/rangeSliderBitrate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvBitrateHint" />
+
+    <TextView
+        android:id="@+id/tvBitrateValMin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:text="Min"
+        android:textAppearance="@style/dialogItemText"
+        android:textColor="@color/selected_genre_color"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rangeSliderBitrate" />
+
+    <TextView
+        android:id="@+id/tvBitrateValMax"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="25dp"
+        android:text="Max"
+        android:textAppearance="@style/dialogItemText"
+        android:textColor="@color/selected_genre_color"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rangeSliderBitrate" />
+
+
+    <TextView
+        android:id="@+id/tvLanguageTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="32dp"
+        android:maxLines="1"
+        android:text="Should include language"
+        android:textAppearance="@style/dialogItemText"
+        app:layout_constraintEnd_toStartOf="@+id/switchLanguagePref"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvBitrateValMin" />
+
+    <TextView
+        android:id="@+id/tvLanguageValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="25dp"
+        android:text="(System: English)"
+        android:textAppearance="@style/dialogItemText"
+        android:textColor="@color/selected_genre_color"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvLanguageTitle" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchLanguagePref"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:minHeight="48dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvLanguageValue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvLanguageTitle"
+        app:thumbTint="@color/switch_thumb_color"
+        app:trackTint="@color/switch_track_color" />
+
+
+
+
+
+
+
+
+    <TextView
+        android:id="@+id/tvBack"
+        android:layout_width="wrap_content"
+        android:layout_height="80dp"
+        android:layout_marginStart="36dp"
+        android:gravity="center_vertical"
+        android:text="@string/dialog_back_button"
+        android:textAppearance="@style/dialogTextButtons"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvLanguageValue" />
+
+
+    <TextView
+        android:id="@+id/tvAccept"
+        android:layout_width="wrap_content"
+        android:layout_height="80dp"
+        android:layout_marginEnd="36dp"
+        android:gravity="center_vertical"
+        android:text="@string/dialog_accept_button"
+        android:textAppearance="@style/dialogTextButtons"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvLanguageValue" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

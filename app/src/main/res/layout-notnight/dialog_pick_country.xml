@@ -35,7 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/black"
-        android:hint="Type country name..."
+        android:hint="Search country..."
         android:inputType="text|textNoSuggestions"
         android:minHeight="48dp"
         android:textAppearance="@style/dialogSearchText"

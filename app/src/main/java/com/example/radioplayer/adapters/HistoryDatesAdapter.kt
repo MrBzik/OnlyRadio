@@ -9,6 +9,7 @@ import android.widget.TextView
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.HistoryDate
 import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -53,13 +54,13 @@ class HistoryDatesAdapter(
 
        if(position != 0){
 
-           textView.text = format.format(date)
+           textView.text = formatLess.format(date)
 
            if(position == selectedItemPosition) textView.setTextColor(selectedColor)
 
        } else {
 
-           textView.text = "History: All"
+           textView.text = "All dates"
             if(selectedItemPosition <=0){
                 textView.setTextColor(selectedColor)
 
@@ -81,6 +82,8 @@ class HistoryDatesAdapter(
     }
 
     private val format = DateFormat.getDateInstance()
+
+    private val formatLess = SimpleDateFormat("d 'of' MMM", Locale.getDefault())
 
      var selectedItemPosition = 0
      var selectedColor = 0

@@ -61,13 +61,6 @@
             android:layout_height="wrap_content"
             >
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/fabPitchPlus"
-            />
-
 
 
 <!--            <TextView-->
@@ -356,9 +349,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginStart="20dp"
                 android:text="(Also: Swipe-Up for searches)*"
-                android:fontFamily="@font/aldrich"
-                android:textSize="13sp"
-                android:textColor="@color/default_secondary_text_color"
+                android:textAppearance="@style/hintText"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/ivButtonsSearch"
                 />
@@ -369,24 +360,22 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
-                android:fontFamily="@font/aldrich"
                 android:text="(Rec. speed is set separately in Details)*"
-                android:textColor="@color/default_secondary_text_color"
-                android:textSize="13sp"
+                android:textAppearance="@style/hintText"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvSearchHint" />
 
 
             <TextView
                 android:id="@+id/tvPlaybackSpeedTitle"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="-61dp"
                 android:layout_marginTop="10dp"
                 android:text="speed : 100%"
                 android:textAppearance="@style/dialogItemText"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toStartOf="@id/guidelineHorizontal"
                 app:layout_constraintTop_toBottomOf="@+id/tvPlaybackSpeedHint" />
 
             <androidx.constraintlayout.widget.Guideline
@@ -437,14 +426,14 @@
 
             <TextView
                 android:id="@+id/tvPlaybackPitchTitle"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="-55dp"
                 android:layout_marginTop="8dp"
                 android:text="pitch : 100%"
                 android:textAppearance="@style/dialogItemText"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toStartOf="@id/guidelineHorizontal"
                 app:layout_constraintTop_toBottomOf="@+id/ivLink" />
 
 
@@ -470,10 +459,91 @@
                 android:src="@drawable/playback_speed_plus"
                 app:backgroundTint="@color/floating_buttons"
                 app:fabCustomSize="30dp"
-
                 app:layout_constraintBottom_toBottomOf="@+id/tvPlaybackPitchTitle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/tvPlaybackPitchTitle" />
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabPrevReverb"
+                android:layout_width="30dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="36dp"
+                android:src="@drawable/ic_arrow_left"
+                app:backgroundTint="@color/floating_buttons"
+                app:fabCustomSize="30dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fabPitchPlus" />
+
+            <TextView
+                android:id="@+id/tvReverbValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/dialogItemText"
+                app:layout_constraintBottom_toBottomOf="@+id/fabPrevReverb"
+                app:layout_constraintStart_toEndOf="@id/fabPrevReverb"
+                app:layout_constraintEnd_toStartOf="@id/fabNextReverb"
+                app:layout_constraintTop_toTopOf="@id/fabPrevReverb" />
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabNextReverb"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd ="30dp"
+                android:src="@drawable/ic_arrow_right"
+                app:backgroundTint="@color/floating_buttons"
+                app:fabCustomSize="30dp"
+                app:layout_constraintBottom_toBottomOf="@+id/fabPrevReverb"
+                app:layout_constraintEnd_toEndOf="parent"
+                 />
+
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabBassBoostLess"
+                android:layout_width="30dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="36dp"
+                android:src="@drawable/playback_speed_minus"
+                app:backgroundTint="@color/floating_buttons"
+                app:fabCustomSize="30dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fabNextReverb" />
+
+            <TextView
+                android:id="@+id/tvBassBoostValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="-65dp"
+                android:text="Virtualizer : 0"
+                android:textAppearance="@style/dialogItemText"
+                app:layout_constraintBottom_toBottomOf="@+id/fabBassBoostLess"
+                app:layout_constraintStart_toEndOf="@id/guidelineHorizontal"
+                app:layout_constraintTop_toTopOf="@id/fabBassBoostLess" />
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabBassBoostMore"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd ="30dp"
+                android:src="@drawable/playback_speed_plus"
+                app:backgroundTint="@color/floating_buttons"
+                app:fabCustomSize="30dp"
+                app:layout_constraintBottom_toBottomOf="@+id/fabBassBoostLess"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fabBassBoostMore"
+                />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 

@@ -122,6 +122,92 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         setBufferSettingsClickListener()
 
+        setReverbClickListeners()
+
+        setBassBoostClickListeners()
+
+    }
+
+    private fun setBassBoostClickListeners(){
+
+        setBassBoostText()
+
+        bind.fabBassBoostLess.setOnClickListener {
+
+            if(RadioService.virtualizerLevel > 0){
+                RadioService.virtualizerLevel -= 500
+                mainViewModel.changeVirtualizerLevel()
+                setBassBoostText()
+            }
+        }
+
+        bind.fabBassBoostMore.setOnClickListener {
+
+            if(RadioService.virtualizerLevel < 1000){
+                RadioService.virtualizerLevel += 500
+                mainViewModel.changeVirtualizerLevel()
+                setBassBoostText()
+            }
+        }
+
+
+    }
+
+    private fun setBassBoostText(){
+        bind.tvBassBoostValue.text = when(RadioService.virtualizerLevel){
+
+            0 -> "Range : normal"
+            500 -> "Range : broad"
+            else -> "Range : widest"
+
+        }
+
+
+
+    }
+
+
+    private fun setReverbClickListeners(){
+
+        setReverbName()
+
+        bind.fabPrevReverb.setOnClickListener {
+
+            if(RadioService.reverbMode == 0){
+                RadioService.reverbMode = 6
+            } else {
+                RadioService.reverbMode -= 1
+            }
+            setReverbName()
+
+            mainViewModel.changeReverbMode()
+        }
+
+        bind.fabNextReverb.setOnClickListener {
+
+            if(RadioService.reverbMode == 6){
+                RadioService.reverbMode = 0
+            } else {
+                RadioService.reverbMode += 1
+            }
+            setReverbName()
+
+            mainViewModel.changeReverbMode()
+
+        }
+    }
+
+    private fun setReverbName(){
+
+       bind.tvReverbValue.text = when(RadioService.reverbMode){
+            0 -> "Reverb: none"
+            1 -> "Large hall"
+            2 -> "Medium hall"
+            3 -> "Large room"
+            4 -> "Medium room"
+            5 -> "Small room"
+            else -> "Plate"
+        }
 
     }
 

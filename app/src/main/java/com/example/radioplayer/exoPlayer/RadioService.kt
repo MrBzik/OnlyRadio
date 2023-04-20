@@ -1,5 +1,6 @@
 package com.example.radioplayer.exoPlayer
 
+import android.animation.ValueAnimator
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -7,7 +8,8 @@ import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.media.audiofx.PresetReverb
+import android.media.audiofx.EnvironmentalReverb
+import android.media.audiofx.Virtualizer
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
@@ -16,6 +18,8 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
+import androidx.core.animation.doOnEnd
+import androidx.core.animation.doOnStart
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
@@ -31,14 +35,18 @@ import com.example.radioplayer.utils.Constants.BUFFER_FOR_PLAYBACK
 import com.example.radioplayer.utils.Constants.BUFFER_PREF
 import com.example.radioplayer.utils.Constants.BUFFER_SIZE_IN_BYTES
 import com.example.radioplayer.utils.Constants.BUFFER_SIZE_IN_MILLS
+import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_BASS_LEVEL
+import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_REVERB_MODE
 
 import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
+import com.example.radioplayer.utils.Constants.COMMAND_PAUSE_PLAYER
 import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
 import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
 
 import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_CURRENT_PLAYING_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_RESTART_PLAYER
+import com.example.radioplayer.utils.Constants.COMMAND_START_PLAYER
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_REC_PLAYBACK_SPEED
@@ -53,6 +61,7 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
+import com.example.radioplayer.utils.setPreset
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.DefaultLoadControl.*
 import com.google.android.exoplayer2.audio.*
@@ -60,7 +69,6 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
-import com.google.android.exoplayer2.upstream.DefaultAllocator
 import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
 import dagger.hilt.android.AndroidEntryPoint
 import dev.brookmg.exorecord.lib.ExoRecord
@@ -162,6 +170,10 @@ class RadioService : MediaBrowserServiceCompat() {
         var isToSetBufferInBytes = false
         var isAdaptiveLoaderToUse = false
 
+        var reverbMode = 0
+
+        var virtualizerLevel = 0
+
     }
 
 
@@ -216,8 +228,17 @@ class RadioService : MediaBrowserServiceCompat() {
 //
 
 
+//    private val effectReverb : PresetReverb by lazy {
+//        PresetReverb(1, 0)
+//    }
 
+    private val environmentalReverb : EnvironmentalReverb by lazy {
+        EnvironmentalReverb(1, 0)
+    }
 
+    private val effectVirtualizer : Virtualizer by lazy{
+        Virtualizer(1, exoPlayer.audioSessionId)
+    }
 
 
     override fun onCreate() {
@@ -375,6 +396,15 @@ class RadioService : MediaBrowserServiceCompat() {
                 COMMAND_RESTART_PLAYER -> {
                     recreateExoPlayer()
                 }
+
+
+                COMMAND_CHANGE_REVERB_MODE -> {
+                    changeReverbMode()
+                }
+
+                COMMAND_CHANGE_BASS_LEVEL -> {
+                    changeVirtualizerLevel()
+                }
             }
         })
 
@@ -409,6 +439,99 @@ class RadioService : MediaBrowserServiceCompat() {
 
     }
 
+     fun fadeInPlayer(){
+        val anim = ValueAnimator.ofFloat(0f, 1f)
+
+        anim.addUpdateListener {
+            exoPlayer.volume = it.animatedValue as Float
+        }
+
+        anim.duration = 1000
+        anim.start()
+
+
+    }
+
+
+
+    private var wasReverbSet = false
+
+    private fun changeReverbMode() {
+
+        setPreset(environmentalReverb, reverbMode)
+
+
+        if(reverbMode == 0){
+            environmentalReverb.enabled = false
+        } else {
+            if(!environmentalReverb.enabled){
+                environmentalReverb.enabled = true
+            }
+        }
+
+        if(!wasReverbSet){
+            exoPlayer.setAuxEffectInfo(AuxEffectInfo(environmentalReverb.id, 1f))
+            wasReverbSet = true
+        }
+    }
+
+    private var wasBassBoostSet = false
+
+    private fun changeVirtualizerLevel() {
+
+        if(virtualizerLevel == 0){
+            effectVirtualizer.enabled = false
+        } else {
+
+            effectVirtualizer.setStrength(virtualizerLevel.toShort())
+
+            if(!effectVirtualizer.enabled){
+                effectVirtualizer.enabled = true
+            }
+        }
+
+        if(!wasBassBoostSet){
+            exoPlayer.setAuxEffectInfo(AuxEffectInfo(effectVirtualizer.id, 1f))
+            wasBassBoostSet = true
+        }
+    }
+
+
+//    private fun changeReverbMode() {
+//
+//        if(!wasReverbSet){
+//            environmentalReverb = EnvironmentalReverb(0, 0)
+//        }
+//
+//        setPreset(environmentalReverb, reverbMode)
+//
+//        if(reverbMode == 0){
+//            environmentalReverb.enabled = false
+//            environmentalReverb.release()
+//            wasReverbSet = false
+//            exoPlayer.clearAuxEffectInfo()
+//        } else {
+//            environmentalReverb.enabled = true
+//            if(!wasReverbSet){
+//                exoPlayer.setAuxEffectInfo(AuxEffectInfo(environmentalReverb.id, 1f))
+//                wasReverbSet = true
+//            }
+//        }
+//    }
+
+//    private fun changeReverbMode() {
+//
+//        effectReverb.preset = reverbMode.toShort()
+//
+//        effectReverb.enabled = reverbMode != 0
+//
+//      if(!wasReverbSet){
+//          exoPlayer.setAuxEffectInfo(AuxEffectInfo(effectReverb.id, 1f))
+//          wasReverbSet = true
+//      }
+//
+//    }
+
 
     private fun initialCheckForBuffer(){
         val buffPref = this@RadioService.getSharedPreferences(BUFFER_PREF, Context.MODE_PRIVATE)
@@ -421,10 +544,29 @@ class RadioService : MediaBrowserServiceCompat() {
 
     }
 
+
+//    lateinit var bandwidthMeter: DefaultBandwidthMeter
+
+//    val handler = android.os.Handler(Looper.getMainLooper())
+//    val listener = BandwidthMeter.EventListener { elapsedMs, bytesTransferred, bitrateEstimate ->
+//
+//        Log.d("CHECKTAGS", "elapse : $elapsedMs, bytes transfered : $bytesTransferred, bitrate : $bitrateEstimate")
+//
+//    }
+
+
+
     private fun provideExoPlayer () : ExoPlayer {
 
         val bites = if (!isToSetBufferInBytes) -1
         else bufferSizeInBytes * 1024
+
+
+//
+//
+//        bandwidthMeter = DefaultBandwidthMeter.Builder(this@RadioService).build()
+//        bandwidthMeter.addEventListener(handler, listener)
+
 
         return ExoPlayer.Builder(this@RadioService, renderersFactory)
             .setAudioAttributes(audioAttributes, true)
@@ -433,6 +575,9 @@ class RadioService : MediaBrowserServiceCompat() {
                 .setBufferDurationsMs(bufferSizeInMills, bufferSizeInMills, bufferForPlayback, 5000)
                 .setTargetBufferBytes(bites)
                 .build())
+//            .setBandwidthMeter(
+//                bandwidthMeter
+//            )
             .build().apply {
                 addListener(radioPlayerEventListener)
             }
@@ -544,7 +689,9 @@ class RadioService : MediaBrowserServiceCompat() {
 
 //                Log.d("CHECKTAGS", "sampleRate: $sampleRate, channels: $channels")
 
-                Log.d("CHECKTAGS", exoPlayer.totalBufferedDuration.toString())
+
+
+
 
                 delay(2000)
 
@@ -848,16 +995,82 @@ class RadioService : MediaBrowserServiceCompat() {
         exoPlayer.playbackParameters = params
 
 
-        val reverb = PresetReverb(1, exoPlayer.audioSessionId)
 
-        reverb.preset = PresetReverb.PRESET_LARGEHALL
 
-        reverb.enabled = true
+//        reverb.preset = PresetReverb.PRESET_LARGEHALL
+//
+//        reverb.enabled = true
+//
+//        exoPlayer.setAuxEffectInfo(AuxEffectInfo(reverb.id, 1.0f))
 
-        exoPlayer.setAuxEffectInfo(AuxEffectInfo(reverb.id, 1.0f))
+
+//        serviceScope.launch {
+//
+//            delay(10000)
+//
+//
+//
+//
+//            delay(20000)
+//
+//            reverb.enabled = false
+//            reverb.release()
+//
+//            exoPlayer.clearAuxEffectInfo()
+//
+//
+//        }
+
+
+
+//        val bassboost = BassBoost(1, exoPlayer.audioSessionId)
+//
+//        bassboost.setStrength(1000)
+
+//        val virtualizer = Virtualizer(1, exoPlayer.audioSessionId)
+//
+//        virtualizer.setStrength(1000)
+
+//
+//        serviceScope.launch {
+//
+//            delay(10000)
+//
+//            virtualizer.enabled = true
+//
+//            delay(20000)
+//
+//            virtualizer.enabled = false
+//            virtualizer.release()
+//
+//
+//
+//        }
+
+
+
+
+//        serviceScope.launch {
+//
+//            delay(20000)
+//            exoPlayer.setAuxEffectInfo(AuxEffectInfo(bassboost.id, 1.0f))
+//            bassboost.enabled = true
+//
+//            Log.d("CHECKTAGS", "enabled")
+//
+//
+//            delay(40000)
+//            exoPlayer.clearAuxEffectInfo()
+//            bassboost.enabled = false
+//            bassboost.release()
+//
+//            Log.d("CHECKTAGS", "disabled")
+//        }
+
+
+//        exoPlayer.setAuxEffectInfo(AuxEffectInfo(reverb.id, 1.0f))
 
         exoPlayer.setMediaSource(mediaSource)
-
 
         exoPlayer.prepare()
 
@@ -885,6 +1098,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
       }
+
+
 
 
     override fun onTaskRemoved(rootIntent: Intent?) {

@@ -38,7 +38,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.sql.Date
 import java.text.DateFormat
-import java.util.Calendar
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -54,7 +55,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     @Inject
     lateinit var glide : RequestManager
 
-    private val dateFormat = DateFormat.getDateInstance()
+    private val dateFormat = SimpleDateFormat("d 'of' MMM", Locale.getDefault())
 
     private var isInitialLoad = true
 
@@ -99,7 +100,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     private fun setToolbar(){
 
         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
-            bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_history_vector)
+            bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_history_trio_vector)
 
             val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_history_frag)
 //            val colorStatus = ContextCompat.getColor(requireContext(), R.color.status_bar_history_frag)
@@ -192,7 +193,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             numberOfDates = it.size
 
-            val allHistory = HistoryDate("History: All", 0)
+            val allHistory = HistoryDate("All dates", 0)
 
             val dates = it.toMutableList()
             dates.add(0, allHistory)
@@ -270,7 +271,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     }
 
     private fun setSliderHeaderText(time : Long){
-        if(time == 0L) bind.tvSliderHeader.text = "History: All"
+        if(time == 0L) bind.tvSliderHeader.text = "All dates"
         else bind.tvSliderHeader.text = dateFormat.format(time)
     }
 

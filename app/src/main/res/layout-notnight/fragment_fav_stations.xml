@@ -44,7 +44,7 @@
         android:id="@+id/viewToolbar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@drawable/toolbar_fav"
+        android:background="@drawable/toolbar_fav_vector"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"

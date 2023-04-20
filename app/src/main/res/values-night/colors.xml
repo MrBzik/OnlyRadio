@@ -11,6 +11,8 @@
     <color name="color_non_interactive">#FD7F20</color>
     <color name="Separator">#AA4D06</color>
 
+    <color name="color_main_text_title">#FD7F20</color>
+
     <color name="Cursor">#AA4D06</color>
 
     <color name="grayColor">#635D5D</color>

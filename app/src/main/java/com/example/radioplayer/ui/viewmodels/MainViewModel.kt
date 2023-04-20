@@ -18,19 +18,27 @@ import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.repositories.DatabaseRepository
+import com.example.radioplayer.ui.dialogs.*
+import com.example.radioplayer.utils.Constants
+import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_BASS_LEVEL
+import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_REVERB_MODE
 
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
+import com.example.radioplayer.utils.Constants.COMMAND_PAUSE_PLAYER
 import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
 import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
 
 import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_CURRENT_PLAYING_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_RESTART_PLAYER
+import com.example.radioplayer.utils.Constants.COMMAND_START_PLAYER
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_REC_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.FAB_POSITION_X
 import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
+import com.example.radioplayer.utils.Constants.IS_NAME_EXACT
+import com.example.radioplayer.utils.Constants.IS_TAG_EXACT
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
 import com.example.radioplayer.utils.Constants.PLAY_WHEN_READY
 import com.example.radioplayer.utils.Constants.SEARCH_BTN_PREF
@@ -38,11 +46,15 @@ import com.example.radioplayer.utils.Constants.SEARCH_BTN_PREF
 import com.example.radioplayer.utils.Constants.SEARCH_FLAG
 import com.example.radioplayer.utils.Constants.SEARCH_FULL_COUNTRY_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
+import com.example.radioplayer.utils.Constants.SEARCH_PREF_MAX_BIT
+import com.example.radioplayer.utils.Constants.SEARCH_PREF_MIN_BIT
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
+import com.example.radioplayer.utils.Constants.SEARCH_PREF_ORDER
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import java.util.*
 import javax.inject.Inject
 
 
@@ -147,11 +159,23 @@ class MainViewModel @Inject constructor(
        var lastSearchTag = searchPreferences.getString(SEARCH_PREF_TAG, "")?: ""
        var searchFullCountryName = searchPreferences.getString(SEARCH_FULL_COUNTRY_NAME, "")?: ""
 
-       var isTagExact = false
-       var isNameExact = false
 
-       var wasTagExact = false
-       var wasNameExact = false
+       var isTagExact = searchPreferences.getBoolean(IS_TAG_EXACT, false)
+       var isNameExact = searchPreferences.getBoolean(IS_NAME_EXACT, false)
+       var wasTagExact = isTagExact
+       var wasNameExact = isNameExact
+
+       var oldSearchOrder = searchPreferences.getString(SEARCH_PREF_ORDER, ORDER_VOTES) ?: ORDER_VOTES
+       var newSearchOrder = oldSearchOrder
+
+       var minBitrateOld = searchPreferences.getInt(SEARCH_PREF_MIN_BIT, BITRATE_0)
+       var minBitrateNew = minBitrateOld
+
+       var maxBitrateOld = searchPreferences.getInt(SEARCH_PREF_MAX_BIT, BITRATE_MAX)
+       var maxBitrateNew = maxBitrateOld
+
+       var isSearchFilterLanguage = searchPreferences.getBoolean(Constants.IS_SEARCH_FILTER_LANGUAGE, false)
+       var wasSearchFilterLanguage = isSearchFilterLanguage
 
 
     private val searchBy : MutableLiveData<Boolean> = MutableLiveData()
@@ -203,15 +227,38 @@ class MainViewModel @Inject constructor(
 
                val calcOffset = limit * offset
 
+                var isReversedOrder = true
+
+
+                val orderSetting = when(newSearchOrder){
+                    ORDER_VOTES -> "votes"
+                    ORDER_POP -> "clickcount"
+                    ORDER_TREND -> "clicktrend"
+                    ORDER_BIT_MIN -> {
+                        isReversedOrder = false
+                        "bitrate"
+                    }
+                    ORDER_BIT_MAX -> "bitrate"
+                    else -> "random"
+                }
+
+           val lang = if(isSearchFilterLanguage) Locale.getDefault().isO3Language
+                        else ""
 
                    val response = radioSource.getRadioStationsSource(
                        offset = calcOffset,
                        pageSize = limit,
                        country = lastSearchCountry,
+                       language = lang,
                        tag = lastSearchTag,
                        isTagExact = isTagExact,
                        name = lastSearchName,
-                       isNameExact = isNameExact
+                       isNameExact = isNameExact,
+                       order = orderSetting,
+                       isReversedOrder = isReversedOrder,
+                       minBit = minBitrateNew,
+                       maxBit = maxBitrateNew,
+
                    )
 
                    if(isNewSearch && response?.size == 0){
@@ -290,12 +337,18 @@ class MainViewModel @Inject constructor(
 
 
     fun initiateNewSearch() : Boolean {
+
+
         if(
             lastSearchName == searchParamName.value &&
             lastSearchTag == searchParamTag.value &&
             lastSearchCountry == searchParamCountry.value &&
             wasTagExact == isTagExact &&
-            wasNameExact == isNameExact
+            wasNameExact == isNameExact &&
+            newSearchOrder == oldSearchOrder &&
+            minBitrateNew == minBitrateOld &&
+            maxBitrateNew == maxBitrateOld &&
+            isSearchFilterLanguage == wasSearchFilterLanguage
 
         )
             return false
@@ -308,6 +361,12 @@ class MainViewModel @Inject constructor(
                 lastSearchCountry = searchParamCountry.value ?: ""
                 wasTagExact = isTagExact
                 wasNameExact = isNameExact
+                oldSearchOrder = newSearchOrder
+                minBitrateOld = minBitrateNew
+                maxBitrateOld = maxBitrateNew
+                wasSearchFilterLanguage = isSearchFilterLanguage
+
+
 
                 if(hasInternetConnection.value == true){
 
@@ -322,7 +381,13 @@ class MainViewModel @Inject constructor(
 
     }
 
+        fun changeReverbMode(){
+            radioServiceConnection.sendCommand(COMMAND_CHANGE_REVERB_MODE, null)
+        }
 
+        fun changeVirtualizerLevel(){
+            radioServiceConnection.sendCommand(COMMAND_CHANGE_BASS_LEVEL, null)
+        }
 
 
         fun restartPlayer(){
@@ -358,11 +423,13 @@ class MainViewModel @Inject constructor(
                 playbackState.value?.let { playbackState ->
                     when {
                         playbackState.isPlaying -> {
+
                             radioServiceConnection.transportControls.pause()
                             return false
                         }
 
                         playbackState.isPlayEnabled -> {
+
                             radioServiceConnection.transportControls.play()
                             return true
                         }

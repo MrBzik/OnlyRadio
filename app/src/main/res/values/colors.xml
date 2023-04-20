@@ -10,6 +10,8 @@
     <color name="ChosenGreen">#004D40</color>
     <color name="color_non_interactive">#311B92</color>
 
+    <color name="color_main_text_title">#000000</color>
+
     <color name="grayColor">#635D5D</color>
     <color name="floating_buttons">#FFFFFF</color>
     <color name="color_interactive">#1A237E</color>

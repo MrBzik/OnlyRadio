@@ -166,8 +166,10 @@ class RadioSource @Inject constructor(
     private var currentUrlIndex = 0
 
     suspend fun getRadioStationsSource(
-        country: String = "", tag: String = "", isTagExact : Boolean,
-        name: String = "", isNameExact : Boolean,
+        country: String = "", language : String = "",
+        tag: String = "", isTagExact : Boolean,
+        name: String = "", isNameExact : Boolean, order : String,
+        isReversedOrder : Boolean, minBit : Int, maxBit : Int,
         offset: Int = 0, pageSize: Int
 
     ): RadioStations? {
@@ -177,28 +179,34 @@ class RadioSource @Inject constructor(
 
         val response = try {
 
-            if(tag == "" && name == "" && country == ""){
-                radioApi.getTopVotedStations(
-                    offset = offset, limit = pageSize,
-                    url =  "${validBaseUrl}$API_RADIO_TOP_VOTE_SEARCH_URL"
-                )
-            } else {
+//            if(tag == "" && name == "" && country == ""){
+//                radioApi.getTopVotedStations(
+//                    offset = offset, limit = pageSize,
+//                    url =  "${validBaseUrl}$API_RADIO_TOP_VOTE_SEARCH_URL"
+//                )
+//            } else {
                 if(country != "") {
                     radioApi.searchRadio(
-                        country = country, tag = tag, tagExact = tagExact,
+                        country = country, language = language,
+                        tag = tag, tagExact = tagExact,
                         name = name, nameExact = nameExact,
+                        sortBy = order, isReversed = isReversedOrder,
+                        bitrateMin = minBit, bitrateMax = maxBit,
                         offset = offset, limit = pageSize,
                         url = "${validBaseUrl}$API_RADIO_SEARCH_URL"
                     )
                 } else {
                     radioApi.searchRadioWithoutCountry(
+                        language = language,
                         tag = tag, tagExact = tagExact,
                         name = name, nameExact = nameExact,
+                        sortBy = order, isReversed = isReversedOrder,
+                        bitrateMin = minBit, bitrateMax = maxBit,
                         offset = offset, limit = pageSize,
                         url = "${validBaseUrl}$API_RADIO_SEARCH_URL"
                     )
                 }
-            }
+
         } catch (e : Exception){
             null
         }
@@ -213,7 +221,13 @@ class RadioSource @Inject constructor(
                             currentUrlIndex ++
                             validBaseUrl = listOfUrls[i]
                             return getRadioStationsSource(
-                                country, tag, isTagExact, name, isNameExact, offset, pageSize)
+                               country = country, language = language,
+                               tag = tag, isTagExact = isTagExact,
+                               name = name, isNameExact = isNameExact,
+                               order = order, isReversedOrder = isReversedOrder,
+                               minBit = minBit, maxBit = maxBit,
+                               offset = offset,
+                               pageSize = pageSize)
                         }
                     }
                 }

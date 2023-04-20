@@ -22,9 +22,14 @@ class RadioPlayerEventListener (
         val withoutWalm = mediaMetadata.title.toString().replace("WALMRadio.com", "")
 
         RadioService.currentSongTitle.postValue(withoutWalm)
+
     }
 
 
+//    override fun onVolumeChanged(volume: Float) {
+//        super.onVolumeChanged(volume)
+//        Log.d("CHECKTAGS", "volume changed")
+//    }
 
 
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
@@ -38,11 +43,14 @@ class RadioPlayerEventListener (
             radioService.stopForeground(STOP_FOREGROUND_DETACH)
 
             radioService.isForegroundService = false
+
+            radioService.exoPlayer.volume = 0f
         }
          else if(playbackState == Player.STATE_READY && playWhenReady){
 
             radioService.isPlaybackStatePlaying = true
             radioService.listenToRecordDuration()
+            radioService.fadeInPlayer()
 
          }
 
@@ -57,12 +65,17 @@ class RadioPlayerEventListener (
 
 
 
+
     override fun onPlayerError(error: PlaybackException) {
         super.onPlayerError(error)
 
         if(RadioService.isToReconnect && radioService.exoPlayer.playWhenReady){
             radioService.exoPlayer.prepare()
-            Toast.makeText(radioService, "Reconnecting...", Toast.LENGTH_SHORT).show()
+
+           Toast.makeText(radioService, "Reconnecting...", Toast.LENGTH_SHORT).show()
+
+
+
         } else {
             Toast.makeText(radioService, "Station not responding", Toast.LENGTH_SHORT).show()
         }

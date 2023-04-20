@@ -42,7 +42,8 @@ object Constants {
 
     const val COMMAND_RESTART_PLAYER = "command to recreate player"
 
-
+    const val COMMAND_PAUSE_PLAYER = "command pause player"
+    const val COMMAND_START_PLAYER = "command start player"
 
 
 
@@ -70,11 +71,18 @@ object Constants {
     const val HISTORY_30_DATES = 30
 
 
+// Search preferences
 
     const val SEARCH_PREF_TAG = "search preferences tag"
     const val SEARCH_PREF_NAME = "search preferences name"
     const val SEARCH_PREF_COUNTRY = "search preferences country"
     const val SEARCH_FULL_COUNTRY_NAME = "full country name for no result message"
+    const val SEARCH_PREF_ORDER = "search preference for order"
+    const val SEARCH_PREF_MIN_BIT = "search pref for minimum bitrate"
+    const val SEARCH_PREF_MAX_BIT = "search pref for maximum bitrate"
+    const val IS_TAG_EXACT = "is tag exact"
+    const val IS_NAME_EXACT = "is name exact"
+    const val IS_SEARCH_FILTER_LANGUAGE = "is to filter by system language"
 
 
     // SearchFragment Floating button positioning
@@ -109,6 +117,12 @@ object Constants {
 
     const val IS_ADAPTIVE_LOADER_TO_USE = "is to use adaptive loader"
 
+
+    // Audio effects
+
+    const val COMMAND_CHANGE_REVERB_MODE = "change reverb mode"
+
+    const val COMMAND_CHANGE_BASS_LEVEL = "change bass boost level"
 
 
 }

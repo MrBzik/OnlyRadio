@@ -22,6 +22,9 @@ interface RadioApi {
             @Query("countrycode")
             country : String,
 
+            @Query("language")
+            language : String = "",
+
             @Query("tag")
             tag : String,
 
@@ -44,10 +47,16 @@ interface RadioApi {
             hidebroken : Boolean = true,
 
             @Query("order")
-            sortBy : String = "bitrate",
+            sortBy : String,
 
             @Query("reverse")
-            isReversed : Boolean = true
+            isReversed : Boolean,
+
+            @Query("bitrateMin")
+            bitrateMin : Int,
+
+            @Query("bitrateMax")
+            bitrateMax : Int
 
         ) : Response<RadioStations>
 
@@ -61,6 +70,9 @@ interface RadioApi {
 
         @Query("tagExact")
         tagExact : Boolean,
+
+        @Query("language")
+        language : String = "",
 
         @Query("name")
         name : String = "",
@@ -78,10 +90,16 @@ interface RadioApi {
         hidebroken : Boolean = true,
 
         @Query("order")
-        sortBy : String = "votes",
+        sortBy : String,
 
         @Query("reverse")
-        isReversed : Boolean = true
+        isReversed : Boolean,
+
+        @Query("bitrateMin")
+        bitrateMin : Int,
+
+        @Query("bitrateMax")
+        bitrateMax : Int
 
     ) : Response<RadioStations>
 

@@ -180,8 +180,6 @@ class PagingRadioAdapter @Inject constructor(
 
     var alpha = 0.1f
 
-    var isNightMode = false
-
     override fun onViewRecycled(holder: RadioItemHolder) {
         super.onViewRecycled(holder)
         glide.clear(holder.bind.ivItemImage)
@@ -195,9 +193,9 @@ class PagingRadioAdapter @Inject constructor(
 
             tvSecondary.setTextColor(defaultSecondaryTextColor)
 
-            if(!isNightMode){
-                viewBottomSeparator.setBackgroundColor(separatorDefault)
-            }
+
+            viewBottomSeparator?.setBackgroundColor(separatorDefault)
+
 
 
         }
@@ -211,9 +209,9 @@ class PagingRadioAdapter @Inject constructor(
 
                tvSecondary.setTextColor(selectedSecondaryTextColor)
 
-                if(!isNightMode){
-                    viewBottomSeparator.setBackgroundResource(R.color.station_bottom_separator_active)
-                }
+
+               viewBottomSeparator?.setBackgroundResource(R.color.station_bottom_separator_active)
+
 
 
             }
@@ -225,9 +223,9 @@ class PagingRadioAdapter @Inject constructor(
 
                 tvSecondary.setTextColor(defaultSecondaryTextColor)
 
-                if(!isNightMode){
-                    viewBottomSeparator.setBackgroundResource(R.color.station_bottom_separator_selected)
-                }
+
+                viewBottomSeparator?.setBackgroundResource(R.color.station_bottom_separator_selected)
+
             }
         }
     }

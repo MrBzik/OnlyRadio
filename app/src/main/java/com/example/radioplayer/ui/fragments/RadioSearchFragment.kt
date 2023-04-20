@@ -27,15 +27,15 @@ import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
 import com.example.radioplayer.ui.animations.slideAnim
-import com.example.radioplayer.ui.dialogs.CountryPickerDialog
-import com.example.radioplayer.ui.dialogs.NameDialog
-import com.example.radioplayer.ui.dialogs.TagPickerDialog
+import com.example.radioplayer.ui.dialogs.*
 import com.example.radioplayer.utils.*
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 
 @AndroidEntryPoint
@@ -126,7 +126,19 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         observeNoResultDetector()
 
         setToolbar()
+
+
+        setSearchParamsFabClickListener()
     }
+
+    private fun setSearchParamsFabClickListener(){
+
+        bind.fabSearchOrder.setOnClickListener {
+            SearchParamsDialog(requireContext(), mainViewModel).show()
+        }
+
+    }
+
 
 
     private fun setToolbar(){
@@ -178,25 +190,35 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         mainViewModel.noResultDetection.observe(viewLifecycleOwner){noResult ->
 
-
             if(noResult){
-                bind.tvResultMessage.apply {
 
-                    val tagExact = if(mainViewModel.isTagExact) "(Exact)" else "(Not exact)"
-                    val nameExact = if(mainViewModel.isNameExact) "(Exact)" else "(Not exact)"
+                val tagExact = if(mainViewModel.isTagExact) "(Exact)" else ""
+                val nameExact = if(mainViewModel.isNameExact) "(Exact)" else ""
+
+                val tag = if(mainViewModel.lastSearchTag.isBlank()) ""
+                else "tag $tagExact: ${mainViewModel.lastSearchTag}\n\n"
+
+                val name = if(mainViewModel.lastSearchName.isBlank()) ""
+                else "name $nameExact: ${mainViewModel.lastSearchName}\n\n"
+
+                val country = if(mainViewModel.searchFullCountryName.isBlank()) ""
+                else "country: ${mainViewModel.searchFullCountryName}\n\n"
+
+                val language = if(!mainViewModel.isSearchFilterLanguage) ""
+                else "Language: ${Locale.getDefault().displayLanguage}\n\n"
+
+                val bitrateMin = if(mainViewModel.minBitrateOld == BITRATE_0) ""
+                else "Min bitrate: ${mainViewModel.minBitrateOld} kbps\n\n"
+
+                val bitrateMax = if(mainViewModel.maxBitrateOld == BITRATE_MAX) ""
+                else "Max bitrate: ${mainViewModel.maxBitrateOld} kbps"
+
+                val message = "No results for\n\n\n$tag$name$country$language$bitrateMin$bitrateMax"
+
+                bind.tvResultMessage.text = message
 
 
-                    val tag = mainViewModel.lastSearchTag.ifBlank { "not selected" }
-
-                    val name = mainViewModel.lastSearchName.ifBlank { "not selected" }
-
-                    val country = mainViewModel.searchFullCountryName.ifBlank { "not selected" }
-
-                    val message = "No results for\n\n\nname $nameExact: $name\n\ntag $tagExact: $tag\n\ncountry: $country"
-                    text = message
-
-                }
-            }   else bind.tvResultMessage.visibility = View.GONE
+            }   else bind.tvResultMessage.visibility = View.INVISIBLE
         }
     }
 
@@ -279,6 +301,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             Log.d("CHECKTAGS", it.url.toString())
 
+
+
         }
     }
 
@@ -300,8 +324,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                 alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
 
                 separatorDefault = ContextCompat.getColor(requireContext(), R.color.station_bottom_separator_default)
-
-                isNightMode = MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES
 
             }
 
@@ -371,7 +393,12 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 //                if(!isInitialLaunch){
 //                    launchRecyclerOutAnim()
 //                }
-                showLoadingResultsMessage()
+
+                if(!isInitialLaunch){
+                    showLoadingResultsMessage()
+                }
+
+
 
                 pagingRadioAdapter.submitData(it)
 

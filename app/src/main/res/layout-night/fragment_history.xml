@@ -22,9 +22,9 @@
         android:layout_width="wrap_content"
         android:layout_height="60dp"
         android:gravity="center"
-        android:text="History: All"
+        android:text="All dates"
         android:layout_marginStart="20dp"
-        android:textAppearance="@style/mainTextTitle"
+        android:textAppearance="@style/mainTextButtons"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         />
@@ -47,6 +47,21 @@
 
         />
 
+
+    <TextView
+        android:id="@+id/tvSelectedTab"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:text="Songs"
+        android:textAppearance="@style/mainTextTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineMiddle"
         android:layout_width="wrap_content"
@@ -61,7 +76,7 @@
         android:layout_width="wrap_content"
         android:layout_height="60dp"
         android:gravity="center"
-        android:text="Select date"
+        android:text="Stations"
         android:textAppearance="@style/mainTextButtons"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

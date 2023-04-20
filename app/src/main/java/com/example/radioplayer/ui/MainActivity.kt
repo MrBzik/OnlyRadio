@@ -51,9 +51,15 @@ import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.FAB_POSITION_X
 import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
+import com.example.radioplayer.utils.Constants.IS_NAME_EXACT
+import com.example.radioplayer.utils.Constants.IS_SEARCH_FILTER_LANGUAGE
+import com.example.radioplayer.utils.Constants.IS_TAG_EXACT
 import com.example.radioplayer.utils.Constants.SEARCH_FULL_COUNTRY_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
+import com.example.radioplayer.utils.Constants.SEARCH_PREF_MAX_BIT
+import com.example.radioplayer.utils.Constants.SEARCH_PREF_MIN_BIT
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
+import com.example.radioplayer.utils.Constants.SEARCH_PREF_ORDER
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
 import com.example.radioplayer.utils.RandomColors
 import com.example.radioplayer.utils.Utils
@@ -614,7 +620,7 @@ class MainActivity : AppCompatActivity() {
                 playingItem.radioStation.apply {
                     newName = name ?: "X"
                     newImage = favicon ?: ""
-                    val bits = if(bitrate == 0) "??? kbps" else "$bitrate kbps"
+                    val bits = if(bitrate == 0) "0? kbps" else "$bitrate kbps"
                     bindPlayer.tvBitrate.text = bits
 
                 }
@@ -731,6 +737,13 @@ class MainActivity : AppCompatActivity() {
             putString(SEARCH_PREF_NAME, mainViewModel.searchParamName.value)
             putString(SEARCH_PREF_COUNTRY, mainViewModel.searchParamCountry.value)
             putString(SEARCH_FULL_COUNTRY_NAME, mainViewModel.searchFullCountryName)
+            putString(SEARCH_PREF_ORDER, mainViewModel.newSearchOrder)
+            putBoolean(IS_NAME_EXACT, mainViewModel.isNameExact)
+            putBoolean(IS_TAG_EXACT, mainViewModel.isTagExact)
+            putInt(SEARCH_PREF_MIN_BIT, mainViewModel.minBitrateNew)
+            putInt(SEARCH_PREF_MAX_BIT, mainViewModel.maxBitrateNew)
+            putBoolean(IS_SEARCH_FILTER_LANGUAGE, mainViewModel.isSearchFilterLanguage)
+
 
 
         }.apply()
