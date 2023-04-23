@@ -5,6 +5,7 @@ import android.app.Service.STOP_FOREGROUND_LEGACY
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.core.text.isDigitsOnly
 import com.example.radioplayer.exoPlayer.RadioService
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.audio.AudioAttributes
@@ -21,7 +22,19 @@ class RadioPlayerEventListener (
 
         val withoutWalm = mediaMetadata.title.toString().replace("WALMRadio.com", "")
 
+
         RadioService.currentSongTitle.postValue(withoutWalm)
+
+        if(!radioService.isFromRecording){
+            if(withoutWalm.equals("NULL", ignoreCase = true) || withoutWalm.isBlank()
+                || withoutWalm.length < 3 || withoutWalm.isDigitsOnly() ||
+                        withoutWalm.equals("unknown", true)
+            ){
+
+            } else {
+                radioService.insertNewTitle(withoutWalm)
+            }
+        }
 
     }
 

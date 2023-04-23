@@ -28,7 +28,7 @@
     <color name="toolbar">#FFFFFF</color>
     <color name="Separator">#FFFFFF</color>
 
-    <color name="separatorLoad">#FC2E20</color>
+    <color name="separatorLoad">#B71C1C</color>
 
     <color name="Cursor">#000000</color>
 
@@ -111,7 +111,7 @@
     <color name="station_bottom_separator_active">#758EB7</color>
     <color name="station_bottom_separator_default">#14000000</color>
 
-
+    <color name="outlined_text_interactive_color">#FFFF99</color>
 
 
 </resources>

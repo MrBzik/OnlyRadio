@@ -5,28 +5,24 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
 import androidx.paging.*
-import com.example.radioplayer.adapters.datasources.HistoryDataSource
-import com.example.radioplayer.adapters.datasources.HistoryDateLoader
-import com.example.radioplayer.adapters.datasources.HistoryOneDateLoader
-import com.example.radioplayer.adapters.datasources.HistoryOneDateSource
+import com.example.radioplayer.adapters.datasources.*
 import com.example.radioplayer.adapters.models.StationWithDateModel
+import com.example.radioplayer.adapters.models.TitleWithDateModel
 import com.example.radioplayer.data.local.entities.HistoryDate
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.data.local.relations.StationDateCrossRef
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
+import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.utils.Constants.HISTORY_3_DATES
 import com.example.radioplayer.utils.Constants.HISTORY_OPTIONS
-import com.example.radioplayer.utils.Utils
+import com.example.radioplayer.utils.Constants.PAGE_SIZE
 import com.example.radioplayer.utils.Utils.fromDateToString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import java.sql.Date
 import java.util.*
@@ -199,7 +195,7 @@ class DatabaseViewModel @Inject constructor(
 
 
 
-     var initialDate: String = ""
+    var initialDate: String = ""
     private val calendar = Calendar.getInstance()
 
 
@@ -209,17 +205,26 @@ class DatabaseViewModel @Inject constructor(
         calendar.time = Date(newTime)
         val update = fromDateToString(calendar)
 
-        if (update == initialDate) {/*DO NOTHING*/
-        } else {
-            val check = repository.checkLastDateRecordInDB(update)
-            if (!check) {
-                initialDate = update
-                compareDatesWithPrefAndCLeanIfNeeded(HistoryDate(update, newTime))
+        if(initialDate.isBlank()){
+
+            val date = repository.getLastDate()
+            date?.let {
+                initialDate = it.date
+                RadioService.currentDateLong = it.time
             }
         }
 
-        repository.insertStationDateCrossRef(StationDateCrossRef(stationID, update))
-//        updateHistory.postValue(true)
+        if (update == initialDate) {/*DO NOTHING*/
+            Log.d("CHECKTAGS", "update is $update")
+        } else {
+            initialDate = update
+
+            RadioService.currentDateLong = newTime
+            compareDatesWithPrefAndCLeanIfNeeded(HistoryDate(update, newTime))
+        }
+
+         repository.insertStationDateCrossRef(StationDateCrossRef(stationID, update))
+
     }
 
 
@@ -230,6 +235,8 @@ class DatabaseViewModel @Inject constructor(
     var selectedDate = 0L
 
     private suspend fun getStationsInDate(limit: Int, offset: Int): List<StationWithDateModel> {
+
+        Log.d("CHECKTAGS", "getting all stations")
 
         val response = radioSource.getStationsInDate(limit, offset, initialDate)
 
@@ -248,9 +255,11 @@ class DatabaseViewModel @Inject constructor(
         return stationsWithDate
     }
 
-    private suspend fun getStationsInOneDate(time : Long) : List<StationWithDateModel> {
+    private suspend fun getStationsInOneDate() : List<StationWithDateModel> {
 
-        val response = radioSource.getStationsInOneDate(time)
+        Log.d("CHECKTAGS", "getting stations in one date")
+
+        val response = radioSource.getStationsInOneDate(selectedDate)
 
         val stationsWithDate: MutableList<StationWithDateModel> = mutableListOf()
 
@@ -260,6 +269,59 @@ class DatabaseViewModel @Inject constructor(
         return stationsWithDate
     }
 
+
+
+    private var lastTitleDate = 0L
+    private var isTitleHeaderSet = false
+    private var dateToString = ""
+
+    private suspend fun getTitlesInAllDates(pageIndex : Int, pageSize : Int) : List<TitleWithDateModel>{
+
+        Log.d("CHECKTAGS", "getting all titles")
+
+        val calendar = Calendar.getInstance()
+        val response = repository.getTitlesPage(pageIndex * PAGE_SIZE, pageSize)
+        val titlesWithDates: MutableList<TitleWithDateModel> = mutableListOf()
+
+        response.forEach { title ->
+
+            if(title.date != lastTitleDate){
+
+                if(isTitleHeaderSet) {
+                    titlesWithDates.add(TitleWithDateModel.TitleDateSeparatorEnclosing(dateToString))
+                }
+                calendar.time = Date(title.date)
+                dateToString = fromDateToString(calendar)
+                titlesWithDates.add(TitleWithDateModel.TitleDateSeparator(dateToString))
+                isTitleHeaderSet = true
+                lastTitleDate = title.date
+
+            }
+            titlesWithDates.add(TitleWithDateModel.TitleItem(title))
+        }
+
+        if(response.size < PAGE_SIZE && isTitleHeaderSet){
+            titlesWithDates.add(TitleWithDateModel.TitleDateSeparatorEnclosing(dateToString))
+            isTitleHeaderSet = false
+        }
+
+        return titlesWithDates
+    }
+
+
+    private suspend fun getTitlesInOneDate(pageIndex : Int, pageSize : Int): List<TitleWithDateModel> {
+
+        Log.d("CHECKTAGS", "getting titles in one date")
+
+        val response = repository.getTitlesInOneDatePage(pageIndex * PAGE_SIZE, pageSize, selectedDate)
+        val titlesWithDates: MutableList<TitleWithDateModel> = mutableListOf()
+
+        response.forEach { title ->
+            titlesWithDates.add(TitleWithDateModel.TitleItem(title))
+        }
+
+        return titlesWithDates
+    }
 
 
 
@@ -275,30 +337,82 @@ class DatabaseViewModel @Inject constructor(
 
 
 
+    var isHistoryInStationsTab = true
 
     private val allHistoryLoader : HistoryDateLoader = { dateIndex ->
         getStationsInDate(1, dateIndex)
     }
 
     private val oneDateHistoryLoader : HistoryOneDateLoader = {
-        getStationsInOneDate(selectedDate)
+        getStationsInOneDate()
+    }
+
+
+    private val allTitlesLoader : TitlesPageLoader = { pageIndex, pageSize ->
+        getTitlesInAllDates(pageIndex, pageSize)
+    }
+
+    private val oneDateTitleLoader : TitlesPageLoader = { pageIndex, pageSize ->
+        getTitlesInOneDate(pageIndex, pageSize)
     }
 
 
 
 
-
-
-     var historyFlow : LiveData<PagingData<StationWithDateModel>>?  = null
-
-
-
+    var historyFlow : LiveData<PagingData<StationWithDateModel>>?  = null
     private var oneDateHistoryFlow : LiveData<PagingData<StationWithDateModel>>?  = null
+
+    var titlesFlow : LiveData<PagingData<TitleWithDateModel>>? = null
+    private var oneDateTitlesFlow : LiveData<PagingData<TitleWithDateModel>>? = null
 
 
     val observableHistory = MediatorLiveData<PagingData<StationWithDateModel>>()
 
-    val isOneDateCalled : MutableLiveData<Boolean> = MutableLiveData(false)
+    val observableTitles = MediatorLiveData<PagingData<TitleWithDateModel>>()
+
+    val oneHistoryDateCaller : MutableLiveData<Boolean> = MutableLiveData(false)
+
+    val oneTitleDateCaller : MutableLiveData<Boolean> = MutableLiveData(false)
+
+    fun setTitlesLiveData(lifecycle: CoroutineScope){
+
+        titlesFlow = Pager(
+            config = PagingConfig(
+                pageSize = PAGE_SIZE,
+                initialLoadSize = PAGE_SIZE,
+                enablePlaceholders = false
+            ), pagingSourceFactory = {
+                TitlesDataSource(allTitlesLoader, PAGE_SIZE)
+            }
+        ).liveData.cachedIn(lifecycle)
+
+        oneDateTitlesFlow = Transformations.switchMap(oneTitleDateCaller){
+            Pager(
+                config = PagingConfig(
+                    pageSize = PAGE_SIZE,
+                    initialLoadSize = PAGE_SIZE,
+                    enablePlaceholders = false
+                ), pagingSourceFactory = {
+                    TitlesDataSource(oneDateTitleLoader, PAGE_SIZE)
+                }
+            ).liveData.cachedIn(lifecycle)
+        }
+
+
+        observableTitles.addSource(titlesFlow!!) { titles ->
+            if(selectedDate == 0L){
+                observableTitles.value = titles
+            }
+        }
+
+        observableTitles.addSource(oneDateTitlesFlow!!) { titles ->
+            if(selectedDate > 0L){
+                observableTitles.value = titles
+            }
+        }
+
+    }
+
 
     fun setHistoryLiveData(lifecycle: CoroutineScope){
 
@@ -312,7 +426,7 @@ class DatabaseViewModel @Inject constructor(
             }
         ).liveData.cachedIn(lifecycle)
 
-        oneDateHistoryFlow = Transformations.switchMap(isOneDateCalled){
+        oneDateHistoryFlow = Transformations.switchMap(oneHistoryDateCaller){
 
                Pager(
                     config = PagingConfig(
@@ -322,11 +436,9 @@ class DatabaseViewModel @Inject constructor(
                     pagingSourceFactory = {
                         HistoryOneDateSource(oneDateHistoryLoader)
                     }
-                ).liveData
+                ).liveData.cachedIn(lifecycle)
 
         }
-
-
 
         observableHistory.addSource(historyFlow!!) { history ->
             if(selectedDate == 0L){
@@ -351,13 +463,39 @@ class DatabaseViewModel @Inject constructor(
     }
 
 
+    fun getAllTitles(){
+
+        titlesFlow?.value?.let {
+            observableTitles.value = it
+        }
+
+    }
+
+
     fun cleanHistory(){
 
-        observableHistory.removeSource(historyFlow!!)
-        observableHistory.removeSource(oneDateHistoryFlow!!)
+        historyFlow?.let{
+            observableHistory.removeSource(it)
+        }
+        oneDateHistoryFlow?.let {
+            observableHistory.removeSource(it)
+        }
+
+       titlesFlow?.let {
+           observableTitles.removeSource(it)
+       }
+
+        oneDateTitlesFlow?.let {
+            observableTitles.removeSource(it)
+        }
 
         historyFlow = null
         oneDateHistoryFlow = null
+        titlesFlow = null
+        oneDateTitlesFlow = null
+
+        lastTitleDate = 0L
+        isTitleHeaderSet = false
 
     }
 
@@ -403,6 +541,7 @@ class DatabaseViewModel @Inject constructor(
             deleteList.forEach {
                 repository.deleteAllCrossRefWithDate(it.date)
                 repository.deleteDate(it)
+                repository.deleteTitlesWithDate(it.time)
             }
         }
 //            updateHistory.postValue(true)

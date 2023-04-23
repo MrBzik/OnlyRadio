@@ -82,11 +82,6 @@ class RecordingsAdapter @Inject constructor(
         return holder
     }
 
-    private fun convertLongToDate(time : Long) : String{
-        val date = Date(time)
-        val format = DateFormat.getDateTimeInstance()
-        return format.format(date)
-    }
 
     override fun onBindViewHolder(holder: RecordingItemHolder, @SuppressLint("RecyclerView") position: Int) {
 
@@ -95,7 +90,7 @@ class RecordingsAdapter @Inject constructor(
         holder.bind.apply {
 
             tvPrimary.text = recording.name
-            tvSecondary.text = convertLongToDate(recording.timeStamp)
+            tvSecondary.text = Utils.convertLongToDate(recording.timeStamp)
 
             val color = randColors.getColor()
             tvPlaceholder.setBackgroundColor(color)

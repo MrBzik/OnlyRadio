@@ -81,8 +81,8 @@ class MainActivity : AppCompatActivity() {
      var isStubPlayerBindInflated = false
 
     private val separatorAnimation : LoadingAnim by lazy { LoadingAnim(this,
-        bind.viewSeparatorStart, bind.viewSeparatorEnd,
-        bind.separatorLowest, bind.separatorSecond) }
+        bind.viewSeparatorStart!!, bind.viewSeparatorEnd!!,
+        bind.separatorLowest!!, bind.separatorSecond!!) }
 
     fun startSeparatorsLoadAnim(){
         separatorAnimation.startLoadingAnim()
@@ -166,8 +166,6 @@ class MainActivity : AppCompatActivity() {
 
         setupInitialNavigation()
 
-        observeInternetConnection()
-
         observeNewStation()
 
         setOnBottomNavClickListener()
@@ -175,8 +173,6 @@ class MainActivity : AppCompatActivity() {
         setOnBottomNavItemReselect()
 
         refreshSeparators()
-
-        handleSeparatorsVisibilityForUiMode()
 
 
 
@@ -188,16 +184,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun handleSeparatorsVisibilityForUiMode(){
-
-        if(uiMode == Configuration.UI_MODE_NIGHT_NO){
-//            bind.viewSeparatorStart.visibility = View.GONE
-//            bind.viewSeparatorEnd.visibility = View.GONE
-            bind.separatorSecond.visibility = View.GONE
-            bind.separatorLowest.visibility = View.GONE
-        }
-
-    }
 
 
     fun smoothDayNightFadeOut(isNightMode : Boolean){
@@ -208,10 +194,15 @@ class MainActivity : AppCompatActivity() {
                 startAnim(bindPlayer.root)
 
                 startAnim(bind.bottomNavigationView)
-                startAnim(bind.viewSeparatorStart)
-                startAnim(bind.viewSeparatorEnd)
-                startAnim(bind.separatorSecond)
-                startAnim(bind.separatorLowest)
+
+                bind.viewSeparatorStart?.let{
+                    startAnim(bind.viewSeparatorStart!!)
+                    startAnim(bind.viewSeparatorEnd!!)
+                    startAnim(bind.separatorSecond!!)
+                    startAnim(bind.separatorLowest!!)
+                }
+
+
 
         }
 
@@ -245,10 +236,10 @@ class MainActivity : AppCompatActivity() {
             bindPlayer.root.slideAnim(700, 0, R.anim.fade_in_anim)
 
         bind.bottomNavigationView.slideAnim(700, 0, R.anim.fade_in_anim)
-        bind.viewSeparatorStart.slideAnim(700, 0, R.anim.fade_in_anim)
-        bind.viewSeparatorEnd.slideAnim(700, 0, R.anim.fade_in_anim)
-        bind.separatorSecond.slideAnim(700, 0, R.anim.fade_in_anim)
-        bind.separatorLowest.slideAnim(700, 0, R.anim.fade_in_anim)
+        bind.viewSeparatorStart?.slideAnim(700, 0, R.anim.fade_in_anim)
+        bind.viewSeparatorEnd?.slideAnim(700, 0, R.anim.fade_in_anim)
+        bind.separatorSecond?.slideAnim(700, 0, R.anim.fade_in_anim)
+        bind.separatorLowest?.slideAnim(700, 0, R.anim.fade_in_anim)
 
         if(!isNightMode){
 
@@ -278,20 +269,12 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun refreshSeparators(){
-        if(!mainViewModel.isInitialLaunchOfTheApp){
+        if(!mainViewModel.isInitialLaunchOfTheApp && uiMode == Configuration.UI_MODE_NIGHT_YES){
             separatorAnimation.refresh()
         }
 
     }
 
-
-
-    private fun observeInternetConnection() {
-
-        mainViewModel.hasInternetConnection.observe(this){
-            bind.ivNoInternet.isVisible = !it
-        }
-    }
 
 
 
@@ -304,9 +287,6 @@ class MainActivity : AppCompatActivity() {
                 addToBackStack(null)
                 commit()
             }
-
-
-            mainViewModel.isInitialLaunchOfTheApp = false
         }
     }
 
@@ -415,7 +395,12 @@ class MainActivity : AppCompatActivity() {
                 if((bindPlayer.tvExpandHideText as TextView).text == resources.getString(R.string.Expand)) {
 
                     putFadeOutForDetailsFragment()
-                    endSeparatorsLoadAnim()
+
+
+                    if(uiMode == Configuration.UI_MODE_NIGHT_YES){
+                        endSeparatorsLoadAnim()
+                    }
+
 
                     supportFragmentManager.beginTransaction().apply {
 
@@ -428,7 +413,7 @@ class MainActivity : AppCompatActivity() {
                         commit()
                     }
 
-                    (bindPlayer.tvExpandHideText as TextView).setText(R.string.Hide)
+                    bindPlayer.tvExpandHideText.setText(R.string.Hide)
 
                 }
 
@@ -450,7 +435,9 @@ class MainActivity : AppCompatActivity() {
 
 
         if((item?.itemId ?: menuItem) != R.id.mi_radioSearchFragment){
-            endSeparatorsLoadAnim()
+            if(uiMode == Configuration.UI_MODE_NIGHT_YES){
+                endSeparatorsLoadAnim()
+            }
         }
 
 

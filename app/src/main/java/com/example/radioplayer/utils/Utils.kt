@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Configuration
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.ListPopupWindow
+import java.text.DateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -75,6 +76,49 @@ object Utils {
         result.append(", $year")
 
         return result.toString()
+    }
+
+
+    fun fromDateToStringShort (calendar: Calendar) : String {
+
+        val result = StringBuilder()
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        val month = calendar.get(Calendar.MONTH)
+
+
+        result.append("$day of ")
+        result.append(
+            when(month){
+                0 -> "Jan"
+                1 -> "Feb"
+                2 -> "Mar"
+                3 -> "Apr"
+                4 -> "May"
+                5 -> "Jun"
+                6 -> "Jul"
+                7 -> "Aug"
+                8 -> "Sep"
+                9 -> "Oct"
+                10 -> "Nov"
+                else -> "Dec"
+            }
+        )
+
+
+        return result.toString()
+    }
+
+
+     fun convertLongToDate(time : Long) : String {
+        val date = Date(time)
+        val format = DateFormat.getDateTimeInstance()
+        return format.format(date)
+    }
+
+    fun convertLongToDate(time : Long, isOnlyTime : Boolean) : String {
+        val date = Date(time)
+        val format = DateFormat.getTimeInstance()
+        return format.format(date)
     }
 
 

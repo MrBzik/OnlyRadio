@@ -19,7 +19,7 @@ class TextViewOutlined(context : Context, attrs : AttributeSet?) : AppCompatText
 
 
 
-//    private var _strokeColor = ContextCompat.getColor(context, R.color.outline_stroke)
+    private var interactiveColor = ContextCompat.getColor(context, R.color.outlined_text_interactive_color)
 
     private var _strokeColor = Color.WHITE
     private var _strokeWidth = 0.4f
@@ -27,7 +27,7 @@ class TextViewOutlined(context : Context, attrs : AttributeSet?) : AppCompatText
     var isSingleColor = false
 
     var colors = intArrayOf(
-        Color.WHITE, Color.RED
+        Color.WHITE, interactiveColor
     )
 
     fun setStrokeColor(color: Int) {

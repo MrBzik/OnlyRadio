@@ -243,7 +243,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
             isDeletingEnabled = !isDeletingEnabled
 
-            if(!isDeletingEnabled){
+            if(isDeletingEnabled){
 
                 (bind.tvEnableDeleting as TextView).setTextColor(ContextCompat.getColor(requireContext(), R.color.swipe_delete_on))
                 itemTouchHelper.attachToRecyclerView(bind.rvRecordings)

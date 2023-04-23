@@ -35,7 +35,7 @@
         android:gravity="center"
         android:layout_marginEnd="20dp"
         android:text="Swipe-delete"
-        android:textAppearance="@style/mainTextButtons"
+        android:textAppearance="@style/swipeDeleteStyle"
         android:textColor="@color/color_interactive"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

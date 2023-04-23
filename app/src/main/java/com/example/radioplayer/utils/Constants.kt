@@ -59,8 +59,8 @@ object Constants {
     const val SEARCH_FROM_RECORDINGS = 4
     const val PLAY_WHEN_READY = "play when ready"
 
-    const val DATE_FORMAT = "dd.MM.yyyy HH:mm"
 
+    // History
 
     const val HISTORY_OPTIONS = "History options"
     const val HISTORY_ONE_DAY = 1
@@ -69,6 +69,11 @@ object Constants {
     const val HISTORY_15_DATES = 15
     const val HISTORY_21_DATES = 21
     const val HISTORY_30_DATES = 30
+
+
+    const val FULL_DATE_FORMAT = "d 'of' MMMM', 'yyyy"
+
+    const val SHORT_DATE_FORMAT = "MMM, ', ' d"
 
 
 // Search preferences

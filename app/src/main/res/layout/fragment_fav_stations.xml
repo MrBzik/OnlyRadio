@@ -57,9 +57,9 @@
     <TextView
         android:id="@+id/tvFavouredTitle"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="16dp"
+        android:gravity="center"
         android:ellipsize="end"
 
 
@@ -70,8 +70,8 @@
     <TextView
         android:id="@+id/tvPlaylistName"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_height="60dp"
+        android:gravity="center"
         android:ellipsize="end"
         android:maxLines="1"
         android:textAlignment="center"
@@ -86,9 +86,9 @@
     <TextView
         android:id="@+id/tvPlaylistEdit"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="16dp"
+       android:gravity="center"
 
         android:textAppearance="@style/mainTextButtons"
 
@@ -99,8 +99,8 @@
     <TextView
         android:id="@+id/tvPlaylistsExpand"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_height="60dp"
+        android:gravity="center"
         android:text="Playlists"
         android:textAppearance="@style/mainTextButtons"
         app:layout_constraintEnd_toEndOf="parent"

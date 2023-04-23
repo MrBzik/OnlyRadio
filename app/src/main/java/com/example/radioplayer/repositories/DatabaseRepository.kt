@@ -2,10 +2,7 @@ package com.example.radioplayer.repositories
 
 
 import com.example.radioplayer.data.local.RadioDAO
-import com.example.radioplayer.data.local.entities.HistoryDate
-import com.example.radioplayer.data.local.entities.Playlist
-import com.example.radioplayer.data.local.entities.RadioStation
-import com.example.radioplayer.data.local.entities.Recording
+import com.example.radioplayer.data.local.entities.*
 import com.example.radioplayer.data.local.relations.StationDateCrossRef
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import javax.inject.Inject
@@ -83,6 +80,8 @@ class DatabaseRepository @Inject constructor(
     suspend fun insertStationDateCrossRef(stationDateCrossRef: StationDateCrossRef)
         = radioDAO.insertStationDateCrossRef(stationDateCrossRef)
 
+    suspend fun getLastDate() = radioDAO.getLastDate()
+
     val getListOfDates = radioDAO.getListOfDates()
 
     // For recyclerView
@@ -117,6 +116,15 @@ class DatabaseRepository @Inject constructor(
 
     suspend fun getAllStations() = radioDAO.getAllStations()
 
+
+    // Title
+
+    suspend fun getTitlesPage(offset: Int, limit: Int) = radioDAO.getTitlesPage(offset, limit)
+
+    suspend fun getTitlesInOneDatePage(offset: Int, limit: Int, date: Long) =
+        radioDAO.getTitlesInOneDatePage(offset, limit, date)
+
+    suspend fun deleteTitlesWithDate(time : Long) = radioDAO.deleteTitlesWithDate(time)
 
     // Recording
 

@@ -1,44 +1,46 @@
 package com.example.radioplayer.ui.fragments
 
+import android.app.SearchManager
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Spinner
 import android.widget.TextView
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.paging.PagingData
-import androidx.paging.map
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.HistoryDatesAdapter
 import com.example.radioplayer.adapters.PagingHistoryAdapter
+import com.example.radioplayer.adapters.TitleAdapter
 import com.example.radioplayer.data.local.entities.HistoryDate
 import com.example.radioplayer.databinding.FragmentHistoryBinding
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
+import com.example.radioplayer.ui.animations.objectSizeScaleAnimation
+import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.SpinnerExt
-import com.example.radioplayer.utils.TextViewOutlined
-import com.example.radioplayer.utils.Utils.dismiss
+import com.example.radioplayer.utils.Utils
 import com.example.radioplayer.utils.Utils.fromDateToString
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import java.sql.Date
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -48,19 +50,28 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 ) {
 
 
-    private var currentDate = ""
+    private var dateForAdapters = ""
 
     private lateinit var datesAdapter : HistoryDatesAdapter
 
     @Inject
     lateinit var glide : RequestManager
 
-    private val dateFormat = SimpleDateFormat("d 'of' MMM", Locale.getDefault())
+    private val calendar = Calendar.getInstance()
 
     private var isInitialLoad = true
 
+    private var stationsHistoryAdapter: PagingHistoryAdapter? = null
 
-    private  var historyAdapter: PagingHistoryAdapter? = null
+    private var titlesHistoryAdapter : TitleAdapter? = null
+
+    private var isStationsAdapterSet = false
+    private var isTitlesAdapterSet = false
+
+    private val clipBoard : ClipboardManager? by lazy {
+        ContextCompat.getSystemService(requireContext(), ClipboardManager::class.java)
+    }
+
 
     companion object{
 
@@ -77,40 +88,55 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         setupRecyclerView()
 
-        setAdapterLoadStateListener()
-
         observePlaybackState()
 
         setupAdapterClickListener()
 
         observeListOfDates()
 
-        setTvSelectDateClickListener()
+//        setTvSelectDateClickListener()
 
         setSpinnerOpenCloseListener()
 
-
-
         setToolbar()
 
+        setTitlesClickListener()
+
+        setStationsClickListener()
+
+        switchTitlesStationsUi(false)
 
     }
 
 
     private fun setToolbar(){
 
-        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
-            bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_history_trio_vector)
 
+        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
             val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_history_frag)
 //            val colorStatus = ContextCompat.getColor(requireContext(), R.color.status_bar_history_frag)
-
 
             (activity as MainActivity).apply {
                 window.navigationBarColor = color
                 window.statusBarColor = color
             }
 
+            bind.tvStationsUnSelected?.setOnClickListener {
+                bind.tvStations.performClick()
+            }
+            bind.tvTitlesUnselected?.setOnClickListener {
+                bind.tvTitles.performClick()
+            }
+
+            bind.viewSpinnerClickBox?.setOnTouchListener { v, event ->
+
+                if (event.action == MotionEvent.ACTION_DOWN){
+                    bind.tvSliderHeader.isPressed = true
+                bind.spinnerDates.performClick()
+                }
+
+                true
+            }
 
 //            (bind.tvSelectDate as TextViewOutlined).setColors(
 //                ContextCompat.getColor(requireContext(), R.color.text_button_history)
@@ -118,28 +144,51 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         } else {
             bind.viewToolbar.setBackgroundColor(Color.BLACK)
+            bind.tvSliderHeader.setOnClickListener {
+                bind.spinnerDates.performClick()
+            }
         }
     }
 
 
-    private fun setAdapterLoadStateListener(){
+    private fun setStationsAdapterLoadStateListener(){
 
-        historyAdapter?.addLoadStateListener {
+        stationsHistoryAdapter?.addLoadStateListener {
 
             if (it.refresh is LoadState.Loading ||
-                it.append is LoadState.Loading)
+                it.append is LoadState.Loading) { }
+            else {
 
-            {
+                if(isInitialLoad){
+                    bind.rvHistory.apply {
 
+                            Log.d("CHECKTAGS", "on layout")
+                            scrollToPosition(0)
+                            startLayoutAnimation()
+
+                    }
+                    isInitialLoad = false
+                }
             }
+        }
+    }
 
+    private fun setTitlesAdapterLoadStateListener(){
+
+        titlesHistoryAdapter?.addLoadStateListener {
+
+            if (it.refresh is LoadState.Loading ||
+                it.append is LoadState.Loading) { }
             else {
 
                 if(isInitialLoad){
 
                     bind.rvHistory.apply {
-                        scrollToPosition(0)
-                        startLayoutAnimation()
+
+                            Log.d("CHECKTAGS", "child animate")
+                            scrollToPosition(0)
+                            startLayoutAnimation()
+
                     }
                     isInitialLoad = false
                 }
@@ -149,32 +198,59 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
 
 
+    private fun setRvLoadChildrenListener(){
+
+        bind.rvHistory.addOnChildAttachStateChangeListener(
+           object : RecyclerView.OnChildAttachStateChangeListener{
+               override fun onChildViewAttachedToWindow(view: View) {
+
+                   if(isInitialLoad){
+
+                       bind.rvHistory.apply {
+
+                               scrollToPosition(0)
+                               startLayoutAnimation()
+
+                       }
+                       isInitialLoad = false
+                   }
+
+               }
+
+               override fun onChildViewDetachedFromWindow(view: View) {
+
+               }
+           }
+        )
+
+    }
+
+
     private fun setSpinnerOpenCloseListener(){
 
         bind.spinnerDates.setSpinnerEventsListener( object : SpinnerExt.OnSpinnerEventsListener{
             override fun onSpinnerOpened(spinner: Spinner?) {
 
-                (bind.tvSelectDate as TextView).
-                   setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_playlists_arrow_shrink,0)
+                bind.tvShrinkArrow?.
+                    setCompoundDrawablesWithIntrinsicBounds(0, 0,
+                        R.drawable.ic_playlists_arrow_shrink,0)
+
+
+
             }
 
             override fun onSpinnerClosed(spinner: Spinner?) {
-                (bind.tvSelectDate as TextView).
-                setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_playlists_arrow_expand,0)
+                bind.tvShrinkArrow?.
+                setCompoundDrawablesWithIntrinsicBounds(0, 0,
+                    R.drawable.ic_playlists_arrow_expand,0)
             }
         })
     }
 
 
-    private fun setTvSelectDateClickListener(){
 
-        bind.tvSelectDate.setOnClickListener {
 
-            bind.spinnerDates.performClick()
 
-            it.isPressed = true
-        }
-    }
 
     private fun setupDatesSpinner(list : List<HistoryDate>){
 
@@ -242,18 +318,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                     setSliderHeaderText(item.time)
 
-                    isInitialLoad = true
-
                     databaseViewModel.selectedDate = item.time
 
-                    if(position == 0){
-                        databaseViewModel.getAllHistory()
-                    } else {
-                        databaseViewModel.isOneDateCalled.postValue(true)
-                    }
-
-
-
+                    loadHistory(true)
 //
 //                    if(position == 0){
 //                        databaseViewModel.updateHistory.postValue(true)
@@ -267,12 +334,46 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
+    }
 
+
+    private fun loadHistory(isSameTab : Boolean = false){
+
+        databaseViewModel.apply {
+
+            if(!isHistoryInStationsTab && isSameTab){
+                titlesHistoryAdapter?.submitData(lifecycle, PagingData.empty())
+            }
+
+            if(selectedDate == 0L){
+                if(isHistoryInStationsTab){
+                    getAllHistory()
+                } else {
+                    getAllTitles()
+                }
+
+            } else {
+                if(isHistoryInStationsTab){
+                    oneHistoryDateCaller.postValue(true)
+                } else {
+                    oneTitleDateCaller.postValue(true)
+                }
+            }
+        }
+
+        isInitialLoad = true
     }
 
     private fun setSliderHeaderText(time : Long){
-        if(time == 0L) bind.tvSliderHeader.text = "All dates"
-        else bind.tvSliderHeader.text = dateFormat.format(time)
+        if(time == 0L) (bind.tvSliderHeader as TextView).text = "All dates"
+
+        else{
+            calendar.time = Date(time)
+
+           val date = Utils.fromDateToStringShort(calendar)
+
+            (bind.tvSliderHeader as TextView).text = date
+        }
     }
 
 
@@ -282,15 +383,15 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 when{
                     it.isPlaying -> {
-                        historyAdapter?.currentPlaybackState = true
+                        stationsHistoryAdapter?.currentPlaybackState = true
 
-                            historyAdapter?.updateStationPlaybackState()
+                            stationsHistoryAdapter?.updateStationPlaybackState()
 
                     }
                     it.isPlayEnabled -> {
-                        historyAdapter?.currentPlaybackState = false
+                        stationsHistoryAdapter?.currentPlaybackState = false
 
-                            historyAdapter?.updateStationPlaybackState()
+                            stationsHistoryAdapter?.updateStationPlaybackState()
 
                     }
                 }
@@ -304,17 +405,34 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         bind.rvHistory.apply {
 
-            historyAdapter = PagingHistoryAdapter(glide)
 
-            adapter = historyAdapter
             layoutManager = LinearLayoutManager(requireContext())
             edgeEffectFactory = BounceEdgeEffectFactory()
-
-            setHasFixedSize(true)
-
             itemAnimator = null
+            layoutAnimation = (activity as MainActivity).layoutAnimationController
 
-            historyAdapter?.apply {
+            setRvLoadChildrenListener()
+
+            if(databaseViewModel.isHistoryInStationsTab){
+                setStationsHistoryAdapter()
+            } else {
+                setTitlesHistoryAdapter()
+            }
+        }
+
+    }
+
+    private fun setStationsHistoryAdapter(){
+
+        if(!isStationsAdapterSet){
+
+            stationsHistoryAdapter = PagingHistoryAdapter(glide)
+
+            setStationsAdapterLoadStateListener()
+
+            stationsHistoryAdapter?.apply {
+
+                currentDate = dateForAdapters
                 defaultTextColor = ContextCompat.getColor(requireContext(), R.color.default_text_color)
                 selectedTextColor = ContextCompat.getColor(requireContext(), R.color.selected_text_color)
 
@@ -325,37 +443,156 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 separatorDefault = ContextCompat.getColor(requireContext(), R.color.station_bottom_separator_default)
 
-                    mainViewModel.currentRadioStation.value?.let {
-                        val id =  it.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)
-                        currentRadioStationID = id
-                    }
+                mainViewModel.currentRadioStation.value?.let {
+                    val id =  it.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)
+                    currentRadioStationID = id
+                }
 
             }
 
-            layoutAnimation = (activity as MainActivity).layoutAnimationController
+            databaseViewModel.setHistoryLiveData(viewLifecycleOwner.lifecycleScope)
 
-//            post {
-//                    scheduleLayoutAnimation()
-//                }
-
+            isStationsAdapterSet = true
         }
 
+
+        bind.rvHistory.apply {
+            adapter = stationsHistoryAdapter
+            setHasFixedSize(true)
+        }
+    }
+
+    private fun setTitlesHistoryAdapter(){
+
+        if(!isTitlesAdapterSet){
+            titlesHistoryAdapter = TitleAdapter(glide)
+            setTitlesAdapterLoadStateListener()
+            titlesHistoryAdapter?.apply {
+                currentDate = dateForAdapters
+                alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
+                setOnClickListener { title ->
+                    val clip = ClipData.newPlainText("label", title.title)
+                    clipBoard?.setPrimaryClip(clip)
+
+                    Snackbar.make(
+                        requireActivity().findViewById(R.id.rootLayout),
+                        "Title copied", Snackbar.LENGTH_LONG).apply {
+                        setAction("SEARCH"){
+                            val intent = Intent(Intent.ACTION_WEB_SEARCH)
+                            intent.putExtra(SearchManager.QUERY, title.title)
+                            startActivity(intent)
+                        }
+                    }.show()
+                }
+            }
+            databaseViewModel.setTitlesLiveData(lifecycleScope)
+            isTitlesAdapterSet = true
+        }
+
+        bind.rvHistory.apply {
+            adapter = titlesHistoryAdapter
+            setHasFixedSize(false)
+        }
+    }
+
+
+    private fun setTitlesClickListener(){
+
+        bind.tvTitles.setOnClickListener {
+
+            if(databaseViewModel.isHistoryInStationsTab){
+
+                setTitlesHistoryAdapter()
+
+                if(databaseViewModel.selectedDate != 0L){
+                    titlesHistoryAdapter?.submitData(lifecycle, PagingData.empty())
+                }
+
+                databaseViewModel.isHistoryInStationsTab = false
+
+                switchTitlesStationsUi(true)
+
+                loadHistory()
+
+            }
+        }
+    }
+
+    private fun setStationsClickListener(){
+
+        bind.tvStations.setOnClickListener {
+
+            if(!databaseViewModel.isHistoryInStationsTab){
+
+                setStationsHistoryAdapter()
+
+                if(databaseViewModel.selectedDate != 0L){
+                    stationsHistoryAdapter?.submitData(lifecycle, PagingData.empty())
+                }
+
+                databaseViewModel.isHistoryInStationsTab = true
+
+                switchTitlesStationsUi(true)
+
+                loadHistory()
+            }
+        }
+    }
+
+    private fun switchTitlesStationsUi(isToAnimate : Boolean){
+
+        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
+            if(databaseViewModel.isHistoryInStationsTab){
+                bind.tvStations.setTextAppearance(R.style.selectedTitle)
+                bind.tvTitles.setTextAppearance(R.style.unselectedTitle)
+
+                if(isToAnimate){
+                    bind.tvStations.objectSizeScaleAnimation(15f, 18f)
+                    bind.tvTitles.objectSizeScaleAnimation(18f, 15f)
+                }
+
+            } else {
+                bind.tvStations.setTextAppearance(R.style.unselectedTitle)
+                bind.tvTitles.setTextAppearance(R.style.selectedTitle)
+
+                if(isToAnimate){
+                    bind.tvStations.objectSizeScaleAnimation(18f, 15f)
+                    bind.tvTitles.objectSizeScaleAnimation(15f, 18f)
+                }
+
+            }
+        } else {
+
+            if(databaseViewModel.isHistoryInStationsTab){
+                bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_history_stations_protected)
+                bind.tvStationsUnSelected?.visibility = View.INVISIBLE
+                bind.tvTitlesUnselected?.visibility = View.VISIBLE
+
+            } else {
+                bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_history_titles_protected)
+
+
+                bind.tvStationsUnSelected?.visibility = View.VISIBLE
+                bind.tvTitlesUnselected?.visibility = View.INVISIBLE
+            }
+        }
     }
 
 
 
     private fun subscribeToHistory(){
 
-        databaseViewModel.setHistoryLiveData(viewLifecycleOwner.lifecycleScope)
-
             databaseViewModel.observableHistory.observe(viewLifecycleOwner){
 
-                historyAdapter?.currentDate = currentDate
-                viewLifecycleOwner.lifecycleScope.launch{
-
-                historyAdapter?.submitData(it)
+                stationsHistoryAdapter?.submitData(lifecycle, it)
             }
 
+
+        databaseViewModel.observableTitles.observe(viewLifecycleOwner){
+
+            titlesHistoryAdapter?.submitData(lifecycle, it)
+
+        }
 
 //            databaseViewModel.historyFlow.collectLatest {
 //
@@ -365,29 +602,26 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 //                historyAdapter.submitData(it)
 //
 //            }
-        }
 
     }
 
     private fun setupAdapterClickListener(){
 
-        historyAdapter?.setOnClickListener {
+        stationsHistoryAdapter?.setOnClickListener {
 
             mainViewModel.playOrToggleStation(it, SEARCH_FROM_HISTORY)
+            databaseViewModel.checkDateAndUpdateHistory(it.stationuuid)
 
         }
     }
 
 
-
-
     private fun updateCurrentDate(){
 
         val time = System.currentTimeMillis()
-        val calendar = Calendar.getInstance()
         calendar.time = Date(time)
         val parsedDate = fromDateToString(calendar)
-        currentDate =  parsedDate
+        dateForAdapters =  parsedDate
 
     }
 
@@ -397,8 +631,11 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         databaseViewModel.cleanHistory()
         isNewHistoryQuery = true
         isInitialLoad = true
+        isStationsAdapterSet = false
+        isTitlesAdapterSet = false
         bind.rvHistory.adapter = null
-        historyAdapter = null
+        stationsHistoryAdapter = null
+        titlesHistoryAdapter = null
         _bind = null
     }
 

@@ -31,3 +31,4 @@ fun View.fadeOut(duration: Long, startAlpha: Float, oldPosition : Int, checkVali
             checkValidness(oldPosition)
     }
 }
+

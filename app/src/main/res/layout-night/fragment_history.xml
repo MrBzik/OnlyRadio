@@ -21,15 +21,29 @@
         android:id="@+id/tvSliderHeader"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
+        android:layout_marginStart="10dp"
         android:gravity="center"
         android:text="All dates"
-        android:layout_marginStart="20dp"
         android:textAppearance="@style/mainTextButtons"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:drawableEndCompat="@drawable/ic_playlists_arrow_expand"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline66"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
+    <View
+        android:layout_width="2dp"
+        android:layout_height="60dp"
+        android:background="@drawable/gradient_for_separators"
+        app:layout_constraintStart_toStartOf="@id/guideline33"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <View
+        android:layout_width="2dp"
+        android:layout_height="60dp"
+        android:background="@drawable/gradient_for_separators"
+        app:layout_constraintStart_toStartOf="@id/guideline66"
+        app:layout_constraintTop_toTopOf="parent"/>
 
 
     <com.example.radioplayer.utils.SpinnerExt
@@ -41,23 +55,23 @@
         android:elevation="-1dp"
         android:popupElevation="-20dp"
         style="@style/listPopupWindow"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/guidelineMiddle"
+        app:layout_constraintStart_toStartOf="@id/guidelineMiddle"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
 
         />
 
 
     <TextView
-        android:id="@+id/tvSelectedTab"
-        android:layout_width="wrap_content"
+        android:id="@+id/tvTitles"
+        android:layout_width="0dp"
         android:layout_height="60dp"
         android:gravity="center"
-        android:text="Songs"
-        android:textAppearance="@style/mainTextTitle"
-        app:layout_constraintStart_toStartOf="parent"
+        android:text="Titles"
+        android:textAppearance="@style/unselectedTitle"
+        app:layout_constraintStart_toStartOf="@id/guideline33"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline66"
         />
 
 
@@ -72,15 +86,17 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/tvSelectDate"
-        android:layout_width="wrap_content"
+        android:id="@+id/tvStations"
+        android:layout_width="0dp"
         android:layout_height="60dp"
         android:gravity="center"
         android:text="Stations"
-        android:textAppearance="@style/mainTextButtons"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:drawableEndCompat="@drawable/ic_playlists_arrow_expand" />
+        android:textAppearance="@style/selectedTitle"
+        app:layout_constraintEnd_toEndOf="@id/guideline33"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+<!--    app:drawableEndCompat="@drawable/ic_playlists_arrow_expand"-->
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -97,6 +113,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5" />
+
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline33"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.33" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline66"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.66" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

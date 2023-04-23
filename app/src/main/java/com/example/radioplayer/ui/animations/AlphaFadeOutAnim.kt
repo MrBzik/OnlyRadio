@@ -12,7 +12,7 @@ class AlphaFadeOutAnim(
 
     fun startAnim(view: View){
         anim.addUpdateListener {
-            view.alpha = anim.animatedValue as Float
+            view?.alpha = anim.animatedValue as Float
         }
 
         anim.duration = duration

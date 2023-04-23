@@ -16,15 +16,19 @@ class HistoryDataSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, StationWithDateModel> {
 
         val dateIndex = params.key ?: 0
-
+        Log.d("CHECKTAGS", "history1")
         var pagesLoaded = 1
 
         return try {
+
+            Log.d("CHECKTAGS", "history2")
 
             val stations = loader(dateIndex).toMutableList()
 
             if(HistoryFragment.isNewHistoryQuery){
                 while(stations.size < 9 && HistoryFragment.numberOfDates > pagesLoaded){
+
+                    Log.d("CHECKTAGS", "history3")
 
                     val moreStations = loader(dateIndex+pagesLoaded)
 
@@ -34,11 +38,15 @@ class HistoryDataSource(
 
                     pagesLoaded += 1
 
+
+
                  }
 
 
                 HistoryFragment.isNewHistoryQuery = false
             }
+
+
 
             LoadResult.Page(
                 data = stations,

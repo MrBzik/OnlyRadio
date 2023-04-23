@@ -28,6 +28,7 @@ import androidx.media.MediaBrowserServiceCompat
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.entities.Recording
+import com.example.radioplayer.data.local.entities.Title
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlaybackPreparer
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerNotificationListener
@@ -136,7 +137,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private var isPlayerInitialized = false
 
-    private var isFromRecording = false
+    var isFromRecording = false
 
 
     private val recordingCheck : SharedPreferences by lazy {
@@ -152,6 +153,8 @@ class RadioService : MediaBrowserServiceCompat() {
     }
 
     companion object{
+
+        var currentDateLong : Long = 0
 
         val currentSongTitle = MutableLiveData<String>()
         val recordingPlaybackPosition = MutableLiveData<Long>()
@@ -191,46 +194,6 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
 
-//
-//    fun providesLameRendersFactory() = object : DefaultRenderersFactory(this@RadioService){
-//        override fun buildAudioSink(
-//            context: Context,
-//            enableFloatOutput: Boolean,
-//            enableAudioTrackPlaybackParams: Boolean,
-//            enableOffload: Boolean
-//        ): AudioSink {
-//            return DefaultAudioSink.Builder()
-//                .setAudioCapabilities(AudioCapabilities(intArrayOf(AudioFormat.ENCODING_PCM_8BIT), 1))
-//                .setAudioProcessorChain(DefaultAudioSink
-//                    .DefaultAudioProcessorChain(exoRecord.exoRecordProcessor))
-//                .setEnableFloatOutput(false)
-//                .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
-//                .build()
-//
-//        }
-//    }
-
-
-
-
-
-
-//    private val defaultExoPlayer : ExoPlayer by lazy{
-//
-//        ExoPlayer.Builder(this@RadioService, providesLameRendersFactory())
-//            .setAudioAttributes(providesAudioAttributes(), true)
-//            .setHandleAudioBecomingNoisy(true)
-//            .build().apply {
-//                addListener(radioPlayerEventListener)
-//            }
-//    }
-//
-//
-
-
-//    private val effectReverb : PresetReverb by lazy {
-//        PresetReverb(1, 0)
-//    }
 
     private val environmentalReverb : EnvironmentalReverb by lazy {
         EnvironmentalReverb(1, 0)
@@ -439,6 +402,29 @@ class RadioService : MediaBrowserServiceCompat() {
 
     }
 
+
+    fun insertNewTitle(title: String){
+
+        serviceScope.launch(Dispatchers.IO){
+
+            val stationName = currentStation?.getString(METADATA_KEY_TITLE) ?: ""
+            val stationUri = currentStation?.getString(METADATA_KEY_DISPLAY_ICON_URI) ?: ""
+
+
+            radioSource.insertNewTitle(Title(
+               timeStamp = System.currentTimeMillis(),
+               date = currentDateLong,
+               title = title,
+               stationName = stationName,
+               stationIconUri = stationUri
+            ))
+
+        }
+
+    }
+
+
+
      fun fadeInPlayer(){
         val anim = ValueAnimator.ofFloat(0f, 1f)
 
@@ -598,22 +584,9 @@ class RadioService : MediaBrowserServiceCompat() {
 
             playFromUri(uri, isToPlay)
         }
-
     }
 
 
-//    private fun changeToBadPlayer(){
-//
-//        exoPlayer = defaultExoPlayer
-
-//        exoPlayer.clearMediaItems()
-//        exoPlayer.stop()
-//
-//        mediaSessionConnector.setPlayer(exoPlayer)
-//
-//        goodExoPlayer.stop()
-//        goodExoPlayer.clearMediaItems()
-//    }
 
 
     private fun checkRecordingAndRecoverIfNeeded(){
@@ -806,46 +779,6 @@ class RadioService : MediaBrowserServiceCompat() {
 
             convertRecording(record.filePath, recSampleRate, recChannelsCount, System.currentTimeMillis(), duration)
 
-
-//                val wavFilePath = this@RadioService.filesDir.absolutePath + File.separator + record.filePath
-//                val output = this@RadioService.filesDir.absolutePath + File.separator + record.filePath.split(".").first() + ".ogg"
-
-
-//                val command = arrayOf( "-i", wavFilePath,
-//                    "-ac", recChannelsCount.toString(),"-acodec",
-//                    "libvorbis",
-//                    output)
-//
-//
-//                FFmpegKit.executeWithArgumentsAsync(command
-//                ) { session ->
-//
-//                    if(session.returnCode.isValueSuccess) {
-//                     Log.d("CHECKTAGS", "success")
-//
-//
-//                        CoroutineScope(Dispatchers.IO).launch {
-//
-//                            try {
-//
-//                                insertNewRecording(
-//                                    record.filePath.split(".").first() + ".ogg",
-//                                    System.currentTimeMillis(),
-//                                    duration
-//                                )
-////                                deleteFile(record.filePath)
-//                                isConverterWorking = false
-//                                radioSource.exoRecordFinishConverting.postValue(true)
-//                            } catch (e: java.lang.Exception){
-//                                Log.d("CHECKTAGS", e.stackTraceToString())
-//                            }
-//                        }
-//
-//                    } else if(session.returnCode.isValueError){
-//                        Log.d("CHECKTAGS", "error")
-//                    }
-//                }
-
         }
     }
 
@@ -995,80 +928,6 @@ class RadioService : MediaBrowserServiceCompat() {
         exoPlayer.playbackParameters = params
 
 
-
-
-//        reverb.preset = PresetReverb.PRESET_LARGEHALL
-//
-//        reverb.enabled = true
-//
-//        exoPlayer.setAuxEffectInfo(AuxEffectInfo(reverb.id, 1.0f))
-
-
-//        serviceScope.launch {
-//
-//            delay(10000)
-//
-//
-//
-//
-//            delay(20000)
-//
-//            reverb.enabled = false
-//            reverb.release()
-//
-//            exoPlayer.clearAuxEffectInfo()
-//
-//
-//        }
-
-
-
-//        val bassboost = BassBoost(1, exoPlayer.audioSessionId)
-//
-//        bassboost.setStrength(1000)
-
-//        val virtualizer = Virtualizer(1, exoPlayer.audioSessionId)
-//
-//        virtualizer.setStrength(1000)
-
-//
-//        serviceScope.launch {
-//
-//            delay(10000)
-//
-//            virtualizer.enabled = true
-//
-//            delay(20000)
-//
-//            virtualizer.enabled = false
-//            virtualizer.release()
-//
-//
-//
-//        }
-
-
-
-
-//        serviceScope.launch {
-//
-//            delay(20000)
-//            exoPlayer.setAuxEffectInfo(AuxEffectInfo(bassboost.id, 1.0f))
-//            bassboost.enabled = true
-//
-//            Log.d("CHECKTAGS", "enabled")
-//
-//
-//            delay(40000)
-//            exoPlayer.clearAuxEffectInfo()
-//            bassboost.enabled = false
-//            bassboost.release()
-//
-//            Log.d("CHECKTAGS", "disabled")
-//        }
-
-
-//        exoPlayer.setAuxEffectInfo(AuxEffectInfo(reverb.id, 1.0f))
 
         exoPlayer.setMediaSource(mediaSource)
 

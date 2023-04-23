@@ -7,10 +7,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.example.radioplayer.data.local.entities.HistoryDate
-import com.example.radioplayer.data.local.entities.Playlist
-import com.example.radioplayer.data.local.entities.RadioStation
-import com.example.radioplayer.data.local.entities.Recording
+import com.example.radioplayer.data.local.entities.*
 import com.example.radioplayer.data.local.relations.DateWithStations
 import com.example.radioplayer.data.local.relations.PlaylistWithStations
 import com.example.radioplayer.data.local.relations.StationDateCrossRef
@@ -100,6 +97,9 @@ interface  RadioDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStationDateCrossRef(stationDateCrossRef: StationDateCrossRef)
 
+    @Query("SELECT * FROM HistoryDate ORDER BY time DESC LIMIT 1")
+    suspend fun getLastDate() : HistoryDate?
+
     // For recyclerView
 
     @Transaction
@@ -146,6 +146,20 @@ interface  RadioDAO {
     @Query("SELECT COUNT(stationuuid) FROM RadioStation")
     suspend fun getAllStations() : Int
 
+
+    // Title
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertNewTitle(title : Title)
+
+    @Query("SELECT * FROM Title ORDER BY timeStamp DESC LIMIT :limit OFFSET :offset")
+    suspend fun getTitlesPage(offset: Int, limit: Int) : List<Title>
+
+    @Query("SELECT * FROM Title WHERE date =:date ORDER BY timeStamp DESC LIMIT :limit OFFSET :offset")
+    suspend fun getTitlesInOneDatePage(offset: Int, limit: Int, date: Long) : List<Title>
+
+    @Query("DELETE FROM Title WHERE date =:time")
+    suspend fun deleteTitlesWithDate(time : Long)
 
     // Recordings
 

@@ -5,16 +5,16 @@
             <shape android:shape="rectangle">
                 <gradient
                     android:centerColor="@color/Separator"
-                    android:startColor="@color/main_background"
+                    android:startColor="@color/black"
                     android:endColor="@color/Separator"
-
+                    android:angle="180"
                     />
             </shape>
         </inset>
     </item>
-    <item  android:end="2dp" android:bottom="2dp">
+    <item  android:bottom="2dp" android:start="2dp">
         <shape android:shape="rectangle">
-            <solid android:color="@color/main_background" />
+            <solid android:color="@color/black" />
         </shape>
     </item>
     <item>
@@ -22,7 +22,7 @@
             <gradient
                 android:centerColor="@color/transparent"
                 android:startColor="#14AA4D06"
-                android:endColor="@color/main_background"
+                android:endColor="@color/black"
                 android:angle="90"/>
         </shape>
     </item>

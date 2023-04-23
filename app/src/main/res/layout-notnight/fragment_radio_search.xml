@@ -68,28 +68,6 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <!--    <ImageView-->
-    <!--        android:id="@+id/ivCountry"-->
-    <!--        android:layout_width="40dp"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginStart="-20dp"-->
-    <!--        android:layout_marginTop="10dp"-->
-    <!--        android:src="@drawable/flagzz"-->
-    <!--        android:visibility="invisible"-->
-    <!--        app:layout_constraintStart_toEndOf="@id/guidelineMiddle"-->
-    <!--        app:layout_constraintTop_toTopOf="parent" />-->
-
-
-    <!--    <ImageView-->
-    <!--        android:id="@+id/ivArrowCountry"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginTop="16dp"-->
-    <!--        android:src="@drawable/ic_arrow_drop_down"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent" />-->
-
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
@@ -112,6 +90,26 @@
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 
+
+    <TextView
+        android:id="@+id/tvLoading"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="40dp"
+        android:fontFamily="@font/aldrich"
+        android:textSize="20sp"
+        android:textColor="@color/transparent"
+        android:text="Waiting for response from servers..."
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
+    
+
+
+
     <TextView
         android:id="@+id/tvResultMessage"
         android:layout_width="0dp"
@@ -126,6 +124,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5" />
+
+
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -184,7 +184,27 @@
         app:layout_constraintGuide_percent="0.5" />
 
 
+    <ImageView
+        android:id="@+id/ivNoInternet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_no_intenet"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
 
+    <androidx.core.widget.ContentLoadingProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="-7dp"
+        android:indeterminate="true"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

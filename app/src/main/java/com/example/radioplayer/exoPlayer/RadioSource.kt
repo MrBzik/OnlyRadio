@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.entities.Recording
+import com.example.radioplayer.data.local.entities.Title
 import com.example.radioplayer.data.local.relations.DateWithStations
 import com.example.radioplayer.data.remote.RadioApi
 import com.example.radioplayer.data.remote.entities.*
@@ -52,6 +53,8 @@ class RadioSource @Inject constructor(
 
     suspend fun insertRecording(recording : Recording) = radioDAO.insertRecording(recording)
     suspend fun deleteRecording(recId : String) = radioDAO.deleteRecording(recId)
+
+    suspend fun insertNewTitle(title : Title) = radioDAO.insertNewTitle(title)
 
 
     suspend fun getStationsInDate(limit: Int, offset: Int, initialDate: String): DateWithStations {

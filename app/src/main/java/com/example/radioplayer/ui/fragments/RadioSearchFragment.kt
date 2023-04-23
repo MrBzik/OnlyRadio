@@ -8,7 +8,6 @@ import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE
 import android.util.Log
 import android.view.DragEvent
 import android.view.View
-import android.view.animation.Animation
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnLayout
@@ -17,7 +16,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
 import com.example.radioplayer.adapters.models.TagWithGenre
@@ -25,7 +23,7 @@ import com.example.radioplayer.databinding.FragmentRadioSearchBinding
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
-import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
+import com.example.radioplayer.ui.animations.TextLoadAnim
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.*
 import com.example.radioplayer.utils.*
@@ -50,6 +48,10 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     @Inject
     lateinit var pagingRadioAdapter : PagingRadioAdapter
+
+    private var textLoadAnim : TextLoadAnim? = null
+
+    private var isToShowLoadingMessage = false
 
 
     companion object {
@@ -127,8 +129,16 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         setToolbar()
 
-
         setSearchParamsFabClickListener()
+
+        observeInternetConnection()
+
+        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
+            textLoadAnim = TextLoadAnim(
+                requireContext(), bind.tvLoading!!)
+        }
+
+
     }
 
     private fun setSearchParamsFabClickListener(){
@@ -174,8 +184,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 //                setStrokeWidth(3.5f)
 //            }
 
-//            bind.tvSeparatorFirst.visibility = View.GONE
-//            bind.tvSeparatorSecond.visibility = View.GONE
 
 
         }
@@ -214,6 +222,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                 else "Max bitrate: ${mainViewModel.maxBitrateOld} kbps"
 
                 val message = "No results for\n\n\n$tag$name$country$language$bitrateMin$bitrateMax"
+
+                bind.tvResultMessage.visibility = View.VISIBLE
 
                 bind.tvResultMessage.text = message
 
@@ -348,33 +358,46 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             {
 
-            (activity as MainActivity).startSeparatorsLoadAnim()
+                if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
+                    (activity as MainActivity).startSeparatorsLoadAnim()
+                } else {
+
+                    Log.d("CHECKTAGS", isNewSearchForAnimations.toString())
+
+                    if(!isNewSearchForAnimations)
+                    bind.progressBar?.show()
+                    else
+                    bind.progressBar?.hide()
+                }
+
+
 
             }
 
             else {
 
-                (activity as MainActivity).endSeparatorsLoadAnim()
+                if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
+                    (activity as MainActivity).endSeparatorsLoadAnim()
+                } else {
+                    textLoadAnim?.endLoadingAnim()
+                    bind.progressBar?.hide()
+                }
 
 
                 if(isNewSearchForAnimations ){
 
                     bind.rvSearchStations.apply {
-
                         if(isInitialLaunch){
                             scheduleLayoutAnimation()
                             isInitialLaunch = false
 
                         } else {
-//                            alpha = 1f
                             scrollToPosition(0)
                             startLayoutAnimation()
-
-
                         }
                     }
-
                     isNewSearchForAnimations = false
+                    isToShowLoadingMessage = false
                 }
             }
         }
@@ -394,12 +417,16 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 //                    launchRecyclerOutAnim()
 //                }
 
-                if(!isInitialLaunch){
-                    showLoadingResultsMessage()
+                if(isToShowLoadingMessage || mainViewModel.isInitialLaunchOfTheApp){
+                    mainViewModel.isInitialLaunchOfTheApp = false
+
+                    if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES)
+                        showLoadingResultsMessage()
+                    else {
+                        bind.tvResultMessage.visibility = View.INVISIBLE
+                        textLoadAnim?.startLoadingAnim()
+                    }
                 }
-
-
-
                 pagingRadioAdapter.submitData(it)
 
             }
@@ -407,19 +434,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     }
 
 
-//    private val alphaAnim = AlphaFadeOutAnim(1f, 100)
-//
-//    private fun launchRecyclerOutAnim(){
-//
-//        if(!bind.tvResultMessage.isVisible){
-//
-//            bind.rvSearchStations.apply {
-//
-//                alphaAnim.startAnim(this)
-//
-//            }
-//        }
-//    }
 
     private fun showLoadingResultsMessage(){
         bind.tvResultMessage.apply {
@@ -474,9 +488,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private fun clearAdapter(check : Boolean){
         if(check){
-            lifecycleScope.launch {
-                pagingRadioAdapter.submitData(PagingData.empty())
-            }
+            isToShowLoadingMessage = true
+            pagingRadioAdapter.submitData(lifecycle, PagingData.empty())
         }
     }
 
@@ -498,26 +511,22 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             (bind.tvSelectedCountry as TextView).text = if (it == "") "Country" else it
 
-//            if(it.isBlank()){
-//
-//                bind.tvSelectedCountry.visibility = View.INVISIBLE
-//                bind.ivCountry.visibility = View.VISIBLE
-//            } else {
-//                bind.tvSelectedCountry.text = it
-//                bind.tvSelectedCountry.visibility = View.VISIBLE
-//                bind.ivCountry.visibility = View.INVISIBLE
-//
-//            }
-
-
         }
     }
 
+
+    private fun observeInternetConnection() {
+
+        mainViewModel.hasInternetConnection.observe(viewLifecycleOwner){
+            bind.ivNoInternet.isVisible = !it
+        }
+    }
 
 
     override fun onDestroyView() {
         super.onDestroyView()
         bind.rvSearchStations.adapter = null
+        textLoadAnim = null
         _bind = null
         isInitialLaunch = true
 

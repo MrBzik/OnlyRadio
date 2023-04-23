@@ -1,5 +1,6 @@
 package com.example.radioplayer.ui.fragments
 
+import android.app.SearchManager
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
@@ -30,6 +31,7 @@ import com.example.radioplayer.utils.RandomColors
 import com.example.radioplayer.utils.Utils
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import java.net.URLEncoder
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -123,14 +125,25 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         }
     }
 
+
+
     private fun setTitleCopy(){
         bind.llSongTitle.setOnClickListener {
+
             bind.ivCopy.isPressed = true
 
             val clip = ClipData.newPlainText("label", songTitle)
             clipBoard?.setPrimaryClip(clip)
 
-            Toast.makeText(requireContext(), "Title copied", Toast.LENGTH_SHORT).show()
+            Snackbar.make(
+                requireActivity().findViewById(R.id.rootLayout),
+                "Title copied", Snackbar.LENGTH_LONG).apply {
+                    setAction("SEARCH"){
+                        val intent = Intent(Intent.ACTION_WEB_SEARCH)
+                        intent.putExtra(SearchManager.QUERY, bind.tvSongTitle.text)
+                        startActivity(intent)
+                    }
+            }.show()
 
         }
     }

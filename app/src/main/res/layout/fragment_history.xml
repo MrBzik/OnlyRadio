@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    >
 
 
 
@@ -15,32 +17,72 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+
         />
 
-    <TextView
+<!--    <View-->
+<!--        android:id="@+id/viewToolbarTitles"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="60dp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.5"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        android:background="@drawable/toolbar_history_titles_protected"-->
+<!--        />-->
+
+    <com.example.radioplayer.utils.TextViewOutlined
         android:id="@+id/tvSliderHeader"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
+        android:layout_marginStart="-6dp"
         android:gravity="center"
-        android:text="History: All"
+        android:text="All dates"
+        android:textAppearance="@style/mainTextButtons"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline66"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        android:textAppearance="@style/mainTextTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/guidelineTitle"
-        app:layout_constraintTop_toTopOf="parent"
-       />
+    <TextView
+        android:id="@+id/tvShrinkArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:drawableEndCompat="@drawable/ic_playlists_arrow_expand"
+        app:layout_constraintBottom_toBottomOf="@id/tvSliderHeader"
+        app:layout_constraintStart_toEndOf="@id/tvSliderHeader"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/viewSpinnerClickBox"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        app:layout_constraintStart_toStartOf="@id/guideline66"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
 
     <TextView
-        android:id="@+id/tvSelectedTab"
-        android:layout_width="wrap_content"
+        android:id="@+id/tvTitles"
+        android:layout_width="0dp"
         android:layout_height="60dp"
         android:gravity="center"
-        android:text="Songs"
+        android:text="Titles"
         android:textAppearance="@style/mainTextTitle"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline33"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline66"
+        />
+
+    <com.example.radioplayer.utils.TextViewOutlined
+        android:id="@+id/tvTitlesUnselected"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:text="Titles"
+        android:textAppearance="@style/mainTextTitle"
+        app:layout_constraintStart_toStartOf="@id/guideline33"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline66"
         />
 
 
@@ -52,9 +94,10 @@
         android:popupBackground="@drawable/spinner_gradient_for_background"
         android:background="@null"
         android:elevation="-1dp"
+
         style="@style/listPopupWindow"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/guidelineTitle"
+        app:layout_constraintStart_toStartOf="@id/guidelineMid"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
 
         />
@@ -77,18 +120,36 @@
         app:layout_constraintGuide_percent="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <com.example.radioplayer.utils.TextViewOutlined
-        android:id="@+id/tvSelectDate"
-        android:layout_width="wrap_content"
+
+
+
+    <TextView
+        android:id="@+id/tvStations"
+        android:layout_width="0dp"
         android:layout_height="60dp"
         android:gravity="center"
-        android:layout_marginStart="24dp"
-        android:text="Select date"
+        android:text="Stations"
         android:textAppearance="@style/mainTextButtons"
-        app:layout_constraintStart_toStartOf="@id/guidelineMid"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline33"
         app:layout_constraintTop_toTopOf="parent"
-        app:drawableEndCompat="@drawable/ic_playlists_arrow_expand" />
+        />
+
+    <com.example.radioplayer.utils.TextViewOutlined
+        android:id="@+id/tvStationsUnSelected"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:text="Stations"
+        android:textAppearance="@style/mainTextButtons"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline33"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+
+<!--    app:drawableEndCompat="@drawable/ic_playlists_arrow_expand"-->
+    <!--    android:layout_marginStart="24dp"-->
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -106,5 +167,23 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5" />
 
+
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline33"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.33"
+        />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline66"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.66"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

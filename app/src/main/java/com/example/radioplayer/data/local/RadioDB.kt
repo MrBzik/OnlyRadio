@@ -7,10 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.example.radioplayer.data.local.entities.HistoryDate
-import com.example.radioplayer.data.local.entities.Playlist
-import com.example.radioplayer.data.local.entities.RadioStation
-import com.example.radioplayer.data.local.entities.Recording
+import com.example.radioplayer.data.local.entities.*
 import com.example.radioplayer.data.local.relations.StationDateCrossRef
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 
@@ -21,9 +18,10 @@ import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
         StationPlaylistCrossRef::class,
         HistoryDate::class,
         StationDateCrossRef::class,
-        Recording::class
+        Recording::class,
+        Title::class
                ],
-        version = 15,
+        version = 16,
          autoMigrations = [
         AutoMigration(from = 9, to = 10, spec = RadioDB.Migration9To10::class),
         AutoMigration(from = 11, to = 12, spec = RadioDB.Migration11To12::class),
@@ -65,6 +63,20 @@ abstract class RadioDB : RoomDatabase() {
                 )
             }
         }
+
+        val migration15To16 = object : Migration(15, 16){
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "CREATE TABLE IF NOT EXISTS Title (" +
+                            "timeStamp INTEGER NOT NULL PRIMARY KEY, " +
+                            "date INTEGER NOT NULL," +
+                            "title TEXT NOT NULL," +
+                            "stationName TEXT NOT NULL," +
+                            "stationIconUri TEXT NOT NULL)"
+                )
+            }
+        }
+
     }
 
 
