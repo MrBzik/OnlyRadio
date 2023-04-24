@@ -235,6 +235,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         bind.btnAudioSettings.setOnClickListener {
 
             try{
+
                 val intent = Intent(Intent.ACTION_MAIN)
                 intent.setClassName("com.sec.android.app.soundalive", "com.sec.android.app.soundalive.SAControlPanelActivity")
                 startActivity(intent)

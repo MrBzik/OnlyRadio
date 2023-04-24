@@ -54,7 +54,11 @@ class RadioSource @Inject constructor(
     suspend fun insertRecording(recording : Recording) = radioDAO.insertRecording(recording)
     suspend fun deleteRecording(recId : String) = radioDAO.deleteRecording(recId)
 
+
+    //Title
     suspend fun insertNewTitle(title : Title) = radioDAO.insertNewTitle(title)
+    suspend fun checkTitleTimestamp(title : String, date : Long) = radioDAO.checkTitleTimestamp(title, date)
+    suspend fun deleteTitle(title : Title) = radioDAO.deleteTitle(title)
 
 
     suspend fun getStationsInDate(limit: Int, offset: Int, initialDate: String): DateWithStations {

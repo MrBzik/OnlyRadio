@@ -9,6 +9,7 @@ import android.view.animation.LinearInterpolator
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -210,6 +211,19 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
     private fun subscribeToRecordings (){
 
         databaseViewModel.allRecordingsLiveData.observe(viewLifecycleOwner){
+
+            bind.tvMessage.apply {
+
+                if(it.isEmpty()){
+                    visibility = View.VISIBLE
+                    slideAnim(400, 0, R.anim.fade_in_anim)
+
+                } else{
+                    visibility = View.INVISIBLE
+                    slideAnim(300, 0, R.anim.fade_out_anim)
+                }
+            }
+
 
             recordingsAdapter.listOfRecordings = it
 

@@ -168,9 +168,9 @@ class RadioService : MediaBrowserServiceCompat() {
         var isToReconnect = true
 
         var bufferSizeInMills = 0
-        var bufferSizeInBytes = 0
+//        var bufferSizeInBytes = 0
         var bufferForPlayback = 0
-        var isToSetBufferInBytes = false
+//        var isToSetBufferInBytes = false
         var isAdaptiveLoaderToUse = false
 
         var reverbMode = 0
@@ -406,21 +406,23 @@ class RadioService : MediaBrowserServiceCompat() {
     fun insertNewTitle(title: String){
 
         serviceScope.launch(Dispatchers.IO){
+           val checkTitle = radioSource.checkTitleTimestamp(title, currentDateLong)
 
-            val stationName = currentStation?.getString(METADATA_KEY_TITLE) ?: ""
-            val stationUri = currentStation?.getString(METADATA_KEY_DISPLAY_ICON_URI) ?: ""
+         checkTitle?.let {
+             radioSource.deleteTitle(it)
+         }
+                val stationName = currentStation?.getString(METADATA_KEY_TITLE) ?: ""
+                val stationUri = currentStation?.getString(METADATA_KEY_DISPLAY_ICON_URI) ?: ""
 
 
-            radioSource.insertNewTitle(Title(
-               timeStamp = System.currentTimeMillis(),
-               date = currentDateLong,
-               title = title,
-               stationName = stationName,
-               stationIconUri = stationUri
-            ))
-
+                radioSource.insertNewTitle(Title(
+                    timeStamp = System.currentTimeMillis(),
+                    date = currentDateLong,
+                    title = title,
+                    stationName = stationName,
+                    stationIconUri = stationUri
+                ))
         }
-
     }
 
 
@@ -432,9 +434,20 @@ class RadioService : MediaBrowserServiceCompat() {
             exoPlayer.volume = it.animatedValue as Float
         }
 
-        anim.duration = 1000
+        anim.duration = 800
         anim.start()
 
+    }
+
+    private fun fadeOutPlayer(){
+        val anim = ValueAnimator.ofFloat(1f, 0f)
+
+        anim.addUpdateListener {
+            exoPlayer.volume = it.animatedValue as Float
+        }
+
+        anim.duration = 200
+        anim.start()
 
     }
 
@@ -523,9 +536,9 @@ class RadioService : MediaBrowserServiceCompat() {
         val buffPref = this@RadioService.getSharedPreferences(BUFFER_PREF, Context.MODE_PRIVATE)
 
         bufferSizeInMills = buffPref.getInt(BUFFER_SIZE_IN_MILLS, DEFAULT_MAX_BUFFER_MS)
-        bufferSizeInBytes = buffPref.getInt(BUFFER_SIZE_IN_BYTES, DEFAULT_TARGET_BUFFER_BYTES)
+//        bufferSizeInBytes = buffPref.getInt(BUFFER_SIZE_IN_BYTES, DEFAULT_TARGET_BUFFER_BYTES)
         bufferForPlayback = buffPref.getInt(BUFFER_FOR_PLAYBACK, DEFAULT_BUFFER_FOR_PLAYBACK_MS)
-        isToSetBufferInBytes = buffPref.getBoolean(IS_TO_SET_BUFFER_IN_BYTES, false)
+//        isToSetBufferInBytes = buffPref.getBoolean(IS_TO_SET_BUFFER_IN_BYTES, false)
         isAdaptiveLoaderToUse = buffPref.getBoolean(IS_ADAPTIVE_LOADER_TO_USE, false)
 
     }
@@ -544,8 +557,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private fun provideExoPlayer () : ExoPlayer {
 
-        val bites = if (!isToSetBufferInBytes) -1
-        else bufferSizeInBytes * 1024
+//        val bites = if (!isToSetBufferInBytes) -1
+//        else bufferSizeInBytes * 1024
 
 
 //
@@ -559,7 +572,7 @@ class RadioService : MediaBrowserServiceCompat() {
             .setHandleAudioBecomingNoisy(true)
             .setLoadControl(DefaultLoadControl.Builder()
                 .setBufferDurationsMs(bufferSizeInMills, bufferSizeInMills, bufferForPlayback, 5000)
-                .setTargetBufferBytes(bites)
+//                .setTargetBufferBytes(bites)
                 .build())
 //            .setBandwidthMeter(
 //                bandwidthMeter
@@ -912,8 +925,12 @@ class RadioService : MediaBrowserServiceCompat() {
 //                 .setAllowChunklessPreparation(true)
                 .createMediaSource(mediaItem)
         } else {
+
+            val checkInterval = if(isAdaptiveLoaderToUse) 1024*40
+                                    else 1024*1024
+
             ProgressiveMediaSource.Factory(dataSourceFactory)
-                .setContinueLoadingCheckIntervalBytes(1024*40)
+                .setContinueLoadingCheckIntervalBytes(checkInterval)
                 .createMediaSource(mediaItem)
         }
 
@@ -928,13 +945,16 @@ class RadioService : MediaBrowserServiceCompat() {
         exoPlayer.playbackParameters = params
 
 
+        fadeOutPlayer()
 
-        exoPlayer.setMediaSource(mediaSource)
+        serviceScope.launch {
+            delay(200)
+            exoPlayer.setMediaSource(mediaSource)
 
-        exoPlayer.prepare()
+            exoPlayer.prepare()
 
-        exoPlayer.playWhenReady = playWhenReady
-
+            exoPlayer.playWhenReady = playWhenReady
+        }
 
     }
 

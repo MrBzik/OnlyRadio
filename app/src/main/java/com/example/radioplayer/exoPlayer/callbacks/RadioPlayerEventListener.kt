@@ -22,16 +22,16 @@ class RadioPlayerEventListener (
 
         val withoutWalm = mediaMetadata.title.toString().replace("WALMRadio.com", "")
 
-
-        RadioService.currentSongTitle.postValue(withoutWalm)
-
         if(!radioService.isFromRecording){
             if(withoutWalm.equals("NULL", ignoreCase = true) || withoutWalm.isBlank()
                 || withoutWalm.length < 3 || withoutWalm.isDigitsOnly() ||
                         withoutWalm.equals("unknown", true)
+                || withoutWalm.contains("{\"STATUS\"", true)
             ){
+                RadioService.currentSongTitle.postValue("")
 
             } else {
+                RadioService.currentSongTitle.postValue(withoutWalm)
                 radioService.insertNewTitle(withoutWalm)
             }
         }

@@ -28,11 +28,12 @@ class BufferSettingsDialog (
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        adjustDialogHeight(bind.clBufferSettingDialog)
+
+//        adjustDialogHeight(bind.clBufferSettingDialog)
 
         setRangeBufferInSec()
 
-        setRangeBufferInBytes()
+//        setRangeBufferInBytes()
 
         setRangePlaybackBuffer()
 
@@ -44,14 +45,14 @@ class BufferSettingsDialog (
             dismiss()
         }
 
-        setBufferBytesTitleColor()
+//        setBufferBytesTitleColor()
         setLoadControllerTitleColor()
 
     }
 
     private fun initialSwitchButtonsState(){
 
-        bind.switchInBytes.isChecked = RadioService.isToSetBufferInBytes
+//        bind.switchInBytes.isChecked = RadioService.isToSetBufferInBytes
         bind.switchLoadController.isChecked = RadioService.isAdaptiveLoaderToUse
     }
 
@@ -89,37 +90,37 @@ class BufferSettingsDialog (
         }
     }
 
-    private fun setRangeBufferInBytes(){
-        bind.rangeSliderBufferInBytes.apply {
-            valueFrom = 300f
-            valueTo = 3000f
-            stepSize = 100f
-
-            val initialValue = if(RadioService.bufferSizeInBytes > 0) RadioService.bufferSizeInBytes
-            else 300
-
-            bind.tvBufferInBytesTitle.text = "$initialValue kilobytes"
-
-            values = listOf(initialValue.toFloat())
-
-            setLabelFormatter { value ->
-                "${value.toInt()} kilobytes"
-            }
-
-            addOnSliderTouchListener(object : RangeSlider.OnSliderTouchListener{
-                override fun onStartTrackingTouch(slider: RangeSlider) {
-
-                }
-
-                override fun onStopTrackingTouch(slider: RangeSlider) {
-                    val newValue = slider.values.first().toInt()
-
-                    bind.tvBufferInBytesTitle.text = "$newValue kilobytes"
-                }
-            })
-
-        }
-    }
+//    private fun setRangeBufferInBytes(){
+//        bind.rangeSliderBufferInBytes.apply {
+//            valueFrom = 300f
+//            valueTo = 3000f
+//            stepSize = 100f
+//
+//            val initialValue = if(RadioService.bufferSizeInBytes > 0) RadioService.bufferSizeInBytes
+//            else 300
+//
+//            bind.tvBufferInBytesTitle.text = "$initialValue kilobytes"
+//
+//            values = listOf(initialValue.toFloat())
+//
+//            setLabelFormatter { value ->
+//                "${value.toInt()} kilobytes"
+//            }
+//
+//            addOnSliderTouchListener(object : RangeSlider.OnSliderTouchListener{
+//                override fun onStartTrackingTouch(slider: RangeSlider) {
+//
+//                }
+//
+//                override fun onStopTrackingTouch(slider: RangeSlider) {
+//                    val newValue = slider.values.first().toInt()
+//
+//                    bind.tvBufferInBytesTitle.text = "$newValue kilobytes"
+//                }
+//            })
+//
+//        }
+//    }
 
     private fun setRangePlaybackBuffer(){
         bind.rangeSliderPlaybackBuffer.apply {
@@ -152,15 +153,15 @@ class BufferSettingsDialog (
         }
     }
 
-    private fun setBufferBytesTitleColor(){
-
-        toggleTitleColors(RadioService.isToSetBufferInBytes, bind.tvBufferInBytesTitle)
-
-        bind.switchInBytes.setOnCheckedChangeListener { _, isChecked ->
-
-            toggleTitleColors(isChecked, bind.tvBufferInBytesTitle)
-        }
-    }
+//    private fun setBufferBytesTitleColor(){
+//
+//        toggleTitleColors(RadioService.isToSetBufferInBytes, bind.tvBufferInBytesTitle)
+//
+//        bind.switchInBytes.setOnCheckedChangeListener { _, isChecked ->
+//
+//            toggleTitleColors(isChecked, bind.tvBufferInBytesTitle)
+//        }
+//    }
 
     private fun setLoadControllerTitleColor(){
 
@@ -204,22 +205,22 @@ class BufferSettingsDialog (
                     isPlayerRestartNeeded = true
                 }
 
-                val bytesSize = bind.rangeSliderBufferInBytes.values.first().toInt()
-                val isSwitchBytesChecked = bind.switchInBytes.isChecked
+//                val bytesSize = bind.rangeSliderBufferInBytes.values.first().toInt()
+//                val isSwitchBytesChecked = bind.switchInBytes.isChecked
 
-                if(RadioService.bufferSizeInBytes != bytesSize){
-                    putInt(BUFFER_SIZE_IN_BYTES, bytesSize)
-                    RadioService.bufferSizeInBytes = bytesSize
-                    if(isSwitchBytesChecked){
-                        isPlayerRestartNeeded = true
-                    }
-                }
+//                if(RadioService.bufferSizeInBytes != bytesSize){
+//                    putInt(BUFFER_SIZE_IN_BYTES, bytesSize)
+//                    RadioService.bufferSizeInBytes = bytesSize
+//                    if(isSwitchBytesChecked){
+//                        isPlayerRestartNeeded = true
+//                    }
+//                }
 
-                if(RadioService.isToSetBufferInBytes != isSwitchBytesChecked){
-                    RadioService.isToSetBufferInBytes = isSwitchBytesChecked
-                    putBoolean(IS_TO_SET_BUFFER_IN_BYTES, isSwitchBytesChecked)
-                    isPlayerRestartNeeded = true
-                }
+//                if(RadioService.isToSetBufferInBytes != isSwitchBytesChecked){
+//                    RadioService.isToSetBufferInBytes = isSwitchBytesChecked
+//                    putBoolean(IS_TO_SET_BUFFER_IN_BYTES, isSwitchBytesChecked)
+//                    isPlayerRestartNeeded = true
+//                }
 
 
                 val millsPlayback = bind.rangeSliderPlaybackBuffer.values.first().toInt()

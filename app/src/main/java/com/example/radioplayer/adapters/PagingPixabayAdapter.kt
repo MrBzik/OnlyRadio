@@ -78,9 +78,14 @@ class PagingPixabayAdapter @Inject constructor(
     }
 
     override fun onViewRecycled(holder: ImageHolder) {
-        holder.bind.ivPixabayImage.apply {
-            glide.clear(this)
+        try {
+            holder.bind.ivPixabayImage.apply {
+                glide.clear(this)
+            }
+        } catch (e : Exception) {
+
         }
+
         super.onViewRecycled(holder)
     }
 

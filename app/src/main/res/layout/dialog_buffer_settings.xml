@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/clBufferSettingDialog"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@drawable/dialog_gradient_for_background"
     android:paddingHorizontal="16dp">
 
@@ -59,52 +59,52 @@
 
 
 
-        <TextView
-            android:id="@+id/tvBufferInBytesTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:text="In kilobytes"
-            android:textColor="@color/selected_genre_color"
-            android:textAppearance="@style/dialogItemText"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rangeSliderBufferInSeconds" />
+<!--        <TextView-->
+<!--            android:id="@+id/tvBufferInBytesTitle"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="20dp"-->
+<!--            android:layout_marginTop="20dp"-->
+<!--            android:text="In kilobytes"-->
+<!--            android:textColor="@color/selected_genre_color"-->
+<!--            android:textAppearance="@style/dialogItemText"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/rangeSliderBufferInSeconds" />-->
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/switchInBytes"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            app:layout_constraintBottom_toBottomOf="@+id/tvBufferInBytesTitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tvBufferInBytesTitle"
-            app:thumbTint="@color/switch_thumb_color"
-            app:trackTint="@color/switch_track_color" />
-
-
-        <com.google.android.material.slider.RangeSlider
-            android:id="@+id/rangeSliderBufferInBytes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvBufferInBytesTitle" />
+<!--        <androidx.appcompat.widget.SwitchCompat-->
+<!--            android:id="@+id/switchInBytes"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:minHeight="48dp"-->
+<!--            app:layout_constraintBottom_toBottomOf="@+id/tvBufferInBytesTitle"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/tvBufferInBytesTitle"-->
+<!--            app:thumbTint="@color/switch_thumb_color"-->
+<!--            app:trackTint="@color/switch_track_color" />-->
 
 
-        <TextView
-            android:id="@+id/tvBufferSizeHint"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:fontFamily="@font/aldrich"
-            android:text="When enabled size of buffer will be as set in seconds or kilobytes depending on which value is smaller"
-            android:textColor="@color/default_secondary_text_color"
-            android:textSize="13sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/rangeSliderBufferInBytes" />
+<!--        <com.google.android.material.slider.RangeSlider-->
+<!--            android:id="@+id/rangeSliderBufferInBytes"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintHorizontal_bias="0.5"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/tvBufferInBytesTitle" />-->
+
+
+<!--        <TextView-->
+<!--            android:id="@+id/tvBufferSizeHint"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="8dp"-->
+<!--            android:layout_marginTop="8dp"-->
+<!--            android:fontFamily="@font/aldrich"-->
+<!--            android:text="When enabled size of buffer will be as set in seconds or kilobytes depending on which value is smaller"-->
+<!--            android:textColor="@color/default_secondary_text_color"-->
+<!--            android:textSize="13sp"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/rangeSliderBufferInBytes" />-->
 
 
         <TextView
@@ -117,7 +117,7 @@
             android:textColor="@color/selected_genre_color"
             android:textAppearance="@style/dialogItemText"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvBufferSizeHint" />
+            app:layout_constraintTop_toBottomOf="@id/rangeSliderBufferInSeconds" />
 
 
         <com.google.android.material.slider.RangeSlider

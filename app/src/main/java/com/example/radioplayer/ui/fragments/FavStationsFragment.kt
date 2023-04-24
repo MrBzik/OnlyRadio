@@ -286,7 +286,15 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         databaseViewModel.observableListOfStations.observe(viewLifecycleOwner){
 
-            bind.tvMessage.isVisible = it.isEmpty()
+            bind.tvMessage.apply {
+                if(it.isEmpty()){
+                    visibility = View.VISIBLE
+                    slideAnim(400, 0, R.anim.fade_in_anim)
+
+                } else{
+                    visibility = View.INVISIBLE
+                }
+            }
 
             mainAdapter.listOfStations = it
 

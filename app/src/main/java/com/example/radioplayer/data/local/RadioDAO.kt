@@ -161,6 +161,12 @@ interface  RadioDAO {
     @Query("DELETE FROM Title WHERE date =:time")
     suspend fun deleteTitlesWithDate(time : Long)
 
+    @Query("SELECT * FROM Title WHERE title =:title AND date =:date ORDER BY timeStamp DESC LIMIT 1")
+    suspend fun checkTitleTimestamp(title : String, date : Long) : Title?
+
+    @Delete
+    suspend fun deleteTitle(title : Title)
+
     // Recordings
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
