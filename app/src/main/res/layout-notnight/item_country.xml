@@ -37,6 +37,15 @@
         android:textAppearance="@style/hintText"/>
 
 
+    <View
+        android:id="@+id/viewBottomSeparator"
+        android:layout_width="match_parent"
+        android:background="@color/option_bottom_separator"
+        android:layout_height="2dp"
+        android:layout_gravity="bottom"
+        />
 
 
 </FrameLayout>
+
+

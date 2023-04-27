@@ -147,6 +147,8 @@ class PagingHistoryAdapter @Inject constructor(
                 val station = item.radioStation
 
                 tvPrimary.text = station.name
+                tvPrimary.textSize = titleSize
+
                 tvSecondary.apply {
                     if(station.country?.isNotBlank() == true){
                         visibility = View.VISIBLE
@@ -249,6 +251,7 @@ class PagingHistoryAdapter @Inject constructor(
     var selectedSecondaryTextColor = 0
 
     var alpha = 0.1f
+    var titleSize = 20f
 
     var separatorDefault = 0
 

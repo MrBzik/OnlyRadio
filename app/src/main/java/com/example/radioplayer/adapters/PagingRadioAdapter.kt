@@ -78,6 +78,8 @@ class PagingRadioAdapter @Inject constructor(
 
 
             tvPrimary.text = station.name
+            tvPrimary.textSize = titleSize
+
             tvSecondary.apply {
                 if(station.country.isNullOrBlank() && station.state.isNullOrBlank())
                     visibility = View.GONE
@@ -179,6 +181,8 @@ class PagingRadioAdapter @Inject constructor(
     var separatorDefault = 0
 
     var alpha = 0.1f
+
+    var titleSize = 18f
 
     override fun onViewRecycled(holder: RadioItemHolder) {
         super.onViewRecycled(holder)

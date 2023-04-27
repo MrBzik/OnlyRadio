@@ -468,10 +468,10 @@ class RadioService : MediaBrowserServiceCompat() {
             }
         }
 
-        if(!wasReverbSet){
+//        if(!wasReverbSet){
             exoPlayer.setAuxEffectInfo(AuxEffectInfo(environmentalReverb.id, 1f))
-            wasReverbSet = true
-        }
+//            wasReverbSet = true
+//        }
     }
 
     private var wasBassBoostSet = false
@@ -489,10 +489,10 @@ class RadioService : MediaBrowserServiceCompat() {
             }
         }
 
-        if(!wasBassBoostSet){
+//        if(!wasBassBoostSet){
             exoPlayer.setAuxEffectInfo(AuxEffectInfo(effectVirtualizer.id, 1f))
-            wasBassBoostSet = true
-        }
+//            wasBassBoostSet = true
+//        }
     }
 
 
@@ -661,6 +661,14 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
     fun listenToRecordDuration ()  {
+
+
+        if(reverbMode != 0)
+            exoPlayer.setAuxEffectInfo(AuxEffectInfo(environmentalReverb.id, 1f))
+
+        if(virtualizerLevel != 0)
+            exoPlayer.setAuxEffectInfo(AuxEffectInfo(effectVirtualizer.id, 1f))
+
 
         serviceScope.launch {
 

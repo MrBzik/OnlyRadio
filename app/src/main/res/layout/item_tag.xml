@@ -3,30 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="60dp"
     android:background="?android:attr/selectableItemBackground"
-    android:orientation="horizontal"
     >
-
-    <ImageView
-        android:id="@+id/ivCountryFlag"
-        android:layout_width="30dp"
-        android:layout_height="20dp"
-        android:layout_marginVertical="20dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginStart="20dp"
-
-        />
-
     <TextView
-        android:id="@+id/tvCountryName"
+        android:id="@+id/tvTagText"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_marginHorizontal="65dp"
-        android:maxLines="3"
-
-        android:ellipsize="end"
-        android:gravity="center_vertical"
         android:textAppearance="@style/dialogItemText"
-        />
+        android:layout_marginStart="20dp"
+        android:gravity="center_vertical"
+        android:layout_marginEnd="65dp"/>
 
     <TextView
         android:id="@+id/tvStationsCount"
@@ -35,8 +20,6 @@
         android:gravity="center"
         android:layout_gravity="end"
         android:textAppearance="@style/hintText"/>
-
-
 
 
 </FrameLayout>

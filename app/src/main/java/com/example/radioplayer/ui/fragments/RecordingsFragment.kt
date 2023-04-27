@@ -213,14 +213,12 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
         databaseViewModel.allRecordingsLiveData.observe(viewLifecycleOwner){
 
             bind.tvMessage.apply {
-
                 if(it.isEmpty()){
                     visibility = View.VISIBLE
                     slideAnim(400, 0, R.anim.fade_in_anim)
 
                 } else{
                     visibility = View.INVISIBLE
-                    slideAnim(300, 0, R.anim.fade_out_anim)
                 }
             }
 
@@ -239,6 +237,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
             setToggleItemDeletion()
 
             recordingsAdapter.alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
+            recordingsAdapter.titleSize = mainViewModel.stationsTitleSize
 
             layoutAnimation = (activity as MainActivity).layoutAnimationController
 

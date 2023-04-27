@@ -47,6 +47,11 @@ abstract class BaseDialog<VB : ViewBinding> (
 
     }
 
+    val dp8 = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        8f,
+        requireContext.resources.displayMetrics
+    ).toInt()
 
     fun adjustDialogHeight(view : ConstraintLayout){
 
@@ -61,6 +66,18 @@ abstract class BaseDialog<VB : ViewBinding> (
     }
 
 
+    fun removeDim(){
+        window?.setDimAmount(0f)
+    }
+
+    fun removeTopPadding(){
+
+        bind.root.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            setMargins(dp8,0,dp8, 0)
+        }
+
+
+    }
 
      fun setupMainWindow(){
 
@@ -78,11 +95,7 @@ abstract class BaseDialog<VB : ViewBinding> (
 
 //         window?.setDimAmount(0.5f)
 
-        val dp8 = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            8f,
-            requireContext.resources.displayMetrics
-        ).toInt()
+
 
          if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
              window?.setDimAmount(0.15f)

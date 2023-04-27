@@ -1,8 +1,5 @@
 package com.example.radioplayer.adapters
 
-import android.graphics.Color
-import android.graphics.drawable.Drawable
-import android.nfc.Tag
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
@@ -12,9 +9,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.example.radioplayer.R
 import com.example.radioplayer.adapters.models.TagWithGenre
 import com.example.radioplayer.databinding.ItemGenreBinding
+import com.example.radioplayer.databinding.ItemTagBinding
 import com.example.radioplayer.databinding.ItemTextBinding
 
 
@@ -26,7 +23,7 @@ class FilterTagsAdapter(): ListAdapter<TagWithGenre, RecyclerView.ViewHolder>(DI
 
     var originalList: List<TagWithGenre> = currentList.toList()
 
-    class TagHolder (val bind : ItemTextBinding) : RecyclerView.ViewHolder(bind.root)
+    class TagHolder (val bind : ItemTagBinding) : RecyclerView.ViewHolder(bind.root)
 
     class GenreHolder (val bind : ItemGenreBinding) : RecyclerView.ViewHolder(bind.root)
 
@@ -42,7 +39,7 @@ class FilterTagsAdapter(): ListAdapter<TagWithGenre, RecyclerView.ViewHolder>(DI
 
         if(viewType == VIEW_TYPE_TAG) {
             val holder = TagHolder(
-                ItemTextBinding.inflate(
+                ItemTagBinding.inflate(
                     LayoutInflater.from(parent.context), parent, false
                 )
             )
@@ -77,7 +74,15 @@ class FilterTagsAdapter(): ListAdapter<TagWithGenre, RecyclerView.ViewHolder>(DI
 
         if(item is TagWithGenre.Tag){
             (holder as TagHolder).apply {
-                bind.tvText.text = item.tag
+                bind.tvTagText.text = item.tag
+
+                if(isExactMatch){
+                    bind.tvStationsCount.text = item.stationCountExact.toString()
+                } else{
+                    bind.tvStationsCount.text = item.stationCount.toString()
+                }
+
+
 
             }
         } else if(item is TagWithGenre.Genre) {
@@ -88,6 +93,8 @@ class FilterTagsAdapter(): ListAdapter<TagWithGenre, RecyclerView.ViewHolder>(DI
         }
 
     }
+
+    var isExactMatch = false
 
     var defaultTextColor = 0
     var selectedTextColor = 0

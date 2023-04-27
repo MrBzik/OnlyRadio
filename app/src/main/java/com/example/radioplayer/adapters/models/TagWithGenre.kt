@@ -2,7 +2,10 @@ package com.example.radioplayer.adapters.models
 
 sealed class TagWithGenre {
 
-    class Tag(val tag : String) : TagWithGenre()
+    class Tag(val tag : String,
+            var stationCount : Int = 0,
+            var stationCountExact : Int = 0
+    ) : TagWithGenre()
 
     class Genre (val genre : String) : TagWithGenre() {
        var isOpened = true

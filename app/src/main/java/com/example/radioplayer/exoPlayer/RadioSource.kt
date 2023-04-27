@@ -12,6 +12,8 @@ import com.example.radioplayer.data.local.entities.Title
 import com.example.radioplayer.data.local.relations.DateWithStations
 import com.example.radioplayer.data.remote.RadioApi
 import com.example.radioplayer.data.remote.entities.*
+import com.example.radioplayer.utils.Constants.API_RADIO_ALL_COUNTRIES
+import com.example.radioplayer.utils.Constants.API_RADIO_LANGUAGES
 
 import com.example.radioplayer.utils.Constants.API_RADIO_SEARCH_URL
 import com.example.radioplayer.utils.Constants.API_RADIO_TOP_VOTE_SEARCH_URL
@@ -176,7 +178,7 @@ class RadioSource @Inject constructor(
         country: String = "", language : String = "",
         tag: String = "", isTagExact : Boolean,
         name: String = "", isNameExact : Boolean, order : String,
-        isReversedOrder : Boolean, minBit : Int, maxBit : Int,
+       minBit : Int, maxBit : Int,
         offset: Int = 0, pageSize: Int
 
     ): RadioStations? {
@@ -197,7 +199,7 @@ class RadioSource @Inject constructor(
                         country = country, language = language,
                         tag = tag, tagExact = tagExact,
                         name = name, nameExact = nameExact,
-                        sortBy = order, isReversed = isReversedOrder,
+                        sortBy = order,
                         bitrateMin = minBit, bitrateMax = maxBit,
                         offset = offset, limit = pageSize,
                         url = "${validBaseUrl}$API_RADIO_SEARCH_URL"
@@ -207,7 +209,7 @@ class RadioSource @Inject constructor(
                         language = language,
                         tag = tag, tagExact = tagExact,
                         name = name, nameExact = nameExact,
-                        sortBy = order, isReversed = isReversedOrder,
+                        sortBy = order,
                         bitrateMin = minBit, bitrateMax = maxBit,
                         offset = offset, limit = pageSize,
                         url = "${validBaseUrl}$API_RADIO_SEARCH_URL"
@@ -231,7 +233,7 @@ class RadioSource @Inject constructor(
                                country = country, language = language,
                                tag = tag, isTagExact = isTagExact,
                                name = name, isNameExact = isNameExact,
-                               order = order, isReversedOrder = isReversedOrder,
+                               order = order,
                                minBit = minBit, maxBit = maxBit,
                                offset = offset,
                                pageSize = pageSize)
@@ -249,7 +251,10 @@ class RadioSource @Inject constructor(
 
         }
 
+    suspend fun getAllCountries() = radioApi.getAllCountries(validBaseUrl + API_RADIO_ALL_COUNTRIES)
 
+    suspend fun getLanguages(language : String)
+        = radioApi.getLanguages(validBaseUrl + API_RADIO_LANGUAGES + language)
 
     suspend fun getRadioStations (isNewSearch : Boolean)   {
 

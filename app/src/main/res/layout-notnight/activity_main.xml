@@ -39,6 +39,17 @@
 
 
 
+    <androidx.core.widget.ContentLoadingProgressBar
+        android:id="@+id/progressBarBottom"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="-7dp"
+        android:indeterminate="true"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView" />
+
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
@@ -47,6 +58,8 @@
         app:itemBackground="@null"
         app:itemIconSize="40dp"
         app:itemIconTint="@color/bottom_nav_icons"
+        app:itemTextAppearanceActive="@style/bottomNavTextActive"
+        app:itemTextAppearanceInactive="@style/bottomNavTextInactive"
         app:itemPaddingBottom="21dp"
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"

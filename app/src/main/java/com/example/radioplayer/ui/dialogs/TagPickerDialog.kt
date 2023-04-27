@@ -55,9 +55,18 @@ class TagPickerDialog (
 
         bind.switchMatchExact.isChecked = mainViewModel.isTagExact
 
+        tagAdapter.isExactMatch = mainViewModel.isTagExact
+
         bind.switchMatchExact.setOnCheckedChangeListener { _, isChecked ->
 
             mainViewModel.isTagExact = isChecked
+            tagAdapter.isExactMatch = isChecked
+            RadioSearchFragment.tagAdapterPosition = bind.recyclerView.layoutManager?.onSaveInstanceState()
+            bind.recyclerView.adapter = null
+            bind.recyclerView.adapter = tagAdapter
+            RadioSearchFragment.tagAdapterPosition?.let {
+                bind.recyclerView.layoutManager?.onRestoreInstanceState(it)
+            }
         }
 
     }

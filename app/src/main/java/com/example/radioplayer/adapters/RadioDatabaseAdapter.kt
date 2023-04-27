@@ -81,6 +81,7 @@ class RadioDatabaseAdapter @Inject constructor(
         holder.bind.apply {
 
             tvPrimary.text = station.name
+            tvPrimary.textSize = titleSize
             tvSecondary.apply {
                 if(station.country?.isNotBlank() == true){
                     visibility = View.VISIBLE
@@ -164,6 +165,7 @@ class RadioDatabaseAdapter @Inject constructor(
     }
 
 
+
     var defaultTextColor = 0
     var selectedTextColor = 0
     var defaultSecondaryTextColor = 0
@@ -172,6 +174,7 @@ class RadioDatabaseAdapter @Inject constructor(
     var separatorDefault = 0
 
     var alpha = 0.1f
+    var titleSize = 20f
 
     var currentRadioStationName : String? = null
     var currentPlaybackState = false

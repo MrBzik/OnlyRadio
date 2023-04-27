@@ -12,6 +12,9 @@ object Constants {
 
     const val API_RADIO_SEARCH_URL = "/json/stations/search"
     const val API_RADIO_TOP_VOTE_SEARCH_URL = "/json/stations/topvote"
+    const val API_RADIO_ALL_COUNTRIES = "/json/countries"
+
+    const val API_RADIO_LANGUAGES = "/json/languages/"
 
     const val BASE_RADIO_URL = "radio base url"
 
@@ -76,10 +79,14 @@ object Constants {
     const val SHORT_DATE_FORMAT = "MMM, ', ' d"
 
 
+    const val TEXT_SIZE_STATION_TITLE_PREF = "pref for text size of stations titles"
+
+
 // Search preferences
 
     const val SEARCH_PREF_TAG = "search preferences tag"
     const val SEARCH_PREF_NAME = "search preferences name"
+    const val SEARCH_PREF_NAME_AUTO = "search pref name auto search"
     const val SEARCH_PREF_COUNTRY = "search preferences country"
     const val SEARCH_FULL_COUNTRY_NAME = "full country name for no result message"
     const val SEARCH_PREF_ORDER = "search preference for order"
@@ -95,6 +102,8 @@ object Constants {
     const val FAB_POSITION_Y = "FAB_POSITION_Y"
     const val IS_FAB_UPDATED = "IS_FAB_UPDATED"
     const val SEARCH_BTN_PREF = "search button position pref"
+
+
 
     //Recording preferences
 

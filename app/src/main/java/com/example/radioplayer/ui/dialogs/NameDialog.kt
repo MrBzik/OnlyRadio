@@ -56,9 +56,9 @@ class NameDialog (
 
             val newName = bind.etNewName.text.toString()
 
-            if(newName.isNotBlank()){
+//            if(newName.isNotBlank()){
                 mainViewModel.searchParamName.postValue(newName)
-            }
+//            }
             dismiss()
         }
 

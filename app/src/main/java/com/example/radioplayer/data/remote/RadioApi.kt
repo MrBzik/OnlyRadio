@@ -1,6 +1,7 @@
 package com.example.radioplayer.data.remote
 
 import com.example.radioplayer.data.remote.entities.Countries
+import com.example.radioplayer.data.remote.entities.Languages
 import com.example.radioplayer.data.remote.entities.RadioStations
 import com.example.radioplayer.data.remote.entities.RadioTags
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
@@ -50,7 +51,7 @@ interface RadioApi {
             sortBy : String,
 
             @Query("reverse")
-            isReversed : Boolean,
+            isReversed : Boolean = true,
 
             @Query("bitrateMin")
             bitrateMin : Int,
@@ -93,7 +94,7 @@ interface RadioApi {
         sortBy : String,
 
         @Query("reverse")
-        isReversed : Boolean,
+        isReversed : Boolean = true,
 
         @Query("bitrateMin")
         bitrateMin : Int,
@@ -125,7 +126,16 @@ interface RadioApi {
         @POST("/json/tags")
         suspend fun getAllTags() : Response<RadioTags>
 
-//        @POST("/json/countries")
-//        suspend fun getAllCountries() : Response<Countries>
+
+        @POST()
+        suspend fun getAllCountries(
+            @Url url : String
+        ) : Response<Countries>
+
+        @POST
+        suspend fun getLanguages(
+            @Url url : String
+        ) : Response<Languages>
+
 
 }

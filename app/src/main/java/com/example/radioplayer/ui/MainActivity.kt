@@ -59,8 +59,10 @@ import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_MAX_BIT
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_MIN_BIT
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
+import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME_AUTO
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_ORDER
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
+import com.example.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
 import com.example.radioplayer.utils.RandomColors
 import com.example.radioplayer.utils.Utils
 
@@ -471,13 +473,6 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.mi_historyFragment -> {
 
-//                if(databaseViewModel.selectedDate == 0L){
-//                    databaseViewModel.updateHistory.postValue(true)
-//                } else {
-//                    databaseViewModel.updateHistory.postValue(false)
-//                }
-
-
                 historyFragment.exitTransition = null
                 supportFragmentManager.beginTransaction().apply {
                     setCustomAnimations(R.anim.blank_anim, android.R.anim.fade_out)
@@ -714,6 +709,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
     override fun onStop() {
         super.onStop()
         this.cacheDir.deleteRecursively()
@@ -730,10 +726,12 @@ class MainActivity : AppCompatActivity() {
             putInt(SEARCH_PREF_MIN_BIT, mainViewModel.minBitrateNew)
             putInt(SEARCH_PREF_MAX_BIT, mainViewModel.maxBitrateNew)
             putBoolean(IS_SEARCH_FILTER_LANGUAGE, mainViewModel.isSearchFilterLanguage)
-
-
+            putBoolean(SEARCH_PREF_NAME_AUTO, mainViewModel.isNameAutoSearch)
 
         }.apply()
+
+        mainViewModel.textSizePref.edit()
+            .putFloat(TEXT_SIZE_STATION_TITLE_PREF, mainViewModel.stationsTitleSize).apply()
 
         if(mainViewModel.isFabUpdated){
             mainViewModel.fabPref.edit().apply {

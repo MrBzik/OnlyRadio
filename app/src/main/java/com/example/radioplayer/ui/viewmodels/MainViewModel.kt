@@ -6,11 +6,15 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
 import android.util.Log
+import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
+import com.example.radioplayer.RadioApplication
 import com.example.radioplayer.adapters.datasources.RadioStationsDataSource
 import com.example.radioplayer.adapters.datasources.StationsPageLoader
+import com.example.radioplayer.adapters.models.CountryWithRegion
+import com.example.radioplayer.adapters.models.TagWithGenre
 import com.example.radioplayer.connectivityObserver.ConnectivityObserver
 import com.example.radioplayer.connectivityObserver.NetworkConnectivityObserver
 import com.example.radioplayer.data.local.entities.RadioStation
@@ -19,6 +23,8 @@ import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.ui.dialogs.*
+import com.example.radioplayer.ui.fragments.RadioSearchFragment
+import com.example.radioplayer.ui.fragments.RadioSearchFragment.Companion.listOfCountries
 import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_BASS_LEVEL
 import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_REVERB_MODE
@@ -49,8 +55,13 @@ import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_MAX_BIT
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_MIN_BIT
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
+import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME_AUTO
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_ORDER
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
+import com.example.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
+import com.example.radioplayer.utils.Language
+import com.example.radioplayer.utils.listOfLanguages
+import com.example.radioplayer.utils.listOfNorthAmerica
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -71,6 +82,9 @@ class MainViewModel @Inject constructor(
        val networkError = radioServiceConnection.networkError
        val playbackState = radioServiceConnection.playbackState
 
+       val textSizePref = app.getSharedPreferences(TEXT_SIZE_STATION_TITLE_PREF, Context.MODE_PRIVATE)
+
+       var stationsTitleSize = textSizePref.getFloat(TEXT_SIZE_STATION_TITLE_PREF, 20f)
 
        private var listOfStations = listOf<RadioStation>()
        var isNewSearch = true
@@ -116,6 +130,7 @@ class MainViewModel @Inject constructor(
     }
 
 
+
     var hasInternetConnection : MutableLiveData<Boolean> = MutableLiveData(false)
 
     private fun setConnectivityObserver() {
@@ -147,12 +162,16 @@ class MainViewModel @Inject constructor(
         setConnectivityObserver()
     }
 
+       var isCountryListToUpdate = true
+
 
        val searchPreferences = app.getSharedPreferences("SearchPref", Context.MODE_PRIVATE)
 
        val searchParamTag : MutableLiveData<String> = MutableLiveData()
        val searchParamName : MutableLiveData<String> = MutableLiveData()
        val searchParamCountry : MutableLiveData<String> = MutableLiveData()
+
+       var isNameAutoSearch = searchPreferences.getBoolean(SEARCH_PREF_NAME_AUTO, true)
 
        var lastSearchCountry = searchPreferences.getString(SEARCH_PREF_COUNTRY, "") ?: ""
        var lastSearchName = searchPreferences.getString(SEARCH_PREF_NAME, "")?: ""
@@ -176,6 +195,76 @@ class MainViewModel @Inject constructor(
 
        var isSearchFilterLanguage = searchPreferences.getBoolean(Constants.IS_SEARCH_FILTER_LANGUAGE, false)
        var wasSearchFilterLanguage = isSearchFilterLanguage
+
+
+
+    fun updateCountryList() = viewModelScope.launch {
+
+        if(isCountryListToUpdate){
+            val countryList = radioSource.getAllCountries()
+
+            countryList.body()?.let{
+
+                it.forEach { country ->
+
+                    for(i in listOfCountries.indices){
+                        if(listOfCountries[i] is CountryWithRegion.Country){
+                            if((listOfCountries[i] as CountryWithRegion.Country)
+                                    .countryCode == country.iso_3166_1){
+                                (listOfCountries[i] as CountryWithRegion.Country).stationsCount =
+                                    country.stationcount
+                                break
+                            }
+                        }
+                    }
+                }
+
+                isCountryListToUpdate = false
+            }
+        }
+    }
+
+    private var currentLanguage = ""
+
+    private var stationsCountForLanguage = 0
+
+    fun updateLanguageCount(resultHandler : (Int) -> Unit) = viewModelScope.launch {
+
+
+        val newLang = Locale.getDefault().language
+
+        if(currentLanguage != newLang){
+
+            var language : Language? = null
+
+            for(i in listOfLanguages.indices){
+                if(listOfLanguages[i].iso == newLang){
+                    language = listOfLanguages[i]
+                    break
+                }
+            }
+
+            resultHandler(language?.stationCount ?: 0)
+
+            val response = language?.let { radioSource.getLanguages(language.name) }
+
+
+            response?.body()?.let { langs ->
+                var count = 0
+
+                langs.forEach {
+                    count += it.stationcount
+                }
+
+                resultHandler(count)
+                stationsCountForLanguage = count
+
+                currentLanguage = newLang
+            }
+        } else {
+            resultHandler(stationsCountForLanguage)
+        }
+    }
 
 
     private val searchBy : MutableLiveData<Boolean> = MutableLiveData()
@@ -227,18 +316,19 @@ class MainViewModel @Inject constructor(
 
                val calcOffset = limit * offset
 
-                var isReversedOrder = true
+//                var isReversedOrder = true
 
 
                 val orderSetting = when(newSearchOrder){
                     ORDER_VOTES -> "votes"
                     ORDER_POP -> "clickcount"
                     ORDER_TREND -> "clicktrend"
-                    ORDER_BIT_MIN -> {
-                        isReversedOrder = false
-                        "bitrate"
-                    }
-                    ORDER_BIT_MAX -> "bitrate"
+
+//                    ORDER_BIT_MIN -> {
+//                        isReversedOrder = false
+//                        "bitrate"
+//                    }
+//                    ORDER_BIT_MAX -> "bitrate"
                     else -> "random"
                 }
 
@@ -255,7 +345,6 @@ class MainViewModel @Inject constructor(
                        name = lastSearchName,
                        isNameExact = isNameExact,
                        order = orderSetting,
-                       isReversedOrder = isReversedOrder,
                        minBit = minBitrateNew,
                        maxBit = maxBitrateNew,
 
@@ -497,24 +586,121 @@ class MainViewModel @Inject constructor(
         var isCutExpanded = false
 
 
-//        fun commandToDeleteRecordingAtPosition(position : Int, recId : String){
-//            radioServiceConnection.sendCommand(
-//                COMMAND_DELETE_RECORDING_AT_POSITION,
-//                bundleOf(
-//                    Pair(RECORDING_POSITION, position),
-//                    Pair(RECORDING_ID, recId)
-//                    )
-//                )
-//        }
+//        private fun calculateTags() = viewModelScope.launch{
 //
-//        fun commandToInsertRecordingAtPosition(position : Int){
-//            radioServiceConnection.sendCommand(
-//                COMMAND_ADD_RECORDING_AT_POSITION,
-//                    bundleOf(
-//                        Pair(RECORDING_POSITION, position)
-//                    )
+//            val response = radioSource.getAllTags()
+//
+//        val builder = StringBuilder()
+//        val builder2 = StringBuilder()
+//        val builder3 = StringBuilder()
+//        val builder4 = StringBuilder()
+//        val builder5 = StringBuilder()
+//        val builder6 = StringBuilder()
+//        val builder7 = StringBuilder()
+//        val builder8 = StringBuilder()
+//        val builder9 = StringBuilder()
+//        val builder10 = StringBuilder()
+//
+//
+//            var buildCount = 0
+//
+//            for(i in RadioSearchFragment.tagsList.indices){
+//
+//                if(RadioSearchFragment.tagsList[i] is TagWithGenre.Tag){
+//
+//                    val tagItem = RadioSearchFragment.tagsList[i] as TagWithGenre.Tag
+//
+//                    var count = 0
+//                    var countExact = 0
+//
+//                    response.body()?.forEach {
+//
+//                        if(it.name.contains(tagItem.tag)){
+//                            count += it.stationcount
+//                        }
+//
+//                        if(it.name == tagItem.tag){
+//                            countExact += it.stationcount
+//                        }
+//                    }
+//
+//                   val newTag ="TagWithGenre.Tag(\"${tagItem.tag}\", $count, $countExact), "
+//
+//                  if(buildCount < 50) {
+//                                    buildCount++
+//                builder.append(
+//                   newTag
+//                )
+//            } else if(buildCount < 100) {
+//                                    buildCount++
+//            builder2.append(
+//                newTag
 //            )
+//        } else if(buildCount < 150) {
+//                                    buildCount++
+//                builder3.append(
+//                    newTag
+//                )
+//            } else if(buildCount < 200) {
+//                                    buildCount++
+//                builder4.append(
+//                    newTag
+//                )
+//            } else if(buildCount < 250) {
+//                 buildCount++
+//                builder5.append(newTag)
+//
+//            } else if(buildCount < 300) {
+//                      buildCount++
+//                      builder6.append(
+//                          newTag
+//                      )
+//                  } else if(buildCount < 350) {
+//                      buildCount++
+//                      builder7.append(
+//                          newTag
+//                      )
+//                  } else if(buildCount < 400) {
+//                      buildCount++
+//                      builder8.append(
+//                          newTag
+//                      )
+//                  } else if(buildCount < 450) {
+//                      buildCount++
+//                      builder9.append(
+//                          newTag
+//                      )
+//                  } else  {
+//                      buildCount++
+//                      builder10.append(newTag)
+//                  }
+//
+//                }
+//            }
+//
+//                    Log.d("CHECKTAGS", builder.toString())
+//        Log.d("CHECKTAGS", builder2.toString())
+//        Log.d("CHECKTAGS", builder3.toString())
+//        Log.d("CHECKTAGS", builder4.toString())
+//        Log.d("CHECKTAGS", builder5.toString())
+//
+//            Log.d("CHECKTAGS", builder6.toString())
+//            Log.d("CHECKTAGS", builder7.toString())
+//            Log.d("CHECKTAGS", builder8.toString())
+//            Log.d("CHECKTAGS", builder9.toString())
+//            Log.d("CHECKTAGS", builder10.toString())
+//
+//
 //        }
+
+
+
+    init {
+
+
+//        calculateTags()
+
+    }
 
 
 

@@ -130,6 +130,8 @@ class TitleAdapter @Inject constructor(
                 val title = item.title
 
                 tvPrimary.text = title.title
+                tvPrimary.textSize = titleSize
+
                 tvSecondary.text = title.stationName
                 tvTime.text = convertLongToDate(title.timeStamp, true)
 
@@ -206,7 +208,7 @@ class TitleAdapter @Inject constructor(
 
 
     var alpha = 0.1f
-
+    var titleSize = 20f
 
 
 

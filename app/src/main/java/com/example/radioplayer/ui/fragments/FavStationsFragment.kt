@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -43,6 +44,7 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -286,12 +288,13 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         databaseViewModel.observableListOfStations.observe(viewLifecycleOwner){
 
-            bind.tvMessage.apply {
+
+            bind.tvPlaylistMessage.apply {
                 if(it.isEmpty()){
                     visibility = View.VISIBLE
                     slideAnim(400, 0, R.anim.fade_in_anim)
-
-                } else{
+                }
+                else {
                     visibility = View.INVISIBLE
                 }
             }
@@ -465,6 +468,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 selectedSecondaryTextColor = ContextCompat.getColor(requireContext(), R.color.selected_secondary_text_color)
 
                 alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
+                titleSize = mainViewModel.stationsTitleSize
 
                 separatorDefault = ContextCompat.getColor(requireContext(), R.color.station_bottom_separator_default)
             }

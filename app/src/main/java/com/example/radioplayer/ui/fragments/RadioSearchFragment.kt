@@ -18,6 +18,7 @@ import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
+import com.example.radioplayer.adapters.models.CountryWithRegion
 import com.example.radioplayer.adapters.models.TagWithGenre
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
 import com.example.radioplayer.exoPlayer.isPlayEnabled
@@ -29,6 +30,8 @@ import com.example.radioplayer.ui.dialogs.*
 import com.example.radioplayer.utils.*
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.*
@@ -61,7 +64,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
 
         val tagsList : ArrayList<TagWithGenre> by lazy { ArrayList<TagWithGenre>().apply {
-
 
                 add(TagWithGenre.Genre(TAG_BY_PERIOD))
                 addAll(tagsListByPeriod)
@@ -97,6 +99,35 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                 addAll(tagsListOther)
             }
         }
+
+        val listOfCountries : ArrayList<CountryWithRegion> by lazy{
+            ArrayList<CountryWithRegion>().apply {
+
+                add(CountryWithRegion.Region(COUNTRY_REGION_AFRICA))
+                addAll(listOfAfrica)
+                 add(CountryWithRegion.Region(COUNTRY_REGION_ASIA))
+                addAll(listOfAsia)
+                 add(CountryWithRegion.Region(COUNTRY_REGION_CENTRAL_AMERICA))
+                addAll(listOfCentralAmerica)
+                 add(CountryWithRegion.Region(COUNTRY_REGION_NORTH_AMERICA))
+                addAll(listOfNorthAmerica)
+                 add(CountryWithRegion.Region(COUNTRY_REGION_SOUTH_AMERICA))
+                addAll(listOfSouthAmerica)
+                 add(CountryWithRegion.Region(COUNTRY_REGION_EAST_EUROPE))
+                addAll(listOfEastEurope)
+                 add(CountryWithRegion.Region(COUNTRY_REGION_WEST_EUROPE))
+                addAll(listOfWestEurope)
+                 add(CountryWithRegion.Region(COUNTRY_REGION_MIDDLE_EAST))
+                addAll(listOfMiddleEast)
+                 add(CountryWithRegion.Region(COUNTRY_REGION_OCEANIA))
+                addAll(listOfOceania)
+                 add(CountryWithRegion.Region(COUNTRY_REGION_THE_CARIBBEAN))
+                addAll(listOfTheCaribbean)
+
+            }
+        }
+
+
     }
 
 
@@ -137,6 +168,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             textLoadAnim = TextLoadAnim(
                 requireContext(), bind.tvLoading!!)
         }
+
+        mainViewModel.updateCountryList()
 
 
     }
@@ -332,7 +365,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                 selectedSecondaryTextColor = ContextCompat.getColor(requireContext(), R.color.selected_secondary_text_color)
 
                 alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
-
+                titleSize = mainViewModel.stationsTitleSize
                 separatorDefault = ContextCompat.getColor(requireContext(), R.color.station_bottom_separator_default)
 
             }
@@ -365,9 +398,12 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                     Log.d("CHECKTAGS", isNewSearchForAnimations.toString())
 
                     if(!isNewSearchForAnimations)
-                    bind.progressBar?.show()
+                        (activity as MainActivity).bind.progressBarBottom?.show()
                     else
-                    bind.progressBar?.hide()
+                        (activity as MainActivity).bind.progressBarBottom?.hide()
+//                    bind.progressBar?.show()
+//                    else
+//                    bind.progressBar?.hide()
                 }
 
 
@@ -380,7 +416,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                     (activity as MainActivity).endSeparatorsLoadAnim()
                 } else {
                     textLoadAnim?.endLoadingAnim()
-                    bind.progressBar?.hide()
+                    (activity as MainActivity).bind.progressBarBottom?.hide()
                 }
 
 
@@ -454,7 +490,11 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         bind.tvName.setOnClickListener {
 
-            NameDialog(requireContext(), mainViewModel).show()
+            if(mainViewModel.isNameAutoSearch){
+                NameAutoDialog(requireContext(), mainViewModel).show()
+            } else {
+                NameDialog(requireContext(), mainViewModel).show()
+            }
 
         }
 
@@ -498,18 +538,25 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         mainViewModel.searchParamTag.observe(viewLifecycleOwner){
 
-            (bind.tvTag as TextView).text  = if (it == "") "Tag" else it
+            (bind.tvTag as TextView).text  = it.ifBlank { "Tag" }
 
         }
 
         mainViewModel.searchParamName.observe(viewLifecycleOwner){
-            (bind.tvName as TextView).text = if (it == "") "Name" else it
+
+            (bind.tvName as TextView).text = it.ifBlank { "Name" }
+
+            if(mainViewModel.isNameAutoSearch){
+
+               val check = mainViewModel.initiateNewSearch()
+               clearAdapter(check)
+            }
         }
 
         mainViewModel.searchParamCountry.observe(viewLifecycleOwner){
 
 
-            (bind.tvSelectedCountry as TextView).text = if (it == "") "Country" else it
+            (bind.tvSelectedCountry as TextView).text = it.ifBlank {"Country"}
 
         }
     }

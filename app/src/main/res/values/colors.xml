@@ -39,6 +39,10 @@
     <color name="selected_station_playing">#CE93D8</color>
     <color name="selected_station_paused">#E1BEE7</color>
 
+    <color name="recording_seekbar_base">#E3F2FD</color>
+    <color name="recording_seekbar_progress">#C8FF66</color>
+
+
     <color name="default_text_color">#1A237E</color>
     <color name="selected_text_color">#4A148C</color>
 
@@ -50,7 +54,7 @@
     <color name="apply_option_text">#4A148C</color>
 
 
-    <color name="seekbar_text_style">#FF80AB</color>
+
     <color name="selected_genre_color">#4A148C</color>
     <color name="unselected_genre_color">#000000</color>
     <color name="option_selected">#698E03</color>
@@ -110,6 +114,8 @@
     <color name="station_bottom_separator_selected">#4D000000</color>
     <color name="station_bottom_separator_active">#758EB7</color>
     <color name="station_bottom_separator_default">#14000000</color>
+
+    <color name="option_bottom_separator">#0D000000</color>
 
     <color name="outlined_text_interactive_color">#FFFF99</color>
 

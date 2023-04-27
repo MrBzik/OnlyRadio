@@ -4,9 +4,12 @@ package com.example.radioplayer.ui.fragments
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
+import android.media.audiofx.AudioEffect
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
@@ -126,7 +129,46 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         setBassBoostClickListeners()
 
+        setAutoSearchByName()
+
+        setStationTitleSize()
+
     }
+
+
+    private fun setStationTitleSize(){
+
+        bind.tvStationsTitleSize.apply {
+
+            textSize = mainViewModel.stationsTitleSize
+
+            setOnClickListener {
+
+                val newSize = if(mainViewModel.stationsTitleSize > 14){
+                    mainViewModel.stationsTitleSize -2f
+                } else {
+                    20f
+                }
+
+                textSize = newSize
+                mainViewModel.stationsTitleSize = newSize
+            }
+        }
+    }
+
+
+    private fun setAutoSearchByName(){
+
+        bind.switchNameAutoSearchPref.apply {
+            isChecked = mainViewModel.isNameAutoSearch
+
+            setOnCheckedChangeListener { _, isChecked ->
+
+                mainViewModel.isNameAutoSearch = isChecked
+            }
+        }
+    }
+
 
     private fun setBassBoostClickListeners(){
 
@@ -234,21 +276,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         bind.btnAudioSettings.setOnClickListener {
 
-            try{
+            val intent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
 
-                val intent = Intent(Intent.ACTION_MAIN)
-                intent.setClassName("com.sec.android.app.soundalive", "com.sec.android.app.soundalive.SAControlPanelActivity")
+            if(intent.resolveActivity(requireContext().packageManager) != null){
                 startActivity(intent)
-            } catch (e: Exception){
-
-                val intent = Intent(android.provider.Settings.ACTION_SOUND_SETTINGS)
-                startActivity(intent)
-
             }
-
-
         }
-
     }
 
 

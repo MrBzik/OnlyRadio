@@ -2,7 +2,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:gravity="center_vertical">
         <shape android:shape="rectangle" >
-            <gradient android:startColor="@color/selected_station_paused"
+            <gradient android:startColor="@color/recording_seekbar_base"
                 android:endColor="@color/main_background"
                 android:angle="90"
                 />
@@ -13,7 +13,7 @@
         <scale android:scaleWidth="100%">
             <shape android:shape="rectangle">
                 <size android:height="69dp"/>
-                <gradient android:startColor="@color/seekbar_text_style"
+                <gradient android:startColor="@color/recording_seekbar_progress"
                     android:endColor="@color/main_background"
                     android:angle="90"/>
 "

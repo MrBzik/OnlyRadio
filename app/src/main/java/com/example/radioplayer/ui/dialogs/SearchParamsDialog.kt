@@ -43,6 +43,19 @@ const val BITRATE_MAX = 1000000
 
 
 
+/*
+       7200       1285     3282     1986    13537      3102    833      1296      0
+
+            310         2565     488     382      671      104      29      442
+
+         0         32        64       96      128       192     256      320     max
+
+                                                            4038
+
+*/
+
+
+val bitrateCalclList = arrayListOf(7000, 60, 230, 20, 1300, 2600, 3300, 500, 2000, 400, 13540, 700, 3100, 100, 850, 50, 1300, 450, 0)
 
 class SearchParamsDialog (
     private val requireContext : Context,
@@ -77,14 +90,23 @@ class SearchParamsDialog (
 
         setLanguageOption()
 
+        updateStationsCountForLanguage()
+
         bind.tvBack.setOnClickListener {
             dismiss()
         }
 
+    }
 
 
+    private fun updateStationsCountForLanguage(){
+
+        mainViewModel.updateLanguageCount {
+            bind.tvStationsLangCount.text = "$it st."
+        }
 
     }
+
 
     private fun setAcceptButton(){
 
@@ -161,8 +183,8 @@ class SearchParamsDialog (
 
     private fun setRangeSliderBitrate(){
         bind.rangeSliderBitrate.apply {
-            valueFrom = 1f
-            valueTo = 10f
+            valueFrom = 0f
+            valueTo = 9f
             stepSize = 1f
 
             val minBit = bitrateToFloatPosition(mainViewModel.minBitrateNew)
@@ -170,18 +192,20 @@ class SearchParamsDialog (
 
             values = listOf(minBit, maxBit)
 
+            calcStationCountForBitrate()
+
             setLabelFormatter { value ->
 
                 when(value){
-                    1f -> "Unset"
-                    2f -> "$BITRATE_24 kbps"
-                    3f -> "$BITRATE_32 kbps"
-                    4f -> "$BITRATE_64 kbps"
-                    5f ->"$BITRATE_96 kbps"
-                    6f -> "$BITRATE_128 kbps"
-                    7f -> "$BITRATE_192 kbps"
-                    8f -> "$BITRATE_256 kbps"
-                    9f -> "$BITRATE_320 kbps"
+                    0f -> "Unset"
+                    1f -> "$BITRATE_24 kbps"
+                    2f -> "$BITRATE_32 kbps"
+                    3f -> "$BITRATE_64 kbps"
+                    4f ->"$BITRATE_96 kbps"
+                    5f -> "$BITRATE_128 kbps"
+                    6f -> "$BITRATE_192 kbps"
+                    7f -> "$BITRATE_256 kbps"
+                    8f -> "$BITRATE_320 kbps"
                     else -> "Unset"
                 }
             }
@@ -197,35 +221,57 @@ class SearchParamsDialog (
                     val newMax = slider.values[1].toInt()
 
                     if(newMin == newMax){
-                        if( newMax == 1){
-                            slider.values = listOf(1f, 2f)
-                        } else if( newMax == 10){
-                            slider.values = listOf(9f, 10f)
+                        if( newMax == 0){
+                            slider.values = listOf(0f, 1f)
+                        } else if( newMax == 9){
+                            slider.values = listOf(8f, 9f)
                         }
-
                     }
 
+                    calcStationCountForBitrate()
                 }
             })
-
-
         }
     }
+
+
+
+    private fun calcStationCountForBitrate(){
+
+        val bitMin = bind.rangeSliderBitrate.values.first().toInt()
+        val bitMax = bind.rangeSliderBitrate.values[1].toInt()
+
+
+        val indexFrom = bitMin*2
+        val indexTo = bitMax*2
+        var result = 0
+
+        for(i in indexFrom .. indexTo){
+
+           result += bitrateCalclList[i]
+
+        }
+
+        bind.tvStationsCountValue.text = "~ $result st."
+
+
+    }
+
 
 
     private fun bitrateToFloatPosition(bit : Int) : Float {
 
        return when(bit){
-            BITRATE_0 -> 1f
-            BITRATE_24 -> 2f
-            BITRATE_32 -> 3f
-            BITRATE_64 -> 4f
-            BITRATE_96 -> 5f
-            BITRATE_128 -> 6f
-            BITRATE_192 -> 7f
-            BITRATE_256 -> 8f
-            BITRATE_320 -> 9f
-            else -> 10f
+            BITRATE_0 -> 0f
+            BITRATE_24 -> 1f
+            BITRATE_32 -> 2f
+            BITRATE_64 -> 3f
+            BITRATE_96 -> 4f
+            BITRATE_128 -> 5f
+            BITRATE_192 -> 6f
+            BITRATE_256 -> 7f
+            BITRATE_320 -> 8f
+            else -> 9f
         }
     }
 
@@ -234,15 +280,15 @@ class SearchParamsDialog (
 
         return when(position){
 
-            1f -> BITRATE_0
-            2f -> BITRATE_24
-            3f -> BITRATE_32
-            4f -> BITRATE_64
-            5f -> BITRATE_96
-            6f -> BITRATE_128
-            7f -> BITRATE_192
-            8f -> BITRATE_256
-            9f -> BITRATE_320
+            0f -> BITRATE_0
+            1f -> BITRATE_24
+            2f -> BITRATE_32
+            3f -> BITRATE_64
+            4f -> BITRATE_96
+            5f -> BITRATE_128
+            6f -> BITRATE_192
+            7f -> BITRATE_256
+            8f -> BITRATE_320
             else -> BITRATE_MAX
 
         }

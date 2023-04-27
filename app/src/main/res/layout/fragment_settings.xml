@@ -187,6 +187,66 @@
                 app:trackTint="@color/switch_track_color" />
 
 
+
+            <TextView
+                android:id="@+id/tvNameAutoSearchPref"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="30dp"
+                android:text="Auto search by name"
+                android:textAppearance="@style/dialogItemText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvNightModePref" />
+
+
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchNameAutoSearchPref"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:minHeight="48dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvNameAutoSearchPref"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvNameAutoSearchPref"
+                app:thumbTint="@color/switch_thumb_color"
+                app:trackTint="@color/switch_track_color" />
+
+
+            <View
+                android:id="@+id/viewBoxForStationsTitleSize"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvNameAutoSearchPref"
+                android:layout_marginTop="30dp"/>
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="30dp"
+                android:text="Text"
+                android:textAppearance="@style/dialogItemText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/viewBoxForStationsTitleSize" />
+
+            <TextView
+                android:id="@+id/tvStationsTitleSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="34dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:fontFamily="sans-serif-smallcaps"
+                android:text="Stations Title Size"
+                android:textColor="@color/default_text_color"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@+id/viewBoxForStationsTitleSize"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+
             <TextView
                 android:id="@+id/tvControlBuffer"
                 android:layout_width="wrap_content"
@@ -196,7 +256,7 @@
                 android:text="Buffer control"
                 android:textAppearance="@style/dialogItemText"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvNightModePref" />
+                app:layout_constraintTop_toBottomOf="@+id/viewBoxForStationsTitleSize" />
 
 
             <TextView

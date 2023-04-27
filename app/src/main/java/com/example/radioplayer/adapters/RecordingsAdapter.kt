@@ -90,6 +90,8 @@ class RecordingsAdapter @Inject constructor(
         holder.bind.apply {
 
             tvPrimary.text = recording.name
+            tvPrimary.textSize = titleSize
+
             tvSecondary.text = Utils.convertLongToDate(recording.timeStamp)
 
             val color = randColors.getColor()
@@ -167,6 +169,7 @@ class RecordingsAdapter @Inject constructor(
 
 
     var alpha = 0.1f
+    var titleSize = 20f
 
     var playingRecordingId = ""
 

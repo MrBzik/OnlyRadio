@@ -440,6 +440,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 selectedSecondaryTextColor = ContextCompat.getColor(requireContext(), R.color.selected_secondary_text_color)
 
                 alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
+                titleSize = mainViewModel.stationsTitleSize
 
                 separatorDefault = ContextCompat.getColor(requireContext(), R.color.station_bottom_separator_default)
 
@@ -470,6 +471,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             titlesHistoryAdapter?.apply {
                 currentDate = dateForAdapters
                 alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
+                titleSize = mainViewModel.stationsTitleSize
                 setOnClickListener { title ->
                     val clip = ClipData.newPlainText("label", title.title)
                     clipBoard?.setPrimaryClip(clip)

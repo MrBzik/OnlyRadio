@@ -5,56 +5,125 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
+import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
+import com.example.radioplayer.adapters.models.CountryWithRegion
+import com.example.radioplayer.adapters.models.TagWithGenre
 import com.example.radioplayer.databinding.ItemCountryBinding
-import com.example.radioplayer.utils.Country
+import com.example.radioplayer.databinding.ItemGenreBinding
+import com.example.radioplayer.databinding.ItemTextBinding
 
-class FilterCountriesAdapter(): ListAdapter<Country, FilterCountriesAdapter.CountryHolder>(DIFF_CALLBACK),
+const val VIEW_TYPE_COUNTRY = 0
+const val VIEW_TYPE_REGION = 1
+
+class FilterCountriesAdapter(): ListAdapter<CountryWithRegion, RecyclerView.ViewHolder>(DIFF_CALLBACK),
     Filterable {
 
-    var originalList: List<Country> = currentList.toList()
+    var originalList: List<CountryWithRegion> = currentList.toList()
 
     class CountryHolder (val bind : ItemCountryBinding) : RecyclerView.ViewHolder(bind.root)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CountryHolder {
+    class RegionHolder (val bind : ItemGenreBinding) : RecyclerView.ViewHolder(bind.root)
 
-        return CountryHolder(
-            ItemCountryBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
-            )
-        )
+    override fun getItemViewType(position: Int): Int {
+        return when (getItem(position)){
+            is CountryWithRegion.Country -> VIEW_TYPE_COUNTRY
+            is CountryWithRegion.Region -> VIEW_TYPE_REGION
+        }
     }
 
-    override fun onBindViewHolder(holder: CountryHolder, position: Int) {
+
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+
+        if(viewType == VIEW_TYPE_COUNTRY) {
+            val holder = CountryHolder (
+                ItemCountryBinding.inflate(
+                    LayoutInflater.from(parent.context), parent, false
+                )
+            )
+            holder.itemView.setOnClickListener {
+                val item = getItem(holder.absoluteAdapterPosition) as CountryWithRegion.Country
+                onItemClickListener?.let { click ->
+                    click(item, holder.absoluteAdapterPosition)
+                }
+            }
+            return holder
+
+        } else {
+            val holder = RegionHolder(
+                ItemGenreBinding.inflate(
+                    LayoutInflater.from(parent.context), parent, false
+                )
+            )
+            holder.itemView.setOnClickListener {
+                val item = getItem(holder.absoluteAdapterPosition) as CountryWithRegion.Region
+                handleGenreTextStyle(!item.isOpened, holder.bind.tvText)
+                onItemClickListener?.let { click ->
+                    click(item, holder.absoluteAdapterPosition)
+                }
+            }
+            return holder
+        }
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         val item = getItem(position)
 
-        holder.bind.apply {
+        if(item is CountryWithRegion.Country){
 
-            tvCountryName.text = item.countryName
+            (holder as CountryHolder).bind.apply {
 
-            Glide.with(ivCountryFlag)
-                .load(
-                    Uri.parse(
-                    "file:///android_asset/flags/${item.countryCode.lowercase()}.png"))
-                .into(ivCountryFlag)
+                tvCountryName.text = item.countryName
 
-            root.setOnClickListener {
-                onItemClickListener?.let { click ->
+                tvStationsCount.text = item.stationsCount.toString()
 
-                    click(item.countryCode, item.countryName)
+                Glide.with(ivCountryFlag)
+                    .load(
+                        Uri.parse(
+                            "file:///android_asset/flags/${item.countryCode.lowercase()}.png"))
+                    .into(ivCountryFlag)
 
-                }
+            }
+        } else if(item is CountryWithRegion.Region){
+            (holder as RegionHolder).apply {
+                bind.tvText.text = item.region
+                handleGenreTextStyle(item.isOpened, bind.tvText)
             }
         }
     }
 
-    private var onItemClickListener : ((code : String, fullName : String) -> Unit)? = null
 
-    fun setOnCountryClickListener(listener : (code :String, fullName : String) -> Unit){
+    var defaultTextColor = 0
+    var selectedTextColor = 0
+    var openingDrawable = 0
+    var closingDrawable = 0
+
+    private fun handleGenreTextStyle(isOpened : Boolean, textView : TextView){
+
+        if(isOpened){
+            textView.apply {
+                textView.setTextColor(selectedTextColor)
+                setCompoundDrawablesWithIntrinsicBounds(closingDrawable, 0, closingDrawable, 0)
+            }
+
+        } else {
+            textView.apply {
+                setTextColor(defaultTextColor)
+                setCompoundDrawablesWithIntrinsicBounds(openingDrawable, 0, openingDrawable, 0)
+            }
+        }
+    }
+
+
+    private var onItemClickListener : ((countryItem : CountryWithRegion, position: Int) -> Unit)? = null
+
+    fun setOnCountryClickListener(listener : (countryItem : CountryWithRegion, position: Int) -> Unit){
         onItemClickListener = listener
     }
 
@@ -69,6 +138,9 @@ class FilterCountriesAdapter(): ListAdapter<Country, FilterCountriesAdapter.Coun
                             originalList
                         else {
                             originalList.filter { country ->
+
+                                country is CountryWithRegion.Country &&
+
                                 country.countryName.contains(charSequence, ignoreCase = true)
                             }
                         }
@@ -76,18 +148,18 @@ class FilterCountriesAdapter(): ListAdapter<Country, FilterCountriesAdapter.Coun
                 }
 
                 override fun publishResults(charSequence: CharSequence, filterResults: Filter.FilterResults) {
-                    submitList(filterResults.values as List<Country>, true)
+                    submitList(filterResults.values as List<CountryWithRegion>, true)
 
                 }
             }
     }
 
-    override fun submitList(list: List<Country>?) {
+    override fun submitList(list: List<CountryWithRegion>?) {
         submitList(list, false)
     }
 
 
-    private fun submitList(list: List<Country>?, filtered: Boolean) {
+    private fun submitList(list: List<CountryWithRegion>?, filtered: Boolean) {
         if (!filtered)
             originalList = list ?: listOf()
 
@@ -96,14 +168,21 @@ class FilterCountriesAdapter(): ListAdapter<Country, FilterCountriesAdapter.Coun
 
 
     companion object {
-        val DIFF_CALLBACK= object: DiffUtil.ItemCallback<Country>() {
+        val DIFF_CALLBACK= object: DiffUtil.ItemCallback<CountryWithRegion>() {
 
-            override fun areItemsTheSame(oldItem: Country, newItem: Country): Boolean {
-                return oldItem.countryCode == newItem.countryCode
+            override fun areItemsTheSame(oldItem: CountryWithRegion, newItem: CountryWithRegion): Boolean {
+                return oldItem is CountryWithRegion.Country && newItem is CountryWithRegion.Country
+                        && oldItem.countryCode == newItem.countryCode ||
+                        oldItem is CountryWithRegion.Region && newItem is CountryWithRegion.Region
+                        && oldItem.region == newItem.region
+
             }
 
-            override fun areContentsTheSame(oldItem: Country, newItem: Country): Boolean {
-                return oldItem.countryCode == newItem.countryCode
+            override fun areContentsTheSame(oldItem: CountryWithRegion, newItem: CountryWithRegion): Boolean {
+                return oldItem is CountryWithRegion.Country && newItem is CountryWithRegion.Country
+                        && oldItem.countryCode == newItem.countryCode ||
+                        oldItem is CountryWithRegion.Region && newItem is CountryWithRegion.Region
+                        && oldItem.region == newItem.region
 
             }
         }

@@ -75,8 +75,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
+        android:layout_marginTop="2dp"
         android:paddingHorizontal="8dp"
-        android:text="Low bitrate streams use less internet, while higher bitrate may result in better audio quality"
+        android:text="Setting min bitrate will hide stations with no bitrate info in database"
         android:textAppearance="@style/hintText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/tvBitrateTitle"
@@ -92,6 +93,19 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvBitrateHint" />
+
+
+    <TextView
+        android:id="@+id/tvStationsCountValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="8dp"
+        android:text="~ 37000 st."
+        android:textAppearance="@style/hintText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rangeSliderBitrate" />
+
 
     <TextView
         android:id="@+id/tvBitrateValMin"
@@ -146,17 +160,24 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
         android:minHeight="48dp"
-        app:layout_constraintBottom_toBottomOf="@+id/tvLanguageValue"
+        app:layout_constraintBottom_toBottomOf="@+id/tvLanguageTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tvLanguageTitle"
         app:thumbTint="@color/switch_thumb_color"
         app:trackTint="@color/switch_track_color" />
 
+    <TextView
+        android:id="@+id/tvStationsLangCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="8dp"
+        android:text="11400 st."
+        android:textAppearance="@style/hintText"
+        app:layout_constraintBottom_toBottomOf="@+id/tvLanguageValue"
+        app:layout_constraintEnd_toEndOf="@+id/switchLanguagePref"
+        app:layout_constraintTop_toTopOf="@+id/tvLanguageValue"
 
-
-
-
-
+        />
 
 
     <TextView

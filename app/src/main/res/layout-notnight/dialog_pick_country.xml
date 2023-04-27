@@ -50,7 +50,6 @@
         android:id="@+id/rvCountries"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:paddingStart="20dp"
         app:layout_constraintBottom_toTopOf="@+id/tvClearSelection"
         app:layout_constraintEnd_toEndOf="@id/tvBack"
         app:layout_constraintHorizontal_bias="0.5"
