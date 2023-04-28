@@ -25,6 +25,8 @@ class RadioPlayerNotificationListener (
 
             isForegroundService = false
 
+            radioService.stopServiceNow()
+
 
             stopSelf()
 

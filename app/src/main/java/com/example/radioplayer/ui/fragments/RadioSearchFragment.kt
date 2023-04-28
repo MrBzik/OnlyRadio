@@ -169,9 +169,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                 requireContext(), bind.tvLoading!!)
         }
 
-        mainViewModel.updateCountryList()
-
-
     }
 
     private fun setSearchParamsFabClickListener(){

@@ -35,7 +35,7 @@
             android:layout_height="65dp"
 
             android:fontFamily="@font/ranchers"
-            android:text="D"
+
             android:textColor="@color/main_background"
             android:textSize="40sp"
             android:gravity="center"
@@ -64,7 +64,7 @@
         android:focusableInTouchMode="true"
         android:textSize="14sp"
         android:layout_marginStart="75dp"
-        android:text="some song title"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -86,7 +86,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="83dp"
         android:layout_marginBottom="5dp"
-        android:text="320/kbps"
+
         android:textAppearance="@style/dialogItemText"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

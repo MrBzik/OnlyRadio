@@ -188,7 +188,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    fun smoothDayNightFadeOut(isNightMode : Boolean){
+    fun smoothDayNightFadeOut(){
 
         AlphaFadeOutAnim(1f, 500).apply {
 
@@ -208,7 +208,7 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        if(!isNightMode){
+        if(uiMode != Configuration.UI_MODE_NIGHT_YES){
 
             val colorAnimator = ValueAnimator.ofArgb(Color.WHITE, Color.BLACK)
             colorAnimator.addUpdateListener {
@@ -233,7 +233,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun smoothDayNightFadeIn(isNightMode: Boolean){
+    fun smoothDayNightFadeIn(){
         if(isStubPlayerBindInflated)
             bindPlayer.root.slideAnim(700, 0, R.anim.fade_in_anim)
 
@@ -243,7 +243,7 @@ class MainActivity : AppCompatActivity() {
         bind.separatorSecond?.slideAnim(700, 0, R.anim.fade_in_anim)
         bind.separatorLowest?.slideAnim(700, 0, R.anim.fade_in_anim)
 
-        if(!isNightMode){
+        if(uiMode != Configuration.UI_MODE_NIGHT_YES){
 
 
             val colorAnimator = ValueAnimator.ofArgb(Color.BLACK, Color.WHITE)

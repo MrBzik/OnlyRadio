@@ -198,29 +198,38 @@ class MainViewModel @Inject constructor(
 
 
 
-    fun updateCountryList() = viewModelScope.launch {
+    fun updateCountryList(handleResults : () -> Unit) = viewModelScope.launch {
 
         if(isCountryListToUpdate){
-            val countryList = radioSource.getAllCountries()
 
-            countryList.body()?.let{
+            try {
+                val countryList = radioSource.getAllCountries()
+                if(countryList.isSuccessful){
+                    countryList.body()?.let {
+                        it.forEach { country ->
 
-                it.forEach { country ->
-
-                    for(i in listOfCountries.indices){
-                        if(listOfCountries[i] is CountryWithRegion.Country){
-                            if((listOfCountries[i] as CountryWithRegion.Country)
-                                    .countryCode == country.iso_3166_1){
-                                (listOfCountries[i] as CountryWithRegion.Country).stationsCount =
-                                    country.stationcount
-                                break
+                            for(i in listOfCountries.indices){
+                                if(listOfCountries[i] is CountryWithRegion.Country){
+                                    if((listOfCountries[i] as CountryWithRegion.Country)
+                                            .countryCode == country.iso_3166_1){
+                                        (listOfCountries[i] as CountryWithRegion.Country).stationsCount =
+                                            country.stationcount
+                                        break
+                                    }
+                                }
                             }
                         }
+
+                        handleResults()
+
+                        isCountryListToUpdate = false
                     }
+
                 }
 
-                isCountryListToUpdate = false
-            }
+
+            } catch (e : Exception){ }
+
         }
     }
 
@@ -229,7 +238,6 @@ class MainViewModel @Inject constructor(
     private var stationsCountForLanguage = 0
 
     fun updateLanguageCount(resultHandler : (Int) -> Unit) = viewModelScope.launch {
-
 
         val newLang = Locale.getDefault().language
 
@@ -245,21 +253,24 @@ class MainViewModel @Inject constructor(
             }
 
             resultHandler(language?.stationCount ?: 0)
+            stationsCountForLanguage
 
-            val response = language?.let { radioSource.getLanguages(language.name) }
+             language?.let {
 
+                try {
+                    val response = radioSource.getLanguages(language.name)
+                      response.body()?.let { langs ->
+                        var count = 0
 
-            response?.body()?.let { langs ->
-                var count = 0
+                        langs.forEach {
+                            count += it.stationcount
+                        }
+                        resultHandler(count)
+                        stationsCountForLanguage = count
+                        currentLanguage = newLang
+                    }
 
-                langs.forEach {
-                    count += it.stationcount
-                }
-
-                resultHandler(count)
-                stationsCountForLanguage = count
-
-                currentLanguage = newLang
+                } catch (e : Exception){}
             }
         } else {
             resultHandler(stationsCountForLanguage)

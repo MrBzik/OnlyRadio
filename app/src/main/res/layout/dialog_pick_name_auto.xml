@@ -6,8 +6,7 @@
     android:layout_height="58dp"
     android:background="@drawable/dialog_gradient_for_background_name"
     android:minHeight="58dp"
-    android:paddingHorizontal="16dp"
-    >
+    android:paddingHorizontal="16dp">
 
 
     <TextView
@@ -15,10 +14,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="2dp"
+        android:fontFamily="@font/aldrich"
         android:text="Exact"
-        android:textAppearance="@style/dialogItemText"
-        android:textSize="14sp"
+        android:textColor="@color/nameDialogAutoHint"
+        android:textSize="12sp"
         app:layout_constraintStart_toStartOf="@+id/switchMatchExact"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -27,14 +27,13 @@
         android:id="@+id/switchMatchExact"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="12dp"
         android:minHeight="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:thumbTint="@color/switch_thumb_color"
-        app:trackTint="@color/switch_track_color"
 
-        />
+        app:trackTint="@color/switch_track_color" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout3"
@@ -45,6 +44,7 @@
         android:layout_marginBottom="-4dp"
         android:hint="Type new name"
         app:endIconMode="clear_text"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/switchMatchExact"
         app:layout_constraintStart_toStartOf="parent">
@@ -54,7 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:inputType="text|textNoSuggestions"
-            android:text="Some name"
+
             android:textAppearance="@style/dialogSearchText"
             android:textColor="@color/search_text_color"
             android:textSize="16sp"
@@ -62,6 +62,8 @@
             />
 
     </com.google.android.material.textfield.TextInputLayout>
+
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

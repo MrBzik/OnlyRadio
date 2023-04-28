@@ -53,7 +53,7 @@
 
     <color name="apply_option_text">#4A148C</color>
 
-
+    <color name="nameDialogAutoHint">#1A237E</color>
 
     <color name="selected_genre_color">#4A148C</color>
     <color name="unselected_genre_color">#000000</color>

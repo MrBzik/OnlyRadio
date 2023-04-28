@@ -6,6 +6,7 @@ import android.content.ClipboardManager
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
 import android.util.Log
@@ -38,6 +39,7 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.SpinnerExt
 import com.example.radioplayer.utils.Utils
 import com.example.radioplayer.utils.Utils.fromDateToString
+import com.example.radioplayer.utils.addAction
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.sql.Date
@@ -479,9 +481,26 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                     Snackbar.make(
                         requireActivity().findViewById(R.id.rootLayout),
                         "Title copied", Snackbar.LENGTH_LONG).apply {
-                        setAction("SEARCH"){
+
+                        setAction("WEBSEARCH"){
+
                             val intent = Intent(Intent.ACTION_WEB_SEARCH)
                             intent.putExtra(SearchManager.QUERY, title.title)
+                            startActivity(intent)
+
+
+//                         val  browserIntent = Intent(Intent.ACTION_VIEW,
+//                             Uri.parse("https://soundcloud.com/search?q=" + title.title))
+//                            browserIntent.putExtra(SearchManager.QUERY, title.title)
+//                            browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//                            startActivity(browserIntent)
+
+                        }
+                        addAction(R.layout.snackbar_extra_action, "YOUTUBE"){
+                            val intent = Intent(Intent.ACTION_SEARCH)
+                            intent.setPackage("com.google.android.youtube")
+                            intent.putExtra("query", title.title)
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             startActivity(intent)
                         }
                     }.show()

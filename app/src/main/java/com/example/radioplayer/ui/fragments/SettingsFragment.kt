@@ -4,12 +4,11 @@ package com.example.radioplayer.ui.fragments
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
 import android.media.audiofx.AudioEffect
 import android.os.Bundle
-import android.util.TypedValue
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
@@ -78,7 +77,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         HISTORY_STRING_15_DATES, HISTORY_STRING_21_DATES, HISTORY_STRING_30_DATES)
     }
 
-    private var isNightMode = false
+//    private var isNightMode = false
 
     private val bluetoothViewModel : BluetoothViewModel by lazy{
         ViewModelProvider(requireActivity())[BluetoothViewModel::class.java]
@@ -91,7 +90,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         getInitialUiMode()
 
-        getInitialNightModePref()
+        getInitialNightModeOnStartPref()
 
         getInitialHistoryOptionValue()
 
@@ -127,7 +126,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         setReverbClickListeners()
 
-        setBassBoostClickListeners()
+        setVirtualizerClickListeners()
 
         setAutoSearchByName()
 
@@ -170,7 +169,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
     }
 
 
-    private fun setBassBoostClickListeners(){
+    private fun setVirtualizerClickListeners(){
 
         setBassBoostText()
 
@@ -380,7 +379,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
             bind.root.slideAnim(700, 0, R.anim.fade_in_anim)
 
-            (activity as MainActivity).smoothDayNightFadeIn(isNightMode)
+            (activity as MainActivity).smoothDayNightFadeIn()
 
             mainViewModel.isSmoothTransitionNeeded = false
         }
@@ -531,7 +530,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
     }
 
-    private fun getInitialNightModePref(){
+    private fun getInitialNightModeOnStartPref(){
 
         val isChecked = darkModePref.getBoolean(DARK_MODE_PREF, false)
 
@@ -660,7 +659,8 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
     private fun setSwitchNightModeListener(){
 
-        bind.switchNightMode.setOnCheckedChangeListener { _, isChecked ->
+        bind.switchNightMode.setOnClickListener {
+
 
             mainViewModel.isSmoothTransitionNeeded = true
 
@@ -670,22 +670,18 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
             fadeAnim.startAnim(bind.root)
 
 
-            (activity as MainActivity).smoothDayNightFadeOut(isNightMode)
+            (activity as MainActivity).smoothDayNightFadeOut()
 
                 bind.root.postDelayed({
 
-
-                    if(isChecked){
+                    if(bind.switchNightMode.isChecked){
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-
-//                        (activity as MainActivity).bind.root.setBackgroundColor(Color.BLACK)
 
 
                     } else{
 
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
-//                        (activity as MainActivity).bind.root.setBackgroundColor(Color.WHITE)
                     }
 
                 }, 500)
@@ -695,17 +691,17 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
     private fun getInitialUiMode(){
 
-       val mode = requireContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+//       val mode = requireContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
 
-        when(mode){
+        when(MainActivity.uiMode){
             Configuration.UI_MODE_NIGHT_YES -> {
                 bind.switchNightMode.isChecked = true
-                isNightMode = true
+//                isNightMode = true
             }
 
             Configuration.UI_MODE_NIGHT_NO -> {
                 bind.switchNightMode.isChecked = false
-                isNightMode = false
+//                isNightMode = false
             }
         }
     }

@@ -29,6 +29,7 @@ import com.example.radioplayer.ui.dialogs.AddStationToPlaylistDialog
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
 import com.example.radioplayer.utils.RandomColors
 import com.example.radioplayer.utils.Utils
+import com.example.radioplayer.utils.addAction
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.net.URLEncoder
@@ -138,11 +139,18 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             Snackbar.make(
                 requireActivity().findViewById(R.id.rootLayout),
                 "Title copied", Snackbar.LENGTH_LONG).apply {
-                    setAction("SEARCH"){
+                    setAction("WEBSEARCH"){
                         val intent = Intent(Intent.ACTION_WEB_SEARCH)
                         intent.putExtra(SearchManager.QUERY, bind.tvSongTitle.text)
                         startActivity(intent)
                     }
+                addAction(R.layout.snackbar_extra_action, "YOUTUBE"){
+                    val intent = Intent(Intent.ACTION_SEARCH)
+                    intent.setPackage("com.google.android.youtube")
+                    intent.putExtra(SearchManager.QUERY, bind.tvSongTitle.text)
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
+                }
             }.show()
 
         }

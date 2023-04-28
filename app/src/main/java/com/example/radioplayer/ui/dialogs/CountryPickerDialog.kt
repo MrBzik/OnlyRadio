@@ -12,9 +12,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.FilterCountriesAdapter
 import com.example.radioplayer.adapters.models.CountryWithRegion
-import com.example.radioplayer.adapters.models.TagWithGenre
+
 
 import com.example.radioplayer.databinding.DialogPickCountryBinding
+
 import com.example.radioplayer.ui.fragments.RadioSearchFragment.Companion.countriesAdapterPosition
 import com.example.radioplayer.ui.fragments.RadioSearchFragment.Companion.listOfCountries
 import com.example.radioplayer.ui.viewmodels.MainViewModel
@@ -60,7 +61,14 @@ class CountryPickerDialog(
 
         adjustDialogHeight(bind.clCountryPickDialog)
 
-
+        mainViewModel.updateCountryList(){
+            countriesAdapterPosition = bind.rvCountries.layoutManager?.onSaveInstanceState()
+            bind.rvCountries.adapter = null
+            bind.rvCountries.adapter = countryAdapter
+            countriesAdapterPosition?.let {
+                bind.rvCountries.layoutManager?.onRestoreInstanceState(it)
+            }
+        }
 
     }
 

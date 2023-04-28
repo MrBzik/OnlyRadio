@@ -61,6 +61,9 @@ class RadioServiceConnection (
         connect()
     }
 
+    fun disconnect(){
+        mediaBrowser.disconnect()
+    }
 
    private inner class MediaBrowserConnectionCallback (
        private val context: Context

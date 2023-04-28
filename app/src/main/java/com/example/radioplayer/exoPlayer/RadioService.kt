@@ -204,8 +204,11 @@ class RadioService : MediaBrowserServiceCompat() {
     }
 
 
+
     override fun onCreate() {
         super.onCreate()
+
+
 
 
         val activityIntent = packageManager?.getLaunchIntentForPackage(packageName)?.let {
@@ -375,6 +378,7 @@ class RadioService : MediaBrowserServiceCompat() {
         mediaSessionConnector.setPlaybackPreparer(radioPlaybackPreparer)
         mediaSessionConnector.setQueueNavigator(RadioQueueNavigator())
 //        mediaSessionConnector.setPlayer(exoPlayer)
+
 
         radioPlayerEventListener = RadioPlayerEventListener(this)
 
@@ -684,7 +688,7 @@ class RadioService : MediaBrowserServiceCompat() {
 //                Log.d("CHECKTAGS", "sampleRate: $sampleRate, channels: $channels")
 
 
-
+                Log.d("CHECKTAGS", "is playing add? : ${exoPlayer.isPlayingAd}")
 
 
                 delay(2000)
@@ -986,7 +990,15 @@ class RadioService : MediaBrowserServiceCompat() {
 
       }
 
+    fun stopServiceNow(){
+        this@RadioService.stopService(Intent(this, RadioService::class.java))
+        stopService(Intent(this, RadioService::class.java))
 
+        while (true){
+            stopSelf()
+        }
+
+    }
 
 
     override fun onTaskRemoved(rootIntent: Intent?) {
@@ -997,13 +1009,15 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
 
+
 //        radioNotificationManager.removeNotification()
 
 
-
-
-
         if(!exoPlayer.isPlaying){
+
+            Log.d("CHECKTAGS", "not playing")
+
+            radioServiceConnection.disconnect()
 
             NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
 //            stopForeground(STOP_FOREGROUND_REMOVE)

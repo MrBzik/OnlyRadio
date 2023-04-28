@@ -7,6 +7,7 @@ import android.media.MediaFormat
 import android.os.Debug
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.app.AppCompatDelegate.*
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.utils.Constants
 import dagger.hilt.android.HiltAndroidApp
@@ -35,7 +36,7 @@ class RadioApplication : Application() {
 
         if(isDarkMode){
 
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            setDefaultNightMode(MODE_NIGHT_YES)
         }
 
     }
