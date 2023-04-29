@@ -19,13 +19,9 @@ class RadioPlayerNotificationListener (
         radioService.apply {
             Log.d("CHECKTAGS", "radio notification")
 
-
             stopForeground(Service.STOP_FOREGROUND_REMOVE)
 
-
             isForegroundService = false
-
-            radioService.stopServiceNow()
 
 
             stopSelf()
@@ -60,6 +56,8 @@ class RadioPlayerNotificationListener (
                 ContextCompat.startForegroundService(this,
                     Intent(applicationContext, this::class.java)
                     )
+
+//                startForegroundService()
 
                 startForeground(NOTIFICATION_ID, notification)
                 isForegroundService = true

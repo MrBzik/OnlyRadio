@@ -21,6 +21,7 @@ import android.util.Log
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -990,15 +991,6 @@ class RadioService : MediaBrowserServiceCompat() {
 
       }
 
-    fun stopServiceNow(){
-        this@RadioService.stopService(Intent(this, RadioService::class.java))
-        stopService(Intent(this, RadioService::class.java))
-
-        while (true){
-            stopSelf()
-        }
-
-    }
 
 
     override fun onTaskRemoved(rootIntent: Intent?) {
@@ -1012,6 +1004,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
 //        radioNotificationManager.removeNotification()
 
+
+        exoPlayer.stop()
 
         if(!exoPlayer.isPlaying){
 
@@ -1037,6 +1031,7 @@ class RadioService : MediaBrowserServiceCompat() {
 //    fun removeNotification(){
 //        radioNotificationManager.removeNotification()
 //    }
+
 
 
 
