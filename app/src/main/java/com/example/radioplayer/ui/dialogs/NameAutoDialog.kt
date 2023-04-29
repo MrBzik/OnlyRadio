@@ -63,9 +63,11 @@ class NameAutoDialog (
     private var handler = Handler(Looper.getMainLooper())
 
     private val runnable = kotlinx.coroutines.Runnable {
-        mainViewModel.searchParamName.postValue(bind.etNewName.text.toString())
+        mainViewModel.searchParamName.postValue(newName?.toString())
     }
 
+
+    private var newName : Editable? = null
 
     private fun setEditTextChangedListener(){
 
@@ -80,8 +82,9 @@ class NameAutoDialog (
             override fun afterTextChanged(s: Editable?) {
 //                        timer?.cancel()
                 handler.removeCallbacks(runnable)
+                newName = s
 
-                s?.let{ newName ->
+                newName?.let{ newName ->
                     if(newName.isBlank() || newName.length > 2){
 
                         handler.postDelayed(runnable, 1000)
@@ -99,27 +102,27 @@ class NameAutoDialog (
     }
 
 
-
-    private fun setEditTextChangeListener(){
-
-        bind.etNewName.addTextChangedListener {
-
-            it?.let {
-
-                val newName = it.toString()
-
-                if(newName.isBlank() || newName.length > 2){
-
-                    lifecycleScope.launch(Dispatchers.IO){
-
-                        delay(1000)
-
-                        mainViewModel.searchParamName.postValue(newName)
-                    }
-                }
-            }
-        }
-    }
+//
+//    private fun setEditTextChangeListener(){
+//
+//        bind.etNewName.addTextChangedListener {
+//
+//            it?.let {
+//
+//                val newName = it.toString()
+//
+//                if(newName.isBlank() || newName.length > 2){
+//
+//                    lifecycleScope.launch(Dispatchers.IO){
+//
+//                        delay(1000)
+//
+//                        mainViewModel.searchParamName.postValue(newName)
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     private fun setEditText(){
 
