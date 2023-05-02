@@ -12,6 +12,6 @@
     <string name="dialog_clear_selection">Clear selection</string>
     <string name="Favoured">Favoured</string>
     <string name="text_placeholder_alpha">0.6</string>
-    <string name="foreground_pref">On app close: stop player and kill service</string>
+    <string name="foreground_pref">Kill service on app close</string>
 
 </resources>

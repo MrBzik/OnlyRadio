@@ -48,7 +48,7 @@ object Constants {
     const val COMMAND_PAUSE_PLAYER = "command pause player"
     const val COMMAND_START_PLAYER = "command start player"
 
-
+    const val COMMAND_STOP_SERVICE = "command to stop service"
 
     const val PAGE_SIZE = 10
 

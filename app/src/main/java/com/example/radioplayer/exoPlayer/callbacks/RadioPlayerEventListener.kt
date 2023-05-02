@@ -51,7 +51,7 @@ class RadioPlayerEventListener (
 
         super.onPlayWhenReadyChanged(playWhenReady, playbackState)
 
-        if(playbackState == Player.STATE_READY && !playWhenReady) {
+        if(playbackState == Player.STATE_READY && !playWhenReady || playbackState == Player.STATE_IDLE && !playWhenReady) {
 
             radioService.isPlaybackStatePlaying = false
 
@@ -72,7 +72,6 @@ class RadioPlayerEventListener (
 //        else if(playbackState == Player.STATE_IDLE){
 //            Log.d("CHECKTAGS", "event")
 //            radioService.radioNotificationManager.removeNotification()
-//
 //        }
 
     }

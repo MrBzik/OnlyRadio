@@ -37,6 +37,10 @@ class RadioNotificationManager (
 
     private val notificationManager : PlayerNotificationManager
 
+    fun clearServiceJob(){
+        serviceJob.cancel()
+    }
+
 
         init {
 

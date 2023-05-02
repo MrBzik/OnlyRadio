@@ -2,14 +2,9 @@ package com.example.radioplayer.ui
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.app.UiModeManager
-import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.StateListDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -23,9 +18,7 @@ import android.view.animation.LayoutAnimationController
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.doOnLayout
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.transition.Fade
 import androidx.transition.Slide
@@ -39,6 +32,7 @@ import com.example.radioplayer.R
 import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.databinding.ActivityMainBinding
 import com.example.radioplayer.databinding.StubPlayerActivityMainBinding
+import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
@@ -47,7 +41,6 @@ import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.fragments.*
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
-import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.FAB_POSITION_X
 import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
@@ -64,12 +57,12 @@ import com.example.radioplayer.utils.Constants.SEARCH_PREF_ORDER
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
 import com.example.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
 import com.example.radioplayer.utils.RandomColors
-import com.example.radioplayer.utils.Utils
 
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -153,6 +146,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        Log.d("CHECKTAGS", "on create")
+
         setTheme(R.style.Theme_RadioPlayer)
 
         bind = ActivityMainBinding.inflate(layoutInflater)
@@ -177,15 +172,18 @@ class MainActivity : AppCompatActivity() {
         refreshSeparators()
 
 
-
             bind.root.doOnLayout {
                 flHeight = bind.viewHeight.height
             }
-
+        RadioService.canOnDestroyBeCalled = false
 
     }
 
-
+    override fun onStart() {
+        Log.d("CHECKTAGS", "on start")
+        super.onStart()
+        mainViewModel.connectMediaBrowser()
+    }
 
 
     fun smoothDayNightFadeOut(){
@@ -712,6 +710,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
+        mainViewModel.disconnectMediaBrowser()
         this.cacheDir.deleteRecursively()
         databaseViewModel.removeUnusedStations()
 
@@ -741,6 +740,12 @@ class MainActivity : AppCompatActivity() {
             }.apply()
         }
 
+    }
+
+    override fun onDestroy() {
+
+        Log.d("CHECKTAGS", "activity on destroy")
+        super.onDestroy()
     }
 
 }

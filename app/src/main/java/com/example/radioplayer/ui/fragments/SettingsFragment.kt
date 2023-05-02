@@ -25,6 +25,7 @@ import com.example.radioplayer.ui.dialogs.RecordingSettingsDialog
 import com.example.radioplayer.ui.viewmodels.BluetoothViewModel
 import com.example.radioplayer.utils.Constants.BUFFER_PREF
 import com.example.radioplayer.utils.Constants.DARK_MODE_PREF
+import com.example.radioplayer.utils.Constants.FOREGROUND_PREF
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.RECONNECT_PREF
 import com.example.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
@@ -96,7 +97,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         setReconnectButton()
 
-//        setForegroundPrefButton()
+        setForegroundPrefButton()
 
         setSwitchNightModeListener()
 
@@ -385,19 +386,21 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         }
 
     }
-//
-//    private fun setForegroundPrefButton(){
-//
-//        val foregroundPref = requireContext().getSharedPreferences(FOREGROUND_PREF, Context.MODE_PRIVATE)
-//        val initialState = foregroundPref.getBoolean(FOREGROUND_PREF, false)
-//
-//        bind.switchForegroundPref.apply {
-//            isChecked = initialState
-//            setOnCheckedChangeListener { _, isChecked ->
-//                foregroundPref.edit().putBoolean(FOREGROUND_PREF, isChecked).apply()
-//            }
-//        }
-//    }
+
+    private fun setForegroundPrefButton(){
+
+        val foregroundPref : SharedPreferences by lazy{
+            requireContext().getSharedPreferences(FOREGROUND_PREF, Context.MODE_PRIVATE)
+        }
+
+        bind.switchForegroundPref.apply {
+            isChecked = RadioService.isToKillServiceOnAppClose
+            setOnCheckedChangeListener { _, isChecked ->
+                foregroundPref.edit().putBoolean(FOREGROUND_PREF, isChecked).apply()
+                RadioService.isToKillServiceOnAppClose = isChecked
+            }
+        }
+    }
 
 
 

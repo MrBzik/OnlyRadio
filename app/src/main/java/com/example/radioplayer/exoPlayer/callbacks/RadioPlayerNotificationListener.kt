@@ -17,12 +17,12 @@ class RadioPlayerNotificationListener (
         super.onNotificationCancelled(notificationId, dismissedByUser)
 
         radioService.apply {
+
             Log.d("CHECKTAGS", "radio notification")
 
             stopForeground(Service.STOP_FOREGROUND_REMOVE)
 
             isForegroundService = false
-
 
             stopSelf()
 

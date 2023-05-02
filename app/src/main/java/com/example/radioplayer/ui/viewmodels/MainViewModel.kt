@@ -6,15 +6,12 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
 import android.util.Log
-import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
-import com.example.radioplayer.RadioApplication
 import com.example.radioplayer.adapters.datasources.RadioStationsDataSource
 import com.example.radioplayer.adapters.datasources.StationsPageLoader
 import com.example.radioplayer.adapters.models.CountryWithRegion
-import com.example.radioplayer.adapters.models.TagWithGenre
 import com.example.radioplayer.connectivityObserver.ConnectivityObserver
 import com.example.radioplayer.connectivityObserver.NetworkConnectivityObserver
 import com.example.radioplayer.data.local.entities.RadioStation
@@ -23,20 +20,17 @@ import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.ui.dialogs.*
-import com.example.radioplayer.ui.fragments.RadioSearchFragment
 import com.example.radioplayer.ui.fragments.RadioSearchFragment.Companion.listOfCountries
 import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_BASS_LEVEL
 import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_REVERB_MODE
 
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
-import com.example.radioplayer.utils.Constants.COMMAND_PAUSE_PLAYER
 import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
 import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
 
 import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_CURRENT_PLAYING_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_RESTART_PLAYER
-import com.example.radioplayer.utils.Constants.COMMAND_START_PLAYER
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_REC_PLAYBACK_SPEED
@@ -61,7 +55,6 @@ import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
 import com.example.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
 import com.example.radioplayer.utils.Language
 import com.example.radioplayer.utils.listOfLanguages
-import com.example.radioplayer.utils.listOfNorthAmerica
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -77,7 +70,7 @@ class MainViewModel @Inject constructor(
     private val repository: DatabaseRepository
 ) : AndroidViewModel(app) {
 
-       val isConnected = radioServiceConnection.isConnected
+//       val isConnected = radioServiceConnection.isConnected
        val currentRadioStation = radioServiceConnection.currentRadioStation
        val networkError = radioServiceConnection.networkError
        val playbackState = radioServiceConnection.playbackState
@@ -101,6 +94,15 @@ class MainViewModel @Inject constructor(
 
        var isSmoothTransitionNeeded = false
 
+
+     fun disconnectMediaBrowser(){
+//            radioServiceConnection.sendCommand(COMMAND_STOP_SERVICE, null)
+         radioServiceConnection.disconnectBrowser()
+    }
+
+    fun connectMediaBrowser(){
+        radioServiceConnection.connectBrowser()
+    }
 
     init {
 
@@ -294,6 +296,7 @@ class MainViewModel @Inject constructor(
            searchParamTag.postValue(lastSearchTag)
            searchParamName.postValue(lastSearchName)
            searchParamCountry.postValue(lastSearchCountry)
+           Log.d("CHECKTAGS", System.currentTimeMillis().toString())
            searchBy.postValue(true)
 
            viewModelScope.launch {
@@ -397,9 +400,11 @@ class MainViewModel @Inject constructor(
                    }
 
 
-                if(isDelayNeededForServiceConnection){
-                    delay(1000)
-                    isDelayNeededForServiceConnection = false
+
+
+                while(!RadioServiceConnection.isConnected){
+                    Log.d("CHECKTAGS", "not connected")
+                    delay(50)
                 }
 
            val firstRunBundle = Bundle().apply {

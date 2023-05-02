@@ -16,7 +16,6 @@ import androidx.lifecycle.MutableLiveData
 import com.example.radioplayer.utils.Constants.NETWORK_ERROR
 import com.example.radioplayer.utils.Event
 import com.example.radioplayer.utils.Resource
-import dagger.hilt.android.AndroidEntryPoint
 
 
 class RadioServiceConnection (
@@ -24,8 +23,13 @@ class RadioServiceConnection (
         ) {
 
 
-    private val _isConnected = MutableLiveData<Event<Resource<Boolean>>>()
-    val isConnected : LiveData<Event<Resource<Boolean>>> = _isConnected
+//    private val _isConnected = MutableLiveData<Event<Resource<Boolean>>>()
+//    val isConnected : LiveData<Event<Resource<Boolean>>> = _isConnected
+
+    companion object{
+        var isConnected = false
+    }
+
 
     private val _networkError = MutableLiveData<Event<Resource<Boolean>>>()
     val networkError : LiveData<Event<Resource<Boolean>>> = _networkError
@@ -38,6 +42,7 @@ class RadioServiceConnection (
 
     lateinit var mediaController : MediaControllerCompat
 
+    private var mediaControllerCallback = MediaControllerCallback()
 
     val transportControls: MediaControllerCompat.TransportControls
         get() = mediaController.transportControls
@@ -57,12 +62,17 @@ class RadioServiceConnection (
         ComponentName(context, RadioService::class.java),
         mediaBrowserConnectionCallback,
         null
-    ).apply {
-        connect()
+    )
+
+    fun disconnectBrowser(){
+        mediaController.unregisterCallback(mediaControllerCallback)
+        mediaBrowser.disconnect()
     }
 
-    fun disconnect(){
-        mediaBrowser.disconnect()
+    fun connectBrowser(){
+        mediaBrowser.connect()
+//        mediaController.registerCallback(mediaControllerCallback)
+
     }
 
    private inner class MediaBrowserConnectionCallback (
@@ -70,26 +80,37 @@ class RadioServiceConnection (
            ) : MediaBrowserCompat.ConnectionCallback() {
 
        override fun onConnected() {
+           Log.d("CHECKTAGS", "on connected")
            mediaController = MediaControllerCompat(context, mediaBrowser.sessionToken).apply {
-               registerCallback(MediaControllerCallback())
+               registerCallback(mediaControllerCallback)
            }
 
-           _isConnected.postValue(
-               Event(Resource.success(true))
-           )
+           isConnected = true
+
+//           _isConnected.postValue(
+//               Event(Resource.success(true))
+//           )
        }
 
        override fun onConnectionSuspended() {
-           _isConnected.postValue(Event(Resource.error(
-               "Connection was suspended", false
-           )))
+
+           isConnected = false
+//
+//           _isConnected.postValue(Event(Resource.error(
+//               "Connection was suspended", false
+//           )))
        }
 
        override fun onConnectionFailed() {
-           _isConnected.postValue(Event(Resource.error(
-               "Connection failed", false
-           )))
+
+           isConnected = false
+
+//           _isConnected.postValue(Event(Resource.error(
+//               "Connection failed", false
+//           )))
        }
+
+
 
    }
 
@@ -122,6 +143,7 @@ class RadioServiceConnection (
 
        override fun onSessionDestroyed() {
            mediaBrowserConnectionCallback.onConnectionSuspended()
+           mediaBrowser.disconnect()
        }
 
    }

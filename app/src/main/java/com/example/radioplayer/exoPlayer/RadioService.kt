@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
+import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -18,10 +19,7 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
-import androidx.core.animation.doOnEnd
-import androidx.core.animation.doOnStart
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -35,25 +33,23 @@ import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerNotificationListener
 import com.example.radioplayer.utils.Constants.BUFFER_FOR_PLAYBACK
 import com.example.radioplayer.utils.Constants.BUFFER_PREF
-import com.example.radioplayer.utils.Constants.BUFFER_SIZE_IN_BYTES
 import com.example.radioplayer.utils.Constants.BUFFER_SIZE_IN_MILLS
 import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_BASS_LEVEL
 import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_REVERB_MODE
 
 import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
-import com.example.radioplayer.utils.Constants.COMMAND_PAUSE_PLAYER
 import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
 import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
 
 import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_CURRENT_PLAYING_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_RESTART_PLAYER
-import com.example.radioplayer.utils.Constants.COMMAND_START_PLAYER
+import com.example.radioplayer.utils.Constants.COMMAND_STOP_SERVICE
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_REC_PLAYBACK_SPEED
+import com.example.radioplayer.utils.Constants.FOREGROUND_PREF
 import com.example.radioplayer.utils.Constants.IS_ADAPTIVE_LOADER_TO_USE
-import com.example.radioplayer.utils.Constants.IS_TO_SET_BUFFER_IN_BYTES
 import com.example.radioplayer.utils.Constants.RECONNECT_PREF
 import com.example.radioplayer.utils.Constants.RECORDING_CHANNEL_ID
 import com.example.radioplayer.utils.Constants.RECORDING_NOTIFICATION_ID
@@ -118,8 +114,8 @@ class RadioService : MediaBrowserServiceCompat() {
     @Inject
     lateinit var exoRecord: ExoRecord
 
-    @Inject
-    lateinit var radioServiceConnection: RadioServiceConnection
+//    @Inject
+//    lateinit var radioServiceConnection: RadioServiceConnection
 
     private val serviceJob = SupervisorJob()
 
@@ -138,6 +134,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private var isPlayerInitialized = false
 
+
+
     var isFromRecording = false
 
 
@@ -154,6 +152,10 @@ class RadioService : MediaBrowserServiceCompat() {
     }
 
     companion object{
+
+        var canOnDestroyBeCalled = false
+
+        var isToKillServiceOnAppClose = false
 
         var currentDateLong : Long = 0
 
@@ -372,6 +374,24 @@ class RadioService : MediaBrowserServiceCompat() {
                 COMMAND_CHANGE_BASS_LEVEL -> {
                     changeVirtualizerLevel()
                 }
+
+                COMMAND_STOP_SERVICE -> {
+
+//                    radioServiceConnection.disconnectBrowser()
+
+//                    Log.d("CHECKTAGS", "command stop service")
+//                    exoPlayer.pause()
+//                    exoPlayer.clearMediaItems()
+//                    isToShutDown = true
+//                    onTaskRemoved(intent)
+//
+//                    radioNotificationManager.removeNotification()
+//                    stopForeground(STOP_FOREGROUND_REMOVE)
+//                    stopForeground(true)
+//
+//                    stopSelf()
+
+                }
             }
         })
 
@@ -404,6 +424,8 @@ class RadioService : MediaBrowserServiceCompat() {
         mediaSessionConnector.setPlayer(exoPlayer)
         radioNotificationManager.showNotification(exoPlayer)
 
+        isToKillServiceOnAppClose = this@RadioService.getSharedPreferences(
+            FOREGROUND_PREF, Context.MODE_PRIVATE).getBoolean(FOREGROUND_PREF, false)
 
     }
 
@@ -731,7 +753,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
                 while (isFromRecording && isPlaybackStatePlaying){
 
-                    val pos = radioServiceConnection.playbackState.value?.currentPlaybackPosition ?: 0L
+                    val pos = 0L
+//                        radioServiceConnection.playbackState.value?.currentPlaybackPosition ?: 0L
 
                     if(exoPlayer.duration in 0..pos) {
 
@@ -807,6 +830,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
         }
     }
+
 
 
     private fun convertRecording(
@@ -932,7 +956,8 @@ class RadioService : MediaBrowserServiceCompat() {
         val mediaItem = MediaItem.fromUri(uri.toUri())
 
 
-        val mediaSource = if(lastPath?.contains("m3u8") == true || lastPath?.contains("m3u") == true) {
+        val mediaSource = if(lastPath?.contains("m3u8") == true ||
+            lastPath?.contains("m3u") == true) {
             Log.d("CHECKTAGS", "hls")
             HlsMediaSource.Factory(dataSourceFactory)
 //                 .setAllowChunklessPreparation(true)
@@ -992,72 +1017,52 @@ class RadioService : MediaBrowserServiceCompat() {
       }
 
 
-
     override fun onTaskRemoved(rootIntent: Intent?) {
+            super.onTaskRemoved(rootIntent)
 
-        super.onTaskRemoved(rootIntent)
-//
-//            exoPlayer.clearMediaItems()
+        canOnDestroyBeCalled = true
 
-
-
-
-//        radioNotificationManager.removeNotification()
-
-
-        exoPlayer.stop()
+        if(isToKillServiceOnAppClose){
+            exoPlayer.stop()
+        }
 
         if(!exoPlayer.isPlaying){
 
             Log.d("CHECKTAGS", "not playing")
 
-            radioServiceConnection.disconnect()
-
             NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
-//            stopForeground(STOP_FOREGROUND_REMOVE)
-//
-//            isForegroundService = false
-//            stopSelf()
 
             radioNotificationManager.removeNotification()
 
         }
     }
 
-//
-
-
-
-//    fun removeNotification(){
-//        radioNotificationManager.removeNotification()
-//    }
-
-
-
 
 
     override fun onDestroy() {
 
+        if(canOnDestroyBeCalled){
+            Log.d("CHECKTAGS", "on destroy")
+            mediaSession.run {
+                isActive = false
+                release()
+            }
 
-        mediaSession.run {
-            isActive = false
-            release()
+            NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
+            radioSource.subscribeToFavouredStations.removeObserver(observerForDatabase)
+            radioSource.allRecordingsLiveData.removeObserver(observerForRecordings)
+
+            exoRecord.removeExoRecordListener("MainListener")
+
+            exoPlayer.removeListener(radioPlayerEventListener)
+            exoPlayer.release()
+
+
+            serviceJob.cancel()
+
+            serviceScope.cancel()
+            android.os.Process.killProcess(android.os.Process.myPid())
         }
-
-
-        radioSource.subscribeToFavouredStations.removeObserver(observerForDatabase)
-        radioSource.allRecordingsLiveData.removeObserver(observerForRecordings)
-
-        exoRecord.removeExoRecordListener("MainListener")
-
-        exoPlayer.removeListener(radioPlayerEventListener)
-        exoPlayer.release()
-
-
-        serviceJob.cancel()
-
-
-        serviceScope.cancel()
     }
 
 

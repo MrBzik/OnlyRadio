@@ -214,12 +214,52 @@
                 app:trackTint="@color/switch_track_color" />
 
 
+            <TextView
+                android:id="@+id/tvForegroundPref"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="30dp"
+                android:text="@string/foreground_pref"
+                android:lineSpacingExtra="4dp"
+                android:textAppearance="@style/dialogItemText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/switchForegroundPref"
+                app:layout_constraintTop_toBottomOf="@+id/tvNameAutoSearchPref" />
+
+            <TextView
+                android:id="@+id/tvForegroundPrefHint"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="6dp"
+                android:text="(By default: keep service if audio is playing)"
+                android:lineSpacingExtra="4dp"
+                android:textSize="13sp"
+                android:textAppearance="@style/dialogItemText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/switchForegroundPref"
+                app:layout_constraintTop_toBottomOf="@+id/tvForegroundPref" />
+
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchForegroundPref"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:minHeight="48dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvForegroundPref"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvForegroundPref"
+                app:thumbTint="@color/switch_thumb_color"
+                app:trackTint="@color/switch_track_color" />
+
             <View
                 android:id="@+id/viewBoxForStationsTitleSize"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvNameAutoSearchPref"
+                app:layout_constraintTop_toBottomOf="@+id/tvForegroundPrefHint"
                 android:layout_marginTop="30dp"/>
 
 
@@ -276,46 +316,6 @@
 
 
 
-
-<!--            <TextView-->
-<!--                android:id="@+id/tvForegroundPref"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginStart="20dp"-->
-<!--                android:layout_marginTop="30dp"-->
-<!--                android:text="@string/foreground_pref"-->
-<!--                android:lineSpacingExtra="4dp"-->
-<!--                android:textAppearance="@style/dialogItemText"-->
-<!--                app:layout_constraintStart_toStartOf="parent"-->
-<!--                app:layout_constraintEnd_toStartOf="@+id/switchForegroundPref"-->
-<!--                app:layout_constraintTop_toBottomOf="@+id/tvNightModePref" />-->
-
-<!--            <TextView-->
-<!--                android:id="@+id/tvForegroundPrefHint"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginStart="20dp"-->
-<!--                android:layout_marginTop="6dp"-->
-<!--                android:text="(By default: keep service if audio is playing)"-->
-<!--                android:lineSpacingExtra="4dp"-->
-<!--                android:textSize="13sp"-->
-<!--                android:textAppearance="@style/dialogItemText"-->
-<!--                app:layout_constraintStart_toStartOf="parent"-->
-<!--                app:layout_constraintEnd_toStartOf="@+id/switchForegroundPref"-->
-<!--                app:layout_constraintTop_toBottomOf="@+id/tvForegroundPref" />-->
-
-
-<!--            <androidx.appcompat.widget.SwitchCompat-->
-<!--                android:id="@+id/switchForegroundPref"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginEnd="10dp"-->
-<!--                android:minHeight="48dp"-->
-<!--                app:layout_constraintBottom_toBottomOf="@+id/tvForegroundPref"-->
-<!--                app:layout_constraintEnd_toEndOf="parent"-->
-<!--                app:layout_constraintTop_toTopOf="@+id/tvForegroundPref"-->
-<!--                app:thumbTint="@color/switch_thumb_color"-->
-<!--                app:trackTint="@color/switch_track_color" />-->
 
 
 
