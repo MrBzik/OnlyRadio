@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcelable
+import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE
 import android.util.Log
 import android.view.DragEvent
@@ -18,9 +19,12 @@ import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
+import com.example.radioplayer.adapters.RadioDatabaseAdapter
 import com.example.radioplayer.adapters.models.CountryWithRegion
 import com.example.radioplayer.adapters.models.TagWithGenre
+import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
+import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
@@ -55,6 +59,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     private var textLoadAnim : TextLoadAnim? = null
 
     private var isToShowLoadingMessage = false
+
+    private var isToHandleNewStationObserver = false
 
 
     companion object {
@@ -134,6 +140,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         setSearchParamsObservers()
 
         setSearchToolbar()
@@ -143,6 +150,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         subscribeToStationsFlow()
 
         observePlaybackState()
+
+        observeNewStation()
 
         setAdapterLoadStateListener()
 
@@ -168,6 +177,10 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             textLoadAnim = TextLoadAnim(
                 requireContext(), bind.tvLoading!!)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
 
     }
 
@@ -263,23 +276,67 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     }
 
 
+    private fun observeNewStation(){
+
+        RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
+
+        if(isToHandleNewStationObserver){
+
+            if(RadioService.currentPlaylist == SEARCH_FROM_API ){
+
+                handleNewRadioStation(RadioService.currentPlayingItemPosition, station)
+
+            } else {
+
+                val index = pagingRadioAdapter.snapshot().items
+                    .indexOfFirst {
+                        it.stationuuid == station.stationuuid
+                    }
+
+                if(index != -1){
+                    handleNewRadioStation(index, station)
+                }
+            }
+        } else {
+            isToHandleNewStationObserver = true
+        }
+
+        }
+    }
+
+    private fun handleNewRadioStation(position : Int, station : RadioStation){
+
+        bind.rvSearchStations.smoothScrollToPosition(position)
+
+        bind.rvSearchStations.post {
+
+            val holder = bind.rvSearchStations
+                .findViewHolderForAdapterPosition(position)
+
+            holder?.let {
+                pagingRadioAdapter.updateOnStationChange(station, holder as PagingRadioAdapter.RadioItemHolder)
+            }
+        }
+    }
+
 
     private fun observePlaybackState(){
         mainViewModel.playbackState.observe(viewLifecycleOwner){
-            it?.let {
+            if(!RadioService.isFromRecording){
+                it?.let {
 
-                when{
-                    it.isPlaying -> {
-                        pagingRadioAdapter.currentPlaybackState = true
+                    when{
+                        it.isPlaying -> {
+                            pagingRadioAdapter.currentPlaybackState = true
 
-                        pagingRadioAdapter.updateStationPlaybackState()
+                            pagingRadioAdapter.updateStationPlaybackState()
 
-                    }
-                    it.isPlayEnabled -> {
-                        pagingRadioAdapter.currentPlaybackState = false
+                        }
+                        it.isPlayEnabled -> {
+                            pagingRadioAdapter.currentPlaybackState = false
 
-                        pagingRadioAdapter.updateStationPlaybackState()
-
+                            pagingRadioAdapter.updateStationPlaybackState()
+                        }
                     }
                 }
             }
@@ -333,13 +390,14 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private fun setAdapterOnClickListener(){
 
-        pagingRadioAdapter.setOnClickListener {
+        pagingRadioAdapter.setOnClickListener { station, index ->
 
-            mainViewModel.playOrToggleStation(it, SEARCH_FROM_API)
-            databaseViewModel.insertRadioStation(it)
-            databaseViewModel.checkDateAndUpdateHistory(it.stationuuid)
+            mainViewModel.playOrToggleStation(station, SEARCH_FROM_API, itemIndex = index)
 
-            Log.d("CHECKTAGS", it.url.toString())
+            databaseViewModel.insertRadioStation(station)
+            databaseViewModel.checkDateAndUpdateHistory(station.stationuuid)
+
+            Log.d("CHECKTAGS", station.url.toString())
 
 
 
@@ -372,9 +430,9 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             layoutAnimation = (activity as MainActivity).layoutAnimationController
 
 
-            mainViewModel.currentRadioStation.value?.let {
-              val name =  it.getString(METADATA_KEY_TITLE)
-                pagingRadioAdapter.currentRadioStationName = name
+            RadioService.currentPlayingStation.value?.let {
+              val id =  it.stationuuid
+                pagingRadioAdapter.currentRadioStationId = id
             }
         }
     }
@@ -573,7 +631,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         textLoadAnim = null
         _bind = null
         isInitialLaunch = true
-
+        isToHandleNewStationObserver = false
     }
 
 }

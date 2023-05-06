@@ -24,6 +24,7 @@ import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.databinding.ItemRecordingWithSeekbarBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.animations.fadeOut
+import com.example.radioplayer.ui.fragments.RecordingsFragment
 import com.example.radioplayer.utils.RandomColors
 import com.example.radioplayer.utils.Utils
 import org.w3c.dom.Text
@@ -52,34 +53,45 @@ class RecordingsAdapter @Inject constructor(
             val recording = differ.currentList[holder.absoluteAdapterPosition]
 
             onItemClickListener?.let { click ->
-                click(recording)
+                click(recording, holder.absoluteAdapterPosition)
 
-                if(playingRecordingId != recording.id) {
+                RecordingsFragment.isToHandleNewRecording = false
 
-                    previousSeekbar?.let{
-                        it.setOnSeekBarChangeListener(null)
-                        it.visibility = View.GONE
-                    }
-                    previousTvTime?.text = Utils.timerFormat(previousTvTimeValue)
-
-                    holder.bind.apply {
-
-                        seekBar.max = recording.durationMills.toInt()
-                        seekBar.progress = 0
-                        previousSeekbar = seekBar
-                        previousTvTime = tvDuration
-                        previousTvTimeValue = recording.durationMills
-
-                        itemSeekbarHandler?.let { handler ->
-
-                            handler(seekBar, tvDuration, true)
-                        }
-                    }
-                }
+                handleRecordingChange(recording, holder)
             }
         }
 
         return holder
+    }
+
+
+
+    fun handleRecordingChange(recording: Recording, holder : RecordingItemHolder){
+
+        if(playingRecordingId != recording.id) {
+
+            playingRecordingId = recording.id
+
+            previousSeekbar?.let{
+                it.setOnSeekBarChangeListener(null)
+                it.visibility = View.GONE
+            }
+            previousTvTime?.text = Utils.timerFormat(previousTvTimeValue)
+
+            holder.bind.apply {
+
+                seekBar.max = recording.durationMills.toInt()
+                seekBar.progress = 0
+                previousSeekbar = seekBar
+                previousTvTime = tvDuration
+                previousTvTimeValue = recording.durationMills
+
+                itemSeekbarHandler?.let { handler ->
+
+                    handler(seekBar, tvDuration, true)
+                }
+            }
+        }
     }
 
 
@@ -185,9 +197,9 @@ class RecordingsAdapter @Inject constructor(
     }
 
 
-    private var onItemClickListener : ((Recording) -> Unit)? = null
+    private var onItemClickListener : ((Recording, Int) -> Unit)? = null
 
-    fun setOnClickListener(listener : (Recording) -> Unit){
+    fun setOnClickListener(listener : (Recording, Int) -> Unit){
         onItemClickListener = listener
     }
 

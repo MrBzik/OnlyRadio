@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit
 
 object Utils {
 
+
      fun getNavigationBarHeight(context : Context): Int {
         val resources = context.resources
 

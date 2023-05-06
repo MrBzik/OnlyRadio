@@ -2,14 +2,8 @@ package com.example.radioplayer.ui.fragments
 
 
 import android.content.res.Configuration
-import android.graphics.Color
 import android.os.Bundle
-import android.support.v4.media.MediaMetadataCompat
-import android.util.Log
-import android.util.TypedValue
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -24,14 +18,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.R
+import com.example.radioplayer.adapters.PagingRadioAdapter
 import com.example.radioplayer.adapters.PlaylistsAdapter
 import com.example.radioplayer.adapters.RadioDatabaseAdapter
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.databinding.FragmentFavStationsBinding
-import com.example.radioplayer.exoPlayer.isPlayEnabled
-import com.example.radioplayer.exoPlayer.isPlaying
+import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
 import com.example.radioplayer.ui.animations.slideAnim
@@ -77,6 +71,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     private var currentPlaylistPosition = 0
 
+    private var isToHandleNewStationObserver = false
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -86,6 +82,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         setupMainRecycleView()
 
         setupPlaylistRecycleView()
+
+        observeNewStation()
 
         observePlaybackState()
 
@@ -105,10 +103,57 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     }
 
+    private fun observeNewStation(){
+
+        RadioService.currentPlayingStation.observe(viewLifecycleOwner) { station ->
+
+            if (isToHandleNewStationObserver) {
+
+                if (RadioService.currentPlaylist == SEARCH_FROM_FAVOURITES && isInFavouriteTab ||
+                    RadioService.currentPlaylist == SEARCH_FROM_PLAYLIST && !isInFavouriteTab
+                ) {
+
+                    handleNewRadioStation(RadioService.currentPlayingItemPosition, station)
+
+                } else {
+
+                    val index = mainAdapter.listOfStations
+                        .indexOfFirst {
+                            it.stationuuid == station.stationuuid
+                        }
+
+
+                    if (index != -1) {
+                        handleNewRadioStation(index, station)
+                    }
+                }
+            } else{
+                isToHandleNewStationObserver = true
+            }
+
+        }
+    }
+
+    private fun handleNewRadioStation(position : Int, station : RadioStation){
+
+        bind.rvFavStations.smoothScrollToPosition(position)
+
+        bind.rvFavStations.post {
+
+            val holder = bind.rvFavStations
+                .findViewHolderForAdapterPosition(position)
+
+            holder?.let {
+                mainAdapter.updateOnStationChange(station, holder as RadioDatabaseAdapter.RadioItemHolder)
+            }
+        }
+    }
 
 
     private fun observePlaybackState(){
+
         mainViewModel.playbackState.observe(viewLifecycleOwner){
+
             it?.let {
 
                 when{
@@ -330,6 +375,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 }
             }
             databaseViewModel.playlist.postValue(result)
+            RadioSource.updatePlaylistStations(result)
         }
     }
 
@@ -441,10 +487,10 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     private fun setMainAdapterClickListener(){
 
-        mainAdapter.setOnClickListener {
+        mainAdapter.setOnClickListener { station, position ->
 
-            mainViewModel.playOrToggleStation(it, searchFlag)
-            databaseViewModel.checkDateAndUpdateHistory(it.stationuuid)
+            mainViewModel.playOrToggleStation(station, searchFlag, itemIndex = position)
+            databaseViewModel.checkDateAndUpdateHistory(station.stationuuid)
         }
     }
 
@@ -473,9 +519,9 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 separatorDefault = ContextCompat.getColor(requireContext(), R.color.station_bottom_separator_default)
             }
 
-            mainViewModel.currentRadioStation.value?.let {
-                val name =  it.getString(MediaMetadataCompat.METADATA_KEY_TITLE)
-                mainAdapter.currentRadioStationName = name
+            RadioService.currentPlayingStation.value?.let {
+                val id =  it.stationuuid
+                mainAdapter.currentRadioStationId = id
             }
 
             layoutAnimation = (activity as MainActivity).layoutAnimationController
@@ -582,6 +628,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         bind.rvFavStations.adapter = null
         bind.rvPlaylists.adapter = null
         _bind = null
+        isToHandleNewStationObserver = false
     }
 
 }

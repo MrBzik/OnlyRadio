@@ -4,6 +4,7 @@ import android.animation.ValueAnimator
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.SeekBar
@@ -48,6 +49,12 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
     private var isInitialLaunchOrNewItem = true
 
+    companion object{
+        var isToHandleNewRecording = false
+    }
+
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -59,7 +66,9 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
         setAdapterClickListener()
 
-        observePlayingItem()
+//        observePlayingItem()
+
+        observeCurrentRecording()
 
         observePlayerPosition()
 
@@ -176,32 +185,56 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
         })
     }
 
+    private fun observeCurrentRecording(){
 
+        RadioService.currentPlayingRecording.observe(viewLifecycleOwner){
 
-    private fun observePlayingItem(){
+            currentRecording = it
 
-        mainViewModel.newPlayingItem.observe(viewLifecycleOwner){
+            if(RadioService.currentPlaylist == SEARCH_FROM_RECORDINGS){
+                if(isToHandleNewRecording){
+                    Log.d("CHECKTAGS", "recording handler")
+                    bind.rvRecordings.apply {
+                        smoothScrollToPosition(RadioService.currentPlayingItemPosition)
+                        post {
+                            val holder = findViewHolderForAdapterPosition(RadioService.currentPlayingItemPosition)
+                            recordingsAdapter.handleRecordingChange(it, holder as RecordingsAdapter.RecordingItemHolder)
+                        }
+                    }
 
-            if(it is PlayingItem.FromRecordings){
-
-                currentRecording = it.recording
-
-                recordingsAdapter.playingRecordingId = it.recording.id
-
-            } else {
-                recordingsAdapter.playingRecordingId = "null"
+                } else {
+                    isToHandleNewRecording = true
+                }
             }
         }
     }
 
 
+//    private fun observePlayingItem(){
+//
+//        mainViewModel.newPlayingItem.observe(viewLifecycleOwner){
+//
+//            if(it is PlayingItem.FromRecordings){
+//
+//                currentRecording = it.recording
+//
+//                recordingsAdapter.playingRecordingId = it.recording.id
+//
+//            } else {
+//                recordingsAdapter.playingRecordingId = "null"
+//            }
+//        }
+//    }
+
+
     private fun setAdapterClickListener(){
 
-        recordingsAdapter.setOnClickListener { recording ->
+        recordingsAdapter.setOnClickListener { recording, position ->
             animator.cancel()
             mainViewModel.playOrToggleStation(
                 rec = recording,
-                searchFlag = SEARCH_FROM_RECORDINGS
+                searchFlag = SEARCH_FROM_RECORDINGS,
+                itemIndex = position
             )
 
         }
@@ -236,8 +269,11 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
             setHasFixedSize(true)
             setToggleItemDeletion()
 
-            recordingsAdapter.alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
-            recordingsAdapter.titleSize = mainViewModel.stationsTitleSize
+            recordingsAdapter.apply{
+                alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
+                titleSize = mainViewModel.stationsTitleSize
+                playingRecordingId = RadioService.currentPlayingRecording.value?.id ?: ""
+            }
 
             layoutAnimation = (activity as MainActivity).layoutAnimationController
 
@@ -354,6 +390,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
         isDeletingEnabled = false
         bind.rvRecordings.adapter = null
         _bind = null
+        isToHandleNewRecording = false
     }
 
 

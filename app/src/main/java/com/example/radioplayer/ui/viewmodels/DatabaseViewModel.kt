@@ -238,7 +238,7 @@ class DatabaseViewModel @Inject constructor(
 
         Log.d("CHECKTAGS", "getting all stations")
 
-        val response = radioSource.getStationsInDate(limit, offset, initialDate)
+        val response = radioSource.getStationsInAllDates(limit, offset, initialDate)
 
         val date = response.date.date
 

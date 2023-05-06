@@ -26,16 +26,23 @@ import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.HistoryDatesAdapter
 import com.example.radioplayer.adapters.PagingHistoryAdapter
+import com.example.radioplayer.adapters.PagingRadioAdapter
 import com.example.radioplayer.adapters.TitleAdapter
+import com.example.radioplayer.adapters.models.StationWithDateModel
 import com.example.radioplayer.data.local.entities.HistoryDate
+import com.example.radioplayer.data.local.entities.RadioStation
+import com.example.radioplayer.data.remote.entities.RadioStationsItem
 import com.example.radioplayer.databinding.FragmentHistoryBinding
+import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
 import com.example.radioplayer.ui.animations.objectSizeScaleAnimation
 import com.example.radioplayer.ui.animations.slideAnim
+import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
 import com.example.radioplayer.utils.SpinnerExt
 import com.example.radioplayer.utils.Utils
 import com.example.radioplayer.utils.Utils.fromDateToString
@@ -70,6 +77,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     private var isStationsAdapterSet = false
     private var isTitlesAdapterSet = false
 
+    private var isToHandleNewStationObserver = false
+
     private val clipBoard : ClipboardManager? by lazy {
         ContextCompat.getSystemService(requireContext(), ClipboardManager::class.java)
     }
@@ -91,6 +100,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         setupRecyclerView()
 
         observePlaybackState()
+
+        observeNewStation()
 
         setupAdapterClickListener()
 
@@ -402,6 +413,56 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     }
 
 
+    private fun observeNewStation(){
+
+        RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
+
+            if(databaseViewModel.isHistoryInStationsTab){
+
+                if(isToHandleNewStationObserver){
+
+                    if(RadioService.currentPlaylist == SEARCH_FROM_HISTORY_ONE_DATE){
+                        handleNewRadioStation(RadioService.currentPlayingItemPosition, station)
+
+                    } else {
+
+                        val index = stationsHistoryAdapter?.snapshot()?.items?.indexOfFirst {
+                            it is StationWithDateModel.Station && it.radioStation.stationuuid == station.stationuuid
+                        }
+
+                        if(index != -1 && index != null){
+
+                            handleNewRadioStation(index, station)
+                        }
+
+                    }
+                } else {
+                    isToHandleNewStationObserver = true
+                }
+
+            }
+
+        }
+    }
+
+
+    private fun handleNewRadioStation(position : Int, station : RadioStation){
+
+        bind.rvHistory.smoothScrollToPosition(position)
+
+        bind.rvHistory.post {
+
+            val holder = bind.rvHistory
+                .findViewHolderForAdapterPosition(position)
+
+            holder?.let {
+                stationsHistoryAdapter?.updateOnStationChange(station, holder as PagingHistoryAdapter.StationViewHolder)
+            }
+        }
+    }
+
+
+
     private fun setupRecyclerView (){
 
 
@@ -446,8 +507,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 separatorDefault = ContextCompat.getColor(requireContext(), R.color.station_bottom_separator_default)
 
-                mainViewModel.currentRadioStation.value?.let {
-                    val id =  it.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)
+                RadioService.currentPlayingStation.value?.let {
+                    val id =  it.stationuuid
                     currentRadioStationID = id
                 }
 
@@ -530,6 +591,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 }
 
                 databaseViewModel.isHistoryInStationsTab = false
+
+                isToHandleNewStationObserver = false
 
                 switchTitlesStationsUi(true)
 
@@ -628,10 +691,16 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private fun setupAdapterClickListener(){
 
-        stationsHistoryAdapter?.setOnClickListener {
+        stationsHistoryAdapter?.setOnClickListener { station, position ->
 
-            mainViewModel.playOrToggleStation(it, SEARCH_FROM_HISTORY)
-            databaseViewModel.checkDateAndUpdateHistory(it.stationuuid)
+            val flag = if(databaseViewModel.selectedDate == 0L){
+                SEARCH_FROM_HISTORY
+            } else
+                SEARCH_FROM_HISTORY_ONE_DATE
+
+            mainViewModel.playOrToggleStation(station, flag,
+                itemIndex = position, historyItemId = station.stationuuid)
+            databaseViewModel.checkDateAndUpdateHistory(station.stationuuid)
 
         }
     }
@@ -658,6 +727,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         stationsHistoryAdapter = null
         titlesHistoryAdapter = null
         _bind = null
+        isToHandleNewStationObserver = false
     }
 
 }

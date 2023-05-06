@@ -62,16 +62,23 @@ class RadioServiceConnection (
         ComponentName(context, RadioService::class.java),
         mediaBrowserConnectionCallback,
         null
-    )
+    ).apply {
+        connect()
+    }
 
     fun disconnectBrowser(){
-        mediaController.unregisterCallback(mediaControllerCallback)
-        mediaBrowser.disconnect()
+        if(isConnected){
+            mediaController.unregisterCallback(mediaControllerCallback)
+            mediaBrowser.disconnect()
+        }
     }
 
     fun connectBrowser(){
-        mediaBrowser.connect()
-//        mediaController.registerCallback(mediaControllerCallback)
+      try {
+          mediaBrowser.connect()
+      } catch (e : Exception){
+          /*SILLY EXCEPTION*/
+      }
 
     }
 

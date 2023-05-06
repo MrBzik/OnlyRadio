@@ -5,7 +5,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -58,16 +57,24 @@ import com.example.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
+import com.example.radioplayer.utils.Constants.TITLE_UNKNOWN
 import com.example.radioplayer.utils.setPreset
+import com.example.radioplayer.utils.toMediaMetadataCompat
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.DefaultLoadControl.*
 import com.google.android.exoplayer2.audio.*
+import com.google.android.exoplayer2.drm.DrmSessionManagerProvider
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
+import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
+import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.source.hls.HlsMediaSource
+import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
+import com.google.android.exoplayer2.upstream.LoadErrorHandlingPolicy
 import dagger.hilt.android.AndroidEntryPoint
 import dev.brookmg.exorecord.lib.ExoRecord
 import dev.brookmg.exorecord.lib.IExoRecord
@@ -119,7 +126,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private val serviceJob = SupervisorJob()
 
-    private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
+    val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
 
     lateinit var radioNotificationManager: RadioNotificationManager
 
@@ -130,13 +137,9 @@ class RadioService : MediaBrowserServiceCompat() {
 
     var isForegroundService = false
 
-    private var currentStation : MediaMetadataCompat? = null
 
     private var isPlayerInitialized = false
 
-
-
-    var isFromRecording = false
 
 
     private val recordingCheck : SharedPreferences by lazy {
@@ -147,11 +150,39 @@ class RadioService : MediaBrowserServiceCompat() {
         radioSource.createMediaItemsFromDB(it)
     }
 
+
+
+    var stationsFromRecordings = listOf<Recording>()
+    var stationsFromRecordingsMediaItems = listOf<MediaItem>()
+    var isStationsFromRecordingUpdated = true
     private val observerForRecordings = Observer<List<Recording>>{
-        radioSource.handleRecordingsUpdates(it)
+        stationsFromRecordings = it
+
+        val fileDir = this@RadioService.filesDir.path
+
+        stationsFromRecordingsMediaItems = it.map { rec ->
+            MediaItem.fromUri("$fileDir/${rec.id}")
+        }
+
+        isStationsFromRecordingUpdated = true
+
+        radioSource.isRecordingUpdated.postValue(true)
     }
 
+     var currentRadioStation: RadioStation? = null
+     var currentRecording : Recording? = null
+
     companion object{
+
+        var currenlyPlaingSong = TITLE_UNKNOWN
+//        var currentStation : MediaMetadataCompat? = null
+        var currentPlaylist = -1
+
+        var currentPlayingStation : MutableLiveData<RadioStation> = MutableLiveData()
+        var currentPlayingRecording : MutableLiveData<Recording> = MutableLiveData()
+        var currentPlayingItemPosition = -1
+
+        var isFromRecording = false
 
         var canOnDestroyBeCalled = false
 
@@ -212,8 +243,6 @@ class RadioService : MediaBrowserServiceCompat() {
         super.onCreate()
 
 
-
-
         val activityIntent = packageManager?.getLaunchIntentForPackage(packageName)?.let {
 
             PendingIntent.getActivity(this, 0, it, FLAG_IMMUTABLE)
@@ -237,49 +266,62 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
         val radioPlaybackPreparer = RadioPlaybackPreparer(
-            radioSource, { itemToPlay, flag, playWhenRady ->
+            radioSource, { _, flag, playWhenReady, itemIndex ->
 
-            currentStation = itemToPlay
+//            currentStation = itemToPlay
+            val isSamePlaylist = currentPlaylist == flag
+            currentPlaylist = flag
 
-            when (flag) {
-                SEARCH_FROM_FAVOURITES -> {
-                    preparePlayer(
-                        radioSource.stationsFavoured,
-                        itemToPlay,
-                        playWhenRady
-                    )
-                }
-                SEARCH_FROM_API -> {
-                    preparePlayer(
-                        radioSource.stations,
-                        itemToPlay,
-                        playWhenRady
-                    )
-                }
-                SEARCH_FROM_HISTORY -> {
-                    preparePlayer(
-                        radioSource.stationsFromHistory,
-                        itemToPlay,
-                        playWhenRady
-                    )
-                }
-                SEARCH_FROM_RECORDINGS -> {
-                    preparePlayer(
-                        radioSource.recordings,
-                        itemToPlay,
-                        playNow = playWhenRady,
-                        isFromRecordings = true
-                    )
-                }
+            val isFromRecordings = flag == SEARCH_FROM_RECORDINGS
 
-                else -> {
-                    preparePlayer(
-                        radioSource.stationsFromPlaylist,
-                        itemToPlay,
-                        playWhenRady
-                    )
-                }
-            }
+            preparePlayer(
+                playNow = playWhenReady,
+                itemIndex =  itemIndex,
+                isSamePlaylist = isSamePlaylist,
+                isFromRecordings = isFromRecordings
+            )
+
+//            when (flag) {
+//                SEARCH_FROM_FAVOURITES -> {
+//                    preparePlayer(
+//                        radioSource.stationsFavouredMetadata,
+//                        itemToPlay,
+//                        playWhenRady
+//                    )
+//                }
+//                SEARCH_FROM_API -> {
+//                    preparePlayer(
+//                       playlist = radioSource.stationsFromApiMetadata,
+//                       itemToPlay = itemToPlay,
+//                       playNow = playWhenRady,
+//                       itemIndex = itemIndex,
+//                       isSamePlaylist = isSamePlaylist
+//                    )
+//                }
+//                SEARCH_FROM_HISTORY -> {
+//                    preparePlayer(
+//                        radioSource.stationsFromHistoryMetadata,
+//                        itemToPlay,
+//                        playWhenRady
+//                    )
+//                }
+//                SEARCH_FROM_RECORDINGS -> {
+//                    preparePlayer(
+//                        radioSource.recordings,
+//                        itemToPlay,
+//                        playNow = playWhenRady,
+//                        isFromRecordings = true
+//                    )
+//                }
+//
+//                else -> {
+//                    preparePlayer(
+//                        radioSource.stationsFromPlaylistMetadata,
+//                        itemToPlay,
+//                        playWhenRady
+//                    )
+//                }
+//            }
 
 
         }, {
@@ -438,8 +480,9 @@ class RadioService : MediaBrowserServiceCompat() {
          checkTitle?.let {
              radioSource.deleteTitle(it)
          }
-                val stationName = currentStation?.getString(METADATA_KEY_TITLE) ?: ""
-                val stationUri = currentStation?.getString(METADATA_KEY_DISPLAY_ICON_URI) ?: ""
+                val stationName = currentRadioStation?.name ?: ""
+
+                val stationUri = currentRadioStation?.favicon ?: ""
 
 
                 radioSource.insertNewTitle(Title(
@@ -587,16 +630,19 @@ class RadioService : MediaBrowserServiceCompat() {
 //        val bites = if (!isToSetBufferInBytes) -1
 //        else bufferSizeInBytes * 1024
 
-
-//
-//
 //        bandwidthMeter = DefaultBandwidthMeter.Builder(this@RadioService).build()
 //        bandwidthMeter.addEventListener(handler, listener)
+
+
+       val checkIntervals = if(isAdaptiveLoaderToUse){
+           bufferSizeInMills/1000 * 10
+       } else 1024
 
 
         return ExoPlayer.Builder(this@RadioService, renderersFactory)
             .setAudioAttributes(audioAttributes, true)
             .setHandleAudioBecomingNoisy(true)
+            .setMediaSourceFactory(MyMediaSourceFactory(this@RadioService, dataSourceFactory, checkIntervals))
             .setLoadControl(DefaultLoadControl.Builder()
                 .setBufferDurationsMs(bufferSizeInMills, bufferSizeInMills, bufferForPlayback, 5000)
 //                .setTargetBufferBytes(bites)
@@ -610,6 +656,45 @@ class RadioService : MediaBrowserServiceCompat() {
     }
 
 
+
+    class MyMediaSourceFactory(context: Context, datasourceFactory: DataSource.Factory, checkIntervals: Int) : MediaSource.Factory {
+        private val defaultMediaSourceFactory: DefaultMediaSourceFactory
+        private val progressiveFactory : MediaSource.Factory
+
+        init {
+            defaultMediaSourceFactory = DefaultMediaSourceFactory(context)
+            progressiveFactory = ProgressiveMediaSource.Factory(datasourceFactory)
+                .setContinueLoadingCheckIntervalBytes(1024 * checkIntervals)
+        }
+
+
+        override fun setDrmSessionManagerProvider(drmSessionManagerProvider: DrmSessionManagerProvider): MediaSource.Factory {
+            defaultMediaSourceFactory.setDrmSessionManagerProvider(drmSessionManagerProvider)
+            progressiveFactory.setDrmSessionManagerProvider(drmSessionManagerProvider)
+            return this;
+        }
+
+        override fun setLoadErrorHandlingPolicy(loadErrorHandlingPolicy: LoadErrorHandlingPolicy): MediaSource.Factory {
+            defaultMediaSourceFactory.setLoadErrorHandlingPolicy(loadErrorHandlingPolicy)
+            progressiveFactory.setLoadErrorHandlingPolicy(loadErrorHandlingPolicy)
+            return this
+        }
+
+        override fun getSupportedTypes(): IntArray {
+            return defaultMediaSourceFactory.supportedTypes
+        }
+
+        override fun createMediaSource(mediaItem: MediaItem): MediaSource {
+            if (mediaItem.localConfiguration?.uri?.path?.contains("m3u8") == true) {
+                return defaultMediaSourceFactory.createMediaSource(mediaItem);
+
+            }
+            return progressiveFactory.createMediaSource(mediaItem)
+        }
+    }
+
+
+
     private fun recreateExoPlayer(){
 
         val isToPlay = exoPlayer.playWhenReady
@@ -618,12 +703,16 @@ class RadioService : MediaBrowserServiceCompat() {
         exoPlayer = provideExoPlayer()
         mediaSessionConnector.setPlayer(exoPlayer)
 
-        currentStation?.let {
+        preparePlayer(isToPlay, currentPlayingItemPosition, true,
+                currentPlaylist == SEARCH_FROM_RECORDINGS
+            )
 
-            val uri = it.getString(METADATA_KEY_MEDIA_URI)
-
-            playFromUri(uri, isToPlay)
-        }
+//        currentRadioStation?.let {
+//
+//            val uri = it.getString(METADATA_KEY_MEDIA_URI)
+//
+//            playFromUri(uri, isToPlay)
+//        }
     }
 
 
@@ -710,8 +799,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
 //                Log.d("CHECKTAGS", "sampleRate: $sampleRate, channels: $channels")
 
-
-                Log.d("CHECKTAGS", "is playing add? : ${exoPlayer.isPlayingAd}")
+//
+//                Log.d("CHECKTAGS", "buffer? : ${exoPlayer.totalBufferedDuration}")
 
 
                 delay(2000)
@@ -753,13 +842,12 @@ class RadioService : MediaBrowserServiceCompat() {
 
                 while (isFromRecording && isPlaybackStatePlaying){
 
-                    val pos = 0L
-//                        radioServiceConnection.playbackState.value?.currentPlaybackPosition ?: 0L
+                    val pos = mediaSession.controller.playbackState.currentPlaybackPosition
 
                     if(exoPlayer.duration in 0..pos) {
 
-                       exoPlayer.seekTo(0)
-                       exoPlayer.playWhenReady = false
+                       exoPlayer.seekTo(currentPlayingItemPosition, 0)
+                        exoPlayer.pause()
                        recordingPlaybackPosition.postValue(0)
 
                         break
@@ -790,7 +878,7 @@ class RadioService : MediaBrowserServiceCompat() {
         override fun onStartRecording(recordFileName: String) {
 
             val notification = RecordingNotification(this@RadioService) {
-                currentStation?.getString(METADATA_KEY_TITLE) ?: ""
+                currentRadioStation?.name ?: ""
             }
 
             notification.showNotification()
@@ -810,8 +898,8 @@ class RadioService : MediaBrowserServiceCompat() {
            recordingCheck.edit().apply{
                putBoolean(IS_RECORDING_HANDLED, false)
                putString(RECORDING_FILE_NAME, recordFileName)
-               putString(RECORDING_NAME, currentStation?.getString(METADATA_KEY_DISPLAY_TITLE) ?: "")
-               putString(RECORDING_ICON_URL, currentStation?.getString(METADATA_KEY_DISPLAY_ICON_URI) ?: "")
+               putString(RECORDING_NAME, currentRadioStation?.name ?: "")
+               putString(RECORDING_ICON_URL, currentRadioStation?.favicon ?: "")
                putInt(RECORDING_SAMPLE_RATE, recSampleRate)
                putInt(RECORDING_CHANNELS_COUNT, recChannelsCount)
                putLong(RECORDING_TIMESTAMP, System.currentTimeMillis())
@@ -857,7 +945,7 @@ class RadioService : MediaBrowserServiceCompat() {
                         timeStamp,
                         duration
                     )
-//                    deleteFile(filePath)
+                    deleteFile(filePath)
                     isConverterWorking = false
                     radioSource.exoRecordFinishConverting.postValue(true)
                     recordingCheck.edit().putBoolean(IS_RECORDING_HANDLED, true).apply()
@@ -930,17 +1018,48 @@ class RadioService : MediaBrowserServiceCompat() {
        }
     }
 
+    fun invalidateNotification(){
+        mediaSessionConnector.invalidateMediaSessionQueue()
+        mediaSessionConnector.invalidateMediaSessionMetadata()
+        radioNotificationManager.updateNotification()
+    }
+
+
+
 
    private inner class RadioQueueNavigator : TimelineQueueNavigator(mediaSession){
 
        override fun getMediaDescription(player: Player, windowIndex: Int): MediaDescriptionCompat {
 
-           return currentStation?.description ?: radioSource.stations.first().description
+           if(currentPlaylist != SEARCH_FROM_RECORDINGS){
+               if(windowIndex != currentPlayingItemPosition){
+                   return MediaDescriptionCompat.Builder().build()
+               } else {
+                   val extra = Bundle()
+                   extra.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currenlyPlaingSong)
+                   return MediaDescriptionCompat.Builder()
+                       .setExtras(extra)
+                       .setIconUri(currentRadioStation?.favicon?.toUri())
+                       .setTitle(currentRadioStation?.name)
+                       .build()
+               }
+           } else{
+               return MediaDescriptionCompat.Builder()
+                   .setIconUri(stationsFromRecordings[windowIndex].iconUri.toUri())
+                   .setTitle(stationsFromRecordings[windowIndex].name)
+                   .build()
+           }
+
+
+//           return currentStation?.description ?: radioSource.stationsFromApiMetadata.first().description
 
        }
    }
 
-    private fun playFromUri (fromUri: String, playWhenReady : Boolean){
+
+
+    private fun playFromUri (fromUri: String, playWhenReady : Boolean,
+                             index : Int = -1, isSamePlaylist: Boolean = true){
 
         var uri = fromUri
 
@@ -951,27 +1070,28 @@ class RadioService : MediaBrowserServiceCompat() {
 
         Log.d("CHECKTAGS", "uri is : $uri")
 
-        val lastPath = uri.toUri().lastPathSegment
+//        val lastPath = uri.toUri().lastPathSegment
 
         val mediaItem = MediaItem.fromUri(uri.toUri())
 
-
-        val mediaSource = if(lastPath?.contains("m3u8") == true ||
-            lastPath?.contains("m3u") == true) {
-            Log.d("CHECKTAGS", "hls")
-            HlsMediaSource.Factory(dataSourceFactory)
+//        val mediaSource = if(lastPath?.contains("m3u8") == true ||
+//            lastPath?.contains("m3u") == true) {
+//            Log.d("CHECKTAGS", "hls")
+//            HlsMediaSource.Factory(dataSourceFactory)
 //                 .setAllowChunklessPreparation(true)
-                .createMediaSource(mediaItem)
-        } else {
-
-            val checkInterval = if(isAdaptiveLoaderToUse) 1024*40
-                                    else 1024*1024
-
-            ProgressiveMediaSource.Factory(dataSourceFactory)
-                .setContinueLoadingCheckIntervalBytes(checkInterval)
-                .createMediaSource(mediaItem)
-        }
-
+//                .createMediaSource(mediaItem)
+//        } else {
+//
+//            val checkInterval = if(isAdaptiveLoaderToUse) 1024*(bufferSizeInMills/1000) * 10
+//                                    else 1024*1024
+//
+//            ProgressiveMediaSource.Factory(dataSourceFactory)
+//                .setContinueLoadingCheckIntervalBytes(checkInterval)
+//                .createMediaSource(mediaItem)
+//        }
+//
+//        val defaultMediaSource = DefaultMediaSourceFactory(dataSourceFactory).createMediaSource(mediaItem)
+//
 
         val playbackSpeed = (if(isFromRecording) playbackSpeedRec
         else playbackSpeedRadio).toFloat()/100
@@ -987,7 +1107,16 @@ class RadioService : MediaBrowserServiceCompat() {
 
         serviceScope.launch {
             delay(200)
-            exoPlayer.setMediaSource(mediaSource)
+
+            if(currentPlaylist == SEARCH_FROM_API){
+                if(!isSamePlaylist || radioSource.isStationsFromApiUpdated){
+                    radioSource.isStationsFromApiUpdated = false
+                    exoPlayer.setMediaItems(radioSource.stationsFromApiMediaItems)
+                }
+                exoPlayer.seekTo(index, 0L)
+            } else {
+                exoPlayer.setMediaItem(mediaItem)
+            }
 
             exoPlayer.prepare()
 
@@ -997,21 +1126,91 @@ class RadioService : MediaBrowserServiceCompat() {
     }
 
     private fun preparePlayer(
-        playlist : List<MediaMetadataCompat>,
-        itemToPlay : MediaMetadataCompat?,
+//        playlist : List<MediaMetadataCompat>,
+//        itemToPlay : MediaMetadataCompat?,
         playNow : Boolean,
-        isFromRecordings : Boolean = false
+        itemIndex : Int = -1,
+        isSamePlaylist : Boolean = true,
+        isFromRecordings : Boolean = false,
+
     ){
 
-        this.isFromRecording = isFromRecordings
+        isFromRecording = isFromRecordings
 
-        val uri = try {
-            playlist[playlist.indexOf(itemToPlay)].getString(METADATA_KEY_MEDIA_URI)
-        } catch (e : ArrayIndexOutOfBoundsException){
-            ""
+        val playbackSpeed = (if(isFromRecording) playbackSpeedRec
+        else playbackSpeedRadio).toFloat()/100
+
+        val playbackPitch = if(isFromRecording) playbackSpeed
+        else playbackPitchRadio.toFloat()/100
+
+        val params = PlaybackParameters(playbackSpeed, playbackPitch)
+        exoPlayer.playbackParameters = params
+
+
+        fadeOutPlayer()
+
+        serviceScope.launch {
+            delay(200)
+
+            when(currentPlaylist){
+
+                SEARCH_FROM_API -> {
+                    if(!isSamePlaylist || radioSource.isStationsFromApiUpdated){
+                        radioSource.isStationsFromApiUpdated = false
+                        exoPlayer.setMediaItems(radioSource.stationsFromApiMediaItems)
+                    }
+                }
+
+                SEARCH_FROM_FAVOURITES -> {
+                    if(!isSamePlaylist || radioSource.isStationsFavouredUpdated){
+                        radioSource.isStationsFavouredUpdated = false
+                        exoPlayer.setMediaItems(radioSource.stationsFavouredMediaItems)
+                    }
+                }
+
+                SEARCH_FROM_PLAYLIST -> {
+                    if(!isSamePlaylist || RadioSource.isStationsInPlaylistUpdated){
+                        RadioSource.isStationsInPlaylistUpdated = false
+                        exoPlayer.setMediaItems(RadioSource.stationsInPlaylistMediaItems)
+                    }
+                }
+
+                SEARCH_FROM_HISTORY -> {
+                    if(!isSamePlaylist || radioSource.isStationsFromHistoryUpdated){
+                        radioSource.isStationsFromHistoryUpdated = false
+                        exoPlayer.setMediaItems(radioSource.stationsFromHistoryMediaItems)
+                    }
+                }
+
+                SEARCH_FROM_HISTORY_ONE_DATE -> {
+                    if(!isSamePlaylist || radioSource.isStationsFromHistoryOneDateUpdated){
+                        radioSource.isStationsFromHistoryOneDateUpdated = false
+                        exoPlayer.setMediaItems(radioSource.stationsFromHistoryOneDateMediaItems)
+                    }
+                }
+
+                SEARCH_FROM_RECORDINGS -> {
+                    if(!isSamePlaylist || isStationsFromRecordingUpdated){
+                        isStationsFromRecordingUpdated = false
+                        exoPlayer.setMediaItems(stationsFromRecordingsMediaItems)
+
+                    }
+                }
+            }
+
+            if(itemIndex != -1){
+                exoPlayer.seekTo(itemIndex, 0L)
+            }
+
+            exoPlayer.prepare()
+
+            exoPlayer.playWhenReady = playNow
         }
 
-        playFromUri(uri, playNow)
+
+
+
+//        playFromUri(uri, playNow, itemIndex, isSamePlaylist)
 
 
       }
@@ -1041,6 +1240,10 @@ class RadioService : MediaBrowserServiceCompat() {
 
     override fun onDestroy() {
 
+        mediaSessionConnector.setPlayer(null)
+        mediaSessionConnector.setQueueNavigator(null)
+        mediaSessionConnector.setPlaybackPreparer(null)
+
         if(canOnDestroyBeCalled){
             Log.d("CHECKTAGS", "on destroy")
             mediaSession.run {
@@ -1048,11 +1251,14 @@ class RadioService : MediaBrowserServiceCompat() {
                 release()
             }
 
+
             NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
             radioSource.subscribeToFavouredStations.removeObserver(observerForDatabase)
             radioSource.allRecordingsLiveData.removeObserver(observerForRecordings)
 
             exoRecord.removeExoRecordListener("MainListener")
+
+
 
             exoPlayer.removeListener(radioPlayerEventListener)
             exoPlayer.release()
@@ -1065,6 +1271,20 @@ class RadioService : MediaBrowserServiceCompat() {
         }
     }
 
+//    override fun onBind(intent: Intent?): IBinder? {
+//        Log.d("CHECKTAGS", "intent:  ${ intent?.action }")
+//        return super.onBind(intent)
+//    }
+//
+//    override fun onUnbind(intent: Intent?): Boolean {
+//        Log.d("CHECKTAGS", "intent unbind:  ${ intent?.action }")
+//        return super.onUnbind(intent)
+//    }
+//
+//    override fun onRebind(intent: Intent?) {
+//        Log.d("CHECKTAGS", "intent rebind:  ${ intent?.action }")
+//        super.onRebind(intent)
+//    }
 
     override fun onGetRoot(
         clientPackageName: String,

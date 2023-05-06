@@ -24,9 +24,11 @@ import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.databinding.FragmentStationDetailsBinding
+import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.dialogs.AddStationToPlaylistDialog
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
+import com.example.radioplayer.utils.Constants.TITLE_UNKNOWN
 import com.example.radioplayer.utils.RandomColors
 import com.example.radioplayer.utils.Utils
 import com.example.radioplayer.utils.addAction
@@ -69,7 +71,11 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         pixabayViewModel = ViewModelProvider(requireActivity())[PixabayViewModel::class.java]
 
-        getNewRadioStation()
+        observePlayingRadioStation()
+
+        observeIfNewStationFavoured()
+
+        observeCurrentSongTitle()
 
         updateListOfPlaylists()
 
@@ -87,20 +93,14 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     }
 
-    private fun getNewRadioStation(){
-
-        mainViewModel.newPlayingItem.value?.let {
-
-            if(it is PlayingItem.FromRadio){
-
-                currentRadioStation = it.radioStation
-
-                observeIfNewStationFavoured()
-                updateUiForRadioStation(it.radioStation)
-                observeCurrentSongTitle()
-            }
+    private fun observePlayingRadioStation(){
+        RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
+            currentRadioStation = station
+            checkIfStationFavoured(station)
+            updateUiForRadioStation(station)
         }
     }
+
 
 
     private fun observeCurrentSongTitle(){
@@ -109,7 +109,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
 
             if(title.equals("NULL", ignoreCase = true) || title.isBlank()){
-                bind.tvSongTitle.text = "No info"
+                bind.tvSongTitle.text = TITLE_UNKNOWN
 
                 bind.tvSongTitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.default_text_color))
 
@@ -273,12 +273,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     private fun updateUiForRadioStation(station : RadioStation){
 
             homepageUrl = station.homepage
-
-
-
-            checkIfStationFavoured(station)
-
-            currentRadioStation = station
 
             bind.tvName.text = station.name
 

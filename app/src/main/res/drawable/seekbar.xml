@@ -16,7 +16,7 @@
                 <gradient android:startColor="@color/recording_seekbar_progress"
                     android:endColor="@color/main_background"
                     android:angle="90"/>
-"
+
             </shape>
         </scale>
     </item>

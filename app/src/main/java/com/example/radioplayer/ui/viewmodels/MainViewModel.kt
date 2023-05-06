@@ -36,9 +36,11 @@ import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_SPE
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_REC_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.FAB_POSITION_X
 import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
+import com.example.radioplayer.utils.Constants.HISTORY_ITEM_ID
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.IS_NAME_EXACT
 import com.example.radioplayer.utils.Constants.IS_TAG_EXACT
+import com.example.radioplayer.utils.Constants.ITEM_INDEX
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
 import com.example.radioplayer.utils.Constants.PLAY_WHEN_READY
 import com.example.radioplayer.utils.Constants.SEARCH_BTN_PREF
@@ -55,6 +57,7 @@ import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
 import com.example.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
 import com.example.radioplayer.utils.Language
 import com.example.radioplayer.utils.listOfLanguages
+import com.example.radioplayer.utils.toRadioStation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -81,7 +84,6 @@ class MainViewModel @Inject constructor(
 
        private var listOfStations = listOf<RadioStation>()
        var isNewSearch = true
-       var isDelayNeededForServiceConnection = true
 
        val newPlayingItem : MutableLiveData<PlayingItem> = MutableLiveData()
 
@@ -104,32 +106,32 @@ class MainViewModel @Inject constructor(
         radioServiceConnection.connectBrowser()
     }
 
-    init {
-
-        currentRadioStation.value?.let {
-            viewModelScope.launch {
-                val itemId = it.getString(METADATA_KEY_MEDIA_ID)
-
-                if(itemId != null){
-
-                    if(itemId.contains(".ogg")) {
-                        val item = repository.getCurrentRecording(itemId)
-                        newPlayingItem.postValue(PlayingItem.FromRecordings(item))
-                        isRadioTrueRecordingFalse = false
-                    } else {
-                        val item = repository.getCurrentRadioStation(itemId)
-                        newPlayingItem.postValue(PlayingItem.FromRadio(item))
-                        isRadioTrueRecordingFalse = true
-
-                    }
-
-                }
-
-
-            }
-        }
-
-    }
+//    init {
+//
+//        currentRadioStation.value?.let {
+//            viewModelScope.launch {
+//                val itemId = it.getString(METADATA_KEY_MEDIA_ID)
+//
+//                if(itemId != null){
+//
+//                    if(itemId.contains(".ogg")) {
+//                        val item = repository.getCurrentRecording(itemId)
+//                        newPlayingItem.postValue(PlayingItem.FromRecordings(item))
+//                        isRadioTrueRecordingFalse = false
+//                    } else {
+//                        val item = repository.getCurrentRadioStation(itemId)
+//                        newPlayingItem.postValue(PlayingItem.FromRadio(item))
+//                        isRadioTrueRecordingFalse = true
+//
+//                    }
+//
+//                }
+//
+//
+//            }
+//        }
+//
+//    }
 
 
 
@@ -263,7 +265,6 @@ class MainViewModel @Inject constructor(
                     val response = radioSource.getLanguages(language.name)
                       response.body()?.let { langs ->
                         var count = 0
-
                         langs.forEach {
                             count += it.stationcount
                         }
@@ -375,30 +376,9 @@ class MainViewModel @Inject constructor(
 
                        listOfStations = it.map { station ->
 
-                           val country = when (station.countrycode) {
-                               "US" -> "USA"
-                               "GB" -> "UK"
-                               "RU" -> "Russia"
-                               else -> station.country
-                           }
-
-
-                           RadioStation(
-                               favicon = station.favicon,
-                               name = station.name,
-                               stationuuid = station.stationuuid,
-                               country = country,
-                               url = station.url_resolved,
-                               homepage = station.homepage,
-                               tags = station.tags,
-                               language = station.language,
-                               favouredAt = 0,
-                               state = station.state,
-                               bitrate = station.bitrate
-                           )
+                           station.toRadioStation()
                        }
                    }
-
 
 
 
@@ -516,7 +496,9 @@ class MainViewModel @Inject constructor(
             station : RadioStation? = null,
             searchFlag : Int = 0,
             rec : Recording? = null,
-            playWhenReady : Boolean = true
+            playWhenReady : Boolean = true,
+            itemIndex : Int = -1,
+            historyItemId : String? = null
         ) : Boolean {
 
             val isPrepared = playbackState.value?.isPrepared ?: false
@@ -524,7 +506,10 @@ class MainViewModel @Inject constructor(
             val id = station?.stationuuid ?: (rec?.id ?: "")
 
             if(isPrepared && id
-                    == currentRadioStation.value?.getString(METADATA_KEY_MEDIA_ID)){
+                    == RadioService.currentPlayingStation.value?.stationuuid ||
+               isPrepared && id == RadioService.currentPlayingRecording.value?.id
+
+                    ){
                 playbackState.value?.let { playbackState ->
                     when {
                         playbackState.isPlaying -> {
@@ -543,20 +528,23 @@ class MainViewModel @Inject constructor(
                 }
             } else{
 
+
                 if(station == null){
-                    newPlayingItem.postValue(PlayingItem.FromRecordings(rec!!))
-                    isRadioTrueRecordingFalse = false
+//                    newPlayingItem.postValue(PlayingItem.FromRecordings(rec!!))
+//                    isRadioTrueRecordingFalse = false
                     RadioService.recordingPlaybackPosition.postValue(0)
 
                 } else {
-                    isRadioTrueRecordingFalse = true
-                    newPlayingItem.postValue(PlayingItem.FromRadio(station))
+//                    isRadioTrueRecordingFalse = true
+//                    newPlayingItem.postValue(PlayingItem.FromRadio(station))
                 }
 
                 radioServiceConnection.transportControls
                     .playFromMediaId(id, bundleOf(
                         Pair(SEARCH_FLAG, searchFlag),
-                        Pair(PLAY_WHEN_READY, playWhenReady)
+                        Pair(PLAY_WHEN_READY, playWhenReady),
+                        Pair(ITEM_INDEX, itemIndex),
+                        Pair(HISTORY_ITEM_ID, historyItemId)
                     ))
 
             }
@@ -564,7 +552,7 @@ class MainViewModel @Inject constructor(
             return false
         }
 
-        var isRadioTrueRecordingFalse = true
+//        var isRadioTrueRecordingFalse = true
 
 
         fun updateRadioPlaybackSpeed(){

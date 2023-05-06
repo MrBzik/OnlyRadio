@@ -29,6 +29,8 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.radioplayer.R
+import com.example.radioplayer.data.local.entities.RadioStation
+import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.databinding.ActivityMainBinding
 import com.example.radioplayer.databinding.StubPlayerActivityMainBinding
@@ -47,6 +49,7 @@ import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.IS_NAME_EXACT
 import com.example.radioplayer.utils.Constants.IS_SEARCH_FILTER_LANGUAGE
 import com.example.radioplayer.utils.Constants.IS_TAG_EXACT
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.Constants.SEARCH_FULL_COUNTRY_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_MAX_BIT
@@ -56,6 +59,7 @@ import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME_AUTO
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_ORDER
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
 import com.example.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
+import com.example.radioplayer.utils.Constants.TITLE_UNKNOWN
 import com.example.radioplayer.utils.RandomColors
 
 import dagger.hilt.android.AndroidEntryPoint
@@ -101,7 +105,8 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var glide : RequestManager
 
-    private var currentPlayingItem : PlayingItem? = null
+    private var currentPlayingStation : RadioStation? = null
+    private var currentPlayingRecording : Recording? = null
 
     companion object{
         var uiMode = 0
@@ -290,26 +295,63 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    private fun handleStubPlayer(){
+
+        if(!isStubPlayerBindInflated) {
+            inflatePlayerStubAndCallRelatedMethods()
+        } else if(bindPlayer.root.visibility == View.GONE){
+
+            bindPlayer.root.visibility = View.VISIBLE
+            bindPlayer.root.slideAnim(500, 0, R.anim.fade_in_anim)
+            bindPlayer.tvStationTitle.isSingleLine = true
+            bindPlayer.tvStationTitle.isSelected = true
+        }
+    }
+
+
     private fun observeNewStation(){
 
-        mainViewModel.newPlayingItem.observe(this){ playingItem ->
+        RadioService.currentPlayingStation.observe(this){ station ->
 
-            currentPlayingItem = playingItem
+            currentPlayingStation = station
 
-            if(!isStubPlayerBindInflated) {
-                inflatePlayerStubAndCallRelatedMethods()
-            } else if(bindPlayer.root.visibility == View.GONE){
+            handleStubPlayer()
 
-                bindPlayer.root.visibility = View.VISIBLE
-                bindPlayer.root.slideAnim(500, 0, R.anim.fade_in_anim)
-                bindPlayer.tvStationTitle.isSingleLine = true
-                bindPlayer.tvStationTitle.isSelected = true
-            }
+            updateImage()
+        }
 
 
-            updateImage(playingItem)
+        RadioService.currentPlayingRecording.observe(this){ recording ->
+
+            currentPlayingRecording = recording
+
+            handleStubPlayer()
+
+            updateImage()
 
         }
+
+
+
+//        mainViewModel.newPlayingItem.observe(this){ playingItem ->
+
+//            currentPlayingItem = playingItem
+
+//            if(!isStubPlayerBindInflated) {
+//                inflatePlayerStubAndCallRelatedMethods()
+//            } else if(bindPlayer.root.visibility == View.GONE){
+//
+//                bindPlayer.root.visibility = View.VISIBLE
+//                bindPlayer.root.slideAnim(500, 0, R.anim.fade_in_anim)
+//                bindPlayer.tvStationTitle.isSingleLine = true
+//                bindPlayer.tvStationTitle.isSelected = true
+//            }
+//
+//
+//            updateImage()
+//
+//        }
     }
 
     private fun inflatePlayerStubAndCallRelatedMethods (){
@@ -348,7 +390,7 @@ class MainActivity : AppCompatActivity() {
 
         if(title.equals("NULL", ignoreCase = true) || title.isBlank()){
             bindPlayer.tvStationTitle.apply {
-                text = "Playing: no info"
+                text = TITLE_UNKNOWN
                 setTextColor(ContextCompat.getColor(this@MainActivity,R.color.regular_text_color))
             }
         } else {
@@ -404,7 +446,7 @@ class MainActivity : AppCompatActivity() {
 
                     supportFragmentManager.beginTransaction().apply {
 
-                        if(mainViewModel.isRadioTrueRecordingFalse){
+                        if(!RadioService.isFromRecording){
                             replace(R.id.flFragment, stationDetailsFragment)
                         } else {
                             replace(R.id.flFragment, recordingDetailsFragment)
@@ -589,28 +631,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateImage(playingItem : PlayingItem){
+    private fun updateImage(){
 
         var newName = ""
         var isRecording = false
         var newImage = ""
 
-        when (playingItem) {
-            is PlayingItem.FromRadio -> {
-                playingItem.radioStation.apply {
+        if (RadioService.currentPlaylist != SEARCH_FROM_RECORDINGS) {
+
+                currentPlayingStation?.apply {
                     newName = name ?: "X"
                     newImage = favicon ?: ""
                     val bits = if(bitrate == 0) "0? kbps" else "$bitrate kbps"
                     bindPlayer.tvBitrate.text = bits
-
-                }
             }
-            is PlayingItem.FromRecordings -> {
+
+        } else  {
+
+            currentPlayingRecording?.apply {
                 isRecording = true
                 bindPlayer.tvStationTitle.text = "From recordings"
                 bindPlayer.tvBitrate.text = ""
-                newName = playingItem.recording.name
-                newImage = playingItem.recording.iconUri
+                newName = name
+                newImage = iconUri
+
             }
         }
 
@@ -656,21 +700,33 @@ class MainActivity : AppCompatActivity() {
 
     private fun onClickListenerForTogglePlay(){
 
-        bindPlayer.ivTogglePlayCurrentStation.setOnClickListener {
+        bindPlayer.ivTogglePlayCurrentStation.setOnClickListener { _ ->
 
-            currentPlayingItem?.let {
+            if(RadioService.isFromRecording){
 
-                when(it){
-                    is PlayingItem.FromRadio -> {
-                     mainViewModel.playOrToggleStation(it.radioStation)
+                currentPlayingRecording?.let { mainViewModel.playOrToggleStation(rec = it) }
 
-                    }
-                    is PlayingItem.FromRecordings -> {
+            } else {
 
-                        mainViewModel.playOrToggleStation(rec = it.recording)
-                    }
-                }
+                currentPlayingStation?.let { mainViewModel.playOrToggleStation(it) }
+
+
             }
+
+
+//            currentPlayingItem?.let {
+//
+//                when(it){
+//                    is PlayingItem.FromRadio -> {
+//                     mainViewModel.playOrToggleStation(it.radioStation)
+//
+//                    }
+//                    is PlayingItem.FromRecordings -> {
+//
+//                        mainViewModel.playOrToggleStation(rec = it.recording)
+//                    }
+//                }
+//            }
         }
     }
 
@@ -710,7 +766,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        mainViewModel.disconnectMediaBrowser()
         this.cacheDir.deleteRecursively()
         databaseViewModel.removeUnusedStations()
 
@@ -743,7 +798,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-
+        mainViewModel.disconnectMediaBrowser()
         Log.d("CHECKTAGS", "activity on destroy")
         super.onDestroy()
     }

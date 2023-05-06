@@ -3,8 +3,6 @@ package com.example.radioplayer.adapters
 import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipDescription
-import android.content.Context
-import android.graphics.Point
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
@@ -17,14 +15,12 @@ import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.ItemRadioWithTextBinding
-import com.example.radioplayer.databinding.RadioItemBinding
+import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.animations.fadeOut
 import com.example.radioplayer.utils.RandomColors
 import javax.inject.Inject
@@ -60,16 +56,10 @@ class RadioDatabaseAdapter @Inject constructor(
         holder.itemView.setOnClickListener {
             val station = listOfStations[holder.absoluteAdapterPosition]
             onItemClickListener?.let { click ->
-                click(station)
-            }
+                click(station, holder.absoluteAdapterPosition)
 
-            if(station.name != currentRadioStationName) {
-                currentRadioStationName = station.name!!
-                previousItemHolder?.bind?.let {
-                    restoreState(it)
-                }
+                updateOnStationChange(station, holder, true)
             }
-            previousItemHolder = holder
         }
 
         return holder
@@ -157,7 +147,7 @@ class RadioDatabaseAdapter @Inject constructor(
             }
         }
 
-        if(station.name == currentRadioStationName) {
+        if(station.stationuuid == currentRadioStationId) {
             previousItemHolder = holder
             handleStationPlaybackState(holder.bind)
         } else
@@ -176,7 +166,7 @@ class RadioDatabaseAdapter @Inject constructor(
     var alpha = 0.1f
     var titleSize = 20f
 
-    var currentRadioStationName : String? = null
+    var currentRadioStationId : String? = null
     var currentPlaybackState = false
     private var previousItemHolder : RadioItemHolder? = null
 
@@ -216,18 +206,35 @@ class RadioDatabaseAdapter @Inject constructor(
     }
 
     fun updateStationPlaybackState(){
-        previousItemHolder?.bind?.let{
-            if(it.tvPrimary.text == currentRadioStationName){
-                handleStationPlaybackState(it)
+        previousItemHolder?.let{
+            if(it.absoluteAdapterPosition == RadioService.currentPlayingItemPosition){
+                handleStationPlaybackState(it.bind)
+            }
+        }
+    }
+
+    fun updateOnStationChange(station : RadioStation, holder : RadioItemHolder?,
+                              isClicked : Boolean = false
+    ){
+        if(station.stationuuid != currentRadioStationId) {
+
+            currentRadioStationId = station.stationuuid
+            previousItemHolder?.bind?.let {
+                restoreState(it)
+            }
+        }
+        holder?.let {
+            previousItemHolder = holder
+            if(!isClicked){
+                handleStationPlaybackState(holder.bind)
             }
         }
     }
 
 
+    private var onItemClickListener : ((RadioStation, Int) -> Unit)? = null
 
-    private var onItemClickListener : ((RadioStation) -> Unit)? = null
-
-    fun setOnClickListener(listener : (RadioStation) -> Unit){
+    fun setOnClickListener(listener : (RadioStation, Int) -> Unit){
         onItemClickListener = listener
     }
 

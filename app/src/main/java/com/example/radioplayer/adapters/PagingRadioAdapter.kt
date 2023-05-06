@@ -25,6 +25,7 @@ import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.ItemRadioWithTextBinding
 import com.example.radioplayer.databinding.RadioItemBinding
+import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
 import com.example.radioplayer.ui.animations.fadeOut
 import com.example.radioplayer.utils.RandomColors
@@ -53,17 +54,13 @@ class PagingRadioAdapter @Inject constructor(
         holder.itemView.setOnClickListener {
 
             val item = getItem(holder.absoluteAdapterPosition)
+
             item?.let { station ->
                 onItemClickListener?.let { click ->
-                    click(station)
+                    click(station, holder.absoluteAdapterPosition)
+
+                    updateOnStationChange(station, holder, true)
                 }
-                if(station.name != currentRadioStationName) {
-                    currentRadioStationName = station.name!!
-                    previousItemHolder?.bind?.let {
-                        restoreState(it)
-                    }
-                }
-                previousItemHolder = holder
             }
         }
 
@@ -75,7 +72,6 @@ class PagingRadioAdapter @Inject constructor(
         val station = getItem(position)!!
 
         holder.bind.apply {
-
 
             tvPrimary.text = station.name
             tvPrimary.textSize = titleSize
@@ -163,7 +159,8 @@ class PagingRadioAdapter @Inject constructor(
                 }
 
 
-        if(station.name == currentRadioStationName){
+        if(station.stationuuid == currentRadioStationId){
+
 
             previousItemHolder = holder
             handleStationPlaybackState(holder.bind)
@@ -213,10 +210,7 @@ class PagingRadioAdapter @Inject constructor(
 
                tvSecondary.setTextColor(selectedSecondaryTextColor)
 
-
                viewBottomSeparator?.setBackgroundResource(R.color.station_bottom_separator_active)
-
-
 
             }
 
@@ -236,23 +230,46 @@ class PagingRadioAdapter @Inject constructor(
 
 
     fun updateStationPlaybackState(){
-        previousItemHolder?.bind?.let{
-            if(it.tvPrimary.text == currentRadioStationName){
-                handleStationPlaybackState(it)
+        previousItemHolder?.let{
+            if(it.absoluteAdapterPosition == RadioService.currentPlayingItemPosition){
+                handleStationPlaybackState(it.bind)
             }
         }
     }
 
-    var currentRadioStationName : String? = null
+
+    fun updateOnStationChange(station : RadioStation, holder : RadioItemHolder?,
+                              isClicked : Boolean = false
+    ){
+        if(station.stationuuid != currentRadioStationId) {
+
+            currentRadioStationId = station.stationuuid
+            previousItemHolder?.bind?.let {
+                restoreState(it)
+            }
+        }
+        holder?.let {
+            previousItemHolder = holder
+            if(!isClicked){
+                handleStationPlaybackState(holder.bind)
+            }
+        }
+    }
+
+
+
+
+
+    var currentRadioStationId : String? = null
     var currentPlaybackState = false
     var previousItemHolder : RadioItemHolder? = null
 
 
 
 
-    private var onItemClickListener : ((RadioStation) -> Unit)? = null
+    private var onItemClickListener : ((RadioStation, Int) -> Unit)? = null
 
-    fun setOnClickListener(listener : (RadioStation) -> Unit){
+    fun setOnClickListener(listener : (RadioStation, Int) -> Unit){
         onItemClickListener = listener
     }
 

@@ -74,7 +74,7 @@ class PagingHistoryAdapter @Inject constructor(
 
                     onItemClickListener?.let { click ->
 
-                        click(item.radioStation)
+                        click(item.radioStation, holder.absoluteAdapterPosition)
                     }
 
                     if(item.radioStation.stationuuid == currentRadioStationID){
@@ -298,6 +298,27 @@ class PagingHistoryAdapter @Inject constructor(
        }
     }
 
+
+    fun updateOnStationChange(station : RadioStation,
+                              holder : PagingHistoryAdapter.StationViewHolder?
+    ){
+        if(station.stationuuid != currentRadioStationID) {
+
+            currentRadioStationID = station.stationuuid
+            previousItemHolder?.bind?.let {
+                restoreState(it)
+            }
+        }
+        holder?.let {
+           previousItemHolder = holder
+
+           handleStationPlaybackState(holder.bind)
+
+        }
+    }
+
+
+
     var currentRadioStationID : String? = null
     var currentPlaybackState = false
     private var selectedAdapterPosition = -2
@@ -305,35 +326,13 @@ class PagingHistoryAdapter @Inject constructor(
 
 
 
-    private var onItemClickListener : ((RadioStation) -> Unit)? = null
+    private var onItemClickListener : ((RadioStation, Int) -> Unit)? = null
 
-    fun setOnClickListener(listener : (RadioStation) -> Unit){
+    fun setOnClickListener(listener : (RadioStation, Int) -> Unit){
         onItemClickListener = listener
     }
 
 
-
-//    if(item.radioStation.stationuuid == currentRadioStationID){
-//
-//        if(checkForInitialSelection) {
-//            selectedAdapterPosition = holder.absoluteAdapterPosition
-//            checkForInitialSelection = false
-//        }
-//
-//        if(selectedAdapterPosition == holder.absoluteAdapterPosition
-//            || previousItemHolder?.absoluteAdapterPosition == -1
-//            && !isInitialShiftHandled || previousItemHolder?.absoluteAdapterPosition ==1
-//        ) {
-//            isInitialShiftHandled = true
-//            handleStationPlaybackState(radioItemRootLayout)
-//
-//            previousItemHolder = holder
-//        } else {
-//            radioItemRootLayout.setBackgroundResource(R.color.main_background)
-//        }
-//    } else
-//    radioItemRootLayout.setBackgroundResource(R.color.main_background)
-//    Log.d("CHECKTAGS", previousItemHolder?.absoluteAdapterPosition.toString())
 
 
 

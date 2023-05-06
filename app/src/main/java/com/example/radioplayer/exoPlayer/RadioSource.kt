@@ -4,6 +4,8 @@ package com.example.radioplayer.exoPlayer
 import android.content.SharedPreferences
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
+import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.entities.RadioStation
@@ -16,10 +18,11 @@ import com.example.radioplayer.utils.Constants.API_RADIO_ALL_COUNTRIES
 import com.example.radioplayer.utils.Constants.API_RADIO_LANGUAGES
 
 import com.example.radioplayer.utils.Constants.API_RADIO_SEARCH_URL
-import com.example.radioplayer.utils.Constants.API_RADIO_TOP_VOTE_SEARCH_URL
 import com.example.radioplayer.utils.Constants.BASE_RADIO_URL
 import com.example.radioplayer.utils.Constants.BASE_RADIO_URL3
 import com.example.radioplayer.utils.Constants.listOfUrls
+import com.example.radioplayer.utils.toMediaMetadataCompat
+import com.google.android.exoplayer2.MediaItem
 
 import javax.inject.Inject
 
@@ -29,18 +32,67 @@ class RadioSource @Inject constructor(
     private val validBaseUrlPref : SharedPreferences
 
 ) {
-    var stations = mutableListOf<MediaMetadataCompat>()
-    private var _stations: RadioStations? = RadioStations()
+
+    // Search tab
+
+    var stationsFromLastSearch: RadioStations? = RadioStations()
+    var stationsFromApi = mutableListOf<RadioStationsItem>()
+    var stationsFromApiMetadata = mutableListOf<MediaMetadataCompat>()
+    var stationsFromApiMediaItems = mutableListOf<MediaItem>()
+    var isStationsFromApiUpdated = false
+
+    // Favoured tab
 
     val subscribeToFavouredStations = radioDAO.getAllFavouredStations()
-    var stationsFavoured = mutableListOf<MediaMetadataCompat>()
+    var stationsFavoured = listOf<RadioStation>()
+    var stationsFavouredMetadata = mutableListOf<MediaMetadataCompat>()
+    var stationsFavouredMediaItems = listOf<MediaItem>()
+    var isStationsFavouredUpdated = false
+
+
+
+    var stationsFromPlaylistMetadata = mutableListOf<MediaMetadataCompat>()
+    companion object{
+
+        var stationsInPlaylist = listOf<RadioStation>()
+        var stationsInPlaylistMediaItems = listOf<MediaItem>()
+        var isStationsInPlaylistUpdated = false
+
+
+        fun updatePlaylistStations(list : List<RadioStation>){
+           stationsInPlaylist = list
+           stationsInPlaylistMediaItems = list.map {
+               MediaItem.fromUri(it.url!!)
+           }
+            isStationsInPlaylistUpdated = true
+        }
+
+    }
+
+
+    // History
+
+    var stationsFromHistory = mutableListOf<RadioStation>()
+    var stationsFromHistoryOneDate = listOf<RadioStation>()
+
+    var stationsFromHistoryMetadata = mutableListOf<MediaMetadataCompat>()
+    var stationsFromHistoryOneDateMetadata = listOf<MediaMetadataCompat>()
+
+    var stationsFromHistoryMediaItems = mutableListOf<MediaItem>()
+    var stationsFromHistoryOneDateMediaItems = listOf<MediaItem>()
+
+
+    var isStationsFromHistoryUpdated = false
+    var isStationsFromHistoryOneDateUpdated = false
+
+    // Recordings
 
     val allRecordingsLiveData =  radioDAO.getAllRecordings()
     var recordings = mutableListOf<MediaMetadataCompat>()
+//    var stationsFromRecordings = listOf<Recording>()
+//    var stationsFromRecordingsMediaItems = listOf<MediaItem>()
+//    var isStationsFromRecordingUpdated = true
 
-    var stationsFromPlaylist = mutableListOf<MediaMetadataCompat>()
-
-    var stationsFromHistory = mutableListOf<MediaMetadataCompat>()
 
     val exoRecordState : MutableLiveData<Boolean> = MutableLiveData(false)
     val exoRecordTimer : MutableLiveData<Long> = MutableLiveData()
@@ -63,28 +115,61 @@ class RadioSource @Inject constructor(
     suspend fun deleteTitle(title : Title) = radioDAO.deleteTitle(title)
 
 
-    suspend fun getStationsInDate(limit: Int, offset: Int, initialDate: String): DateWithStations {
+    suspend fun getStationsInAllDates(limit: Int, offset: Int, initialDate: String): DateWithStations {
         val response = radioDAO.getStationsInAllDates(limit, offset)
         val date = response.date.date
+
+        Log.d("CHECKTAGS", "getting all dates")
+
         if (date == initialDate) {
-            stationsFromHistory = response.radioStations.map { station ->
-                stationToMediaMetadataCompat(station)
+
+            stationsFromHistory = response.radioStations.reversed().toMutableList()
+
+            stationsFromHistoryMetadata = response.radioStations.reversed().map { station ->
+                station.toMediaMetadataCompat()
             }.toMutableList()
+
+            stationsFromHistoryMediaItems = response.radioStations.reversed().map { station ->
+                MediaItem.fromUri(station.url!!)
+            }.toMutableList()
+
+
         } else {
-            response.radioStations.map { station ->
-                stationsFromHistory.add(
-                    stationToMediaMetadataCompat(station)
+
+            stationsFromHistory.addAll(response.radioStations.reversed())
+
+            response.radioStations.reversed().map { station ->
+                stationsFromHistoryMetadata.add(
+                    station.toMediaMetadataCompat()
+                )
+            }
+            response.radioStations.reversed().map { station ->
+                stationsFromHistoryMediaItems.add(
+                    MediaItem.fromUri(station.url!!)
                 )
             }
         }
+        isStationsFromHistoryUpdated = true
+
         return response
     }
 
     suspend fun getStationsInOneDate(time : Long) : DateWithStations {
         val response = radioDAO.getStationsInOneDate(time)
-        stationsFromHistory = response.radioStations.map{ station ->
-            stationToMediaMetadataCompat(station)
+
+        Log.d("CHECKTAGS", "getting one date")
+
+        stationsFromHistoryOneDate = response.radioStations.reversed()
+
+        stationsFromHistoryOneDateMetadata = response.radioStations.reversed().map{ station ->
+            station.toMediaMetadataCompat()
         }.toMutableList()
+
+        stationsFromHistoryOneDateMediaItems = response.radioStations.reversed().map { station ->
+            MediaItem.fromUri(station.url!!)
+        }.toMutableList()
+        isStationsFromHistoryOneDateUpdated = true
+
         return response
     }
 
@@ -92,10 +177,15 @@ class RadioSource @Inject constructor(
 
     fun createMediaItemsFromDB(listOfStations : List<RadioStation>){
 
-        stationsFavoured = listOfStations.map { station ->
-            stationToMediaMetadataCompat(station)
-        }.toMutableList()
+        stationsFavoured = listOfStations
 
+        stationsFavouredMetadata = listOfStations.map { station ->
+            station.toMediaMetadataCompat()
+        }.toMutableList()
+        stationsFavouredMediaItems = listOfStations.map{ station ->
+            MediaItem.fromUri(station.url!!)
+        }
+        isStationsFavouredUpdated = true
     }
 
     val isRecordingUpdated : MutableLiveData<Boolean> = MutableLiveData()
@@ -112,6 +202,12 @@ class RadioSource @Inject constructor(
 //            val mediaRec = createMediaMetadataCompatFromRecording(rec)
 //            recordings.add(addRecordingAt, mediaRec)
 //        }
+
+//            stationsFromRecordings = listOfRecordings
+//
+//            stationsFromRecordingsMediaItems = listOfRecordings.map {
+//                MediaItem.fromUri(it.id)
+//            }
 
             recordings = listOfRecordings.map { recording ->
                 createMediaMetadataCompatFromRecording(recording)
@@ -158,8 +254,8 @@ class RadioSource @Inject constructor(
 
        val list = response?.radioStations ?: emptyList()
 
-        stationsFromPlaylist = list.map { station ->
-            stationToMediaMetadataCompat(station)
+        stationsFromPlaylistMetadata = list.map { station ->
+            station.toMediaMetadataCompat()
         }.toMutableList()
 
     }
@@ -246,7 +342,7 @@ class RadioSource @Inject constructor(
                     currentUrlIndex = 0
                 }
 
-            _stations = response?.body()
+            stationsFromLastSearch = response?.body()
         return response?.body()
 
         }
@@ -260,22 +356,41 @@ class RadioSource @Inject constructor(
 
 //            state = STATE_PROCESSING
 
-              _stations?.let {
+              stationsFromLastSearch?.let {
 
                   if(isNewSearch) {
-                      stations = it.map { station ->
+
+                      stationsFromApi = it
+
+                      stationsFromApiMediaItems = it.map { station ->
+                          MediaItem.fromUri(station.url_resolved.toUri())
+                      }.toMutableList()
+
+
+
+                      stationsFromApiMetadata = it.map { station ->
                           stationItemToMediaMetadataCompat(station)
                       }.toMutableList()
+
                   } else {
+
+                      stationsFromApi.addAll(it)
 
                       it.map { station ->
 
-                          stations.add(
+                          stationsFromApiMetadata.add(
                               stationItemToMediaMetadataCompat(station)
                           )
+
+                          stationsFromApiMediaItems.add(
+                              MediaItem.fromUri(station.url_resolved.toUri())
+                          )
+
+
                       }
                   }
 
+                  isStationsFromApiUpdated = true
 //                     state = STATE_INITIALIZED
                 }
     }
@@ -293,16 +408,16 @@ class RadioSource @Inject constructor(
         .build()
 
 
-    private fun stationToMediaMetadataCompat(station : RadioStation)
-        = MediaMetadataCompat.Builder()
-        .putString(METADATA_KEY_TITLE, station.name)
-        .putString(METADATA_KEY_DISPLAY_TITLE, station.name)
-        .putString(METADATA_KEY_MEDIA_ID, station.stationuuid)
-        .putString(METADATA_KEY_ALBUM_ART_URI, station.favicon)
-        .putString(METADATA_KEY_DISPLAY_ICON_URI, station.favicon)
-        .putString(METADATA_KEY_MEDIA_URI, station.url)
-        .putString(METADATA_KEY_DISPLAY_SUBTITLE, station.country)
-        .build()
+//    private fun stationToMediaMetadataCompat(station : RadioStation)
+//        = MediaMetadataCompat.Builder()
+//        .putString(METADATA_KEY_TITLE, station.name)
+//        .putString(METADATA_KEY_DISPLAY_TITLE, station.name)
+//        .putString(METADATA_KEY_MEDIA_ID, station.stationuuid)
+//        .putString(METADATA_KEY_ALBUM_ART_URI, station.favicon)
+//        .putString(METADATA_KEY_DISPLAY_ICON_URI, station.favicon)
+//        .putString(METADATA_KEY_MEDIA_URI, station.url)
+//        .putString(METADATA_KEY_DISPLAY_SUBTITLE, station.country)
+//        .build()
 
 
 
