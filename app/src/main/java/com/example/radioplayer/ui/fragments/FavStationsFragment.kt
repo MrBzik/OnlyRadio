@@ -35,6 +35,7 @@ import com.example.radioplayer.ui.dialogs.RemovePlaylistDialog
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -107,29 +108,36 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         RadioService.currentPlayingStation.observe(viewLifecycleOwner) { station ->
 
-            if (isToHandleNewStationObserver) {
+            if(RadioService.currentPlaylist != SEARCH_FROM_RECORDINGS){
 
-                if (RadioService.currentPlaylist == SEARCH_FROM_FAVOURITES && isInFavouriteTab ||
-                    RadioService.currentPlaylist == SEARCH_FROM_PLAYLIST && !isInFavouriteTab
-                ) {
+                if (isToHandleNewStationObserver) {
 
-                    handleNewRadioStation(RadioService.currentPlayingItemPosition, station)
+                    if (RadioService.currentPlaylist == SEARCH_FROM_FAVOURITES && isInFavouriteTab ||
+                        RadioService.currentPlaylist == SEARCH_FROM_PLAYLIST && !isInFavouriteTab
+                    ) {
 
-                } else {
+                        handleNewRadioStation(RadioService.currentPlayingItemPosition, station)
 
-                    val index = mainAdapter.listOfStations
-                        .indexOfFirst {
-                            it.stationuuid == station.stationuuid
+                    } else {
+
+                        val index = mainAdapter.listOfStations
+                            .indexOfFirst {
+                                it.stationuuid == station.stationuuid
+                            }
+
+
+                        if (index != -1) {
+                            handleNewRadioStation(index, station)
                         }
-
-
-                    if (index != -1) {
-                        handleNewRadioStation(index, station)
                     }
+                } else{
+                    isToHandleNewStationObserver = true
                 }
-            } else{
-                isToHandleNewStationObserver = true
+
             }
+
+
+
 
         }
     }
@@ -519,10 +527,15 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 separatorDefault = ContextCompat.getColor(requireContext(), R.color.station_bottom_separator_default)
             }
 
-            RadioService.currentPlayingStation.value?.let {
-                val id =  it.stationuuid
-                mainAdapter.currentRadioStationId = id
+            if(RadioService.currentPlaylist != SEARCH_FROM_RECORDINGS){
+                RadioService.currentPlayingStation.value?.let {
+                    val id =  it.stationuuid
+                    mainAdapter.currentRadioStationId = id
+                }
+            } else{
+                mainAdapter.currentRadioStationId = ""
             }
+
 
             layoutAnimation = (activity as MainActivity).layoutAnimationController
 

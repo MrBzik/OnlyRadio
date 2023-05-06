@@ -46,6 +46,7 @@ import com.example.radioplayer.utils.Constants.PLAY_WHEN_READY
 import com.example.radioplayer.utils.Constants.SEARCH_BTN_PREF
 
 import com.example.radioplayer.utils.Constants.SEARCH_FLAG
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.Constants.SEARCH_FULL_COUNTRY_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_MAX_BIT
@@ -85,7 +86,7 @@ class MainViewModel @Inject constructor(
        private var listOfStations = listOf<RadioStation>()
        var isNewSearch = true
 
-       val newPlayingItem : MutableLiveData<PlayingItem> = MutableLiveData()
+//       val newPlayingItem : MutableLiveData<PlayingItem> = MutableLiveData()
 
 
        var noResultDetection : MutableLiveData<Boolean> = MutableLiveData()
@@ -492,10 +493,55 @@ class MainViewModel @Inject constructor(
 
         }
 
+        fun playOrToggleRecording(
+            rec : Recording,
+            playWhenReady : Boolean = true,
+            itemIndex : Int? = -1
+            ): Boolean{
+
+            val isPrepared = playbackState.value?.isPrepared ?: false
+
+            val id = rec.id
+
+            if(isPrepared && id == RadioService.currentPlayingRecording.value?.id
+                && RadioService.currentPlaylist == SEARCH_FROM_RECORDINGS
+            ) {
+                playbackState.value?.let { playbackState ->
+                    when {
+                        playbackState.isPlaying -> {
+
+                            radioServiceConnection.transportControls.pause()
+                            return false
+                        }
+
+                        playbackState.isPlayEnabled -> {
+
+                            radioServiceConnection.transportControls.play()
+                            return true
+                        }
+                        else -> false
+                    }
+                }
+
+            } else {
+
+                RadioService.recordingPlaybackPosition.postValue(0)
+
+                radioServiceConnection.transportControls
+                    .playFromMediaId(id, bundleOf(
+                        Pair(SEARCH_FLAG, SEARCH_FROM_RECORDINGS),
+                        Pair(PLAY_WHEN_READY, playWhenReady),
+                        Pair(ITEM_INDEX, itemIndex),
+                    ))
+            }
+
+            return false
+        }
+
+
         fun playOrToggleStation(
             station : RadioStation? = null,
             searchFlag : Int = 0,
-            rec : Recording? = null,
             playWhenReady : Boolean = true,
             itemIndex : Int = -1,
             historyItemId : String? = null
@@ -503,12 +549,11 @@ class MainViewModel @Inject constructor(
 
             val isPrepared = playbackState.value?.isPrepared ?: false
 
-            val id = station?.stationuuid ?: (rec?.id ?: "")
+            val id = station?.stationuuid
 
             if(isPrepared && id
-                    == RadioService.currentPlayingStation.value?.stationuuid ||
-               isPrepared && id == RadioService.currentPlayingRecording.value?.id
-
+                    == RadioService.currentPlayingStation.value?.stationuuid
+                && RadioService.currentPlaylist != SEARCH_FROM_RECORDINGS
                     ){
                 playbackState.value?.let { playbackState ->
                     when {
@@ -527,17 +572,6 @@ class MainViewModel @Inject constructor(
                     }
                 }
             } else{
-
-
-                if(station == null){
-//                    newPlayingItem.postValue(PlayingItem.FromRecordings(rec!!))
-//                    isRadioTrueRecordingFalse = false
-                    RadioService.recordingPlaybackPosition.postValue(0)
-
-                } else {
-//                    isRadioTrueRecordingFalse = true
-//                    newPlayingItem.postValue(PlayingItem.FromRadio(station))
-                }
 
                 radioServiceConnection.transportControls
                     .playFromMediaId(id, bundleOf(

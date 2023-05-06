@@ -173,9 +173,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
         bind.tvRename.setOnClickListener {
             currentRecording?.let { recording ->
                 RenameRecordingDialog(requireContext(), recording.name){ newName ->
-
-                    mainViewModel.newPlayingItem.postValue(
-                        PlayingItem.FromRecordings(
+                RadioService.currentPlayingRecording.postValue(
                             Recording(
                                 recording.id,
                                 recording.iconUri,
@@ -184,7 +182,8 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
                                 recording.durationMills
                             )
                         )
-                    )
+
+
                     databaseViewModel.renameRecording(recording.id, newName)
 
 
@@ -208,19 +207,16 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
     private fun observeCurrentRecording(){
 
-        mainViewModel.newPlayingItem.observe(viewLifecycleOwner) {
+        RadioService.currentPlayingRecording.observe(viewLifecycleOwner) {
 
-        if(it is PlayingItem.FromRecordings){
+            currentRecording = it
 
-            currentRecording = it.recording
+            updateUiForRecording(it)
 
-            updateUiForRecording(it.recording)
+            bind.seekBar.max = it.durationMills.toInt()
 
-            bind.seekBar.max = it.recording.durationMills.toInt()
+            updateRangeSeekbar(it)
 
-            updateRangeSeekbar(it.recording)
-
-            }
         }
     }
 
@@ -244,9 +240,8 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
         mainViewModel.isRecordingUpdated.observe(viewLifecycleOwner){
             if(isRecordingToUpdate && currentRecording != null){
-                mainViewModel.playOrToggleStation(
-                    rec = currentRecording,
-                    searchFlag = SEARCH_FROM_RECORDINGS,
+                mainViewModel.playOrToggleRecording(
+                    rec = currentRecording!!,
                     playWhenReady = false
                 )
                 isRecordingToUpdate = false

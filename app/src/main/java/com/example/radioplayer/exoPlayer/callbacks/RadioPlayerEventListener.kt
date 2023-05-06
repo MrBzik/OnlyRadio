@@ -95,7 +95,10 @@ class RadioPlayerEventListener (
                 val recording = radioService.stationsFromRecordings[index]
                 radioService.currentRecording = recording
                 RadioService.currentPlayingRecording.postValue(recording)
-
+//                radioService.serviceScope.launch {
+//                    delay(1000)
+//                    radioService.invalidateNotification()
+//                }
             }
 
 

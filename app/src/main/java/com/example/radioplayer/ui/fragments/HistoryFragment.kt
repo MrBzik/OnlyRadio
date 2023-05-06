@@ -43,6 +43,7 @@ import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.SpinnerExt
 import com.example.radioplayer.utils.Utils
 import com.example.radioplayer.utils.Utils.fromDateToString
@@ -417,7 +418,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
 
-            if(databaseViewModel.isHistoryInStationsTab){
+            if(databaseViewModel.isHistoryInStationsTab &&
+                    RadioService.currentPlaylist != SEARCH_FROM_RECORDINGS){
 
                 if(isToHandleNewStationObserver){
 
@@ -507,11 +509,14 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 separatorDefault = ContextCompat.getColor(requireContext(), R.color.station_bottom_separator_default)
 
-                RadioService.currentPlayingStation.value?.let {
-                    val id =  it.stationuuid
-                    currentRadioStationID = id
+                if(RadioService.currentPlaylist != SEARCH_FROM_RECORDINGS){
+                    RadioService.currentPlayingStation.value?.let {
+                        val id =  it.stationuuid
+                        currentRadioStationID = id
+                    }
+                } else {
+                    currentRadioStationID = ""
                 }
-
             }
 
             databaseViewModel.setHistoryLiveData(viewLifecycleOwner.lifecycleScope)

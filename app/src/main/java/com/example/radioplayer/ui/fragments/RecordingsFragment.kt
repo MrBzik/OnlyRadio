@@ -188,10 +188,9 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
     private fun observeCurrentRecording(){
 
         RadioService.currentPlayingRecording.observe(viewLifecycleOwner){
-
             currentRecording = it
-
             if(RadioService.currentPlaylist == SEARCH_FROM_RECORDINGS){
+
                 if(isToHandleNewRecording){
                     Log.d("CHECKTAGS", "recording handler")
                     bind.rvRecordings.apply {
@@ -231,9 +230,8 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
         recordingsAdapter.setOnClickListener { recording, position ->
             animator.cancel()
-            mainViewModel.playOrToggleStation(
+            mainViewModel.playOrToggleRecording(
                 rec = recording,
-                searchFlag = SEARCH_FROM_RECORDINGS,
                 itemIndex = position
             )
 
@@ -272,7 +270,12 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
             recordingsAdapter.apply{
                 alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
                 titleSize = mainViewModel.stationsTitleSize
-                playingRecordingId = RadioService.currentPlayingRecording.value?.id ?: ""
+
+                if(RadioService.currentPlaylist == SEARCH_FROM_RECORDINGS){
+                    playingRecordingId = RadioService.currentPlayingRecording.value?.id ?: ""
+                } else {
+                    playingRecordingId = ""
+                }
             }
 
             layoutAnimation = (activity as MainActivity).layoutAnimationController

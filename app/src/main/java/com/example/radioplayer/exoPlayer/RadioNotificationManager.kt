@@ -37,6 +37,7 @@ import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.ui.PlayerNotificationManager.MediaDescriptionAdapter
 import com.google.android.exoplayer2.ui.PlayerNotificationManager.NotificationListener
 import kotlinx.coroutines.*
+import kotlin.math.log
 
 
 const val ACTION_NEXT_STATION = "action next station"
@@ -181,7 +182,9 @@ class RadioNotificationManager (
                 serviceScope.launch {
                     currentBitmap = resolveUriAsBitmap(iconUri)
                     currentBitmap?.let { callback.onBitmap(it) }
+                    updateNotification()
                 }
+
                 currentBitmap
             } else {
                 currentIconUri = iconUri

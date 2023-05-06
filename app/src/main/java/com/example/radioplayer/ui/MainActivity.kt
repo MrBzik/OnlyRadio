@@ -704,7 +704,7 @@ class MainActivity : AppCompatActivity() {
 
             if(RadioService.isFromRecording){
 
-                currentPlayingRecording?.let { mainViewModel.playOrToggleStation(rec = it) }
+                currentPlayingRecording?.let { mainViewModel.playOrToggleRecording(rec = it) }
 
             } else {
 

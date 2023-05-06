@@ -33,6 +33,7 @@ import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.*
 import com.example.radioplayer.utils.*
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -280,29 +281,32 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
 
-        if(isToHandleNewStationObserver){
+        if(RadioService.currentPlaylist != SEARCH_FROM_RECORDINGS){
+            if(isToHandleNewStationObserver){
 
-            if(RadioService.currentPlaylist == SEARCH_FROM_API ){
+                if(RadioService.currentPlaylist == SEARCH_FROM_API ){
 
-                handleNewRadioStation(RadioService.currentPlayingItemPosition, station)
+                    handleNewRadioStation(RadioService.currentPlayingItemPosition, station)
 
-            } else {
+                } else {
 
-                val index = pagingRadioAdapter.snapshot().items
-                    .indexOfFirst {
-                        it.stationuuid == station.stationuuid
+                    val index = pagingRadioAdapter.snapshot().items
+                        .indexOfFirst {
+                            it.stationuuid == station.stationuuid
+                        }
+
+                    if(index != -1){
+                        handleNewRadioStation(index, station)
                     }
-
-                if(index != -1){
-                    handleNewRadioStation(index, station)
                 }
+            } else {
+                isToHandleNewStationObserver = true
             }
-        } else {
-            isToHandleNewStationObserver = true
-        }
 
         }
+
     }
+}
 
     private fun handleNewRadioStation(position : Int, station : RadioStation){
 
@@ -430,10 +434,16 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             layoutAnimation = (activity as MainActivity).layoutAnimationController
 
 
-            RadioService.currentPlayingStation.value?.let {
-              val id =  it.stationuuid
-                pagingRadioAdapter.currentRadioStationId = id
+            if(RadioService.currentPlaylist != SEARCH_FROM_RECORDINGS){
+                RadioService.currentPlayingStation.value?.let {
+                    val id =  it.stationuuid
+                    pagingRadioAdapter.currentRadioStationId = id
+                }
+            } else {
+                pagingRadioAdapter.currentRadioStationId = ""
             }
+
+
         }
     }
 
