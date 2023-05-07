@@ -16,9 +16,6 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.Constants.TITLE_UNKNOWN
 import com.example.radioplayer.utils.toRadioStation
 import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.metadata.Metadata
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class RadioPlayerEventListener (
     private val radioService : RadioService
@@ -76,8 +73,11 @@ class RadioPlayerEventListener (
 
         when(RadioService.currentPlaylist){
 
-            SEARCH_FROM_API ->
+            SEARCH_FROM_API -> {
                 station = radioService.radioSource.stationsFromApi[index].toRadioStation()
+
+
+            }
 
             SEARCH_FROM_FAVOURITES ->
                 station = radioService.radioSource.stationsFavoured[index]
@@ -95,11 +95,10 @@ class RadioPlayerEventListener (
                 val recording = radioService.stationsFromRecordings[index]
                 radioService.currentRecording = recording
                 RadioService.currentPlayingRecording.postValue(recording)
-//                radioService.serviceScope.launch {
-//                    delay(1000)
-//                    radioService.invalidateNotification()
-//                }
+
             }
+
+
 
 
         }

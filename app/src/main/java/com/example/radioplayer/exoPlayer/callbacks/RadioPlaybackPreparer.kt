@@ -64,8 +64,10 @@ class RadioPlaybackPreparer (
         }
 
         if(flag == SEARCH_FROM_HISTORY){
-            index = radioSource.stationsFromHistory.indexOfFirst {
-                it.stationuuid == historyId
+            if(historyId.isNotBlank()){
+                index = radioSource.stationsFromHistory.indexOfFirst {
+                    it.stationuuid == historyId
+                }
             }
         }
 

@@ -30,7 +30,7 @@
     <LinearLayout
         android:id="@+id/llSongTitle"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -62,7 +62,8 @@
             android:fontFamily="sans-serif-smallcaps"
             android:gravity="center"
             android:layout_marginHorizontal="8dp"
-            android:text="No info now but  "
+            android:ellipsize="end"
+            android:maxLines="2"
             android:textColor="@color/selected_text_color"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -79,97 +80,128 @@
     </LinearLayout>
 
 
-
-
+    <ImageView
+        android:id="@+id/ivSwipeLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_swipe_left"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="50dp"
+        android:layout_marginStart="10dp"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@+id/llSongTitle"/>
 
 
     <ImageView
-        android:id="@+id/ivIcon"
+        android:id="@+id/ivSwipeRight"
         android:layout_width="wrap_content"
-        android:layout_height="85dp"
-        android:layout_marginTop="20dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_swipe_right"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/llSongTitle" />
-
-    <TextView
-        android:id="@+id/tvPlaceholder"
-        android:layout_width="85dp"
-        android:layout_height="85dp"
-        android:layout_marginTop="20dp"
-        android:alpha="0.6"
-        android:fontFamily="@font/ranchers"
-        android:gravity="center"
-        android:textSize="60sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/llSongTitle" />
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="10dp"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@+id/llSongTitle"/>
 
 
-    <ScrollView
-        android:id="@+id/svTvTags"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginVertical="20dp"
-        android:paddingHorizontal="16dp"
-        app:layout_constraintBottom_toTopOf="@id/fabAddToFav"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivIcon">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-smallcaps"
-                android:gravity="center"
-                android:textColor="@color/selected_text_color"
-                android:textSize="20sp" />
+        app:layout_constraintTop_toBottomOf="@+id/llSongTitle"
+        app:layout_constraintBottom_toTopOf="@+id/fabAddToFav"
+        >
+    </androidx.viewpager2.widget.ViewPager2>
 
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/tvHomePage"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="8dp"
-                android:backgroundTint="@color/white"
-                android:elevation="10dp"
-                android:text="Homepage"
-                android:textAppearance="@style/mainTextButtons"
-                android:textColor="@color/text_button"
-                app:cornerRadius="10dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+
+<!--    <ImageView-->
+<!--        android:id="@+id/ivIcon"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="85dp"-->
+<!--        android:layout_marginTop="20dp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.5"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/llSongTitle" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/tvPlaceholder"-->
+<!--        android:layout_width="85dp"-->
+<!--        android:layout_height="85dp"-->
+<!--        android:layout_marginTop="20dp"-->
+<!--        android:alpha="0.6"-->
+<!--        android:fontFamily="@font/ranchers"-->
+<!--        android:gravity="center"-->
+<!--        android:textSize="60sp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.5"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/llSongTitle" />-->
 
 
-            <TextView
-                android:id="@+id/tvLanguage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textAppearance="@style/detailsTextExtras"
-                android:visibility="gone" />
+<!--    <ScrollView-->
+<!--        android:id="@+id/svTvTags"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_marginVertical="20dp"-->
+<!--        android:paddingHorizontal="16dp"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/fabAddToFav"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.5"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/ivIcon">-->
 
-            <TextView
-                android:id="@+id/tvTags"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:gravity="center"
-                android:textAppearance="@style/detailsTextExtras"
-                android:visibility="gone" />
-        </LinearLayout>
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical">-->
 
-    </ScrollView>
+<!--            <TextView-->
+<!--                android:id="@+id/tvName"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:fontFamily="sans-serif-smallcaps"-->
+<!--                android:gravity="center"-->
+<!--                android:textColor="@color/selected_text_color"-->
+<!--                android:textSize="20sp" />-->
+
+
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:id="@+id/tvHomePage"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="50dp"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:layout_marginTop="8dp"-->
+<!--                android:backgroundTint="@color/white"-->
+<!--                android:elevation="10dp"-->
+<!--                android:text="Homepage"-->
+<!--                android:textAppearance="@style/mainTextButtons"-->
+<!--                android:textColor="@color/text_button"-->
+<!--                app:cornerRadius="10dp"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent" />-->
+
+
+<!--            <TextView-->
+<!--                android:id="@+id/tvLanguage"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:gravity="center"-->
+<!--                android:textAppearance="@style/detailsTextExtras"-->
+<!--                android:visibility="gone" />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/tvTags"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:gravity="center"-->
+<!--                android:textAppearance="@style/detailsTextExtras"-->
+<!--                android:visibility="gone" />-->
+<!--        </LinearLayout>-->
+
+<!--    </ScrollView>-->
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

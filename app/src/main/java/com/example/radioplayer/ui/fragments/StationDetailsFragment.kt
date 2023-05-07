@@ -4,37 +4,43 @@ import android.app.SearchManager
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
+import androidx.viewpager2.widget.ViewPager2.ORIENTATION_HORIZONTAL
 import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.example.radioplayer.R
+import com.example.radioplayer.adapters.ViewPagerStationsAdapter
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
-import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.databinding.FragmentStationDetailsBinding
 import com.example.radioplayer.exoPlayer.RadioService
+import com.example.radioplayer.exoPlayer.RadioSource
+import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.dialogs.AddStationToPlaylistDialog
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.example.radioplayer.utils.Constants.TITLE_UNKNOWN
 import com.example.radioplayer.utils.RandomColors
 import com.example.radioplayer.utils.Utils
 import com.example.radioplayer.utils.addAction
+import com.example.radioplayer.utils.toRadioStation
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import java.net.URLEncoder
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -45,6 +51,8 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     lateinit var pixabayViewModel: PixabayViewModel
 
+    lateinit var viewPagerAdapter : ViewPagerStationsAdapter
+
     private var homepageUrl : String? = null
 
     private var listOfPlaylists : List<Playlist> = emptyList()
@@ -53,7 +61,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     lateinit var glide : RequestManager
 
     private var currentRadioStation : RadioStation? = null
-
 
     private var isFavoured = false
 
@@ -64,6 +71,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     }
 
 
+    private var isViewPagerCallbackSet = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -71,7 +79,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         pixabayViewModel = ViewModelProvider(requireActivity())[PixabayViewModel::class.java]
 
-        observePlayingRadioStation()
 
         observeIfNewStationFavoured()
 
@@ -81,7 +88,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         setAddToPlaylistClickListener()
 
-        setFabStationHomePageClickListener()
+//        setHomePageClickListener()
 
         addToFavClickListener()
 
@@ -91,13 +98,94 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         setTitleCopy()
 
+        setupPagerView()
+
+        getCurrentPlaylistItems()
+
+
+    }
+
+
+    private fun getCurrentPlaylistItems(){
+
+        val list = when(RadioService.currentPlaylist){
+            SEARCH_FROM_API -> mainViewModel.radioSource.stationsFromApi.map {
+                it.toRadioStation()
+        }
+            SEARCH_FROM_FAVOURITES -> mainViewModel.radioSource.stationsFavoured
+
+            SEARCH_FROM_PLAYLIST -> RadioSource.stationsInPlaylist
+
+            SEARCH_FROM_HISTORY -> mainViewModel.radioSource.stationsFromHistory
+
+            SEARCH_FROM_HISTORY_ONE_DATE -> mainViewModel.radioSource.stationsFromHistoryOneDate
+
+            else -> emptyList()
+       }
+
+        viewPagerAdapter.listOfStations = list
+
+        bind.viewPager.apply {
+            post {
+                setCurrentItem(RadioService.currentPlayingItemPosition, false)
+                if(!isViewPagerCallbackSet){
+                    isViewPagerCallbackSet = true
+                    observePlayingRadioStation()
+                    bind.viewPager.registerOnPageChangeCallback(pageChangeCallback)
+                }
+            }
+        }
+    }
+
+
+    private val pageChangeCallback = object: ViewPager2.OnPageChangeCallback(){
+        override fun onPageSelected(position: Int) {
+            super.onPageSelected(position)
+
+            val newStation = viewPagerAdapter.listOfStations[position]
+
+            val playWhenReady = mainViewModel.playbackState.value?.isPlaying ?: true
+
+//            val historyStationId = if(RadioService.currentPlaylist == SEARCH_FROM_HISTORY)
+//                newStation.stationuuid else null
+
+            mainViewModel.playOrToggleStation(
+                station =  newStation, searchFlag =  RadioService.currentPlaylist,
+                playWhenReady = playWhenReady, itemIndex = position
+
+            )
+        }
+    }
+
+    private fun setupPagerView(){
+
+        viewPagerAdapter = ViewPagerStationsAdapter(glide){
+            val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
+            startActivity(webIntent)
+        }
+
+        bind.viewPager.apply {
+            adapter = viewPagerAdapter
+            orientation = ORIENTATION_HORIZONTAL
+            offscreenPageLimit = 1
+        }
     }
 
     private fun observePlayingRadioStation(){
         RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
             currentRadioStation = station
             checkIfStationFavoured(station)
-            updateUiForRadioStation(station)
+            bind.viewPager.apply {
+                if(currentItem != RadioService.currentPlayingItemPosition){
+                    setCurrentItem(RadioService.currentPlayingItemPosition, true)
+                }
+            }
+
+            bind.ivSwipeLeft.isVisible = RadioService.currentPlayingItemPosition != 0
+
+            bind.ivSwipeRight.isVisible = RadioService.currentPlayingItemPosition < viewPagerAdapter.listOfStations.size - 1
+
+//            updateUiForRadioStation(station)
         }
     }
 
@@ -249,84 +337,84 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     private val randColors = RandomColors()
 
-    private fun setTvPlaceHolderLetter(name : String,){
-
-        val color = randColors.getColor()
-
-            var char = 'X'
-
-            for(l in name.indices){
-                if(name[l].isLetter()){
-                    char = name[l]
-                    break
-                }
-            }
-
-            bind.tvPlaceholder.apply {
-                text = char.toString().uppercase()
-                setTextColor(color)
-                alpha = 0.6f
-        }
-    }
-
-
-    private fun updateUiForRadioStation(station : RadioStation){
-
-            homepageUrl = station.homepage
-
-            bind.tvName.text = station.name
-
-            if(station.favicon.isNullOrBlank()){
-
-                bind.ivIcon.visibility = View.INVISIBLE
-                setTvPlaceHolderLetter(station.name?: "")
-
-            } else {
-
-                glide
-                    .load(station.favicon)
-                    .listener(object : RequestListener<Drawable>{
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-
-                            bind.ivIcon.visibility = View.INVISIBLE
-                            setTvPlaceHolderLetter(station.name ?: "")
-                            return true
-                        }
-
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            return false
-                        }
-                    })
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(bind.ivIcon)
-
-            }
+//    private fun setTvPlaceHolderLetter(name : String,){
+//
+//        val color = randColors.getColor()
+//
+//            var char = 'X'
+//
+//            for(l in name.indices){
+//                if(name[l].isLetter()){
+//                    char = name[l]
+//                    break
+//                }
+//            }
+//
+//            bind.tvPlaceholder.apply {
+//                text = char.toString().uppercase()
+//                setTextColor(color)
+//                alpha = 0.6f
+//        }
+//    }
 
 
-
-            if(!station.language.isNullOrBlank()){
-                bind.tvLanguage.isVisible = true
-                val languages = station.language.replace(",", ", ")
-                bind.tvLanguage.text = "Languages : $languages"
-            }
-            if(!station.tags.isNullOrBlank()){
-                bind.tvTags.isVisible = true
-                val tags = station.tags.replace(",", ", ")
-                bind.tvTags.text = "Tags : $tags"
-            }
-
-    }
+//    private fun updateUiForRadioStation(station : RadioStation){
+//
+//            homepageUrl = station.homepage
+//
+//            bind.tvName.text = station.name
+//
+//            if(station.favicon.isNullOrBlank()){
+//
+//                bind.ivIcon.visibility = View.INVISIBLE
+//                setTvPlaceHolderLetter(station.name?: "")
+//
+//            } else {
+//
+//                glide
+//                    .load(station.favicon)
+//                    .listener(object : RequestListener<Drawable>{
+//                        override fun onLoadFailed(
+//                            e: GlideException?,
+//                            model: Any?,
+//                            target: Target<Drawable>?,
+//                            isFirstResource: Boolean
+//                        ): Boolean {
+//
+//                            bind.ivIcon.visibility = View.INVISIBLE
+//                            setTvPlaceHolderLetter(station.name ?: "")
+//                            return true
+//                        }
+//
+//                        override fun onResourceReady(
+//                            resource: Drawable?,
+//                            model: Any?,
+//                            target: Target<Drawable>?,
+//                            dataSource: DataSource?,
+//                            isFirstResource: Boolean
+//                        ): Boolean {
+//                            return false
+//                        }
+//                    })
+//                    .transition(DrawableTransitionOptions.withCrossFade())
+//                    .into(bind.ivIcon)
+//
+//            }
+//
+//
+//
+//            if(!station.language.isNullOrBlank()){
+//                bind.tvLanguage.isVisible = true
+//                val languages = station.language.replace(",", ", ")
+//                bind.tvLanguage.text = "Languages : $languages"
+//            }
+//            if(!station.tags.isNullOrBlank()){
+//                bind.tvTags.isVisible = true
+//                val tags = station.tags.replace(",", ", ")
+//                bind.tvTags.text = "Tags : $tags"
+//            }
+//
+//    }
 
 
     private fun updateListOfPlaylists(){
@@ -338,16 +426,16 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     }
 
 
-    private fun setFabStationHomePageClickListener(){
-
-        bind.tvHomePage.setOnClickListener {
-
-            if(!homepageUrl.isNullOrBlank()) {
-                val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(homepageUrl))
-                startActivity(webIntent)
-            }
-        }
-    }
+//    private fun setHomePageClickListener(){
+//
+//        bind.tvHomePage.setOnClickListener {
+//
+//            if(!homepageUrl.isNullOrBlank()) {
+//                val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(homepageUrl))
+//                startActivity(webIntent)
+//            }
+//        }
+//    }
 
     private fun setAddToPlaylistClickListener(){
 
@@ -410,7 +498,9 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         super.onDestroyView()
         isTimerObserverSet = false
         isConverterCallbackSet = false
+        bind.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
         _bind = null
+        isViewPagerCallbackSet = false
     }
 
 

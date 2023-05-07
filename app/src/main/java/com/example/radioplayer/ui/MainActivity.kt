@@ -665,7 +665,7 @@ class MainActivity : AppCompatActivity() {
 
             } else {
 
-                bindPlayer.tvPlaceholder.alpha = 0f
+
                 bindPlayer.ivCurrentStationImage.visibility = View.VISIBLE
                 glide
                     .load(newImage)
@@ -689,6 +689,7 @@ class MainActivity : AppCompatActivity() {
                             dataSource: DataSource?,
                             isFirstResource: Boolean
                         ): Boolean {
+                            bindPlayer.tvPlaceholder.alpha = 0f
                             return false
                         }
                     })
