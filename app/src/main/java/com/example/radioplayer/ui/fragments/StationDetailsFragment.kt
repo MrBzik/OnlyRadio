@@ -9,11 +9,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
-import androidx.viewpager2.widget.ViewPager2.ORIENTATION_HORIZONTAL
+import androidx.viewpager2.widget.ViewPager2.*
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.ViewPagerStationsAdapter
@@ -25,6 +26,8 @@ import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
+import com.example.radioplayer.ui.animations.reduceDragSensitivity
+import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.AddStationToPlaylistDialog
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
@@ -139,6 +142,32 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
 
     private val pageChangeCallback = object: ViewPager2.OnPageChangeCallback(){
+
+        override fun onPageScrollStateChanged(state: Int) {
+            super.onPageScrollStateChanged(state)
+            when(state){
+                SCROLL_STATE_DRAGGING -> {
+
+                    bind.ivSwipeLeft.apply {
+                        if(isVisible){
+                            visibility = View.INVISIBLE
+                            slideAnim(250, 0, R.anim.fade_out_anim)
+                        }
+                    }
+
+                    bind.ivSwipeRight.apply {
+                        if(isVisible){
+                            visibility = View.INVISIBLE
+                            slideAnim(250, 0, R.anim.fade_out_anim)
+                        }
+                    }
+                }
+                SCROLL_STATE_IDLE -> {
+                    handleSwipeIconsVisibility()
+                }
+            }
+        }
+
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
 
@@ -168,8 +197,34 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             adapter = viewPagerAdapter
             orientation = ORIENTATION_HORIZONTAL
             offscreenPageLimit = 1
+            reduceDragSensitivity(2)
+
         }
     }
+
+    private fun handleSwipeIconsVisibility(){
+
+        bind.ivSwipeLeft.apply {
+
+            if(RadioService.currentPlayingItemPosition != 0){
+                if(!isVisible){
+                    visibility = View.VISIBLE
+                    slideAnim(300, 100, R.anim.fade_in_anim)
+
+                }
+            }
+        }
+
+        bind.ivSwipeRight.apply {
+            if(RadioService.currentPlayingItemPosition < viewPagerAdapter.listOfStations.size - 1){
+                if(!isVisible){
+                    visibility = View.VISIBLE
+                    slideAnim(300, 100, R.anim.fade_in_anim)
+                }
+            }
+        }
+    }
+
 
     private fun observePlayingRadioStation(){
         RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
@@ -180,10 +235,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                     setCurrentItem(RadioService.currentPlayingItemPosition, true)
                 }
             }
-
-            bind.ivSwipeLeft.isVisible = RadioService.currentPlayingItemPosition != 0
-
-            bind.ivSwipeRight.isVisible = RadioService.currentPlayingItemPosition < viewPagerAdapter.listOfStations.size - 1
+            handleSwipeIconsVisibility()
 
 //            updateUiForRadioStation(station)
         }

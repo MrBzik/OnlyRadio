@@ -16,7 +16,7 @@
     <color name="floating_buttons">#FFFFFF</color>
     <color name="color_interactive">#1A237E</color>
 
-    <color name="color_icon">#000000</color>
+    <color name="color_icon">#1A237E</color>
 
     <color name="color_changed_on_interaction">#FC2E20</color>
     <color name="color_warning_text">#B71C1C</color>
@@ -31,6 +31,8 @@
     <color name="separatorLoad">#B71C1C</color>
 
     <color name="Cursor">#000000</color>
+
+    <color name="swipe_icon">#000000</color>
 
 
     <color name="text_interactive_shadow">#000000</color>

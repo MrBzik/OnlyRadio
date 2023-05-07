@@ -702,16 +702,12 @@ class RadioService : MediaBrowserServiceCompat() {
         exoPlayer = provideExoPlayer()
         mediaSessionConnector.setPlayer(exoPlayer)
 
-        preparePlayer(isToPlay, currentPlayingItemPosition, true,
-                currentPlaylist == SEARCH_FROM_RECORDINGS
+        preparePlayer(
+            playNow = isToPlay,
+            itemIndex = currentPlayingItemPosition,
+            isSamePlaylist = false,
+            isFromRecordings = currentPlaylist == SEARCH_FROM_RECORDINGS
             )
-
-//        currentRadioStation?.let {
-//
-//            val uri = it.getString(METADATA_KEY_MEDIA_URI)
-//
-//            playFromUri(uri, isToPlay)
-//        }
     }
 
 
@@ -1040,6 +1036,7 @@ class RadioService : MediaBrowserServiceCompat() {
                        .setExtras(extra)
                        .setIconUri(currentRadioStation?.favicon?.toUri())
                        .setTitle(currentRadioStation?.name)
+                       .setSubtitle(currenlyPlaingSong)
                        .build()
                }
            } else{
