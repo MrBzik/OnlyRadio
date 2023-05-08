@@ -11,27 +11,14 @@
 
 
     <TextView
-        android:id="@+id/tvCutExpander"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="16dp"
-        android:text="Cut recording"
-        android:textAppearance="@style/mainTextButtons"
-        app:drawableEndCompat="@drawable/ic_playlists_arrow_expand"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
-    <TextView
         android:id="@+id/tvRename"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:text="Rename"
         android:textAppearance="@style/mainTextButtons"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         />
 
@@ -62,54 +49,6 @@
         app:layout_constraintTop_toBottomOf="@+id/tvName" />
 
 
-        <TextView
-            android:id="@+id/tvSwitchOption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_marginTop="25dp"
-            android:text="Keep original recording"
-            android:textAppearance="@style/dialogItemText"
-            app:layout_constraintEnd_toStartOf="@+id/switchKeepOriginal"
-            app:layout_constraintTop_toBottomOf="@+id/ivIcon" />
-
-
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/switchKeepOriginal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:minHeight="48dp"
-            app:layout_constraintBottom_toBottomOf="@+id/tvSwitchOption"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tvSwitchOption"
-            app:thumbTint="@color/switch_thumb_color"
-            app:trackTint="@color/switch_track_color" />
-
-        <com.google.android.material.slider.RangeSlider
-            android:id="@+id/rangeSlider"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:stepSize="1"
-            android:value="0"
-            android:valueFrom="0"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvSwitchOption" />
-
-        <TextView
-            android:id="@+id/tvProcessTrim"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Apply"
-            android:textAppearance="@style/dialogTextButtons"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/rangeSlider" />
 
 
     <TextView

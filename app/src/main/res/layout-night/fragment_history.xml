@@ -131,4 +131,18 @@
         app:layout_constraintGuide_percent="0.66" />
 
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabBookmarkedTitles"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="70dp"
+        android:layout_marginEnd="10dp"
+        android:scaleType="centerCrop"
+        app:fabCustomSize="50dp"
+        android:src="@drawable/ic_bookmark_hollow"
+        app:backgroundTint="@color/floating_buttons"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

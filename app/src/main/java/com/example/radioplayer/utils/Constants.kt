@@ -10,6 +10,14 @@ object Constants {
 
 //    const val BASE_RADIO_URLTEST = "https://ts1.api.radio-browser.info"
 
+
+    const val FRAG_SEARCH = 0
+    const val FRAG_FAV = 1
+    const val FRAG_HISTORY = 2
+    const val FRAG_REC = 3
+    const val FRAG_OPTIONS = 4
+
+
     const val API_RADIO_SEARCH_URL = "/json/stations/search"
     const val API_RADIO_TOP_VOTE_SEARCH_URL = "/json/stations/topvote"
     const val API_RADIO_ALL_COUNTRIES = "/json/countries"
@@ -28,6 +36,7 @@ object Constants {
 
     const val RECORDING_CHANNEL_ID = "recording channel"
     const val RECORDING_NOTIFICATION_ID = 7
+
 
 
 

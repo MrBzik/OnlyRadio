@@ -19,15 +19,17 @@ import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
         HistoryDate::class,
         StationDateCrossRef::class,
         Recording::class,
-        Title::class
+        Title::class,
+        BookmarkedTitle::class
                ],
-        version = 16,
+        version = 18,
          autoMigrations = [
         AutoMigration(from = 9, to = 10, spec = RadioDB.Migration9To10::class),
         AutoMigration(from = 11, to = 12, spec = RadioDB.Migration11To12::class),
         AutoMigration(from = 12, to = 13, spec = RadioDB.Migration12To13::class),
         AutoMigration(from = 13, to = 14, spec = RadioDB.Migration13To14::class),
-         AutoMigration(from = 14, to = 15, spec = RadioDB.Migration14To15::class)
+         AutoMigration(from = 14, to = 15, spec = RadioDB.Migration14To15::class),
+         AutoMigration(from = 16, to = 17, spec = RadioDB.Migration16To17::class),
     ]
 )
 
@@ -50,6 +52,8 @@ abstract class RadioDB : RoomDatabase() {
 
     class Migration14To15 : AutoMigrationSpec
 
+    class Migration16To17 : AutoMigrationSpec
+
     companion object{
 
         val migration10To11 = object : Migration(10, 11){
@@ -68,6 +72,19 @@ abstract class RadioDB : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS Title (" +
+                            "timeStamp INTEGER NOT NULL PRIMARY KEY, " +
+                            "date INTEGER NOT NULL," +
+                            "title TEXT NOT NULL," +
+                            "stationName TEXT NOT NULL," +
+                            "stationIconUri TEXT NOT NULL)"
+                )
+            }
+        }
+
+        val migration17To18 = object : Migration(17, 18){
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "CREATE TABLE IF NOT EXISTS BookmarkedTitle (" +
                             "timeStamp INTEGER NOT NULL PRIMARY KEY, " +
                             "date INTEGER NOT NULL," +
                             "title TEXT NOT NULL," +

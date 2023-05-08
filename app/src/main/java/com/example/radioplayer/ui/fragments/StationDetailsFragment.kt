@@ -4,15 +4,13 @@ import android.app.SearchManager
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.*
 import com.bumptech.glide.RequestManager
@@ -30,6 +28,10 @@ import com.example.radioplayer.ui.animations.reduceDragSensitivity
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.AddStationToPlaylistDialog
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
+import com.example.radioplayer.utils.Constants.FRAG_FAV
+import com.example.radioplayer.utils.Constants.FRAG_HISTORY
+import com.example.radioplayer.utils.Constants.FRAG_REC
+import com.example.radioplayer.utils.Constants.FRAG_SEARCH
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
@@ -42,8 +44,6 @@ import com.example.radioplayer.utils.addAction
 import com.example.radioplayer.utils.toRadioStation
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -106,6 +106,29 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         getCurrentPlaylistItems()
 
 
+        setSystemBarsColor()
+
+    }
+
+
+    private fun setSystemBarsColor(){
+
+        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
+
+            val color = when(mainViewModel.currentFragment){
+
+                FRAG_SEARCH -> ContextCompat.getColor(requireContext(), R.color.nav_bar_search_fragment)
+                FRAG_FAV -> ContextCompat.getColor(requireContext(), R.color.nav_bar_fav_fragment)
+                FRAG_HISTORY -> ContextCompat.getColor(requireContext(), R.color.nav_bar_history_frag)
+                FRAG_REC -> ContextCompat.getColor(requireContext(), R.color.nav_bar_rec_frag)
+                else -> ContextCompat.getColor(requireContext(), R.color.nav_bar_settings_frag)
+            }
+
+            (activity as MainActivity).apply {
+                window.navigationBarColor = color
+                window.statusBarColor = color
+            }
+        }
     }
 
 
@@ -489,18 +512,31 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 //        }
 //    }
 
+
+    private fun addToPlaylistLogic(){
+
+        AddStationToPlaylistDialog(
+            requireContext(), listOfPlaylists, databaseViewModel, pixabayViewModel, glide
+        ) { playlistName ->
+            insertStationInPlaylist(playlistName)
+        }.show()
+
+    }
+
+
     private fun setAddToPlaylistClickListener(){
 
-        bind.tvAddToPlaylist.setOnClickListener {
+        bind.tvAddToPlaylist?.setOnClickListener {
 
-            AddStationToPlaylistDialog(
-                requireContext(), listOfPlaylists, databaseViewModel, pixabayViewModel, glide
-            ) { playlistName ->
-                insertStationInPlaylist(playlistName)
-            }.show()
+          addToPlaylistLogic()
+
+        } ?: kotlin.run {
+
+            bind.btnAddToPlaylist?.setOnClickListener {
+
+             addToPlaylistLogic()
+            }
         }
-
-
     }
 
 
@@ -548,9 +584,11 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     override fun onDestroyView() {
         super.onDestroyView()
+
         isTimerObserverSet = false
         isConverterCallbackSet = false
         bind.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
+        bind.viewPager.adapter = null
         _bind = null
         isViewPagerCallbackSet = false
     }

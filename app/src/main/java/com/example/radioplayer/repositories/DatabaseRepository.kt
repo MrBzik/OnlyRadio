@@ -126,6 +126,18 @@ class DatabaseRepository @Inject constructor(
 
     suspend fun deleteTitlesWithDate(time : Long) = radioDAO.deleteTitlesWithDate(time)
 
+//    suspend fun updateBookmarkedState(isBookmarked : Boolean, title : String)
+//        = radioDAO.updateBookmarkedState(isBookmarked, title)
+
+
+    // Bookmarked title
+
+    fun bookmarkedTitlesLiveData() = radioDAO.bookmarkedTitlesLiveData()
+
+    suspend fun deleteBookmarkedTitle(title : String) = radioDAO.deleteBookmarkedTitle(title)
+
+    suspend fun insertNewBookmarkedTitle(title : BookmarkedTitle) = radioDAO.insertNewBookmarkedTitle(title)
+
     // Recording
 
 

@@ -476,6 +476,8 @@ class RadioService : MediaBrowserServiceCompat() {
         serviceScope.launch(Dispatchers.IO){
            val checkTitle = radioSource.checkTitleTimestamp(title, currentDateLong)
 
+            val isTitleBookmarked = checkTitle?.isBookmarked
+
          checkTitle?.let {
              radioSource.deleteTitle(it)
          }
@@ -489,7 +491,8 @@ class RadioService : MediaBrowserServiceCompat() {
                     date = currentDateLong,
                     title = title,
                     stationName = stationName,
-                    stationIconUri = stationUri
+                    stationIconUri = stationUri,
+                    isBookmarked = isTitleBookmarked ?: false
                 ))
         }
     }

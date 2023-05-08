@@ -15,8 +15,10 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.paging.PagingData
@@ -24,10 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
-import com.example.radioplayer.adapters.HistoryDatesAdapter
-import com.example.radioplayer.adapters.PagingHistoryAdapter
-import com.example.radioplayer.adapters.PagingRadioAdapter
-import com.example.radioplayer.adapters.TitleAdapter
+import com.example.radioplayer.adapters.*
 import com.example.radioplayer.adapters.models.StationWithDateModel
 import com.example.radioplayer.data.local.entities.HistoryDate
 import com.example.radioplayer.data.local.entities.RadioStation
@@ -75,10 +74,15 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private var titlesHistoryAdapter : TitleAdapter? = null
 
+    @Inject
+    lateinit var bookmarkedTitlesAdapter : BookmarkedTitlesAdapter
+
     private var isStationsAdapterSet = false
     private var isTitlesAdapterSet = false
 
     private var isToHandleNewStationObserver = false
+
+    private var isBookmarkedTitlesObserverSet = false
 
     private val clipBoard : ClipboardManager? by lazy {
         ContextCompat.getSystemService(requireContext(), ClipboardManager::class.java)
@@ -120,7 +124,13 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         switchTitlesStationsUi(false)
 
+        setBookmarksFabClickListener()
+
+        bind.fabBookmarkedTitles.isVisible = !databaseViewModel.isHistoryInStationsTab
+
     }
+
+
 
 
     private fun setToolbar(){
@@ -151,10 +161,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 true
             }
-
-//            (bind.tvSelectDate as TextViewOutlined).setColors(
-//                ContextCompat.getColor(requireContext(), R.color.text_button_history)
-//            )
 
         } else {
             bind.viewToolbar.setBackgroundColor(Color.BLACK)
@@ -481,7 +487,13 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             if(databaseViewModel.isHistoryInStationsTab){
                 setStationsHistoryAdapter()
             } else {
-                setTitlesHistoryAdapter()
+
+                if(databaseViewModel.isHistoryTitlesInBookmark){
+                    switchToBookmarkedTitles()
+                    bind.fabBookmarkedTitles.setImageResource(R.drawable.ic_bookmark_selected)
+                } else {
+                    setTitlesHistoryAdapter()
+                }
             }
         }
 
@@ -541,36 +553,17 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
                 titleSize = mainViewModel.stationsTitleSize
                 setOnClickListener { title ->
-                    val clip = ClipData.newPlainText("label", title.title)
-                    clipBoard?.setPrimaryClip(clip)
-
-                    Snackbar.make(
-                        requireActivity().findViewById(R.id.rootLayout),
-                        "Title copied", Snackbar.LENGTH_LONG).apply {
-
-                        setAction("WEBSEARCH"){
-
-                            val intent = Intent(Intent.ACTION_WEB_SEARCH)
-                            intent.putExtra(SearchManager.QUERY, title.title)
-                            startActivity(intent)
-
-
-//                         val  browserIntent = Intent(Intent.ACTION_VIEW,
-//                             Uri.parse("https://soundcloud.com/search?q=" + title.title))
-//                            browserIntent.putExtra(SearchManager.QUERY, title.title)
-//                            browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//                            startActivity(browserIntent)
-
-                        }
-                        addAction(R.layout.snackbar_extra_action, "YOUTUBE"){
-                            val intent = Intent(Intent.ACTION_SEARCH)
-                            intent.setPackage("com.google.android.youtube")
-                            intent.putExtra("query", title.title)
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            startActivity(intent)
-                        }
-                    }.show()
+                  handleTitleClick(title.title)
                 }
+
+                onBookmarkClickListener { title ->
+
+                    Toast.makeText(requireContext(), "Title bookmarked", Toast.LENGTH_SHORT).show()
+
+                    databaseViewModel.upsertBookmarkedTitle(title)
+
+                }
+
             }
             databaseViewModel.setTitlesLiveData(lifecycleScope)
             isTitlesAdapterSet = true
@@ -583,35 +576,146 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     }
 
 
+    private fun handleTitleClick(title : String){
+
+        val clip = ClipData.newPlainText("label", title)
+        clipBoard?.setPrimaryClip(clip)
+
+        Snackbar.make(
+            requireActivity().findViewById(R.id.rootLayout),
+            "Title copied", Snackbar.LENGTH_LONG).apply {
+
+            setAction("WEBSEARCH"){
+
+                val intent = Intent(Intent.ACTION_WEB_SEARCH)
+                intent.putExtra(SearchManager.QUERY, title)
+                startActivity(intent)
+
+
+//                         val  browserIntent = Intent(Intent.ACTION_VIEW,
+//                             Uri.parse("https://soundcloud.com/search?q=" + title.title))
+//                            browserIntent.putExtra(SearchManager.QUERY, title.title)
+//                            browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//                            startActivity(browserIntent)
+
+            }
+            addAction(R.layout.snackbar_extra_action, "YOUTUBE"){
+                val intent = Intent(Intent.ACTION_SEARCH)
+                intent.setPackage("com.google.android.youtube")
+                intent.putExtra("query", title)
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+            }
+        }.show()
+
+
+    }
+
     private fun setTitlesClickListener(){
 
         bind.tvTitles.setOnClickListener {
 
             if(databaseViewModel.isHistoryInStationsTab){
 
-                setTitlesHistoryAdapter()
-
-                if(databaseViewModel.selectedDate != 0L){
-                    titlesHistoryAdapter?.submitData(lifecycle, PagingData.empty())
-                }
-
+                bind.fabBookmarkedTitles.isVisible = true
+                isToHandleNewStationObserver = false
                 databaseViewModel.isHistoryInStationsTab = false
 
-                isToHandleNewStationObserver = false
+                if(databaseViewModel.isHistoryTitlesInBookmark){
+                    switchToBookmarkedTitles()
 
-                switchTitlesStationsUi(true)
+                } else {
+                    handleSwitchToNotMarkedTitles()
+                }
 
-                loadHistory()
+            }
 
+            switchTitlesStationsUi(true)
+
+        }
+    }
+
+
+    private fun handleSwitchToNotMarkedTitles(){
+        setTitlesHistoryAdapter()
+
+        if(databaseViewModel.selectedDate != 0L){
+            titlesHistoryAdapter?.submitData(lifecycle, PagingData.empty())
+        }
+
+        loadHistory()
+    }
+
+    private fun setBookmarksFabClickListener(){
+
+        bind.fabBookmarkedTitles.apply {
+
+            setOnClickListener {
+
+                databaseViewModel.isHistoryTitlesInBookmark = !databaseViewModel.isHistoryTitlesInBookmark
+
+                if(databaseViewModel.isHistoryTitlesInBookmark){
+                    setImageResource(R.drawable.ic_bookmark_selected)
+                    switchToBookmarkedTitles()
+                    isToHandleNewStationObserver = false
+                } else {
+                    setImageResource(R.drawable.ic_bookmark_hollow)
+                    handleSwitchToNotMarkedTitles()
+                }
             }
         }
     }
+
+
+
+    private fun switchToBookmarkedTitles(){
+
+        bind.rvHistory.apply {
+            adapter = bookmarkedTitlesAdapter
+            setHasFixedSize(false)
+
+        }
+
+        if(!isBookmarkedTitlesObserverSet){
+
+            isBookmarkedTitlesObserverSet = true
+
+            bookmarkedTitlesAdapter.apply {
+                alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
+                titleSize = mainViewModel.stationsTitleSize
+
+                setOnClickListener { title ->
+                    handleTitleClick(title.title)
+                }
+
+            }
+
+            databaseViewModel.bookmarkedTitlesLivedata.observe(viewLifecycleOwner){
+
+                bookmarkedTitlesAdapter.listOfTitles = it
+
+            }
+
+            bind.rvHistory.post {
+                bind.rvHistory.scheduleLayoutAnimation()
+            }
+
+        } else {
+            bind.rvHistory.scheduleLayoutAnimation()
+        }
+
+    }
+
+
+
 
     private fun setStationsClickListener(){
 
         bind.tvStations.setOnClickListener {
 
             if(!databaseViewModel.isHistoryInStationsTab){
+
+                bind.fabBookmarkedTitles.isVisible = false
 
                 setStationsHistoryAdapter()
 
@@ -733,6 +837,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         titlesHistoryAdapter = null
         _bind = null
         isToHandleNewStationObserver = false
+        isBookmarkedTitlesObserverSet = false
     }
 
 }

@@ -88,19 +88,5 @@
         />
 
 
-    <TextView
-        android:id="@+id/tvBookmark"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/aldrich"
-        android:textColor="@color/default_text_color"
-        android:text="Bookmark"
-        android:textSize="14sp"
-        android:layout_marginStart="58dp"
-        android:layout_marginBottom="6dp"
-        android:layout_gravity="bottom"
-        app:drawableEndCompat="@drawable/ic_bookmark_hollow"
-        android:background="?android:attr/selectableItemBackground"
-        />
 
 </FrameLayout>

@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -84,6 +85,18 @@ class TitleAdapter @Inject constructor(
                     }
                 }
 
+
+                holder.bind.tvBookmark.setOnClickListener {
+
+                    val item = getItem(holder.absoluteAdapterPosition) as TitleWithDateModel.TitleItem
+
+                    onBookmarkClickListener?.let { click ->
+                        click(item.title)
+
+//                        handleBookmarkImage(!item.title.isBookmarked, holder.bind.ivBookmark)
+                    }
+                }
+
                 return holder
 
             }
@@ -128,6 +141,8 @@ class TitleAdapter @Inject constructor(
             (holder as TitleViewHolder).bind.apply {
 
                 val title = item.title
+
+//                handleBookmarkImage(title.isBookmarked, holder.bind.ivBookmark)
 
                 tvPrimary.text = title.title
                 tvPrimary.textSize = titleSize
@@ -214,7 +229,6 @@ class TitleAdapter @Inject constructor(
 
 
 
-
     private var onItemClickListener : ((Title) -> Unit)? = null
 
     fun setOnClickListener(listener : (Title) -> Unit){
@@ -222,6 +236,11 @@ class TitleAdapter @Inject constructor(
     }
 
 
+    private var onBookmarkClickListener : ((Title) -> Unit)? = null
+
+    fun onBookmarkClickListener(listener : (Title) -> Unit){
+        onBookmarkClickListener = listener
+    }
 
     override fun getItemViewType(position: Int): Int {
 
@@ -242,6 +261,7 @@ class TitleAdapter @Inject constructor(
             val isSameTitle = oldItem is TitleWithDateModel.TitleItem
                     && newItem is TitleWithDateModel.TitleItem
                     && oldItem.title.timeStamp == newItem.title.timeStamp
+
 
             val isSameSeparator = oldItem is TitleWithDateModel.TitleDateSeparator
                     && newItem is TitleWithDateModel.TitleDateSeparator

@@ -167,6 +167,25 @@ interface  RadioDAO {
     @Delete
     suspend fun deleteTitle(title : Title)
 
+//    @Query("UPDATE Title SET isBookmarked =:isBookmarked WHERE title =:title")
+//    suspend fun updateBookmarkedState(isBookmarked : Boolean, title : String)
+
+
+    // Bookmarked titles
+
+    @Query("DELETE FROM BookmarkedTitle WHERE title =:title")
+    suspend fun deleteBookmarkedTitle(title : String)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertNewBookmarkedTitle(title : BookmarkedTitle)
+
+    @Query("SELECT * FROM BookmarkedTitle ORDER BY timeStamp DESC")
+    fun bookmarkedTitlesLiveData() : LiveData<List<BookmarkedTitle>>
+
+
+    //    @Query("SELECT * FROM BookmarkedTitle WHERE title =:title LIMIT 1")
+//    suspend fun checkIfAlreadyBookmarked(title : String) : BookmarkedTitle?
+
     // Recordings
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

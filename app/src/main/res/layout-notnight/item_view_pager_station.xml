@@ -51,7 +51,7 @@
 
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/tvHomePage"
+        android:id="@+id/btnHomePage"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_gravity="center"

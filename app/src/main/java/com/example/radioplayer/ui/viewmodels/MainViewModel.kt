@@ -83,10 +83,15 @@ class MainViewModel @Inject constructor(
 
        var stationsTitleSize = textSizePref.getFloat(TEXT_SIZE_STATION_TITLE_PREF, 20f)
 
-       private var listOfStations = listOf<RadioStation>()
+//       private var listOfStations = listOf<RadioStation>()
        var isNewSearch = true
 
 //       val newPlayingItem : MutableLiveData<PlayingItem> = MutableLiveData()
+
+
+
+       var isInDetailsFragment = false
+       var currentFragment = 0
 
 
        var noResultDetection : MutableLiveData<Boolean> = MutableLiveData()
@@ -373,13 +378,13 @@ class MainViewModel @Inject constructor(
                    }
 
 
-                   response?.let {
+                    val listOfStations = response?.let {
 
-                       listOfStations = it.map { station ->
+                       it.map { station ->
 
                            station.toRadioStation()
                        }
-                   }
+                   } ?: emptyList()
 
 
 

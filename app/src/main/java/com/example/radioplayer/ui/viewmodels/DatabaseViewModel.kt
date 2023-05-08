@@ -8,10 +8,7 @@ import androidx.paging.*
 import com.example.radioplayer.adapters.datasources.*
 import com.example.radioplayer.adapters.models.StationWithDateModel
 import com.example.radioplayer.adapters.models.TitleWithDateModel
-import com.example.radioplayer.data.local.entities.HistoryDate
-import com.example.radioplayer.data.local.entities.Playlist
-import com.example.radioplayer.data.local.entities.RadioStation
-import com.example.radioplayer.data.local.entities.Recording
+import com.example.radioplayer.data.local.entities.*
 import com.example.radioplayer.data.local.relations.StationDateCrossRef
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.exoPlayer.RadioService
@@ -339,6 +336,9 @@ class DatabaseViewModel @Inject constructor(
 
     var isHistoryInStationsTab = true
 
+    var isHistoryTitlesInBookmark = false
+
+
     private val allHistoryLoader : HistoryDateLoader = { dateIndex ->
         getStationsInDate(1, dateIndex)
     }
@@ -471,6 +471,12 @@ class DatabaseViewModel @Inject constructor(
 
     }
 
+//    fun updateBookmarkedState(isBookmarked : Boolean, title : String) = viewModelScope.launch{
+//        repository.updateBookmarkedState(isBookmarked, title)
+//    }
+
+
+
 
     fun cleanHistory(){
 
@@ -498,6 +504,27 @@ class DatabaseViewModel @Inject constructor(
         isTitleHeaderSet = false
 
     }
+
+
+    // Bookmarked title
+
+    val bookmarkedTitlesLivedata = repository.bookmarkedTitlesLiveData()
+
+    fun upsertBookmarkedTitle(title : Title) = viewModelScope.launch {
+
+        repository.deleteBookmarkedTitle(title.title)
+
+        repository.insertNewBookmarkedTitle(
+            BookmarkedTitle(
+                timeStamp = title.timeStamp,
+                date = title.date,
+                title = title.title,
+                stationName = title.stationName,
+                stationIconUri = title.stationIconUri
+            )
+        )
+    }
+
 
 
     // Handle history options and cleaning history

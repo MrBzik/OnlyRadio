@@ -45,6 +45,11 @@ import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.utils.Constants.FAB_POSITION_X
 import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
+import com.example.radioplayer.utils.Constants.FRAG_FAV
+import com.example.radioplayer.utils.Constants.FRAG_HISTORY
+import com.example.radioplayer.utils.Constants.FRAG_OPTIONS
+import com.example.radioplayer.utils.Constants.FRAG_REC
+import com.example.radioplayer.utils.Constants.FRAG_SEARCH
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.IS_NAME_EXACT
 import com.example.radioplayer.utils.Constants.IS_SEARCH_FILTER_LANGUAGE
@@ -182,7 +187,22 @@ class MainActivity : AppCompatActivity() {
             }
         RadioService.canOnDestroyBeCalled = false
 
+
+
     }
+
+    private fun setInitialDetailsText(){
+
+        if(isStubPlayerBindInflated){
+            if(mainViewModel.isInDetailsFragment){
+                bindPlayer.tvExpandHideText.setText(R.string.Hide)
+            } else {
+                bindPlayer.tvExpandHideText.setText(R.string.Expand)
+            }
+        }
+
+    }
+
 
     override fun onStart() {
         Log.d("CHECKTAGS", "on start")
@@ -319,6 +339,8 @@ class MainActivity : AppCompatActivity() {
             handleStubPlayer()
 
             updateImage()
+
+            setInitialDetailsText()
         }
 
 
@@ -329,6 +351,8 @@ class MainActivity : AppCompatActivity() {
             handleStubPlayer()
 
             updateImage()
+
+            setInitialDetailsText()
 
         }
 
@@ -417,7 +441,7 @@ class MainActivity : AppCompatActivity() {
         bind.bottomNavigationView.setOnItemReselectedListener {
 
             if(isStubPlayerBindInflated){
-                if((bindPlayer.tvExpandHideText as TextView).text == resources.getString(R.string.Hide)){
+                if(mainViewModel.isInDetailsFragment){
                     handleNavigationToFragments(it)
                 }
             }
@@ -434,7 +458,8 @@ class MainActivity : AppCompatActivity() {
 
             if (event.action == MotionEvent.ACTION_DOWN){
 
-                if((bindPlayer.tvExpandHideText as TextView).text == resources.getString(R.string.Expand)) {
+                if(!mainViewModel.isInDetailsFragment) {
+                    mainViewModel.isInDetailsFragment = true
 
                     putFadeOutForDetailsFragment()
 
@@ -488,6 +513,8 @@ class MainActivity : AppCompatActivity() {
 
                 radioSearchFragment.exitTransition = null
 
+                mainViewModel.currentFragment = FRAG_SEARCH
+
                 supportFragmentManager.beginTransaction().apply {
                     setCustomAnimations(R.anim.blank_anim, android.R.anim.fade_out)
                     replace(R.id.flFragment, radioSearchFragment)
@@ -500,6 +527,8 @@ class MainActivity : AppCompatActivity() {
             R.id.mi_favStationsFragment -> {
 
                 favStationsFragment.exitTransition = null
+
+                mainViewModel.currentFragment = FRAG_FAV
 
                 supportFragmentManager.beginTransaction().apply {
                     setCustomAnimations(R.anim.blank_anim, android.R.anim.fade_out)
@@ -514,6 +543,9 @@ class MainActivity : AppCompatActivity() {
             R.id.mi_historyFragment -> {
 
                 historyFragment.exitTransition = null
+
+                mainViewModel.currentFragment = FRAG_HISTORY
+
                 supportFragmentManager.beginTransaction().apply {
                     setCustomAnimations(R.anim.blank_anim, android.R.anim.fade_out)
                     replace(R.id.flFragment, historyFragment)
@@ -528,6 +560,9 @@ class MainActivity : AppCompatActivity() {
             R.id.mi_recordingsFragment -> {
 
                 recordingsFragment.exitTransition = null
+
+                mainViewModel.currentFragment = FRAG_REC
+
                 supportFragmentManager.beginTransaction().apply {
                     setCustomAnimations(R.anim.blank_anim, android.R.anim.fade_out)
                     replace(R.id.flFragment, recordingsFragment)
@@ -540,6 +575,9 @@ class MainActivity : AppCompatActivity() {
 
             R.id.mi_settingsFragment -> {
                 settingsFragment.exitTransition = null
+
+                mainViewModel.currentFragment = FRAG_OPTIONS
+
                 supportFragmentManager.beginTransaction().apply {
                     setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                     replace(R.id.flFragment, settingsFragment)
@@ -547,19 +585,16 @@ class MainActivity : AppCompatActivity() {
                     commit()
                 }
 
-
-
-
 //                val drawable = bindPlayer.root.background as GradientDrawable
 //                drawable.mutate()
 //                drawable.setStroke(4,color)
 
             }
-
         }
 
         if(isStubPlayerBindInflated){
-            (bindPlayer.tvExpandHideText as TextView).setText(R.string.Expand)
+            bindPlayer.tvExpandHideText.setText(R.string.Expand)
+            mainViewModel.isInDetailsFragment = false
 
         }
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<FrameLayout xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/radioItemRootLayout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -73,10 +73,25 @@
             android:fontFamily="@font/aldrich"
             android:textColor="@color/default_secondary_text_color"
             android:maxLines="1"
-            android:text="22:04:15"
+            android:text="Bookmark"
             android:textSize="14sp"
             />
 
     </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/tvBookmark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/mainTextButtons"
+        android:text="Bookmark"
+        android:textSize="14sp"
+        android:layout_marginStart="58dp"
+        android:layout_marginBottom="6dp"
+        app:drawableEndCompat="@drawable/ic_bookmark_hollow"
+        android:layout_gravity="bottom"
+        android:background="?android:attr/selectableItemBackground"
+        />
 
 </FrameLayout>

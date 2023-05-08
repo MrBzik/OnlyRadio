@@ -1,44 +1,27 @@
 package com.example.radioplayer.ui.fragments
 
 
-import android.content.Context
-import android.content.SharedPreferences
+//import com.arthenica.ffmpegkit.FFmpegKit
+
+
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.SeekBar
-import androidx.core.view.isVisible
-import androidx.lifecycle.lifecycleScope
-
-//import com.arthenica.ffmpegkit.FFmpegKit
-
+import androidx.core.content.ContextCompat
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Recording
-import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.databinding.FragmentRecordingDetailsBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.MainActivity
-
 import com.example.radioplayer.ui.dialogs.RenameRecordingDialog
-import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
+import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Utils
-
-import com.google.android.material.slider.RangeSlider
-import com.google.android.material.snackbar.Snackbar
-
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-
-
-import java.io.File
-
 import javax.inject.Inject
 
-
-const val RECORDING_CUT_PREF = "recording cut pref"
 
 @AndroidEntryPoint
 class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
@@ -52,14 +35,10 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
     private var isSeekBarToUpdate = true
 
-    private var isTrimmerWorking = false
-
     private var isRecordingToUpdate = false
 
-    private var isTvTrimProcessVisible = false
 
-    private lateinit var recordingCutterPref : SharedPreferences
-    private var switchPref = true
+
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -70,57 +49,35 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
         setRecordingsRenameClickListener()
 
-        setSwitchPreference()
-
-        setRangeSeekbarListener()
-
-        setTrimmingProcesserButton()
-
         observeRecordingPlaylistUpdate()
 
         setPlaybackSpeedButtons()
 
-        setCutExpandClickListener()
+        setSystemBarsColor()
+
     }
 
-    private fun setCutExpandClickListener(){
 
-        handleCutContainerVisibility(mainViewModel.isCutExpanded)
+    private fun setSystemBarsColor(){
 
         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
-            bind.btnCutExpander?.setOnClickListener {
-                mainViewModel.isCutExpanded = !mainViewModel.isCutExpanded
 
-                handleCutContainerVisibility(mainViewModel.isCutExpanded)
+            val color = when(mainViewModel.currentFragment){
+
+                Constants.FRAG_SEARCH -> ContextCompat.getColor(requireContext(), R.color.nav_bar_search_fragment)
+                Constants.FRAG_FAV -> ContextCompat.getColor(requireContext(), R.color.nav_bar_fav_fragment)
+                Constants.FRAG_HISTORY -> ContextCompat.getColor(requireContext(), R.color.nav_bar_history_frag)
+                Constants.FRAG_REC -> ContextCompat.getColor(requireContext(), R.color.nav_bar_rec_frag)
+                else -> ContextCompat.getColor(requireContext(), R.color.nav_bar_settings_frag)
             }
-        } else {
-            bind.tvCutExpander.setOnClickListener {
-                mainViewModel.isCutExpanded = !mainViewModel.isCutExpanded
 
-                handleCutContainerVisibility(mainViewModel.isCutExpanded)
+            (activity as MainActivity).apply {
+                window.navigationBarColor = color
+                window.statusBarColor = color
             }
         }
     }
 
-    private fun handleCutContainerVisibility(isVisible : Boolean){
-
-        bind.tvSwitchOption.isVisible = isVisible
-        bind.switchKeepOriginal.isVisible = isVisible
-        bind.rangeSlider.isVisible = isVisible
-        bind.tvProcessTrim.isVisible = isVisible && isTvTrimProcessVisible
-
-        if(isVisible) bind.ivIcon.visibility = View.GONE
-            else bind.ivIcon.visibility = View.VISIBLE
-
-
-        bind.tvCutExpander.apply {
-            if(isVisible)
-                setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_shrink_rec, 0)
-            else
-                setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_expand_rec, 0)
-        }
-
-    }
 
 
     private fun setPlaybackSpeedButtons(){
@@ -152,45 +109,39 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
     }
 
 
-    private fun setSwitchPreference(){
 
-        recordingCutterPref = requireActivity().getSharedPreferences(RECORDING_CUT_PREF, Context.MODE_PRIVATE)
 
-        switchPref = recordingCutterPref.getBoolean(RECORDING_CUT_PREF, true)
+    private fun renameLogic(){
+        currentRecording?.let { recording ->
+            RenameRecordingDialog(requireContext(), recording.name){ newName ->
+                RadioService.currentPlayingRecording.postValue(
+                    Recording(
+                        recording.id,
+                        recording.iconUri,
+                        recording.timeStamp,
+                        newName,
+                        recording.durationMills
+                    )
+                )
 
-        bind.switchKeepOriginal.isChecked = switchPref
 
-        bind.switchKeepOriginal.setOnCheckedChangeListener { _, isChecked ->
+                databaseViewModel.renameRecording(recording.id, newName)
 
-            switchPref = isChecked
 
+            }.show()
         }
-
     }
 
-
     private fun setRecordingsRenameClickListener(){
-        bind.tvRename.setOnClickListener {
-            currentRecording?.let { recording ->
-                RenameRecordingDialog(requireContext(), recording.name){ newName ->
-                RadioService.currentPlayingRecording.postValue(
-                            Recording(
-                                recording.id,
-                                recording.iconUri,
-                                recording.timeStamp,
-                                newName,
-                                recording.durationMills
-                            )
-                        )
-
-
-                    databaseViewModel.renameRecording(recording.id, newName)
-
-
-                }.show()
+        bind.tvRename?.setOnClickListener {
+            renameLogic()
+        } ?: kotlin.run {
+            bind.btnRename?.setOnClickListener {
+                renameLogic()
             }
         }
     }
+
 
 
     private fun subscribeToObservers(){
@@ -215,23 +166,11 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
             bind.seekBar.max = it.durationMills.toInt()
 
-            updateRangeSeekbar(it)
 
         }
     }
 
 
-    private fun setTrimmingProcesserButton(){
-
-        bind.tvProcessTrim.setOnClickListener {
-            if(!isTrimmerWorking){
-
-                currentRecording?.let {
-                    trimAudio(it)
-                }
-            }
-        }
-    }
 
 
 
@@ -251,37 +190,8 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
 
 
-    private fun updateRangeSeekbar(rec : Recording){
 
-        val seconds = (rec.durationMills / 1000).toFloat()
 
-        bind.rangeSlider.apply {
-
-            valueTo = seconds
-            setLabelFormatter { float ->
-
-                Utils.timerFormatCut(float.toLong()*1000)
-            }
-
-            values = listOf(0f, seconds)
-
-        }
-    }
-
-    private fun setRangeSeekbarListener(){
-
-        bind.rangeSlider.addOnChangeListener(RangeSlider.OnChangeListener { _, _, fromUser ->
-            if(fromUser && bind.tvProcessTrim.visibility == View.GONE){
-
-                bind.tvProcessTrim.apply {
-                    visibility = View.VISIBLE
-                    text = "Apply"
-                    isTvTrimProcessVisible = true
-                }
-            }
-        })
-
-    }
 
     private fun setSeekbarChangeListener(){
         bind.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
@@ -347,73 +257,10 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
     override fun onDestroyView() {
         super.onDestroyView()
         isRecordingToUpdate = false
-        isTvTrimProcessVisible = false
-        recordingCutterPref.edit().putBoolean(RECORDING_CUT_PREF, switchPref).apply()
         _bind = null
     }
 
 
-
-    private fun trimAudio(rec : Recording){
-
-        isTrimmerWorking = true
-
-        bind.tvProcessTrim.text = "Processing..."
-
-        val totalDuration = (rec.durationMills/1000).toInt()
-        val trimStart = bind.rangeSlider.values[0].toInt()
-        val trimEnd = totalDuration - bind.rangeSlider.values[1].toInt()
-        val duration = (rec.durationMills/1000).toInt() - trimEnd - trimStart
-        val oggFilePath = requireActivity().filesDir.absolutePath.toString() + "/" + rec.id
-
-        val currentTime = System.currentTimeMillis()
-        val output = requireActivity().filesDir.absolutePath.toString() + File.separator + currentTime + ".ogg"
-
-        val command = arrayOf( "-ss", trimStart.toString(), "-i",
-            oggFilePath, "-t", duration.toString(), "-c", "copy", output)
-
-//       FFmpegKit.executeWithArgumentsAsync(command
-//        ) { session ->
-//
-//           var message = ""
-//
-//            if(session.returnCode.isValueSuccess) {
-//
-//
-//                val newRecording = Recording(
-//                    id ="$currentTime.ogg",
-//                    iconUri = rec.iconUri,
-//                    timeStamp = currentTime,
-//                    name = rec.name,
-//                    durationMills = (duration*1000).toLong()
-//                )
-//
-//                databaseViewModel.insertNewRecording(newRecording)
-//                message = "Success!"
-//
-//
-//                if(!switchPref){
-//                    databaseViewModel.deleteRecording(rec.id)
-//                    currentRecording = newRecording
-//                    isRecordingToUpdate = true
-//
-//                }
-//
-//            } else if(session.returnCode.isValueError){
-//
-//                message = "Something went wrong!"
-//
-//            }
-//
-//           lifecycleScope.launch(Dispatchers.Main){
-//               Snackbar.make(requireActivity().findViewById(R.id.rootLayout), message, Snackbar.LENGTH_SHORT).show()
-//               isTrimmerWorking = false
-//               bind.tvProcessTrim.visibility = View.GONE
-//               isTvTrimProcessVisible = false
-//           }
-//          session.cancel()
-//        }
-    }
 
 
 }

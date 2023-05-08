@@ -104,12 +104,21 @@ class ViewPagerStationsAdapter constructor(
             }
 
 
-            tvHomePage.setOnClickListener {
+            tvHomePage?.setOnClickListener {
 
                 if(!station.homepage.isNullOrBlank()) {
 
                     homePageClick(station.homepage)
 
+                }
+            } ?: kotlin.run {
+                btnHomePage?.setOnClickListener {
+
+                    if(!station.homepage.isNullOrBlank()) {
+
+                        homePageClick(station.homepage)
+
+                    }
                 }
             }
         }
