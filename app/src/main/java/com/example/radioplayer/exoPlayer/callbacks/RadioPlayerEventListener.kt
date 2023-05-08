@@ -45,12 +45,16 @@ class RadioPlayerEventListener (
                             || withoutWalm.contains("{\"STATUS\"", true)
                         ){
                             RadioService.currentSongTitle.postValue("")
-                            RadioService.currenlyPlaingSong = TITLE_UNKNOWN
+                            RadioService.currentlyPlaingSong = TITLE_UNKNOWN
 
                         } else {
                             RadioService.currentSongTitle.postValue(withoutWalm)
-                            radioService.insertNewTitle(withoutWalm)
-                            RadioService.currenlyPlaingSong = withoutWalm
+
+                            if(radioService.exoPlayer.playWhenReady){
+                                radioService.insertNewTitle(withoutWalm)
+                            }
+
+                            RadioService.currentlyPlaingSong = withoutWalm
                         }
                     }
                     radioService.invalidateNotification()
@@ -61,6 +65,16 @@ class RadioPlayerEventListener (
         }
     }
 
+
+    override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+        super.onPlayWhenReadyChanged(playWhenReady, reason)
+        if(playWhenReady){
+            if(RadioService.currentlyPlaingSong != radioService.lastInsertedSong &&
+               RadioService.currentlyPlaingSong != TITLE_UNKNOWN){
+                radioService.insertNewTitle(RadioService.currentlyPlaingSong)
+            }
+        }
+    }
 
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
         super.onMediaItemTransition(mediaItem, reason)

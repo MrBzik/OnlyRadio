@@ -74,7 +74,7 @@ object Constants {
     const val ITEM_INDEX = "index of item"
     const val HISTORY_ITEM_ID = "id of station from history"
 
-    const val TITLE_UNKNOWN = "No info"
+    const val TITLE_UNKNOWN = "Playing: no info"
 
     // History
 
@@ -87,12 +87,22 @@ object Constants {
     const val HISTORY_30_DATES = 30
 
 
+    const val HISTORY_PREF = "history pref"
+
+    const val HISTORY_PREF_DATES = "preference for history dates"
+
+    const val HISTORY_PREF_BOOKMARK = "pref for bookmarked titles"
+
+
     const val FULL_DATE_FORMAT = "d 'of' MMMM', 'yyyy"
 
     const val SHORT_DATE_FORMAT = "MMM, ', ' d"
 
-
     const val TEXT_SIZE_STATION_TITLE_PREF = "pref for text size of stations titles"
+
+
+
+
 
 
 // Search preferences

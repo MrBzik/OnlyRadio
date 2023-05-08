@@ -170,9 +170,11 @@ class RadioService : MediaBrowserServiceCompat() {
      var currentRadioStation: RadioStation? = null
      var currentRecording : Recording? = null
 
+    var lastInsertedSong = ""
+
     companion object{
 
-        var currenlyPlaingSong = TITLE_UNKNOWN
+        var currentlyPlaingSong = TITLE_UNKNOWN
 //        var currentStation : MediaMetadataCompat? = null
         var currentPlaylist = -1
 
@@ -474,9 +476,10 @@ class RadioService : MediaBrowserServiceCompat() {
     fun insertNewTitle(title: String){
 
         serviceScope.launch(Dispatchers.IO){
+
            val checkTitle = radioSource.checkTitleTimestamp(title, currentDateLong)
 
-            val isTitleBookmarked = checkTitle?.isBookmarked
+           val isTitleBookmarked = checkTitle?.isBookmarked
 
          checkTitle?.let {
              radioSource.deleteTitle(it)
@@ -494,6 +497,9 @@ class RadioService : MediaBrowserServiceCompat() {
                     stationIconUri = stationUri,
                     isBookmarked = isTitleBookmarked ?: false
                 ))
+
+            lastInsertedSong = title
+
         }
     }
 
@@ -1034,12 +1040,12 @@ class RadioService : MediaBrowserServiceCompat() {
                    return MediaDescriptionCompat.Builder().build()
                } else {
                    val extra = Bundle()
-                   extra.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currenlyPlaingSong)
+                   extra.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentlyPlaingSong)
                    return MediaDescriptionCompat.Builder()
                        .setExtras(extra)
                        .setIconUri(currentRadioStation?.favicon?.toUri())
                        .setTitle(currentRadioStation?.name)
-                       .setSubtitle(currenlyPlaingSong)
+                       .setSubtitle(currentlyPlaingSong)
                        .build()
                }
            } else{

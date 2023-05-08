@@ -21,14 +21,35 @@
         android:id="@+id/tvSliderHeader"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="-6dp"
         android:gravity="center"
         android:text="All dates"
         android:textAppearance="@style/mainTextButtons"
-        app:drawableEndCompat="@drawable/ic_playlists_arrow_expand"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/guideline66"
         app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/tvShrinkArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:drawableEndCompat="@drawable/ic_playlists_arrow_expand"
+        app:layout_constraintBottom_toBottomOf="@id/tvSliderHeader"
+        app:layout_constraintStart_toEndOf="@id/tvSliderHeader"
+        app:layout_constraintTop_toTopOf="parent" />
+
+<!--    <TextView-->
+<!--        android:id="@+id/tvBookmarks"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:gravity="center"-->
+<!--        android:text="Bookmarks"-->
+<!--        android:visibility="invisible"-->
+<!--        android:textAppearance="@style/mainTextTitle"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="@id/guideline66"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
 
     <View

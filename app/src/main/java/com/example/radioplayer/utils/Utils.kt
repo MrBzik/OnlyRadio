@@ -118,7 +118,10 @@ object Utils {
 
     fun convertLongToDate(time : Long, isOnlyTime : Boolean) : String {
         val date = Date(time)
-        val format = DateFormat.getTimeInstance()
+        val format = if(isOnlyTime)
+            DateFormat.getTimeInstance()
+                else DateFormat.getDateTimeInstance()
+
         return format.format(date)
     }
 

@@ -16,6 +16,9 @@ import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.utils.Constants.HISTORY_3_DATES
 import com.example.radioplayer.utils.Constants.HISTORY_OPTIONS
+import com.example.radioplayer.utils.Constants.HISTORY_PREF
+import com.example.radioplayer.utils.Constants.HISTORY_PREF_BOOKMARK
+import com.example.radioplayer.utils.Constants.HISTORY_PREF_DATES
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
 import com.example.radioplayer.utils.Utils.fromDateToString
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -336,7 +339,9 @@ class DatabaseViewModel @Inject constructor(
 
     var isHistoryInStationsTab = true
 
-    var isHistoryTitlesInBookmark = false
+//    var isHistoryTitlesInBookmark = false
+
+    var isInBookmarksLiveData : MutableLiveData<Boolean> = MutableLiveData(false)
 
 
     private val allHistoryLoader : HistoryDateLoader = { dateIndex ->
@@ -478,7 +483,7 @@ class DatabaseViewModel @Inject constructor(
 
 
 
-    fun cleanHistory(){
+    fun cleanHistoryTab(){
 
         historyFlow?.let{
             observableHistory.removeSource(it)
@@ -516,33 +521,45 @@ class DatabaseViewModel @Inject constructor(
 
         repository.insertNewBookmarkedTitle(
             BookmarkedTitle(
-                timeStamp = title.timeStamp,
+                timeStamp = System.currentTimeMillis(),
                 date = title.date,
                 title = title.title,
                 stationName = title.stationName,
                 stationIconUri = title.stationIconUri
             )
         )
+
+        checkAndCleanBookmarkTitles()
+    }
+
+
+    fun checkAndCleanBookmarkTitles() = viewModelScope.launch {
+
+        val count = repository.countBookmarkedTitles()
+
+        if(count > historyPrefBookmark && historyPrefBookmark != 100){
+
+            val bookmark = repository.getLastValidBookmarkedTitle(historyPrefBookmark -1)
+
+            repository.cleanBookmarkedTitles(bookmark.timeStamp)
+
+        }
+
+
     }
 
 
 
     // Handle history options and cleaning history
 
-    private val historyOptionsPref = app.getSharedPreferences(HISTORY_OPTIONS, Context.MODE_PRIVATE)
+//    private val historyOptionsPref = app.getSharedPreferences(HISTORY_OPTIONS, Context.MODE_PRIVATE)
 
-    private val editor = historyOptionsPref.edit()
+    private val historySettingsPref = app.getSharedPreferences(HISTORY_PREF, Context.MODE_PRIVATE)
 
-    fun getHistoryOptionsPref() : Int {
+    var historyPrefDates = historySettingsPref.getInt(HISTORY_PREF_DATES, 3)
 
-        return historyOptionsPref.getInt(HISTORY_OPTIONS, HISTORY_3_DATES)
-    }
+    var historyPrefBookmark = historySettingsPref.getInt(HISTORY_PREF_BOOKMARK, 20)
 
-    fun setHistoryOptionsPref(newOption : Int) {
-
-        editor.putInt(HISTORY_OPTIONS, newOption)
-        editor.commit()
-    }
 
 
     fun compareDatesWithPrefAndCLeanIfNeeded(newDate: HistoryDate?)
@@ -552,17 +569,13 @@ class DatabaseViewModel @Inject constructor(
             repository.insertNewDate(newDate)
         }
 
-        val pref = getHistoryOptionsPref()
-
-//        if(pref == HISTORY_NEVER_CLEAN) return@launch
-
 
         val numberOfDatesInDB =  repository.getNumberOfDates()
 
-        if(pref >= numberOfDatesInDB) return@launch
+        if(historyPrefDates >= numberOfDatesInDB) return@launch
         else {
             isCleanUpNeeded = true
-            val numberOfDatesToDelete = numberOfDatesInDB - pref
+            val numberOfDatesToDelete = numberOfDatesInDB - historyPrefDates
             val deleteList = repository.getDatesToDelete(numberOfDatesToDelete)
 
             deleteList.forEach {
@@ -571,8 +584,6 @@ class DatabaseViewModel @Inject constructor(
                 repository.deleteTitlesWithDate(it.time)
             }
         }
-//            updateHistory.postValue(true)
-
     }
 
 

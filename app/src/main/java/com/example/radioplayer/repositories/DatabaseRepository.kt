@@ -1,6 +1,7 @@
 package com.example.radioplayer.repositories
 
 
+import androidx.room.Query
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.entities.*
 import com.example.radioplayer.data.local.relations.StationDateCrossRef
@@ -137,6 +138,12 @@ class DatabaseRepository @Inject constructor(
     suspend fun deleteBookmarkedTitle(title : String) = radioDAO.deleteBookmarkedTitle(title)
 
     suspend fun insertNewBookmarkedTitle(title : BookmarkedTitle) = radioDAO.insertNewBookmarkedTitle(title)
+
+    suspend fun countBookmarkedTitles() = radioDAO.countBookmarkedTitles()
+
+    suspend fun getLastValidBookmarkedTitle(offset : Int) = radioDAO.getLastValidBookmarkedTitle(offset)
+
+    suspend fun cleanBookmarkedTitles(timeStamp : Long) = radioDAO.cleanBookmarkedTitles(timeStamp)
 
     // Recording
 

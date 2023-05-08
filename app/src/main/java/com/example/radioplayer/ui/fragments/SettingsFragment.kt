@@ -20,12 +20,14 @@ import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.BufferSettingsDialog
+import com.example.radioplayer.ui.dialogs.HistoryOptionsDialog
 import com.example.radioplayer.ui.dialogs.HistorySettingsDialog
 import com.example.radioplayer.ui.dialogs.RecordingSettingsDialog
 import com.example.radioplayer.ui.viewmodels.BluetoothViewModel
 import com.example.radioplayer.utils.Constants.BUFFER_PREF
 import com.example.radioplayer.utils.Constants.DARK_MODE_PREF
 import com.example.radioplayer.utils.Constants.FOREGROUND_PREF
+import com.example.radioplayer.utils.Constants.HISTORY_PREF
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.RECONNECT_PREF
 import com.example.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
@@ -67,16 +69,20 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
     }
 
 
+    private val historyPref : SharedPreferences by lazy {
+        requireContext().getSharedPreferences(HISTORY_PREF, Context.MODE_PRIVATE)
+    }
+
 
     private val listOfRecOptions : List<String> by lazy { listOf(
         REC_LOWEST, REC_LOW, REC_MEDIUM, REC_NORMAL, REC_ABOVE_AVERAGE, REC_HIGH, REC_VERY_HIGH,
         REC_SUPER, REC_ULTRA, REC_MAXIMUM)
     }
 
-    private val listOfHistoryOptions : List<String> by lazy { listOf(
-        HISTORY_STRING_ONE_DAY, HISTORY_STRING_3_DATES, HISTORY_STRING_7_DATES,
-        HISTORY_STRING_15_DATES, HISTORY_STRING_21_DATES, HISTORY_STRING_30_DATES)
-    }
+//    private val listOfHistoryOptions : List<String> by lazy { listOf(
+//        HISTORY_STRING_ONE_DAY, HISTORY_STRING_3_DATES, HISTORY_STRING_7_DATES,
+//        HISTORY_STRING_15_DATES, HISTORY_STRING_21_DATES, HISTORY_STRING_30_DATES)
+//    }
 
 //    private var isNightMode = false
 
@@ -93,7 +99,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         getInitialNightModeOnStartPref()
 
-        getInitialHistoryOptionValue()
+//        getInitialHistoryOptionValue()
 
         setReconnectButton()
 
@@ -546,43 +552,47 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         bind.tvHistorySettingValue.setOnClickListener {
 
-            HistorySettingsDialog(listOfHistoryOptions,
-                listOfHistoryOptions.indexOf(bind.tvHistorySettingValue.text),
-                requireContext(), databaseViewModel,
-            )
+//            HistorySettingsDialog(listOfHistoryOptions,
+//                listOfHistoryOptions.indexOf(bind.tvHistorySettingValue.text),
+//                requireContext(), databaseViewModel,
+//            )
+//
+//            { newOption ->
+//
+//                val toString = historyOptionToString(newOption)
+//                bind.tvHistorySettingValue.text = toString
+//
+//            }.show()
 
-            { newOption ->
 
-                val toString = historyOptionToString(newOption)
-                bind.tvHistorySettingValue.text = toString
+            HistoryOptionsDialog(requireContext(), historyPref, databaseViewModel).show()
 
-            }.show()
         }
     }
 
 
-    fun historyOptionToString(option : Int) : String{
+//    fun historyOptionToString(option : Int) : String{
+//
+//        return when(option){
+//            1 -> HISTORY_STRING_ONE_DAY
+//            3 -> HISTORY_STRING_3_DATES
+//            7 -> HISTORY_STRING_7_DATES
+//            15 -> HISTORY_STRING_15_DATES
+//            21 -> HISTORY_STRING_21_DATES
+//            else -> HISTORY_STRING_30_DATES
+//        }
+//
+//    }
 
-        return when(option){
-            1 -> HISTORY_STRING_ONE_DAY
-            3 -> HISTORY_STRING_3_DATES
-            7 -> HISTORY_STRING_7_DATES
-            15 -> HISTORY_STRING_15_DATES
-            21 -> HISTORY_STRING_21_DATES
-            else -> HISTORY_STRING_30_DATES
-        }
-
-    }
-
-    private fun getInitialHistoryOptionValue(){
-
-        val option = databaseViewModel.getHistoryOptionsPref()
-
-        val toString = historyOptionToString(option)
-
-        bind.tvHistorySettingValue.text = toString
-
-    }
+//    private fun getInitialHistoryOptionValue(){
+//
+//        val option = databaseViewModel.getHistoryOptionsPref()
+//
+//        val toString = historyOptionToString(option)
+//
+//        bind.tvHistorySettingValue.text = toString
+//
+//    }
 
     private fun updateRecordingSettingValue(){
 

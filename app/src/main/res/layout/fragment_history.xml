@@ -43,6 +43,8 @@
         app:layout_constraintStart_toStartOf="@id/guideline66"
         app:layout_constraintTop_toTopOf="parent" />
 
+
+
     <TextView
         android:id="@+id/tvShrinkArrow"
         android:layout_width="wrap_content"
@@ -51,6 +53,20 @@
         app:layout_constraintBottom_toBottomOf="@id/tvSliderHeader"
         app:layout_constraintStart_toEndOf="@id/tvSliderHeader"
         app:layout_constraintTop_toTopOf="parent" />
+
+
+<!--    <TextView-->
+<!--        android:id="@+id/tvBookmarks"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:gravity="center"-->
+<!--        android:text="Bookmarks"-->
+<!--        android:visibility="invisible"-->
+<!--        android:textAppearance="@style/mainTextButtons"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="@id/guideline66"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
+
 
     <View
         android:id="@+id/viewSpinnerClickBox"
@@ -61,20 +77,21 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
 
-    <TextView
-        android:id="@+id/tvTitles"
-        android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:gravity="center"
-        android:text="Titles"
-        android:textAppearance="@style/mainTextTitle"
-        app:layout_constraintStart_toStartOf="@id/guideline33"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/guideline66"
-        />
+<!--    <TextView-->
+<!--        android:id="@+id/tvTitles"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:gravity="center"-->
+<!--        android:text="Titles"-->
+<!--        android:visibility="invisible"-->
+<!--        android:textAppearance="@style/mainTextTitle"-->
+<!--        app:layout_constraintStart_toStartOf="@id/guideline33"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="@id/guideline66"-->
+<!--        />-->
 
     <com.example.radioplayer.utils.TextViewOutlined
-        android:id="@+id/tvTitlesUnselected"
+        android:id="@+id/tvTitles"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:gravity="center"
@@ -123,20 +140,21 @@
 
 
 
-    <TextView
-        android:id="@+id/tvStations"
-        android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:gravity="center"
-        android:text="Stations"
-        android:textAppearance="@style/mainTextButtons"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/guideline33"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+<!--    <TextView-->
+<!--        android:id="@+id/tvStations"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:gravity="center"-->
+<!--        android:text="Stations"-->
+<!--        android:visibility="invisible"-->
+<!--        android:textAppearance="@style/mainTextButtons"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="@id/guideline33"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        />-->
 
     <com.example.radioplayer.utils.TextViewOutlined
-        android:id="@+id/tvStationsUnSelected"
+        android:id="@+id/tvStations"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:gravity="center"

@@ -18,6 +18,7 @@ import com.example.radioplayer.R
 import com.example.radioplayer.adapters.ViewPagerStationsAdapter
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
+import com.example.radioplayer.data.local.entities.Title
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.databinding.FragmentStationDetailsBinding
 import com.example.radioplayer.exoPlayer.RadioService
@@ -55,8 +56,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     lateinit var pixabayViewModel: PixabayViewModel
 
     lateinit var viewPagerAdapter : ViewPagerStationsAdapter
-
-    private var homepageUrl : String? = null
 
     private var listOfPlaylists : List<Playlist> = emptyList()
 
@@ -101,10 +100,11 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         setTitleCopy()
 
+        setBookmarkClickListener()
+
         setupPagerView()
 
         getCurrentPlaylistItems()
-
 
         setSystemBarsColor()
 
@@ -272,27 +272,54 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
 
             if(title.equals("NULL", ignoreCase = true) || title.isBlank()){
+
                 bind.tvSongTitle.text = TITLE_UNKNOWN
 
                 bind.tvSongTitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.default_text_color))
 
-                bind.ivCopy.visibility = View.GONE
+                bind.ivCopy.visibility = View.INVISIBLE
+                bind.ivBookmark.visibility = View.INVISIBLE
+
 
 
             } else {
+
+                songTitle = title
+
                 bind.tvSongTitle.text = title
                 bind.tvSongTitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.selected_text_color))
 
                 bind.ivCopy.visibility = View.VISIBLE
-
+                bind.ivBookmark.visibility = View.VISIBLE
             }
         }
     }
 
 
 
+    private fun setBookmarkClickListener(){
+
+        bind.ivBookmark.setOnClickListener {
+
+            val name = currentRadioStation?.name ?: ""
+            val iconUri = currentRadioStation?.favicon ?: ""
+
+         databaseViewModel.upsertBookmarkedTitle(
+             Title(
+                 System.currentTimeMillis(),
+                 RadioService.currentDateLong,
+                 songTitle,
+                 name,
+                 iconUri,
+                 true
+             )
+         )
+        }
+    }
+
+
     private fun setTitleCopy(){
-        bind.llSongTitle.setOnClickListener {
+        bind.ivCopy.setOnClickListener {
 
             bind.ivCopy.isPressed = true
 
@@ -304,13 +331,13 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                 "Title copied", Snackbar.LENGTH_LONG).apply {
                     setAction("WEBSEARCH"){
                         val intent = Intent(Intent.ACTION_WEB_SEARCH)
-                        intent.putExtra(SearchManager.QUERY, bind.tvSongTitle.text)
+                        intent.putExtra(SearchManager.QUERY, songTitle)
                         startActivity(intent)
                     }
                 addAction(R.layout.snackbar_extra_action, "YOUTUBE"){
                     val intent = Intent(Intent.ACTION_SEARCH)
                     intent.setPackage("com.google.android.youtube")
-                    intent.putExtra(SearchManager.QUERY, bind.tvSongTitle.text)
+                    intent.putExtra(SearchManager.QUERY, songTitle)
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     startActivity(intent)
                 }

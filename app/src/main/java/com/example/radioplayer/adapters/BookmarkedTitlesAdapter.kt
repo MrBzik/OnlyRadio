@@ -63,13 +63,11 @@ class BookmarkedTitlesAdapter @Inject constructor(
 
         holder.bind.apply {
 
-
-
             tvPrimary.text = title.title
             tvPrimary.textSize = titleSize
 
             tvSecondary.text = title.stationName
-            tvTime.text = Utils.convertLongToDate(title.timeStamp, true)
+            tvTime.text = Utils.convertLongToDate(title.timeStamp, false)
 
 
             title.title.let { titleName ->

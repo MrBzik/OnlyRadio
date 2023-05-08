@@ -37,20 +37,14 @@
         android:paddingHorizontal="16dp"
         >
 
-        <TextView
+        <ImageView
+            android:id="@+id/ivBookmark"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_bookmark_hollow"
+            android:layout_gravity="center_vertical"
 
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:alpha="0.7"
-            android:fontFamily="sans-serif-smallcaps"
-            android:gravity="center"
-            android:text="Playing:"
-            android:textColor="@color/regular_text_color"
-            android:textSize="16sp"
-            android:textStyle="bold"
             />
-
         <TextView
             android:id="@+id/tvSongTitle"
             android:layout_width="0dp"

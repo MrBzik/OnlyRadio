@@ -57,7 +57,7 @@ class HistorySettingsDialog (
                 if(newOption != initialOption) {
                     val newValue = positionToValue(newOption)
                     handleChoice(newValue)
-                    databaseViewModel.setHistoryOptionsPref(newValue)
+//                    databaseViewModel.setHistoryOptionsPref(newValue)
                     if(initialOption > newOption){
                         databaseViewModel.compareDatesWithPrefAndCLeanIfNeeded(null)
                     }

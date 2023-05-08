@@ -182,6 +182,15 @@ interface  RadioDAO {
     @Query("SELECT * FROM BookmarkedTitle ORDER BY timeStamp DESC")
     fun bookmarkedTitlesLiveData() : LiveData<List<BookmarkedTitle>>
 
+    @Query("SELECT COUNT(timeStamp) FROM BookmarkedTitle")
+    suspend fun countBookmarkedTitles() : Int
+
+    @Query("SELECT * FROM BookmarkedTitle ORDER BY timeStamp DESC LIMIT 1 OFFSET :offset")
+    suspend fun getLastValidBookmarkedTitle(offset : Int) : BookmarkedTitle
+
+    @Query("DELETE FROM BookmarkedTitle WHERE timeStamp <:timeStamp")
+    suspend fun cleanBookmarkedTitles(timeStamp : Long)
+
 
     //    @Query("SELECT * FROM BookmarkedTitle WHERE title =:title LIMIT 1")
 //    suspend fun checkIfAlreadyBookmarked(title : String) : BookmarkedTitle?

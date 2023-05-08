@@ -41,7 +41,7 @@ class TextViewOutlined(context : Context, attrs : AttributeSet?) : AppCompatText
 
     fun setColors(colorDefault : Int){
 
-        colors = intArrayOf(colorDefault, Color.RED)
+        colors = intArrayOf(colorDefault, interactiveColor)
 
     }
 

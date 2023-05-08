@@ -16,7 +16,7 @@
             android:layout_marginStart="8dp"
             android:gravity="center_vertical"
             android:layout_marginTop="@dimen/dialog_top_margin"
-            android:text="Buffer settings"
+            android:text="Buffer options"
             android:textAppearance="@style/dialogTitleText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
