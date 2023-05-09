@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Radio Enthusiast</string>
+    <string name="app_name">Only Radio</string>
     <string name="notification_channel_name">Radio Channel</string>
     <string name="notification_channel_description">Shows the currently playing station</string>
     <string name="open">Open</string>

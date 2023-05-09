@@ -22,15 +22,50 @@ import com.google.android.exoplayer2.ui.PlayerNotificationManager.NotificationLi
 import kotlinx.coroutines.*
 
 
-const val ACTION_NEXT_STATION = "action next station"
+const val ACTION_BOOKMARK = "action make bookmark"
+
+const val ACTION_BOOKMARK_FILLED = "action bookmark filled"
+
+const val ACTION_STOP_RECORDING = "action stop recording"
+
 
 class RadioNotificationManager (
     private val context : Context,
    sessionToken : MediaSessionCompat.Token,
    notificationListener: NotificationListener,
     private val glide : RequestManager,
-    private val newSong : () -> CharSequence?
+    private val handleBookmark : () -> Unit,
+    private val handleStopRecording : () -> Unit
     ) {
+
+
+    private var isBookmarkClicked = false
+
+    private var isRecordingNow = false
+
+    private val actionBookmark = NotificationCompat.Action(
+        R.drawable.ic_bookmark_hollow,
+        "Bookmark",
+        PendingIntent.getBroadcast(context, 123,
+            Intent(ACTION_BOOKMARK).setPackage(context.packageName), PendingIntent.FLAG_IMMUTABLE)
+    )
+
+    private val actionBookmarkFilled = NotificationCompat.Action(
+        R.drawable.ic_bookmark_selected,
+        "Bookmark",
+        PendingIntent.getBroadcast(context, 124,
+            Intent(ACTION_BOOKMARK_FILLED).setPackage(context.packageName), PendingIntent.FLAG_IMMUTABLE)
+    )
+
+    private val actionStopRecording = NotificationCompat.Action(
+        R.drawable.ic_stop_recording,
+        "Stop rec.",
+        PendingIntent.getBroadcast(context, 125,
+            Intent(ACTION_STOP_RECORDING).setPackage(context.packageName), PendingIntent.FLAG_IMMUTABLE)
+    )
+
+
+
 
     val color = ContextCompat.getColor(context, R.color.transparent)
 
@@ -42,6 +77,7 @@ class RadioNotificationManager (
 //        )
 
 
+
     private val bitmap = ContextCompat.getDrawable(context, R.drawable.splash_screen)?.toBitmap(144, 144)
 
     private val serviceJob = SupervisorJob()
@@ -51,26 +87,38 @@ class RadioNotificationManager (
 
     private val notificationManager : PlayerNotificationManager
 
+
+
     private val actionReceiver  = object : PlayerNotificationManager.CustomActionReceiver {
+
         override fun createCustomActions(
             context: Context,
             instanceId: Int
         ): MutableMap<String, NotificationCompat.Action> {
-            return mutableMapOf(Pair(ACTION_NEXT_STATION,
-                NotificationCompat.Action(R.drawable.ic_play_pause, "Next",
-                PendingIntent.getBroadcast(context, 123,
-                    Intent(ACTION_NEXT_STATION).setPackage(context.packageName), PendingIntent.FLAG_IMMUTABLE)
-                    )
-                ))
+
+            return mutableMapOf(Pair(ACTION_BOOKMARK, actionBookmark),
+                                Pair(ACTION_BOOKMARK_FILLED, actionBookmarkFilled),
+                                Pair(ACTION_STOP_RECORDING, actionStopRecording)
+                )
         }
 
         override fun getCustomActions(player: Player): MutableList<String> {
-           return mutableListOf(ACTION_NEXT_STATION)
+
+           return mutableListOf(if (isBookmarkClicked)
+               ACTION_BOOKMARK_FILLED
+                    else ACTION_BOOKMARK,
+               if(isRecordingNow) ACTION_STOP_RECORDING
+                    else ""
+           )
         }
 
         override fun onCustomAction(player: Player, action: String, intent: Intent) {
-            if(action == ACTION_NEXT_STATION){
-                Log.d("CHECKTAGS", "next action")
+            if(action == ACTION_BOOKMARK){
+                handleBookmark()
+                isBookmarkClicked = true
+                updateNotification()
+            } else if(action == ACTION_STOP_RECORDING){
+                handleStopRecording()
             }
         }
     }
@@ -92,7 +140,7 @@ class RadioNotificationManager (
                 .setChannelDescriptionResourceId(R.string.notification_channel_description)
                 .setMediaDescriptionAdapter(DescriptionAdapter(mediaController))
                 .setNotificationListener(notificationListener)
-//                .setCustomActionReceiver(actionReceiver)
+                .setCustomActionReceiver(actionReceiver)
                 .build().apply {
                     setSmallIcon(R.drawable.ic_radio_default)
                     setMediaSessionToken(sessionToken)
@@ -122,6 +170,24 @@ class RadioNotificationManager (
         notificationManager.invalidate()
     }
 
+    fun resetBookmarkIcon(){
+        isBookmarkClicked = false
+    }
+
+
+    fun updateForStartRecording(){
+//        notificationManager.setUseChronometer(true)
+        isRecordingNow = true
+        notificationManager.invalidate()
+    }
+
+    fun updateForStopRecording(){
+//        notificationManager.setUseChronometer(false)
+        isRecordingNow = false
+        notificationManager.invalidate()
+    }
+
+    var recordingDuration = ""
 
 
     var currentIconUri: Uri? = null
@@ -144,6 +210,14 @@ class RadioNotificationManager (
         override fun getCurrentContentText(player: Player): CharSequence? {
             return RadioService.currentlyPlaingSong
 //            return newSong()
+        }
+
+        override fun getCurrentSubText(player: Player): CharSequence? {
+           if(isRecordingNow)
+               return "rec: $recordingDuration"
+            else
+               return super.getCurrentSubText(player)
+
         }
 
         override fun getCurrentLargeIcon(

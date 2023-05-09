@@ -8,6 +8,7 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -67,6 +68,8 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     private var isFavoured = false
 
     private var songTitle = ""
+
+    private var isToTogglePlayStation = true
 
     private val clipBoard : ClipboardManager? by lazy {
         ContextCompat.getSystemService(requireContext(), ClipboardManager::class.java)
@@ -194,18 +197,21 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
 
-            val newStation = viewPagerAdapter.listOfStations[position]
+            if(isToTogglePlayStation){
+                val newStation = viewPagerAdapter.listOfStations[position]
 
-            val playWhenReady = mainViewModel.playbackState.value?.isPlaying ?: true
+                val playWhenReady = mainViewModel.playbackState.value?.isPlaying ?: true
 
-//            val historyStationId = if(RadioService.currentPlaylist == SEARCH_FROM_HISTORY)
-//                newStation.stationuuid else null
+                mainViewModel.playOrToggleStation(
+                    station =  newStation, searchFlag =  RadioService.currentPlaylist,
+                    playWhenReady = playWhenReady, itemIndex = position
 
-            mainViewModel.playOrToggleStation(
-                station =  newStation, searchFlag =  RadioService.currentPlaylist,
-                playWhenReady = playWhenReady, itemIndex = position
+                )
+            } else {
+                isToTogglePlayStation = true
+            }
 
-            )
+
         }
     }
 
@@ -255,6 +261,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             checkIfStationFavoured(station)
             bind.viewPager.apply {
                 if(currentItem != RadioService.currentPlayingItemPosition){
+                    isToTogglePlayStation = false
                     setCurrentItem(RadioService.currentPlayingItemPosition, true)
                 }
             }
@@ -314,6 +321,10 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                  true
              )
          )
+
+            Toast.makeText(requireContext(), "Title bookmarked", Toast.LENGTH_SHORT).show()
+
+
         }
     }
 
@@ -369,7 +380,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
                  if(!isTimerObserverSet){
                      mainViewModel.exoRecordTimer.observe(viewLifecycleOwner){ time ->
-                         bind.tvTimer.text = Utils.timerFormat(time)
+                         bind.tvTimer.text = time as String
                      }
                      isTimerObserverSet = true
                  }

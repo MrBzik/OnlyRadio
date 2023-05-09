@@ -74,6 +74,10 @@ class RadioPlayerEventListener (
                 radioService.insertNewTitle(RadioService.currentlyPlaingSong)
             }
         }
+
+        if(radioService.radioSource.exoRecordState.value == true){
+            radioService.stopRecording()
+        }
     }
 
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
@@ -111,10 +115,6 @@ class RadioPlayerEventListener (
                 RadioService.currentPlayingRecording.postValue(recording)
 
             }
-
-
-
-
         }
 
         station?.let { radioService.currentRadioStation = it }
@@ -123,8 +123,9 @@ class RadioPlayerEventListener (
 
         RadioService.currentPlayingStation.postValue(station)
 
-        Log.d("CHECKTAGS", "uri of playing mediaitem is $uri")
-        Log.d("CHECKTAGS", "index is $index")
+        if(radioService.radioSource.exoRecordState.value == true){
+            radioService.stopRecording()
+        }
 
     }
 
@@ -141,13 +142,19 @@ class RadioPlayerEventListener (
 
             radioService.isForegroundService = false
 
-            radioService.exoPlayer.volume = 0f
+
+
+//            radioService.exoPlayer.volume = 0f
         }
          else if(playbackState == Player.STATE_READY && playWhenReady){
 
             radioService.isPlaybackStatePlaying = true
             radioService.listenToRecordDuration()
-            radioService.fadeInPlayer()
+            if(RadioService.currentPlaylist != SEARCH_FROM_RECORDINGS){
+                radioService.fadeInPlayer()
+            } else {
+                radioService.exoPlayer.volume = 1f
+            }
 
          }
 

@@ -80,6 +80,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     private var isBookmarkedTitlesObserverSet = false
 
     private var isInBookmarks = false
+    private var isInStationsTab = true
 
     private val clipBoard : ClipboardManager? by lazy {
         ContextCompat.getSystemService(requireContext(), ClipboardManager::class.java)
@@ -97,6 +98,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         super.onViewCreated(view, savedInstanceState)
 
         observeIsInBookmarks()
+
+        observeIsInStationsTab()
 
         updateCurrentDate()
 
@@ -127,6 +130,20 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     }
 
+    private fun observeIsInStationsTab(){
+
+        databaseViewModel.isHistoryInStationsTabLiveData.observe(viewLifecycleOwner){
+
+            isInStationsTab = it
+
+            bind.fabBookmarkedTitles.isVisible = !it
+
+            switchButtonsVisibilityWithBookmarks()
+
+        }
+
+    }
+
 
     private fun observeIsInBookmarks(){
 
@@ -140,6 +157,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                     setImageResource(R.drawable.ic_bookmark_hollow)
             }
 
+            switchButtonsVisibilityWithBookmarks()
+
         }
 
     }
@@ -147,16 +166,12 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private fun switchButtonsVisibilityWithBookmarks(){
 
-        bind.fabBookmarkedTitles.isVisible = !databaseViewModel.isHistoryInStationsTab
-
-        if(!databaseViewModel.isHistoryInStationsTab && isInBookmarks){
-
+        if(!isInStationsTab && isInBookmarks){
             bind.tvSliderHeader.isVisible = false
             bind.spinnerDates.isVisible = false
             bind.tvShrinkArrow.isVisible = false
             bind.viewSpinnerClickBox?.isVisible = false
         } else {
-
             bind.tvSliderHeader.isVisible = true
             bind.spinnerDates.isVisible = true
             bind.tvShrinkArrow.isVisible = true
@@ -166,8 +181,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
 
     private fun setToolbar(){
-
-        switchButtonsVisibilityWithBookmarks()
 
         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
             val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_history_frag)
@@ -387,19 +400,19 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         databaseViewModel.apply {
 
-            if(!isHistoryInStationsTab && isSameTab){
+            if(!isInStationsTab && isSameTab){
                 titlesHistoryAdapter?.submitData(lifecycle, PagingData.empty())
             }
 
             if(selectedDate == 0L){
-                if(isHistoryInStationsTab){
+                if(isInStationsTab){
                     getAllHistory()
                 } else {
                     getAllTitles()
                 }
 
             } else {
-                if(isHistoryInStationsTab){
+                if(isInStationsTab){
                     oneHistoryDateCaller.postValue(true)
                 } else {
                     oneTitleDateCaller.postValue(true)
@@ -452,7 +465,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
 
-            if(databaseViewModel.isHistoryInStationsTab &&
+            if(isInStationsTab &&
                     RadioService.currentPlaylist != SEARCH_FROM_RECORDINGS){
 
                 if(isToHandleNewStationObserver){
@@ -512,7 +525,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             setRvLoadChildrenListener()
 
-            if(databaseViewModel.isHistoryInStationsTab){
+            if(isInStationsTab){
                 setStationsHistoryAdapter()
             } else {
 
@@ -642,11 +655,11 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     private fun setTitlesClickListener(){
 
         bind.tvTitles.setOnClickListener {
-            if(databaseViewModel.isHistoryInStationsTab){
+            if(isInStationsTab){
 
-                databaseViewModel.isHistoryInStationsTab = false
+                isInStationsTab = false
+                databaseViewModel.isHistoryInStationsTabLiveData.postValue(false)
 
-                switchButtonsVisibilityWithBookmarks()
 
                 isToHandleNewStationObserver = false
 
@@ -669,6 +682,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
 
     private fun handleSwitchToNotMarkedTitles(){
+
         setTitlesHistoryAdapter()
 
         if(databaseViewModel.selectedDate != 0L){
@@ -688,13 +702,11 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 databaseViewModel.isInBookmarksLiveData.postValue(isInBookmarks)
 
-                switchButtonsVisibilityWithBookmarks()
 
                 if(isInBookmarks){
 
-
                     switchToBookmarkedTitles()
-                    isToHandleNewStationObserver = false
+
                 } else {
 
                     handleSwitchToNotMarkedTitles()
@@ -753,11 +765,11 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     private fun setStationsClickListener(){
 
         bind.tvStations.setOnClickListener {
-            if(!databaseViewModel.isHistoryInStationsTab){
 
-                databaseViewModel.isHistoryInStationsTab = true
+            if(!isInStationsTab){
 
-                switchButtonsVisibilityWithBookmarks()
+                isInStationsTab = true
+                databaseViewModel.isHistoryInStationsTabLiveData.postValue(true)
 
                 setStationsHistoryAdapter()
 
@@ -777,7 +789,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     private fun switchTitlesStationsUi(isToAnimate : Boolean){
 
         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
-            if(databaseViewModel.isHistoryInStationsTab){
+            if(isInStationsTab){
                 (bind.tvStations as TextView).setTextAppearance(R.style.selectedTitle)
                 (bind.tvTitles as TextView).setTextAppearance(R.style.unselectedTitle)
 
@@ -798,7 +810,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             }
         } else {
 
-            if(databaseViewModel.isHistoryInStationsTab){
+            if(isInStationsTab){
                 bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_history_stations_protected)
 
                 (bind.tvStations as TextViewOutlined).apply {

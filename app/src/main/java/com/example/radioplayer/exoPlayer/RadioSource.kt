@@ -95,7 +95,7 @@ class RadioSource @Inject constructor(
 
 
     val exoRecordState : MutableLiveData<Boolean> = MutableLiveData(false)
-    val exoRecordTimer : MutableLiveData<Long> = MutableLiveData()
+    val exoRecordTimer : MutableLiveData<String> = MutableLiveData()
     val exoRecordFinishConverting : MutableLiveData<Boolean> = MutableLiveData()
 
 
@@ -113,6 +113,11 @@ class RadioSource @Inject constructor(
     suspend fun insertNewTitle(title : Title) = radioDAO.insertNewTitle(title)
     suspend fun checkTitleTimestamp(title : String, date : Long) = radioDAO.checkTitleTimestamp(title, date)
     suspend fun deleteTitle(title : Title) = radioDAO.deleteTitle(title)
+
+
+    // Bookmarked titles
+
+
 
 
     suspend fun getStationsInAllDates(limit: Int, offset: Int, initialDate: String): DateWithStations {

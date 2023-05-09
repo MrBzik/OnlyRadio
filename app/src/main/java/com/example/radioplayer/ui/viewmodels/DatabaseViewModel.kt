@@ -337,12 +337,12 @@ class DatabaseViewModel @Inject constructor(
 
 
 
-    var isHistoryInStationsTab = true
+//    var isHistoryInStationsTab = true
 
 //    var isHistoryTitlesInBookmark = false
 
     var isInBookmarksLiveData : MutableLiveData<Boolean> = MutableLiveData(false)
-
+    var isHistoryInStationsTabLiveData : MutableLiveData<Boolean> = MutableLiveData(true)
 
     private val allHistoryLoader : HistoryDateLoader = { dateIndex ->
         getStationsInDate(1, dateIndex)

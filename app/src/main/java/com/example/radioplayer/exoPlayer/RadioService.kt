@@ -23,12 +23,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.media.MediaBrowserServiceCompat
 import com.bumptech.glide.RequestManager
+import com.example.radioplayer.data.local.entities.BookmarkedTitle
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.data.local.entities.Title
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlaybackPreparer
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerNotificationListener
+import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.utils.Constants.BUFFER_FOR_PLAYBACK
 import com.example.radioplayer.utils.Constants.BUFFER_PREF
 import com.example.radioplayer.utils.Constants.BUFFER_SIZE_IN_MILLS
@@ -47,10 +49,11 @@ import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_PIT
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_REC_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.FOREGROUND_PREF
+import com.example.radioplayer.utils.Constants.HISTORY_PREF
+import com.example.radioplayer.utils.Constants.HISTORY_PREF_BOOKMARK
 import com.example.radioplayer.utils.Constants.IS_ADAPTIVE_LOADER_TO_USE
 import com.example.radioplayer.utils.Constants.RECONNECT_PREF
-import com.example.radioplayer.utils.Constants.RECORDING_CHANNEL_ID
-import com.example.radioplayer.utils.Constants.RECORDING_NOTIFICATION_ID
+
 
 import com.example.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
@@ -60,6 +63,7 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.Constants.TITLE_UNKNOWN
+import com.example.radioplayer.utils.Utils
 import com.example.radioplayer.utils.setPreset
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.DefaultLoadControl.*
@@ -118,6 +122,10 @@ class RadioService : MediaBrowserServiceCompat() {
 
     @Inject
     lateinit var exoRecord: ExoRecord
+
+    @Inject
+    lateinit var databaseRepository: DatabaseRepository
+
 
 //    @Inject
 //    lateinit var radioServiceConnection: RadioServiceConnection
@@ -260,10 +268,12 @@ class RadioService : MediaBrowserServiceCompat() {
             this,
             mediaSession.sessionToken,
             RadioPlayerNotificationListener(this),
-            glide
-            ) {
-             exoPlayer.mediaMetadata.title
-        }
+            glide, {
+                upsertNewBookmark()
+            }, {
+                stopRecording()
+            }
+            )
 
 
         val radioPlaybackPreparer = RadioPlaybackPreparer(
@@ -281,49 +291,6 @@ class RadioService : MediaBrowserServiceCompat() {
                 isSamePlaylist = isSamePlaylist,
                 isFromRecordings = isFromRecordings
             )
-
-//            when (flag) {
-//                SEARCH_FROM_FAVOURITES -> {
-//                    preparePlayer(
-//                        radioSource.stationsFavouredMetadata,
-//                        itemToPlay,
-//                        playWhenRady
-//                    )
-//                }
-//                SEARCH_FROM_API -> {
-//                    preparePlayer(
-//                       playlist = radioSource.stationsFromApiMetadata,
-//                       itemToPlay = itemToPlay,
-//                       playNow = playWhenRady,
-//                       itemIndex = itemIndex,
-//                       isSamePlaylist = isSamePlaylist
-//                    )
-//                }
-//                SEARCH_FROM_HISTORY -> {
-//                    preparePlayer(
-//                        radioSource.stationsFromHistoryMetadata,
-//                        itemToPlay,
-//                        playWhenRady
-//                    )
-//                }
-//                SEARCH_FROM_RECORDINGS -> {
-//                    preparePlayer(
-//                        radioSource.recordings,
-//                        itemToPlay,
-//                        playNow = playWhenRady,
-//                        isFromRecordings = true
-//                    )
-//                }
-//
-//                else -> {
-//                    preparePlayer(
-//                        radioSource.stationsFromPlaylistMetadata,
-//                        itemToPlay,
-//                        playWhenRady
-//                    )
-//                }
-//            }
-
 
         }, {
             command, extras ->
@@ -343,7 +310,7 @@ class RadioService : MediaBrowserServiceCompat() {
                     if(isPlaybackStatePlaying){
                         if(isExoRecordListenerToSet){
                             setExoRecordListener()
-                            createRecordingNotificationChannel()
+//                            createRecordingNotificationChannel()
                         }
                         startRecording()
                     }
@@ -417,24 +384,6 @@ class RadioService : MediaBrowserServiceCompat() {
                 COMMAND_CHANGE_BASS_LEVEL -> {
                     changeVirtualizerLevel()
                 }
-
-                COMMAND_STOP_SERVICE -> {
-
-//                    radioServiceConnection.disconnectBrowser()
-
-//                    Log.d("CHECKTAGS", "command stop service")
-//                    exoPlayer.pause()
-//                    exoPlayer.clearMediaItems()
-//                    isToShutDown = true
-//                    onTaskRemoved(intent)
-//
-//                    radioNotificationManager.removeNotification()
-//                    stopForeground(STOP_FOREGROUND_REMOVE)
-//                    stopForeground(true)
-//
-//                    stopSelf()
-
-                }
             }
         })
 
@@ -500,6 +449,38 @@ class RadioService : MediaBrowserServiceCompat() {
 
             lastInsertedSong = title
 
+        }
+    }
+
+
+
+    private fun upsertNewBookmark() = CoroutineScope(Dispatchers.IO).launch{
+
+        if(currentlyPlaingSong != TITLE_UNKNOWN){
+
+            databaseRepository.deleteBookmarkedTitle(currentlyPlaingSong)
+
+            databaseRepository.insertNewBookmarkedTitle(
+                BookmarkedTitle(
+                    timeStamp = System.currentTimeMillis(),
+                    date = currentDateLong,
+                    title = currentlyPlaingSong,
+                    stationName = currentRadioStation?.name ?: "",
+                    stationIconUri = currentRadioStation?.favicon ?: ""
+                )
+            )
+
+            val count = databaseRepository.countBookmarkedTitles()
+
+            val limit = this@RadioService.getSharedPreferences(HISTORY_PREF, Context.MODE_PRIVATE)
+                .getInt(HISTORY_PREF_BOOKMARK, 20)
+
+            if(count > limit && limit != 100){
+
+                val bookmark = databaseRepository.getLastValidBookmarkedTitle(limit -1)
+
+                databaseRepository.cleanBookmarkedTitles(bookmark.timeStamp)
+            }
         }
     }
 
@@ -742,37 +723,37 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+//    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+//
+//        intent?.let {
+//
+//            if(it.action == COMMAND_STOP_RECORDING) {
+//
+//                stopRecording()
 
-        intent?.let {
-
-            if(it.action == COMMAND_STOP_RECORDING) {
-
-                stopRecording()
-
-                NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
-            }
-        }
-
-        return super.onStartCommand(intent, flags, startId)
-    }
+//                NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
+//            }
+//        }
+//
+//        return super.onStartCommand(intent, flags, startId)
+//    }
 
 
 
-    private fun createRecordingNotificationChannel(){
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-            val channel = NotificationChannel(
-                RECORDING_CHANNEL_ID, "Recording",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            channel.description = "Shows ongoing recording"
-
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
+//    private fun createRecordingNotificationChannel(){
+//
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//
+//            val channel = NotificationChannel(
+//                RECORDING_CHANNEL_ID, "Recording",
+//                NotificationManager.IMPORTANCE_DEFAULT
+//            )
+//            channel.description = "Shows ongoing recording"
+//
+//            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//            notificationManager.createNotificationChannel(channel)
+//        }
+//    }
 
 
 
@@ -804,7 +785,7 @@ class RadioService : MediaBrowserServiceCompat() {
 //                Log.d("CHECKTAGS", "sampleRate: $sampleRate, channels: $channels")
 
 //
-//                Log.d("CHECKTAGS", "buffer? : ${exoPlayer.totalBufferedDuration}")
+                Log.d("CHECKTAGS", "buffer? : ${exoPlayer.totalBufferedDuration}")
 
 
                 delay(2000)
@@ -881,11 +862,11 @@ class RadioService : MediaBrowserServiceCompat() {
 
         override fun onStartRecording(recordFileName: String) {
 
-            val notification = RecordingNotification(this@RadioService) {
-                currentRadioStation?.name ?: ""
-            }
+//            val notification = RecordingNotification(this@RadioService) {
+//                currentRadioStation?.name ?: ""
+//            }
 
-            notification.showNotification()
+//            notification.showNotification()
 
             radioSource.exoRecordState.postValue(true)
             radioSource.exoRecordFinishConverting.postValue(false)
@@ -895,7 +876,13 @@ class RadioService : MediaBrowserServiceCompat() {
                 val startTime = System.currentTimeMillis()
                 override fun run() {
                     duration = (System.currentTimeMillis() - startTime)
-                    radioSource.exoRecordTimer.postValue(duration)
+
+                    val time = Utils.timerFormat(duration)
+
+                    radioNotificationManager.recordingDuration = time
+                    radioNotificationManager.updateNotification()
+
+                    radioSource.exoRecordTimer.postValue(time)
                 }
             }, 0L, 1000L)
 
@@ -908,11 +895,19 @@ class RadioService : MediaBrowserServiceCompat() {
                putInt(RECORDING_CHANNELS_COUNT, recChannelsCount)
                putLong(RECORDING_TIMESTAMP, System.currentTimeMillis())
            }.apply()
+
+
+            radioNotificationManager.updateForStartRecording()
+
+
         }
 
         override fun onStopRecording(record: IExoRecord.Record) {
 
-            NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
+//            NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
+
+
+            radioNotificationManager.updateForStopRecording()
 
             timer.cancel()
             isConverterWorking = true
@@ -1016,7 +1011,7 @@ class RadioService : MediaBrowserServiceCompat() {
         }
     }
 
-    private fun stopRecording () = serviceScope.launch {
+    fun stopRecording () = serviceScope.launch {
        if(!isConverterWorking){
            exoRecord.stopRecording()
        }
@@ -1025,6 +1020,7 @@ class RadioService : MediaBrowserServiceCompat() {
     fun invalidateNotification(){
         mediaSessionConnector.invalidateMediaSessionQueue()
         mediaSessionConnector.invalidateMediaSessionMetadata()
+        radioNotificationManager.resetBookmarkIcon()
         radioNotificationManager.updateNotification()
     }
 
@@ -1234,7 +1230,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
             Log.d("CHECKTAGS", "not playing")
 
-            NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
+//            NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
 
             radioNotificationManager.removeNotification()
 
@@ -1257,7 +1253,7 @@ class RadioService : MediaBrowserServiceCompat() {
             }
 
 
-            NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
+//            NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
             radioSource.subscribeToFavouredStations.removeObserver(observerForDatabase)
             radioSource.allRecordingsLiveData.removeObserver(observerForRecordings)
 

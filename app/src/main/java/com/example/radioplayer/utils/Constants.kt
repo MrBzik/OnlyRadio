@@ -34,8 +34,8 @@ object Constants {
     const val NOTIFICATION_ID = 1
     const val CHANNEL_ID = "radio"
 
-    const val RECORDING_CHANNEL_ID = "recording channel"
-    const val RECORDING_NOTIFICATION_ID = 7
+//    const val RECORDING_CHANNEL_ID = "recording channel"
+//    const val RECORDING_NOTIFICATION_ID = 7
 
 
 
