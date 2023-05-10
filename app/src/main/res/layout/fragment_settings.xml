@@ -16,24 +16,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <View
+        android:id="@+id/viewSeparator"
+        android:layout_width="2dp"
+        android:layout_height="60dp"
+        android:background="@drawable/gradient_for_separators"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+
     <TextView
         android:id="@+id/tvSettingsTitle"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="17dp"
-        android:text="Options"
-        android:textAppearance="@style/mainTextTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
-    <TextView
-        android:id="@+id/tvSettingsTitleDay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="17dp"
-        android:text="Options"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:text="General"
         android:textAppearance="@style/mainTextTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -86,30 +84,30 @@
 <!--                app:layout_constraintTop_toTopOf="@+id/tvCastAudio" />-->
 
 
-            <TextView
-                android:id="@+id/tvChangePlayers"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:text="Shortcut to audio settings"
-                android:textAppearance="@style/dialogItemText"
-                app:layout_constraintEnd_toStartOf="@+id/btnAudioSettings"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+<!--            <TextView-->
+<!--                android:id="@+id/tvChangePlayers"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="20dp"-->
+<!--                android:layout_marginTop="20dp"-->
+<!--                android:text="Shortcut to audio settings"-->
+<!--                android:textAppearance="@style/dialogItemText"-->
+<!--                app:layout_constraintEnd_toStartOf="@+id/btnAudioSettings"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent" />-->
 
-            <Button
-                android:id="@+id/btnAudioSettings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:minHeight="48dp"
-                android:text="Go"
-                app:layout_constraintBottom_toBottomOf="@+id/tvChangePlayers"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/tvChangePlayers"
-                app:thumbTint="@color/switch_thumb_color"
-                app:trackTint="@color/switch_track_color" />
+<!--            <Button-->
+<!--                android:id="@+id/btnAudioSettings"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginEnd="10dp"-->
+<!--                android:minHeight="48dp"-->
+<!--                android:text="Go"-->
+<!--                app:layout_constraintBottom_toBottomOf="@+id/tvChangePlayers"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="@+id/tvChangePlayers"-->
+<!--                app:thumbTint="@color/switch_thumb_color"-->
+<!--                app:trackTint="@color/switch_track_color" />-->
 
 
 
@@ -118,11 +116,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="20dp"
                 android:text="Reconnect to streams"
                 android:textAppearance="@style/dialogItemText"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvChangePlayers" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/switchReconnect"
@@ -162,29 +160,29 @@
                 app:thumbTint="@color/switch_thumb_color"
                 app:trackTint="@color/switch_track_color" />
 
-            <TextView
-                android:id="@+id/tvNightModePref"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="30dp"
-                android:text="Dark mode on start"
-                android:textAppearance="@style/dialogItemText"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvNightMode" />
+<!--            <TextView-->
+<!--                android:id="@+id/tvNightModePref"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="20dp"-->
+<!--                android:layout_marginTop="30dp"-->
+<!--                android:text="Dark mode on start"-->
+<!--                android:textAppearance="@style/dialogItemText"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/tvNightMode" />-->
 
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/switchNightModePref"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:minHeight="48dp"
-                app:layout_constraintBottom_toBottomOf="@+id/tvNightModePref"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/tvNightModePref"
-                app:thumbTint="@color/switch_thumb_color"
-                app:trackTint="@color/switch_track_color" />
+<!--            <androidx.appcompat.widget.SwitchCompat-->
+<!--                android:id="@+id/switchNightModePref"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginEnd="10dp"-->
+<!--                android:minHeight="48dp"-->
+<!--                app:layout_constraintBottom_toBottomOf="@+id/tvNightModePref"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="@+id/tvNightModePref"-->
+<!--                app:thumbTint="@color/switch_thumb_color"-->
+<!--                app:trackTint="@color/switch_track_color" />-->
 
 
 
@@ -197,7 +195,7 @@
                 android:text="Auto search by name"
                 android:textAppearance="@style/dialogItemText"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvNightModePref" />
+                app:layout_constraintTop_toBottomOf="@+id/tvNightMode" />
 
 
 

@@ -21,7 +21,6 @@ import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.BufferSettingsDialog
 import com.example.radioplayer.ui.dialogs.HistoryOptionsDialog
-import com.example.radioplayer.ui.dialogs.HistorySettingsDialog
 import com.example.radioplayer.ui.dialogs.RecordingSettingsDialog
 import com.example.radioplayer.ui.viewmodels.BluetoothViewModel
 import com.example.radioplayer.utils.Constants.BUFFER_PREF
@@ -43,13 +42,6 @@ const val REC_VERY_HIGH = "Very high"
 const val REC_SUPER = "Super high"
 const val REC_ULTRA = "Ultra high"
 const val REC_MAXIMUM = "Maximum"
-
-const val HISTORY_STRING_ONE_DAY = "One day"
-const val HISTORY_STRING_3_DATES = "3 dates"
-const val HISTORY_STRING_7_DATES = "7 dates"
-const val HISTORY_STRING_15_DATES = "15 dates"
-const val HISTORY_STRING_21_DATES = "21 dates"
-const val HISTORY_STRING_30_DATES = "30 dates"
 
 
 class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
@@ -79,12 +71,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         REC_SUPER, REC_ULTRA, REC_MAXIMUM)
     }
 
-//    private val listOfHistoryOptions : List<String> by lazy { listOf(
-//        HISTORY_STRING_ONE_DAY, HISTORY_STRING_3_DATES, HISTORY_STRING_7_DATES,
-//        HISTORY_STRING_15_DATES, HISTORY_STRING_21_DATES, HISTORY_STRING_30_DATES)
-//    }
-
-//    private var isNightMode = false
 
     private val bluetoothViewModel : BluetoothViewModel by lazy{
         ViewModelProvider(requireActivity())[BluetoothViewModel::class.java]
@@ -97,17 +83,11 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         getInitialUiMode()
 
-        getInitialNightModeOnStartPref()
-
-//        getInitialHistoryOptionValue()
-
         setReconnectButton()
 
         setForegroundPrefButton()
 
         setSwitchNightModeListener()
-
-        setSwitchNightModePrefListener()
 
         setupRecSettingClickListener()
 
@@ -127,7 +107,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
 //        setBluetoothDialog()
 
-        openAudioSettings()
 
         setBufferSettingsClickListener()
 
@@ -278,17 +257,17 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
 
 
-    private fun openAudioSettings(){
-
-        bind.btnAudioSettings.setOnClickListener {
-
-            val intent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
-
-            if(intent.resolveActivity(requireContext().packageManager) != null){
-                startActivity(intent)
-            }
-        }
-    }
+//    private fun openAudioSettings(){
+//
+//        bind.btnAudioSettings.setOnClickListener {
+//
+//            val intent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
+//
+//            if(intent.resolveActivity(requireContext().packageManager) != null){
+//                startActivity(intent)
+//            }
+//        }
+//    }
 
 
 //
@@ -362,7 +341,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
             val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_settings_frag)
 //            val colorStatus = ContextCompat.getColor(requireContext(), R.color.status_bar_settings_frag)
 
-            bind.tvSettingsTitle.visibility = View.GONE
+          bind.viewSeparator.visibility = View.GONE
 
             if(!mainViewModel.isSmoothTransitionNeeded){
 
@@ -374,8 +353,8 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         } else {
             bind.viewToolbar.setBackgroundColor(Color.BLACK)
+            bind.viewSeparator.visibility = View.VISIBLE
 
-            bind.tvSettingsTitleDay.visibility = View.GONE
         }
     }
 
@@ -529,70 +508,35 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
     }
 
 
-    private fun setSwitchNightModePrefListener(){
+//    private fun setSwitchNightModePrefListener(){
+//
+//        bind.switchNightModePref.setOnCheckedChangeListener { _, isChecked ->
+//
+//                darkModePref.edit().putBoolean(DARK_MODE_PREF, isChecked).apply()
+//
+//        }
+//
+//    }
 
-        bind.switchNightModePref.setOnCheckedChangeListener { _, isChecked ->
-
-                darkModePref.edit().putBoolean(DARK_MODE_PREF, isChecked).apply()
-
-        }
-
-    }
-
-    private fun getInitialNightModeOnStartPref(){
-
-        val isChecked = darkModePref.getBoolean(DARK_MODE_PREF, false)
-
-        bind.switchNightModePref.isChecked = isChecked
-
-    }
+//    private fun getInitialNightModeOnStartPref(){
+//
+//        val isChecked = darkModePref.getBoolean(DARK_MODE_PREF, false)
+//
+//        bind.switchNightModePref.isChecked = isChecked
+//
+//    }
 
 
     private fun historySettingsClickListener(){
 
         bind.tvHistorySettingValue.setOnClickListener {
 
-//            HistorySettingsDialog(listOfHistoryOptions,
-//                listOfHistoryOptions.indexOf(bind.tvHistorySettingValue.text),
-//                requireContext(), databaseViewModel,
-//            )
-//
-//            { newOption ->
-//
-//                val toString = historyOptionToString(newOption)
-//                bind.tvHistorySettingValue.text = toString
-//
-//            }.show()
-
-
-            HistoryOptionsDialog(requireContext(), historyPref, databaseViewModel).show()
+            HistoryOptionsDialog(requireContext(), historyPref, databaseViewModel, mainViewModel).show()
 
         }
     }
 
 
-//    fun historyOptionToString(option : Int) : String{
-//
-//        return when(option){
-//            1 -> HISTORY_STRING_ONE_DAY
-//            3 -> HISTORY_STRING_3_DATES
-//            7 -> HISTORY_STRING_7_DATES
-//            15 -> HISTORY_STRING_15_DATES
-//            21 -> HISTORY_STRING_21_DATES
-//            else -> HISTORY_STRING_30_DATES
-//        }
-//
-//    }
-
-//    private fun getInitialHistoryOptionValue(){
-//
-//        val option = databaseViewModel.getHistoryOptionsPref()
-//
-//        val toString = historyOptionToString(option)
-//
-//        bind.tvHistorySettingValue.text = toString
-//
-//    }
 
     private fun updateRecordingSettingValue(){
 
@@ -709,12 +653,10 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         when(MainActivity.uiMode){
             Configuration.UI_MODE_NIGHT_YES -> {
                 bind.switchNightMode.isChecked = true
-//                isNightMode = true
             }
 
             Configuration.UI_MODE_NIGHT_NO -> {
                 bind.switchNightMode.isChecked = false
-//                isNightMode = false
             }
         }
     }

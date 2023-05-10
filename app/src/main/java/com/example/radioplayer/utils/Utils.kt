@@ -86,6 +86,34 @@ object Utils {
         val day = calendar.get(Calendar.DAY_OF_MONTH)
         val month = calendar.get(Calendar.MONTH)
 
+        result.append("$day of ")
+        result.append(
+            when(month){
+                0 -> "Jan"
+                1 -> "Feb"
+                2 -> "Mar"
+                3 -> "Apr"
+                4 -> "May"
+                5 -> "Jun"
+                6 -> "Jul"
+                7 -> "Aug"
+                8 -> "Sep"
+                9 -> "Oct"
+                10 -> "Nov"
+                else -> "Dec"
+            }
+        )
+
+        return result.toString()
+    }
+
+
+
+    fun fromDateToStringShortWithTime(calendar: Calendar) : String{
+
+        val result = StringBuilder()
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        val month = calendar.get(Calendar.MONTH)
 
         result.append("$day of ")
         result.append(
@@ -106,7 +134,15 @@ object Utils {
         )
 
 
+        val hour = calendar.get(Calendar.HOUR)
+        val minutes = calendar.get(Calendar.MINUTE)
+        val seconds = calendar.get(Calendar.SECOND)
+
+        result.append(", $hour:$minutes:$seconds")
+
+
         return result.toString()
+
     }
 
 

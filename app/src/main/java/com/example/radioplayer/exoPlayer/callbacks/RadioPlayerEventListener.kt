@@ -16,6 +16,7 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.Constants.TITLE_UNKNOWN
 import com.example.radioplayer.utils.toRadioStation
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.metadata.Metadata
 
 class RadioPlayerEventListener (
     private val radioService : RadioService
@@ -93,7 +94,7 @@ class RadioPlayerEventListener (
 
             SEARCH_FROM_API -> {
                 station = radioService.radioSource.stationsFromApi[index].toRadioStation()
-
+                radioService.insertRadioStation(station)
 
             }
 
@@ -117,7 +118,15 @@ class RadioPlayerEventListener (
             }
         }
 
-        station?.let { radioService.currentRadioStation = it }
+        station?.let { radioService.currentRadioStation = it
+
+            if(RadioService.currentPlaylist != SEARCH_FROM_RECORDINGS){
+
+                radioService.checkDateAndUpdateHistory(it.stationuuid)
+
+            }
+
+        }
 
 
 
@@ -164,7 +173,6 @@ class RadioPlayerEventListener (
 //        }
 
     }
-
 
 
 

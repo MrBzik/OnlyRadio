@@ -6,9 +6,12 @@ package com.example.radioplayer.ui.fragments
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.text.format.Formatter
+import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.R
@@ -20,6 +23,11 @@ import com.example.radioplayer.ui.dialogs.RenameRecordingDialog
 import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.util.*
 import javax.inject.Inject
 
 
@@ -37,7 +45,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
     private var isRecordingToUpdate = false
 
-
+    private val calendar = Calendar.getInstance()
 
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -165,6 +173,19 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
             updateUiForRecording(it)
 
             bind.seekBar.max = it.durationMills.toInt()
+
+            lifecycleScope.launch(Dispatchers.IO){
+                val filePath = requireContext().filesDir.path + "/" + it.id
+                val file = File(filePath)
+                val length = Formatter.formatFileSize(requireContext(), file.length())
+                withContext(Dispatchers.Main){
+                    bind.tvOccupiedSpace.text = length
+                }
+            }
+
+            calendar.time = Date(it.timeStamp)
+
+           bind.tvDate.text = Utils.fromDateToStringShortWithTime(calendar)
 
 
         }

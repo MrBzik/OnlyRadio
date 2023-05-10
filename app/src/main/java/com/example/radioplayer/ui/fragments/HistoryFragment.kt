@@ -866,7 +866,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             mainViewModel.playOrToggleStation(station, flag,
                 itemIndex = position, historyItemId = station.stationuuid)
-            databaseViewModel.checkDateAndUpdateHistory(station.stationuuid)
 
         }
     }

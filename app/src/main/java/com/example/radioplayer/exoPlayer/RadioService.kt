@@ -1,8 +1,6 @@
 package com.example.radioplayer.exoPlayer
 
 import android.animation.ValueAnimator
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
@@ -10,23 +8,19 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.media.audiofx.EnvironmentalReverb
 import android.media.audiofx.Virtualizer
-import android.os.Build
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.media.MediaBrowserServiceCompat
 import com.bumptech.glide.RequestManager
-import com.example.radioplayer.data.local.entities.BookmarkedTitle
-import com.example.radioplayer.data.local.entities.RadioStation
-import com.example.radioplayer.data.local.entities.Recording
-import com.example.radioplayer.data.local.entities.Title
+import com.example.radioplayer.data.local.entities.*
+import com.example.radioplayer.data.local.relations.StationDateCrossRef
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlaybackPreparer
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerNotificationListener
@@ -36,6 +30,7 @@ import com.example.radioplayer.utils.Constants.BUFFER_PREF
 import com.example.radioplayer.utils.Constants.BUFFER_SIZE_IN_MILLS
 import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_BASS_LEVEL
 import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_REVERB_MODE
+import com.example.radioplayer.utils.Constants.COMMAND_COMPARE_DATES_PREF_AND_CLEAN
 
 import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
@@ -44,13 +39,15 @@ import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
 
 import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_CURRENT_PLAYING_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_RESTART_PLAYER
-import com.example.radioplayer.utils.Constants.COMMAND_STOP_SERVICE
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_REC_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.FOREGROUND_PREF
+import com.example.radioplayer.utils.Constants.HISTORY_BOOKMARK_PREF_DEFAULT
+import com.example.radioplayer.utils.Constants.HISTORY_DATES_PREF_DEFAULT
 import com.example.radioplayer.utils.Constants.HISTORY_PREF
 import com.example.radioplayer.utils.Constants.HISTORY_PREF_BOOKMARK
+import com.example.radioplayer.utils.Constants.HISTORY_PREF_DATES
 import com.example.radioplayer.utils.Constants.IS_ADAPTIVE_LOADER_TO_USE
 import com.example.radioplayer.utils.Constants.RECONNECT_PREF
 
@@ -82,6 +79,7 @@ import dev.brookmg.exorecord.lib.ExoRecord
 import dev.brookmg.exorecord.lib.IExoRecord
 import dev.brookmg.exorecordogg.ExoRecordOgg
 import kotlinx.coroutines.*
+import java.sql.Date
 import java.util.*
 import javax.inject.Inject
 
@@ -141,11 +139,17 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private lateinit var radioPlayerEventListener: RadioPlayerEventListener
 
+    private val historySettingsPref by lazy{
+        this@RadioService.getSharedPreferences(HISTORY_PREF, Context.MODE_PRIVATE)
+    }
+
     var isForegroundService = false
 
 
     private var isPlayerInitialized = false
 
+    private var initialDate = ""
+    private val calendar = Calendar.getInstance()
 
 
     private val recordingCheck : SharedPreferences by lazy {
@@ -181,6 +185,10 @@ class RadioService : MediaBrowserServiceCompat() {
     var lastInsertedSong = ""
 
     companion object{
+
+        var isCleanUpNeeded = false
+        var historyDatesPref = 3
+        var historyPrefBookmark = 20
 
         var currentlyPlaingSong = TITLE_UNKNOWN
 //        var currentStation : MediaMetadataCompat? = null
@@ -384,6 +392,10 @@ class RadioService : MediaBrowserServiceCompat() {
                 COMMAND_CHANGE_BASS_LEVEL -> {
                     changeVirtualizerLevel()
                 }
+
+                COMMAND_COMPARE_DATES_PREF_AND_CLEAN -> {
+                    compareDatesWithPrefAndCLeanIfNeeded(null)
+                }
             }
         })
 
@@ -418,6 +430,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
         isToKillServiceOnAppClose = this@RadioService.getSharedPreferences(
             FOREGROUND_PREF, Context.MODE_PRIVATE).getBoolean(FOREGROUND_PREF, false)
+
+        initialHistoryPref()
 
     }
 
@@ -472,12 +486,9 @@ class RadioService : MediaBrowserServiceCompat() {
 
             val count = databaseRepository.countBookmarkedTitles()
 
-            val limit = this@RadioService.getSharedPreferences(HISTORY_PREF, Context.MODE_PRIVATE)
-                .getInt(HISTORY_PREF_BOOKMARK, 20)
+            if(count > historyPrefBookmark && historyPrefBookmark != 100){
 
-            if(count > limit && limit != 100){
-
-                val bookmark = databaseRepository.getLastValidBookmarkedTitle(limit -1)
+                val bookmark = databaseRepository.getLastValidBookmarkedTitle(historyPrefBookmark -1)
 
                 databaseRepository.cleanBookmarkedTitles(bookmark.timeStamp)
             }
@@ -1324,6 +1335,74 @@ class RadioService : MediaBrowserServiceCompat() {
 //               }
 //           }
 //       }
+    }
+
+
+    fun insertRadioStation(station : RadioStation) = serviceScope.launch(Dispatchers.IO){
+
+        databaseRepository.insertRadioStation(station)
+
+    }
+
+    private fun initialHistoryPref(){
+        historyDatesPref = historySettingsPref.getInt(HISTORY_PREF_DATES, HISTORY_DATES_PREF_DEFAULT
+        )
+        historyPrefBookmark = historySettingsPref.getInt(HISTORY_PREF_BOOKMARK, HISTORY_BOOKMARK_PREF_DEFAULT)
+    }
+
+
+
+    fun checkDateAndUpdateHistory(stationID: String) = serviceScope.launch(Dispatchers.IO) {
+
+        val newTime = System.currentTimeMillis()
+        calendar.time = Date(newTime)
+        val update = Utils.fromDateToString(calendar)
+
+        if(initialDate.isBlank()){
+
+            val date = databaseRepository.getLastDate()
+            date?.let {
+                initialDate = it.date
+                currentDateLong = it.time
+            }
+        }
+
+        if (update == initialDate) {/*DO NOTHING*/
+            Log.d("CHECKTAGS", "update is $update")
+        } else {
+            initialDate = update
+
+            currentDateLong = newTime
+            compareDatesWithPrefAndCLeanIfNeeded(HistoryDate(update, newTime))
+        }
+
+        databaseRepository.insertStationDateCrossRef(StationDateCrossRef(stationID, update))
+
+    }
+
+
+    private fun compareDatesWithPrefAndCLeanIfNeeded(newDate: HistoryDate?)
+            = serviceScope.launch(Dispatchers.IO) {
+
+        newDate?.let {
+            databaseRepository.insertNewDate(newDate)
+        }
+
+
+        val numberOfDatesInDB =  databaseRepository.getNumberOfDates()
+
+        if(historyDatesPref >= numberOfDatesInDB) return@launch
+        else {
+            isCleanUpNeeded = true
+            val numberOfDatesToDelete = numberOfDatesInDB - historyDatesPref
+            val deleteList = databaseRepository.getDatesToDelete(numberOfDatesToDelete)
+
+            deleteList.forEach {
+                databaseRepository.deleteAllCrossRefWithDate(it.date)
+                databaseRepository.deleteDate(it)
+                databaseRepository.deleteTitlesWithDate(it.time)
+            }
+        }
     }
 
 

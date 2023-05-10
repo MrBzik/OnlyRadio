@@ -8,8 +8,10 @@ import android.view.View
 import androidx.core.view.isVisible
 
 import com.example.radioplayer.databinding.DialogHistoryOptionsBinding
+import com.example.radioplayer.exoPlayer.RadioService
 
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
+import com.example.radioplayer.ui.viewmodels.MainViewModel
 
 import com.example.radioplayer.utils.Constants.HISTORY_PREF_BOOKMARK
 import com.example.radioplayer.utils.Constants.HISTORY_PREF_DATES
@@ -19,15 +21,16 @@ import com.google.android.material.slider.RangeSlider
 class HistoryOptionsDialog (
     private val requireContext : Context,
     private val historyPref : SharedPreferences,
-    private val databaseViewModel: DatabaseViewModel
+    private val databaseViewModel: DatabaseViewModel,
+    private val mainViewModel: MainViewModel
         ) : BaseDialog<DialogHistoryOptionsBinding> (
             requireContext,
     DialogHistoryOptionsBinding::inflate
                 ){
 
 
-    private val initialDatesNumber = databaseViewModel.historyPrefDates
-    private val initialBookmarkNumber =  databaseViewModel.historyPrefBookmark
+    private val initialDatesNumber = RadioService.historyDatesPref
+    private val initialBookmarkNumber =  RadioService.historyPrefBookmark
 
     private var newDatesNumber = initialDatesNumber
     private var newBookmarkNumber = initialBookmarkNumber
@@ -156,7 +159,7 @@ class HistoryOptionsDialog (
 
                historyPref.edit().putInt(HISTORY_PREF_BOOKMARK, newBookmarkNumber).apply()
 
-               databaseViewModel.historyPrefBookmark = newBookmarkNumber
+               RadioService.historyPrefBookmark = newBookmarkNumber
 
                if(newBookmarkNumber < initialBookmarkNumber){
                    databaseViewModel.checkAndCleanBookmarkTitles()
@@ -168,10 +171,10 @@ class HistoryOptionsDialog (
             if(newDatesNumber != initialDatesNumber){
 
                historyPref.edit().putInt(HISTORY_PREF_DATES, newDatesNumber).apply()
-               databaseViewModel.historyPrefDates = newDatesNumber
+               RadioService.historyDatesPref = newDatesNumber
 
                 if(newDatesNumber < initialDatesNumber){
-                    databaseViewModel.compareDatesWithPrefAndCLeanIfNeeded(null)
+                    mainViewModel.compareDatesWithPrefAndCLeanIfNeeded()
                 }
             }
 

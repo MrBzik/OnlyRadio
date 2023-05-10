@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
 import android.util.Log
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
@@ -16,7 +15,6 @@ import com.example.radioplayer.connectivityObserver.ConnectivityObserver
 import com.example.radioplayer.connectivityObserver.NetworkConnectivityObserver
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.entities.Recording
-import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.ui.dialogs.*
@@ -24,6 +22,7 @@ import com.example.radioplayer.ui.fragments.RadioSearchFragment.Companion.listOf
 import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_BASS_LEVEL
 import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_REVERB_MODE
+import com.example.radioplayer.utils.Constants.COMMAND_COMPARE_DATES_PREF_AND_CLEAN
 
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
@@ -602,8 +601,14 @@ class MainViewModel @Inject constructor(
             radioServiceConnection.sendCommand(COMMAND_UPDATE_RADIO_PLAYBACK_PITCH, null)
         }
 
+        fun compareDatesWithPrefAndCLeanIfNeeded() {
+            radioServiceConnection.sendCommand(COMMAND_COMPARE_DATES_PREF_AND_CLEAN, null)
 
-        // ExoRecord
+         }
+
+
+
+    // ExoRecord
 
         val currentPlayerPosition = RadioService.recordingPlaybackPosition
         val currentRecordingDuration = RadioService.recordingDuration

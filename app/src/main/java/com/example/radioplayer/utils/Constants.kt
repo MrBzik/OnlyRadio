@@ -54,6 +54,9 @@ object Constants {
 
     const val COMMAND_RESTART_PLAYER = "command to recreate player"
 
+    const val COMMAND_COMPARE_DATES_PREF_AND_CLEAN = "command check date and update history"
+
+
     const val COMMAND_PAUSE_PLAYER = "command pause player"
     const val COMMAND_START_PLAYER = "command start player"
 
@@ -78,20 +81,15 @@ object Constants {
 
     // History
 
-    const val HISTORY_OPTIONS = "History options"
-    const val HISTORY_ONE_DAY = 1
-    const val HISTORY_3_DATES = 3
-    const val HISTORY_7_DATES = 7
-    const val HISTORY_15_DATES = 15
-    const val HISTORY_21_DATES = 21
-    const val HISTORY_30_DATES = 30
-
+    const val HISTORY_DATES_PREF_DEFAULT = 3
 
     const val HISTORY_PREF = "history pref"
 
     const val HISTORY_PREF_DATES = "preference for history dates"
 
     const val HISTORY_PREF_BOOKMARK = "pref for bookmarked titles"
+
+    const val HISTORY_BOOKMARK_PREF_DEFAULT = 20
 
 
     const val FULL_DATE_FORMAT = "d 'of' MMMM', 'yyyy"

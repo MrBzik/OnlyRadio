@@ -115,18 +115,15 @@ class RadioSource @Inject constructor(
     suspend fun deleteTitle(title : Title) = radioDAO.deleteTitle(title)
 
 
-    // Bookmarked titles
 
 
-
-
-    suspend fun getStationsInAllDates(limit: Int, offset: Int, initialDate: String): DateWithStations {
+    suspend fun getStationsInAllDates(limit: Int, offset: Int): DateWithStations {
         val response = radioDAO.getStationsInAllDates(limit, offset)
-        val date = response.date.date
+        val date = response.date.time
 
         Log.d("CHECKTAGS", "getting all dates")
 
-        if (date == initialDate) {
+        if (date == RadioService.currentDateLong) {
 
             stationsFromHistory = response.radioStations.reversed().toMutableList()
 

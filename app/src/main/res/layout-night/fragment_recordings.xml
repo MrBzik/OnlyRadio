@@ -15,14 +15,23 @@
         app:layout_constraintTop_toTopOf="parent"
         />
 
+    <View
+        android:layout_width="2dp"
+        android:layout_height="60dp"
+        android:background="@drawable/gradient_for_separators"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+
     <TextView
         android:id="@+id/tvRecTitle"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
         android:gravity="center"
-        android:layout_marginStart="20dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guidelineHorizontal"
         android:textAppearance="@style/mainTextTitle"
         android:text="Recordings"/>
 
@@ -33,10 +42,10 @@
         android:layout_width="wrap_content"
         android:layout_height="60dp"
         android:gravity="center"
-        android:layout_marginEnd="20dp"
         android:text="Swipe-delete"
         android:textAppearance="@style/swipeDeleteStyle"
         android:textColor="@color/color_interactive"
+        app:layout_constraintStart_toStartOf="@+id/guidelineHorizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -73,6 +82,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

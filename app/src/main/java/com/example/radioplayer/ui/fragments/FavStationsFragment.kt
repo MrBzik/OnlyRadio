@@ -498,7 +498,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         mainAdapter.setOnClickListener { station, position ->
 
             mainViewModel.playOrToggleStation(station, searchFlag, itemIndex = position)
-            databaseViewModel.checkDateAndUpdateHistory(station.stationuuid)
+
         }
     }
 

@@ -26,6 +26,7 @@ import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
+import com.example.radioplayer.ui.animations.PagerZoomOutSlideTransformer
 import com.example.radioplayer.ui.animations.reduceDragSensitivity
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.AddStationToPlaylistDialog
@@ -226,6 +227,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             adapter = viewPagerAdapter
             orientation = ORIENTATION_HORIZONTAL
             offscreenPageLimit = 1
+            setPageTransformer(PagerZoomOutSlideTransformer())
             reduceDragSensitivity(2)
 
         }

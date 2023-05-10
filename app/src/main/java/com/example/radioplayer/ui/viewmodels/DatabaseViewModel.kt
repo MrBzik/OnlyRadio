@@ -14,8 +14,8 @@ import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.repositories.DatabaseRepository
-import com.example.radioplayer.utils.Constants.HISTORY_3_DATES
-import com.example.radioplayer.utils.Constants.HISTORY_OPTIONS
+import com.example.radioplayer.utils.Constants.HISTORY_BOOKMARK_PREF_DEFAULT
+import com.example.radioplayer.utils.Constants.HISTORY_DATES_PREF_DEFAULT
 import com.example.radioplayer.utils.Constants.HISTORY_PREF
 import com.example.radioplayer.utils.Constants.HISTORY_PREF_BOOKMARK
 import com.example.radioplayer.utils.Constants.HISTORY_PREF_DATES
@@ -50,7 +50,7 @@ class DatabaseViewModel @Inject constructor(
 
     var currentPlaylistName: MutableLiveData<String> = MutableLiveData("")
 
-    var isCleanUpNeeded = false
+
 
 
 
@@ -65,9 +65,9 @@ class DatabaseViewModel @Inject constructor(
 
 
 
-    fun insertRadioStation(station: RadioStation) = viewModelScope.launch {
-        repository.insertRadioStation(station)
-    }
+//    fun insertRadioStation(station: RadioStation) = viewModelScope.launch {
+//        repository.insertRadioStation(station)
+//    }
 
     fun insertNewPlayList(playlist: Playlist) = viewModelScope.launch {
         repository.insertNewPlaylist(playlist)
@@ -191,44 +191,8 @@ class DatabaseViewModel @Inject constructor(
 
 
 
-    // date
 
-
-
-    var initialDate: String = ""
-    private val calendar = Calendar.getInstance()
-
-
-    fun checkDateAndUpdateHistory(stationID: String) = viewModelScope.launch {
-
-        val newTime = System.currentTimeMillis()
-        calendar.time = Date(newTime)
-        val update = fromDateToString(calendar)
-
-        if(initialDate.isBlank()){
-
-            val date = repository.getLastDate()
-            date?.let {
-                initialDate = it.date
-                RadioService.currentDateLong = it.time
-            }
-        }
-
-        if (update == initialDate) {/*DO NOTHING*/
-            Log.d("CHECKTAGS", "update is $update")
-        } else {
-            initialDate = update
-
-            RadioService.currentDateLong = newTime
-            compareDatesWithPrefAndCLeanIfNeeded(HistoryDate(update, newTime))
-        }
-
-         repository.insertStationDateCrossRef(StationDateCrossRef(stationID, update))
-
-    }
-
-
-    // For RecyclerView
+    // Dates for RecyclerView
 
     val listOfDates = repository.getListOfDates
 
@@ -238,7 +202,7 @@ class DatabaseViewModel @Inject constructor(
 
         Log.d("CHECKTAGS", "getting all stations")
 
-        val response = radioSource.getStationsInAllDates(limit, offset, initialDate)
+        val response = radioSource.getStationsInAllDates(limit, offset)
 
         val date = response.date.date
 
@@ -537,55 +501,14 @@ class DatabaseViewModel @Inject constructor(
 
         val count = repository.countBookmarkedTitles()
 
-        if(count > historyPrefBookmark && historyPrefBookmark != 100){
+        if(count > RadioService.historyPrefBookmark && RadioService.historyPrefBookmark != 100){
 
-            val bookmark = repository.getLastValidBookmarkedTitle(historyPrefBookmark -1)
+            val bookmark = repository.getLastValidBookmarkedTitle(RadioService.historyPrefBookmark -1)
 
             repository.cleanBookmarkedTitles(bookmark.timeStamp)
 
         }
-
-
     }
-
-
-
-    // Handle history options and cleaning history
-
-//    private val historyOptionsPref = app.getSharedPreferences(HISTORY_OPTIONS, Context.MODE_PRIVATE)
-
-    private val historySettingsPref = app.getSharedPreferences(HISTORY_PREF, Context.MODE_PRIVATE)
-
-    var historyPrefDates = historySettingsPref.getInt(HISTORY_PREF_DATES, 3)
-
-    var historyPrefBookmark = historySettingsPref.getInt(HISTORY_PREF_BOOKMARK, 20)
-
-
-
-    fun compareDatesWithPrefAndCLeanIfNeeded(newDate: HistoryDate?)
-            = viewModelScope.launch {
-
-        newDate?.let {
-            repository.insertNewDate(newDate)
-        }
-
-
-        val numberOfDatesInDB =  repository.getNumberOfDates()
-
-        if(historyPrefDates >= numberOfDatesInDB) return@launch
-        else {
-            isCleanUpNeeded = true
-            val numberOfDatesToDelete = numberOfDatesInDB - historyPrefDates
-            val deleteList = repository.getDatesToDelete(numberOfDatesToDelete)
-
-            deleteList.forEach {
-                repository.deleteAllCrossRefWithDate(it.date)
-                repository.deleteDate(it)
-                repository.deleteTitlesWithDate(it.time)
-            }
-        }
-    }
-
 
 
 
@@ -593,7 +516,7 @@ class DatabaseViewModel @Inject constructor(
 
     fun removeUnusedStations() = viewModelScope.launch {
 
-        if(isCleanUpNeeded){
+        if(RadioService.isCleanUpNeeded){
 
             val stations = repository.gatherStationsForCleaning()
 
@@ -612,7 +535,7 @@ class DatabaseViewModel @Inject constructor(
                     }
                 }
 
-            isCleanUpNeeded = false
+            RadioService.isCleanUpNeeded
         }
     }
 
