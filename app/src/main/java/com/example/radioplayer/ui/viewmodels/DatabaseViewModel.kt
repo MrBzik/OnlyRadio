@@ -1,7 +1,6 @@
 package com.example.radioplayer.ui.viewmodels
 
 import android.app.Application
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
 import androidx.paging.*
@@ -9,17 +8,17 @@ import com.example.radioplayer.adapters.datasources.*
 import com.example.radioplayer.adapters.models.StationWithDateModel
 import com.example.radioplayer.adapters.models.TitleWithDateModel
 import com.example.radioplayer.data.local.entities.*
-import com.example.radioplayer.data.local.relations.StationDateCrossRef
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.exoPlayer.RadioService
+import com.example.radioplayer.exoPlayer.RadioServiceConnection
 import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.repositories.DatabaseRepository
-import com.example.radioplayer.utils.Constants.HISTORY_BOOKMARK_PREF_DEFAULT
-import com.example.radioplayer.utils.Constants.HISTORY_DATES_PREF_DEFAULT
-import com.example.radioplayer.utils.Constants.HISTORY_PREF
-import com.example.radioplayer.utils.Constants.HISTORY_PREF_BOOKMARK
-import com.example.radioplayer.utils.Constants.HISTORY_PREF_DATES
+import com.example.radioplayer.utils.Constants
+import com.example.radioplayer.utils.Constants.COMMAND_ON_DROP_STATION_IN_PLAYLIST
+import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_HISTORY_MEDIA_ITEMS
+import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Utils.fromDateToString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -32,7 +31,8 @@ import javax.inject.Inject
 class DatabaseViewModel @Inject constructor(
         private val app : Application,
         private val repository: DatabaseRepository,
-        private val radioSource: RadioSource
+        private val radioSource: RadioSource,
+        private val radioServiceConnection: RadioServiceConnection
 ) : AndroidViewModel(app) {
 
 
@@ -71,6 +71,28 @@ class DatabaseViewModel @Inject constructor(
 
     fun insertNewPlayList(playlist: Playlist) = viewModelScope.launch {
         repository.insertNewPlaylist(playlist)
+    }
+
+
+    fun checkAndInsertStationPlaylistCrossRef(stationID: String, playlistName: String,
+                    resultHandler : (Boolean) -> Unit)
+        = viewModelScope.launch {
+
+        val check = repository.checkIfAlreadyInPlaylist(stationID, playlistName)
+
+        resultHandler(check)
+
+        if(!check){
+            repository.insertStationPlaylistCrossRef(
+                StationPlaylistCrossRef(
+                stationID, playlistName, System.currentTimeMillis()
+                )
+            )
+        }
+    }
+
+    fun addMediaItemOnDropToPlaylist(){
+        radioServiceConnection.sendCommand(COMMAND_ON_DROP_STATION_IN_PLAYLIST, null)
     }
 
 
@@ -200,9 +222,12 @@ class DatabaseViewModel @Inject constructor(
 
     private suspend fun getStationsInDate(limit: Int, offset: Int): List<StationWithDateModel> {
 
-        Log.d("CHECKTAGS", "getting all stations")
-
         val response = radioSource.getStationsInAllDates(limit, offset)
+
+        if(RadioService.currentMediaItems == SEARCH_FROM_HISTORY){
+            radioServiceConnection.sendCommand(COMMAND_UPDATE_HISTORY_MEDIA_ITEMS, null)
+        }
+
 
         val date = response.date.date
 
@@ -221,15 +246,23 @@ class DatabaseViewModel @Inject constructor(
 
     private suspend fun getStationsInOneDate() : List<StationWithDateModel> {
 
-        Log.d("CHECKTAGS", "getting stations in one date")
-
         val response = radioSource.getStationsInOneDate(selectedDate)
 
         val stationsWithDate: MutableList<StationWithDateModel> = mutableListOf()
 
-        response.radioStations.reversed().forEach {
+        response.forEach {
             stationsWithDate.add(StationWithDateModel.Station(it))
         }
+
+
+        if(selectedDate == RadioService.currentDateLong &&
+            RadioService.currentMediaItems == Constants.SEARCH_FROM_HISTORY_ONE_DATE
+        ){
+            RadioSource.updateHistoryOneDateStations()
+            radioServiceConnection.sendCommand(COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS, null)
+        }
+
+
         return stationsWithDate
     }
 
@@ -307,6 +340,10 @@ class DatabaseViewModel @Inject constructor(
 
     var isInBookmarksLiveData : MutableLiveData<Boolean> = MutableLiveData(false)
     var isHistoryInStationsTabLiveData : MutableLiveData<Boolean> = MutableLiveData(true)
+
+    var isInBookmarks = false
+    var isInStationsTab = true
+
 
     private val allHistoryLoader : HistoryDateLoader = { dateIndex ->
         getStationsInDate(1, dateIndex)

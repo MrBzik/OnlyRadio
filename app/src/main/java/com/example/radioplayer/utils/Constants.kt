@@ -56,17 +56,37 @@ object Constants {
 
     const val COMMAND_COMPARE_DATES_PREF_AND_CLEAN = "command check date and update history"
 
+    const val COMMAND_UPDATE_FAV_PLAYLIST = "command update fav playlist"
+    const val COMMAND_UPDATE_HISTORY_MEDIA_ITEMS = "command update history mediaitems"
+
+    const val COMMAND_CLEAR_MEDIA_ITEMS = "command clear media items"
+
+    const val COMMAND_CHANGE_MEDIA_ITEMS = "command change media items"
+
+    const val COMMAND_REMOVE_MEDIA_ITEM = "command remove media item"
+    const val COMMAND_ADD_MEDIA_ITEM = "command add media item"
+
+    const val COMMAND_ON_DROP_STATION_IN_PLAYLIST = "command on drop station in playlist"
+
+
+    const val COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS = "command update history one date media items"
 
     const val COMMAND_PAUSE_PLAYER = "command pause player"
     const val COMMAND_START_PLAYER = "command start player"
 
     const val COMMAND_STOP_SERVICE = "command to stop service"
 
+
+
     const val PAGE_SIZE = 10
 
     const val DATABASE_NAME = "radio_stations_db"
 
     const val SEARCH_FLAG = "search flag"
+
+    const val IS_NEW_SEARCH = "is new search"
+
+    const val NO_PLAYLIST = -1
     const val SEARCH_FROM_API = 0
     const val SEARCH_FROM_FAVOURITES = 1
     const val SEARCH_FROM_PLAYLIST = 2
@@ -75,7 +95,7 @@ object Constants {
     const val SEARCH_FROM_RECORDINGS = 5
     const val PLAY_WHEN_READY = "play when ready"
     const val ITEM_INDEX = "index of item"
-    const val HISTORY_ITEM_ID = "id of station from history"
+    const val IS_CHANGE_MEDIA_ITEMS = "id of station from history"
 
     const val TITLE_UNKNOWN = "Playing: no info"
 
@@ -129,6 +149,14 @@ object Constants {
     //Recording preferences
 
     const val RECORDING_QUALITY_PREF = "recording quality pref"
+    const val REC_QUALITY_LOW = 0.1f
+    const val REC_QUALITY_MEDIUM = 0.25f
+    const val REC_QUALITY_DEF = 0.4f
+    const val REC_QUALITY_HIGH = 0.6f
+    const val REC_QUALITY_ULTRA = 0.8f
+    const val REC_QUALITY_MAX = 1f
+
+
 
     // DarkMode pref
 

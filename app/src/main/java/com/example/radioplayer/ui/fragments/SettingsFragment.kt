@@ -21,6 +21,7 @@ import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.BufferSettingsDialog
 import com.example.radioplayer.ui.dialogs.HistoryOptionsDialog
+import com.example.radioplayer.ui.dialogs.RecordingOptionsDialog
 import com.example.radioplayer.ui.dialogs.RecordingSettingsDialog
 import com.example.radioplayer.ui.viewmodels.BluetoothViewModel
 import com.example.radioplayer.utils.Constants.BUFFER_PREF
@@ -30,18 +31,9 @@ import com.example.radioplayer.utils.Constants.HISTORY_PREF
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.RECONNECT_PREF
 import com.example.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
+import com.example.radioplayer.utils.Constants.REC_QUALITY_DEF
+import com.example.radioplayer.utils.RecPref
 
-
-const val REC_LOWEST = "Very light"
-const val REC_LOW = "Light"
-const val REC_MEDIUM = "Medium"
-const val REC_NORMAL = "Normal"
-const val REC_ABOVE_AVERAGE = "Above normal"
-const val REC_HIGH = "High"
-const val REC_VERY_HIGH = "Very high"
-const val REC_SUPER = "Super high"
-const val REC_ULTRA = "Ultra high"
-const val REC_MAXIMUM = "Maximum"
 
 
 class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
@@ -66,12 +58,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
     }
 
 
-    private val listOfRecOptions : List<String> by lazy { listOf(
-        REC_LOWEST, REC_LOW, REC_MEDIUM, REC_NORMAL, REC_ABOVE_AVERAGE, REC_HIGH, REC_VERY_HIGH,
-        REC_SUPER, REC_ULTRA, REC_MAXIMUM)
-    }
-
-
     private val bluetoothViewModel : BluetoothViewModel by lazy{
         ViewModelProvider(requireActivity())[BluetoothViewModel::class.java]
     }
@@ -90,8 +76,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         setSwitchNightModeListener()
 
         setupRecSettingClickListener()
-
-        updateRecordingSettingValue()
 
         historySettingsClickListener()
 
@@ -508,24 +492,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
     }
 
 
-//    private fun setSwitchNightModePrefListener(){
-//
-//        bind.switchNightModePref.setOnCheckedChangeListener { _, isChecked ->
-//
-//                darkModePref.edit().putBoolean(DARK_MODE_PREF, isChecked).apply()
-//
-//        }
-//
-//    }
-
-//    private fun getInitialNightModeOnStartPref(){
-//
-//        val isChecked = darkModePref.getBoolean(DARK_MODE_PREF, false)
-//
-//        bind.switchNightModePref.isChecked = isChecked
-//
-//    }
-
 
     private fun historySettingsClickListener(){
 
@@ -538,77 +504,26 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
 
 
-    private fun updateRecordingSettingValue(){
-
-        val value = recordingQualityPref.getFloat(RECORDING_QUALITY_PREF, 0.4f)
-
-        when(value){
-            0.1f -> {
-                bind.tvRecordingSettingsValue.text = REC_LOWEST
-
-            }
-
-            0.2f  -> {
-                bind.tvRecordingSettingsValue.text = REC_LOW
-
-            }
-
-            0.3f  -> {
-                bind.tvRecordingSettingsValue.text = REC_MEDIUM
-
-            }
-
-            0.4f  -> {
-                bind.tvRecordingSettingsValue.text = REC_NORMAL
-
-            }
-
-            0.5f  -> {
-                bind.tvRecordingSettingsValue.text = REC_ABOVE_AVERAGE
-
-            }
-
-            0.6f  -> {
-                bind.tvRecordingSettingsValue.text = REC_HIGH
-
-            }
-
-            0.7f  -> {
-                bind.tvRecordingSettingsValue.text = REC_VERY_HIGH
-
-            }
-
-            0.8f  -> {
-                bind.tvRecordingSettingsValue.text = REC_SUPER
-
-            }
-
-            0.9f  -> {
-                bind.tvRecordingSettingsValue.text = REC_ULTRA
-
-            }
-
-            1f  -> {
-                bind.tvRecordingSettingsValue.text = REC_MAXIMUM
-
-            }
-        }
-
-
-    }
-
 
 
     private fun setupRecSettingClickListener(){
 
+        val initialValue = RecPref.qualityFloatToInt(
+            recordingQualityPref.getFloat(RECORDING_QUALITY_PREF, REC_QUALITY_DEF)
+        )
+
+        bind.tvRecordingSettingsValue.text = RecPref.setTvRecQualityValue(initialValue)
+
+
         bind.tvRecordingSettingsValue.setOnClickListener {
 
-            RecordingSettingsDialog(
-                listOfRecOptions,
+            RecordingOptionsDialog(
                 recordingQualityPref,
                 requireContext(),
-                ) {
-                updateRecordingSettingValue()
+                ) { newValue ->
+
+                bind.tvRecordingSettingsValue.text = RecPref.setTvRecQualityValue(newValue)
+
             }.show()
 
         }

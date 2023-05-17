@@ -33,6 +33,9 @@ class DatabaseRepository @Inject constructor(
     suspend fun insertStationPlaylistCrossRef (crossRef: StationPlaylistCrossRef)
             = radioDAO.insertStationPlaylistCrossRef(crossRef)
 
+    suspend fun checkIfAlreadyInPlaylist(stationID : String, playlistName : String)
+            = radioDAO.checkIfAlreadyInPlaylist(stationID, playlistName)
+
     suspend fun getTimeOfStationPlaylistInsertion(stationID : String, playlistName : String)
             = radioDAO.getTimeOfStationPlaylistInsertion(stationID, playlistName)
 

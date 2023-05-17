@@ -4,8 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginHorizontal="8dp"
     android:background="@color/main_background">
+
+
+    <TextView
+        android:id="@+id/tvPlaylistTitle"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="3dp"
+        android:paddingHorizontal="8dp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:textAppearance="@style/mainTextTitle"
+        app:layout_constraintEnd_toEndOf="@id/guidelineMid"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <com.google.android.material.button.MaterialButton
@@ -13,16 +27,15 @@
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:backgroundTint="@color/white"
         android:elevation="10dp"
+        android:backgroundTint="@color/white"
         android:text="Add to playlist"
         android:textAppearance="@style/mainTextButtons"
         android:textColor="@color/text_button"
         app:cornerRadius="10dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guidelineMid"
         app:layout_constraintTop_toTopOf="parent" />
-
 
     <LinearLayout
         android:id="@+id/llSongTitle"
@@ -98,7 +111,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/fabAddToFav"
-        app:layout_constraintTop_toBottomOf="@+id/llSongTitle"></androidx.viewpager2.widget.ViewPager2>
+        app:layout_constraintTop_toBottomOf="@+id/llSongTitle"/>
 
 
     <!--    <ImageView-->
@@ -222,6 +235,17 @@
         app:layout_constraintBottom_toBottomOf="@+id/fabRecording"
         app:layout_constraintStart_toEndOf="@+id/fabRecording"
         app:layout_constraintTop_toTopOf="@+id/fabRecording" />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineMid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_percent="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

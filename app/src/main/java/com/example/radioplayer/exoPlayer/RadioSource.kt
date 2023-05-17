@@ -20,8 +20,13 @@ import com.example.radioplayer.utils.Constants.API_RADIO_LANGUAGES
 import com.example.radioplayer.utils.Constants.API_RADIO_SEARCH_URL
 import com.example.radioplayer.utils.Constants.BASE_RADIO_URL
 import com.example.radioplayer.utils.Constants.BASE_RADIO_URL3
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
 import com.example.radioplayer.utils.Constants.listOfUrls
 import com.example.radioplayer.utils.toMediaMetadataCompat
+import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 
 import javax.inject.Inject
@@ -44,46 +49,69 @@ class RadioSource @Inject constructor(
     // Favoured tab
 
     val subscribeToFavouredStations = radioDAO.getAllFavouredStations()
-    var stationsFavoured = listOf<RadioStation>()
+    var stationsFavoured = mutableListOf<RadioStation>()
     var stationsFavouredMetadata = mutableListOf<MediaMetadataCompat>()
-    var stationsFavouredMediaItems = listOf<MediaItem>()
+    var stationsFavouredMediaItems = mutableListOf<MediaItem>()
     var isStationsFavouredUpdated = false
 
 
 
     var stationsFromPlaylistMetadata = mutableListOf<MediaMetadataCompat>()
+
     companion object{
 
-        var stationsInPlaylist = listOf<RadioStation>()
-        var stationsInPlaylistMediaItems = listOf<MediaItem>()
+        var stationsInPlaylist = mutableListOf<RadioStation>()
+        var stationsInPlaylistMediaItems = mutableListOf<MediaItem>()
         var isStationsInPlaylistUpdated = false
 
 
         fun updatePlaylistStations(list : List<RadioStation>){
-           stationsInPlaylist = list
+           stationsInPlaylist = list.toMutableList()
            stationsInPlaylistMediaItems = list.map {
                MediaItem.fromUri(it.url!!)
-           }
+           }.toMutableList()
             isStationsInPlaylistUpdated = true
         }
 
+
+        var stationInOneDateResponse = listOf<RadioStation>()
+        var stationsFromHistoryOneDate = listOf<RadioStation>()
+        var stationsFromHistoryOneDateMetadata = listOf<MediaMetadataCompat>()
+        var stationsFromHistoryOneDateMediaItems = listOf<MediaItem>()
+        var isStationsFromHistoryOneDateUpdated = false
+
+
+        fun updateHistoryOneDateStations(){
+            stationsFromHistoryOneDate = stationInOneDateResponse
+
+            stationsFromHistoryOneDateMetadata = stationInOneDateResponse.map{ station ->
+                station.toMediaMetadataCompat()
+            }.toMutableList()
+
+            stationsFromHistoryOneDateMediaItems = stationInOneDateResponse.map { station ->
+                MediaItem.fromUri(station.url!!)
+            }.toMutableList()
+            isStationsFromHistoryOneDateUpdated = true
+        }
     }
 
 
     // History
 
+    var allHistoryMap = mutableListOf<Int>()
+
     var stationsFromHistory = mutableListOf<RadioStation>()
-    var stationsFromHistoryOneDate = listOf<RadioStation>()
+
 
     var stationsFromHistoryMetadata = mutableListOf<MediaMetadataCompat>()
-    var stationsFromHistoryOneDateMetadata = listOf<MediaMetadataCompat>()
+
 
     var stationsFromHistoryMediaItems = mutableListOf<MediaItem>()
-    var stationsFromHistoryOneDateMediaItems = listOf<MediaItem>()
+
 
 
     var isStationsFromHistoryUpdated = false
-    var isStationsFromHistoryOneDateUpdated = false
+
 
     // Recordings
 
@@ -121,73 +149,110 @@ class RadioSource @Inject constructor(
         val response = radioDAO.getStationsInAllDates(limit, offset)
         val date = response.date.time
 
-        Log.d("CHECKTAGS", "getting all dates")
+
+        if(RadioService.currentMediaItems == SEARCH_FROM_HISTORY){
+            RadioService.currentPlayingItemPosition = 0
+        }
 
         if (date == RadioService.currentDateLong) {
 
+            allHistoryMap.clear()
+
+            allHistoryMap.add(response.radioStations.size + 2)
+
             stationsFromHistory = response.radioStations.reversed().toMutableList()
 
-            stationsFromHistoryMetadata = response.radioStations.reversed().map { station ->
-                station.toMediaMetadataCompat()
-            }.toMutableList()
 
-            stationsFromHistoryMediaItems = response.radioStations.reversed().map { station ->
-                MediaItem.fromUri(station.url!!)
-            }.toMutableList()
+                stationsFromHistoryMediaItems = response.radioStations.reversed().map { station ->
+                    MediaItem.fromUri(station.url!!)
+                }.toMutableList()
+
+                stationsFromHistoryMetadata = response.radioStations.reversed().map { station ->
+                    station.toMediaMetadataCompat()
+                }.toMutableList()
+
+                isStationsFromHistoryUpdated = true
+
+
 
 
         } else {
 
+            val addUp = if(allHistoryMap.isNotEmpty()) allHistoryMap.last() + 2
+                        else 2
+
+
+            allHistoryMap.add(response.radioStations.size + addUp)
+
             stationsFromHistory.addAll(response.radioStations.reversed())
 
-            response.radioStations.reversed().map { station ->
-                stationsFromHistoryMetadata.add(
-                    station.toMediaMetadataCompat()
-                )
-            }
-            response.radioStations.reversed().map { station ->
-                stationsFromHistoryMediaItems.add(
-                    MediaItem.fromUri(station.url!!)
-                )
-            }
+                response.radioStations.reversed().map { station ->
+                    stationsFromHistoryMetadata.add(
+                        station.toMediaMetadataCompat()
+                    )
+                }
+                response.radioStations.reversed().map { station ->
+                    stationsFromHistoryMediaItems.add(
+                        MediaItem.fromUri(station.url!!)
+                    )
+                }
+                isStationsFromHistoryUpdated = true
+
+
         }
-        isStationsFromHistoryUpdated = true
-
-        return response
-    }
-
-    suspend fun getStationsInOneDate(time : Long) : DateWithStations {
-        val response = radioDAO.getStationsInOneDate(time)
-
-        Log.d("CHECKTAGS", "getting one date")
-
-        stationsFromHistoryOneDate = response.radioStations.reversed()
-
-        stationsFromHistoryOneDateMetadata = response.radioStations.reversed().map{ station ->
-            station.toMediaMetadataCompat()
-        }.toMutableList()
-
-        stationsFromHistoryOneDateMediaItems = response.radioStations.reversed().map { station ->
-            MediaItem.fromUri(station.url!!)
-        }.toMutableList()
-        isStationsFromHistoryOneDateUpdated = true
 
         return response
     }
 
 
 
-    fun createMediaItemsFromDB(listOfStations : List<RadioStation>){
 
-        stationsFavoured = listOfStations
+    suspend fun getStationsInOneDate(time : Long) : List<RadioStation> {
+        val response = radioDAO.getStationsInOneDate(time).radioStations.reversed()
+
+        stationInOneDateResponse = response
+
+        return response
+    }
+
+
+
+
+    fun createMediaItemsFromDB(listOfStations : List<RadioStation>, player : ExoPlayer, currentStation : RadioStation?){
+
+        stationsFavoured = listOfStations.toMutableList()
 
         stationsFavouredMetadata = listOfStations.map { station ->
             station.toMediaMetadataCompat()
         }.toMutableList()
-        stationsFavouredMediaItems = listOfStations.map{ station ->
-            MediaItem.fromUri(station.url!!)
-        }
+
+
         isStationsFavouredUpdated = true
+
+        if(RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES){
+
+            var index = 0
+
+            stationsFavouredMediaItems = listOfStations.map{ station ->
+
+                val item = MediaItem.fromUri(station.url!!)
+
+                if(station.url != currentStation?.url){
+                    player.addMediaItem(index, item)
+                    index ++
+                } else {
+                    index ++
+                }
+
+                item
+            }.toMutableList()
+        } else {
+            stationsFavouredMediaItems = listOfStations.map{ station ->
+                MediaItem.fromUri(station.url!!)
+            }.toMutableList()
+        }
+
+
     }
 
     val isRecordingUpdated : MutableLiveData<Boolean> = MutableLiveData()
@@ -354,7 +419,7 @@ class RadioSource @Inject constructor(
     suspend fun getLanguages(language : String)
         = radioApi.getLanguages(validBaseUrl + API_RADIO_LANGUAGES + language)
 
-    suspend fun getRadioStations (isNewSearch : Boolean)   {
+    fun getRadioStations (isNewSearch : Boolean, exoPlayer: ExoPlayer)   {
 
 //            state = STATE_PROCESSING
 
@@ -369,32 +434,50 @@ class RadioSource @Inject constructor(
                       }.toMutableList()
 
 
-
                       stationsFromApiMetadata = it.map { station ->
                           stationItemToMediaMetadataCompat(station)
                       }.toMutableList()
+
+                      isStationsFromApiUpdated = true
 
                   } else {
 
                       stationsFromApi.addAll(it)
 
-                      it.map { station ->
 
-                          stationsFromApiMetadata.add(
-                              stationItemToMediaMetadataCompat(station)
-                          )
+                      if(RadioService.currentMediaItems == SEARCH_FROM_API){
 
-                          stationsFromApiMediaItems.add(
-                              MediaItem.fromUri(station.url_resolved.toUri())
-                          )
+                          it.map { station ->
 
+                              stationsFromApiMetadata.add(
+                                  stationItemToMediaMetadataCompat(station)
+                              )
+
+                              val item = MediaItem.fromUri(station.url_resolved.toUri())
+                              exoPlayer.addMediaItem(item)
+                              stationsFromApiMediaItems.add(item)
+
+                          }
+                      }
+
+                      else {
+
+                          it.map { station ->
+
+                              stationsFromApiMetadata.add(
+                                  stationItemToMediaMetadataCompat(station)
+                              )
+
+                              stationsFromApiMediaItems.add(
+                                  MediaItem.fromUri(station.url_resolved.toUri())
+                              )
+                          }
+
+                          isStationsFromApiUpdated = true
 
                       }
                   }
-
-                  isStationsFromApiUpdated = true
-//                     state = STATE_INITIALIZED
-                }
+              }
     }
 
 

@@ -1,6 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/clBufferSettingDialog"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_gradient_for_background"
+    android:paddingHorizontal="16dp">
+
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginStart="8dp"
+        android:gravity="center_vertical"
+        android:layout_marginTop="@dimen/dialog_top_margin"
+        android:text="Recording quality"
+        android:textAppearance="@style/dialogTitleText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+
+    <TextView
+        android:id="@+id/tvMainHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:fontFamily="@font/aldrich"
+        android:text="Recordings are meant for personal use only. As for now they are accessible only within this app"
+        android:textColor="@color/default_secondary_text_color"
+        android:textSize="13sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+
+
+
+
+    <TextView
+        android:id="@+id/tvRecQualityValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="Normal"
+        android:textAppearance="@style/dialogItemText"
+        android:textColor="@color/selected_genre_color"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvMainHint" />
+
+
+    <TextView
+        android:id="@+id/tvQualityEstimate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="1 min ~ 1 mb"
+        android:textAppearance="@style/dialogItemText"
+        android:textColor="@color/selected_genre_color"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvMainHint" />
+
+    <com.google.android.material.slider.RangeSlider
+        android:id="@+id/rangeSliderRecQuality"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvRecQualityValue" />
+
+
+
+
+    <TextView
+        android:id="@+id/tvBack"
+        android:layout_width="wrap_content"
+        android:layout_height="80dp"
+        android:layout_marginStart="20dp"
+        android:gravity="center_vertical"
+        android:text="@string/dialog_back_button"
+        android:textAppearance="@style/dialogTextButtons"
+        app:layout_constraintTop_toBottomOf="@+id/rangeSliderRecQuality"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <TextView
+        android:id="@+id/tvAccept"
+        android:layout_width="wrap_content"
+        android:layout_height="80dp"
+        android:layout_marginEnd="20dp"
+        android:gravity="center_vertical"
+        android:text="@string/dialog_accept_button"
+        android:textAppearance="@style/dialogTextButtons"
+        app:layout_constraintTop_toBottomOf="@+id/rangeSliderRecQuality"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

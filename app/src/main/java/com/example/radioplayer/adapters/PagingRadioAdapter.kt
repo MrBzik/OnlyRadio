@@ -160,14 +160,15 @@ class PagingRadioAdapter @Inject constructor(
 
 
         if(station.stationuuid == currentRadioStationId){
-
-
+            selectedAdapterPosition = holder.absoluteAdapterPosition
             previousItemHolder = holder
             handleStationPlaybackState(holder.bind)
 
         } else restoreState(holder.bind)
 
     }
+
+    private var selectedAdapterPosition = -2
 
     var defaultTextColor = 0
     var selectedTextColor = 0
@@ -203,6 +204,7 @@ class PagingRadioAdapter @Inject constructor(
     }
 
     private fun handleStationPlaybackState(bind: ItemRadioWithTextBinding){
+
         if(currentPlaybackState){
             bind.apply {
                radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
@@ -231,7 +233,7 @@ class PagingRadioAdapter @Inject constructor(
 
     fun updateStationPlaybackState(){
         previousItemHolder?.let{
-            if(it.absoluteAdapterPosition == RadioService.currentPlayingItemPosition){
+            if(it.absoluteAdapterPosition == selectedAdapterPosition){
                 handleStationPlaybackState(it.bind)
             }
         }
@@ -241,6 +243,7 @@ class PagingRadioAdapter @Inject constructor(
     fun updateOnStationChange(station : RadioStation, holder : RadioItemHolder?,
                               isClicked : Boolean = false
     ){
+
         if(station.stationuuid != currentRadioStationId) {
 
             currentRadioStationId = station.stationuuid
@@ -249,10 +252,13 @@ class PagingRadioAdapter @Inject constructor(
             }
         }
         holder?.let {
+            selectedAdapterPosition = holder.absoluteAdapterPosition
             previousItemHolder = holder
             if(!isClicked){
                 handleStationPlaybackState(holder.bind)
             }
+        } ?: kotlin.run {
+            selectedAdapterPosition = -2
         }
     }
 

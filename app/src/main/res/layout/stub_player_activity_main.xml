@@ -78,6 +78,7 @@
         android:layout_marginEnd="@dimen/player_view_bottom_margin"
         android:src="@drawable/ic_play_pause"
         android:layout_gravity="end"
+        android:background="?android:attr/selectableItemBackground"
         />
 
 

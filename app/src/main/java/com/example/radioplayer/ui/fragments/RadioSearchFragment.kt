@@ -4,8 +4,6 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
-import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE
 import android.util.Log
 import android.view.DragEvent
 import android.view.View
@@ -19,7 +17,6 @@ import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
-import com.example.radioplayer.adapters.RadioDatabaseAdapter
 import com.example.radioplayer.adapters.models.CountryWithRegion
 import com.example.radioplayer.adapters.models.TagWithGenre
 import com.example.radioplayer.data.local.entities.RadioStation
@@ -35,8 +32,6 @@ import com.example.radioplayer.utils.*
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.*
@@ -148,6 +143,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         setRecycleView()
 
+        subscribeToStationsFlow()
+
         observePlaybackState()
 
         observeNewStation()
@@ -172,7 +169,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         observeInternetConnection()
 
-        subscribeToStationsFlow()
 
         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
             textLoadAnim = TextLoadAnim(
@@ -257,7 +253,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
 
-        if(RadioService.currentPlaylist != SEARCH_FROM_RECORDINGS){
+        if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
 
             if(isToHandleNewStationObserver){
 
@@ -265,6 +261,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
                 if(index != -1){
                     handleNewRadioStation(index, station)
+                } else {
+                    pagingRadioAdapter.updateOnStationChange(station, null)
                 }
             }
 
@@ -280,7 +278,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private fun getCurrentItemPosition(station : RadioStation?) : Int {
 
-        if(RadioService.currentPlaylist == SEARCH_FROM_API ){
+        if(RadioService.currentMediaItems == SEARCH_FROM_API ){
 
             return RadioService.currentPlayingItemPosition
 
@@ -304,7 +302,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         bind.rvSearchStations.apply {
 
             post {
-//                scrollToPosition(position)
+                scrollToPosition(position)
 
                 post {
                     val holder = findViewHolderForAdapterPosition(position)
@@ -393,7 +391,12 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         pagingRadioAdapter.setOnClickListener { station, index ->
 
-            mainViewModel.playOrToggleStation(station, SEARCH_FROM_API, itemIndex = index)
+
+           val isToChangeMediaItems = RadioService.currentMediaItems != SEARCH_FROM_API
+
+
+            mainViewModel.playOrToggleStation(station, SEARCH_FROM_API,
+                itemIndex = index, isToChangeMediaItems = isToChangeMediaItems)
 
 
         }
@@ -425,7 +428,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             layoutAnimation = (activity as MainActivity).layoutAnimationController
 
 
-            if(RadioService.currentPlaylist != SEARCH_FROM_RECORDINGS){
+            if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
                 RadioService.currentPlayingStation.value?.let {
                     val id =  it.stationuuid
                     pagingRadioAdapter.currentRadioStationId = id
@@ -481,11 +484,15 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                     bind.rvSearchStations.apply {
                         if(isInitialLaunch){
 
-//                            val index = getCurrentItemPosition(null)
-//
-//                            if(index != -1 ) scrollToPosition(index)
+                            post {
+                                val index = getCurrentItemPosition(null)
 
-                            scheduleLayoutAnimation()
+                                if(index != -1 ) scrollToPosition(index)
+
+                                scheduleLayoutAnimation()
+                            }
+
+
                             isInitialLaunch = false
 
                         } else {
@@ -590,6 +597,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     private fun clearAdapter(check : Boolean){
         if(check){
             isToShowLoadingMessage = true
+            pagingRadioAdapter.previousItemHolder = null
             pagingRadioAdapter.submitData(lifecycle, PagingData.empty())
         }
     }

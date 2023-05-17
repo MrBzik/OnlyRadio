@@ -19,7 +19,6 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnLayout
-import androidx.lifecycle.lifecycleScope
 import androidx.transition.Fade
 import androidx.transition.Slide
 import com.bumptech.glide.RequestManager
@@ -31,7 +30,6 @@ import com.bumptech.glide.request.target.Target
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.entities.Recording
-import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.databinding.ActivityMainBinding
 import com.example.radioplayer.databinding.StubPlayerActivityMainBinding
 import com.example.radioplayer.exoPlayer.RadioService
@@ -68,10 +66,6 @@ import com.example.radioplayer.utils.Constants.TITLE_UNKNOWN
 import com.example.radioplayer.utils.RandomColors
 
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -454,7 +448,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     private fun clickListenerToHandleNavigationWithDetailsFragment(){
 
-        bindPlayer.tvStationTitle.setOnTouchListener { _, event ->
+        bindPlayer.tvStationTitle.setOnTouchListener { v, event ->
 
             if (event.action == MotionEvent.ACTION_DOWN){
 
@@ -672,7 +666,7 @@ class MainActivity : AppCompatActivity() {
         var isRecording = false
         var newImage = ""
 
-        if (RadioService.currentPlaylist != SEARCH_FROM_RECORDINGS) {
+        if (RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS) {
 
                 currentPlayingStation?.apply {
                     newName = name ?: "X"
@@ -744,7 +738,7 @@ class MainActivity : AppCompatActivity() {
 
             } else {
 
-                currentPlayingStation?.let { mainViewModel.playOrToggleStation(it) }
+                currentPlayingStation?.let { mainViewModel.playOrToggleStation(it, isToChangeMediaItems = false) }
 
 
             }

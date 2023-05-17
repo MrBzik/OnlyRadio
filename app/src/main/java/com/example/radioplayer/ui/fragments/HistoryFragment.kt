@@ -29,6 +29,7 @@ import com.example.radioplayer.data.local.entities.HistoryDate
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.FragmentHistoryBinding
 import com.example.radioplayer.exoPlayer.RadioService
+import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
@@ -79,8 +80,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private var isBookmarkedTitlesObserverSet = false
 
-    private var isInBookmarks = false
-    private var isInStationsTab = true
 
     private val clipBoard : ClipboardManager? by lazy {
         ContextCompat.getSystemService(requireContext(), ClipboardManager::class.java)
@@ -134,7 +133,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         databaseViewModel.isHistoryInStationsTabLiveData.observe(viewLifecycleOwner){
 
-            isInStationsTab = it
+            databaseViewModel.isInStationsTab = it
 
             bind.fabBookmarkedTitles.isVisible = !it
 
@@ -148,7 +147,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     private fun observeIsInBookmarks(){
 
         databaseViewModel.isInBookmarksLiveData.observe(viewLifecycleOwner){
-            isInBookmarks = it
+            databaseViewModel.isInBookmarks = it
 
             bind.fabBookmarkedTitles.apply {
                 if(it)
@@ -166,7 +165,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private fun switchButtonsVisibilityWithBookmarks(){
 
-        if(!isInStationsTab && isInBookmarks){
+        if(!databaseViewModel.isInStationsTab && databaseViewModel.isInBookmarks){
             bind.tvSliderHeader.isVisible = false
             bind.spinnerDates.isVisible = false
             bind.tvShrinkArrow.isVisible = false
@@ -465,34 +464,63 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
 
-            if(isInStationsTab &&
-                    RadioService.currentPlaylist != SEARCH_FROM_RECORDINGS){
+            if(databaseViewModel.isInStationsTab &&
+                    RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
 
                 if(isToHandleNewStationObserver){
 
-                    if(RadioService.currentPlaylist == SEARCH_FROM_HISTORY_ONE_DATE){
-                        handleNewRadioStation(RadioService.currentPlayingItemPosition, station)
+                    val index =
 
-                    } else {
-
-                        val index = stationsHistoryAdapter?.snapshot()?.items?.indexOfFirst {
-                            it is StationWithDateModel.Station && it.radioStation.stationuuid == station.stationuuid
+                        if(databaseViewModel.selectedDate == RadioService.selectedHistoryDate){
+                            RadioService.currentPlayingItemPosition
+                        } else if(
+                            databaseViewModel.selectedDate == 0L
+                            && RadioService.currentMediaItems == SEARCH_FROM_HISTORY) {
+                            adjustHistoryIndex()
+                        } else {
+                            stationsHistoryAdapter?.snapshot()?.items?.indexOfFirst {
+                                it is StationWithDateModel.Station && it.radioStation.stationuuid == station.stationuuid
+                            }
                         }
 
-                        if(index != -1 && index != null){
-
+                    if(index != -1 && index != null){
                             handleNewRadioStation(index, station)
-                        }
-
+                        } else {
+                            stationsHistoryAdapter?.updateOnStationChange(station, null)
                     }
+
                 } else {
                     isToHandleNewStationObserver = true
                 }
-
             }
+        }
+    }
+
+
+    private fun adjustHistoryIndex() : Int {
+
+        val map = mainViewModel.radioSource.allHistoryMap
+        val index = RadioService.currentPlayingItemPosition
+
+        if(index < map[0] - 2)
+            return index + 1
+
+        else {
+            var shift = 3
+
+            for(i in 1 until map.size){
+
+                if (index < map[i] - 2)
+                    break
+                else shift += 2
+            }
+
+            return index + shift
 
         }
     }
+
+
 
 
     private fun handleNewRadioStation(position : Int, station : RadioStation){
@@ -525,11 +553,11 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             setRvLoadChildrenListener()
 
-            if(isInStationsTab){
+            if(databaseViewModel.isInStationsTab){
                 setStationsHistoryAdapter()
             } else {
 
-                if(isInBookmarks){
+                if(databaseViewModel.isInBookmarks){
                     switchToBookmarkedTitles()
                     bind.fabBookmarkedTitles.setImageResource(R.drawable.ic_bookmark_selected)
                 } else {
@@ -562,7 +590,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 separatorDefault = ContextCompat.getColor(requireContext(), R.color.station_bottom_separator_default)
 
-                if(RadioService.currentPlaylist != SEARCH_FROM_RECORDINGS){
+                if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
                     RadioService.currentPlayingStation.value?.let {
                         val id =  it.stationuuid
                         currentRadioStationID = id
@@ -655,16 +683,13 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     private fun setTitlesClickListener(){
 
         bind.tvTitles.setOnClickListener {
-            if(isInStationsTab){
+            if(databaseViewModel.isInStationsTab){
 
-                isInStationsTab = false
+                databaseViewModel.isInStationsTab = false
                 databaseViewModel.isHistoryInStationsTabLiveData.postValue(false)
 
 
-                isToHandleNewStationObserver = false
-
-
-                if(isInBookmarks){
+                if(databaseViewModel.isInBookmarks){
                     switchToBookmarkedTitles()
 
                 } else {
@@ -698,12 +723,12 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             setOnClickListener {
 
-                isInBookmarks = !isInBookmarks
+                databaseViewModel.isInBookmarks = !databaseViewModel.isInBookmarks
 
-                databaseViewModel.isInBookmarksLiveData.postValue(isInBookmarks)
+                databaseViewModel.isInBookmarksLiveData.postValue(databaseViewModel.isInBookmarks)
 
 
-                if(isInBookmarks){
+                if(databaseViewModel.isInBookmarks){
 
                     switchToBookmarkedTitles()
 
@@ -766,9 +791,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         bind.tvStations.setOnClickListener {
 
-            if(!isInStationsTab){
+            if(!databaseViewModel.isInStationsTab){
 
-                isInStationsTab = true
+                databaseViewModel.isInStationsTab = true
                 databaseViewModel.isHistoryInStationsTabLiveData.postValue(true)
 
                 setStationsHistoryAdapter()
@@ -789,7 +814,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     private fun switchTitlesStationsUi(isToAnimate : Boolean){
 
         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
-            if(isInStationsTab){
+            if(databaseViewModel.isInStationsTab){
                 (bind.tvStations as TextView).setTextAppearance(R.style.selectedTitle)
                 (bind.tvTitles as TextView).setTextAppearance(R.style.unselectedTitle)
 
@@ -810,7 +835,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             }
         } else {
 
-            if(isInStationsTab){
+            if(databaseViewModel.isInStationsTab){
                 bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_history_stations_protected)
 
                 (bind.tvStations as TextViewOutlined).apply {
@@ -864,9 +889,25 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             } else
                 SEARCH_FROM_HISTORY_ONE_DATE
 
-            mainViewModel.playOrToggleStation(station, flag,
-                itemIndex = position, historyItemId = station.stationuuid)
+          var isToChangeMediaItems = false
 
+            if(databaseViewModel.selectedDate > 0 &&
+                RadioService.selectedHistoryDate != databaseViewModel.selectedDate){
+                RadioService.selectedHistoryDate = databaseViewModel.selectedDate
+                RadioSource.updateHistoryOneDateStations()
+                isToChangeMediaItems = true
+            }
+
+            else if (RadioService.currentMediaItems != flag){
+                isToChangeMediaItems = true
+            }
+
+           val isNewItem = mainViewModel.playOrToggleStation(station, flag,
+                itemIndex = position, isToChangeMediaItems = isToChangeMediaItems)
+
+            if(isToChangeMediaItems || isNewItem){
+                isToHandleNewStationObserver = false
+            }
         }
     }
 

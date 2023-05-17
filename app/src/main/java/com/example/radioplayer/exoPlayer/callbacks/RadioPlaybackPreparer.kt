@@ -3,26 +3,22 @@ package com.example.radioplayer.exoPlayer.callbacks
 import android.net.Uri
 import android.os.Bundle
 import android.os.ResultReceiver
-import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import com.example.radioplayer.exoPlayer.RadioSource
-import com.example.radioplayer.utils.Constants.HISTORY_ITEM_ID
+import com.example.radioplayer.utils.Constants.IS_CHANGE_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants.ITEM_INDEX
 import com.example.radioplayer.utils.Constants.PLAY_WHEN_READY
 import com.example.radioplayer.utils.Constants.SEARCH_FLAG
-import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
-import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
-import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
-import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
-import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 
 class RadioPlaybackPreparer (
 
     private val radioSource: RadioSource,
-    private val playerPrepared : (MediaMetadataCompat?, flag: Int,
-                                  playWhenReady : Boolean, itemIndex : Int
+    private val playerPrepared : (
+//        MediaMetadataCompat?,
+                                  flag: Int,
+                                  playWhenReady : Boolean, itemIndex : Int, isToChangeMediaItems : Boolean
     ) -> Unit,
     private val onCommand : (String, Bundle?) -> Unit
         ) : MediaSessionConnector.PlaybackPreparer {
@@ -54,52 +50,56 @@ class RadioPlaybackPreparer (
 
         var index = -1
 
-        var historyId = ""
+        var isToChangeMediaItems = false
+
+//        var historyId = ""
 
         extras?.let {
             flag = it.getInt(SEARCH_FLAG, 0)
             isToPlay = it.getBoolean(PLAY_WHEN_READY, true)
             index = it.getInt(ITEM_INDEX, -1)
-            historyId = it.getString(HISTORY_ITEM_ID, "")
+            isToChangeMediaItems = it.getBoolean(IS_CHANGE_MEDIA_ITEMS, false)
         }
 
-        if(flag == SEARCH_FROM_HISTORY){
-            if(historyId.isNotBlank()){
-                index = radioSource.stationsFromHistory.indexOfFirst {
-                    it.stationuuid == historyId
-                }
-            }
-        }
+//        if(flag == SEARCH_FROM_HISTORY){
+//            if(historyId.isNotBlank()){
+//                index = radioSource.stationsFromHistory.indexOfFirst {
+//                    it.stationuuid == historyId
+//                }
+//            }
+//        }
 
 
 //        radioSource.whenReady {
-            val itemToPlay =
-                    when(flag){
-                        SEARCH_FROM_API -> radioSource.stationsFromApiMetadata.find {
-                            it.description.mediaId == mediaId
-                        }
-                         SEARCH_FROM_FAVOURITES -> radioSource.stationsFavouredMetadata.find {
-                             it.description.mediaId == mediaId
-                         }
-                          SEARCH_FROM_HISTORY -> radioSource.stationsFromHistoryMetadata.find{
-                              it.description.mediaId == mediaId
-                          }
-                          SEARCH_FROM_HISTORY_ONE_DATE -> radioSource.stationsFromHistoryOneDateMetadata.find{
-                              it.description.mediaId == mediaId
-                          }
+//            val itemToPlay =
+//                    when(flag){
+//                        SEARCH_FROM_API -> radioSource.stationsFromApiMetadata.find {
+//                            it.description.mediaId == mediaId
+//                        }
+//                         SEARCH_FROM_FAVOURITES -> radioSource.stationsFavouredMetadata.find {
+//                             it.description.mediaId == mediaId
+//                         }
+//                          SEARCH_FROM_HISTORY -> radioSource.stationsFromHistoryMetadata.find{
+//                              it.description.mediaId == mediaId
+//                          }
+//                          SEARCH_FROM_HISTORY_ONE_DATE -> radioSource.stationsFromHistoryOneDateMetadata.find{
+//                              it.description.mediaId == mediaId
+//                          }
+//
+//                           SEARCH_FROM_RECORDINGS -> {
+//
+//                               radioSource.recordings.find {
+//                                   it.description.mediaId == mediaId
+//                               }
+//                           }
+//                         else -> radioSource.stationsFromPlaylistMetadata.find {
+//                             it.description.mediaId == mediaId
+//                         }
+//                    }
 
-                           SEARCH_FROM_RECORDINGS -> {
-
-                               radioSource.recordings.find {
-                                   it.description.mediaId == mediaId
-                               }
-                           }
-                         else -> radioSource.stationsFromPlaylistMetadata.find {
-                             it.description.mediaId == mediaId
-                         }
-                    }
-
-            playerPrepared(itemToPlay, flag, isToPlay, index)
+            playerPrepared(
+//                itemToPlay,
+                flag, isToPlay, index, isToChangeMediaItems)
 //        }
 
     }

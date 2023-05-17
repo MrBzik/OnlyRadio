@@ -10,20 +10,18 @@ import android.view.animation.LinearInterpolator
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.RecordingsAdapter
 import com.example.radioplayer.data.local.entities.Recording
-import com.example.radioplayer.data.models.PlayingItem
 import com.example.radioplayer.databinding.FragmentRecordingsBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
+import com.example.radioplayer.ui.animations.SwipeToDeleteCallback
 import com.example.radioplayer.ui.animations.slideAnim
-import com.example.radioplayer.ui.dialogs.RecordingSettingsDialog
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.TextViewOutlined
 import com.example.radioplayer.utils.Utils
@@ -189,7 +187,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
         RadioService.currentPlayingRecording.observe(viewLifecycleOwner){
             currentRecording = it
-            if(RadioService.currentPlaylist == SEARCH_FROM_RECORDINGS){
+            if(RadioService.currentMediaItems == SEARCH_FROM_RECORDINGS){
 
                 if(isToHandleNewRecording){
                     Log.d("CHECKTAGS", "recording handler")
@@ -271,7 +269,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
                 alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
                 titleSize = mainViewModel.stationsTitleSize
 
-                if(RadioService.currentPlaylist == SEARCH_FROM_RECORDINGS){
+                if(RadioService.currentMediaItems == SEARCH_FROM_RECORDINGS){
                     playingRecordingId = RadioService.currentPlayingRecording.value?.id ?: ""
                 } else {
                     playingRecordingId = ""
@@ -308,30 +306,22 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
     }
 
 
-    private val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(
-        0,
-        ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT
-    ) {
-        override fun onMove(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder
-        ): Boolean {
-            return true
-        }
+    private val itemTouchCallback by lazy {
 
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            val position = viewHolder.layoutPosition
+        object : SwipeToDeleteCallback(requireContext()) {
 
-            val recording = recordingsAdapter.listOfRecordings[position]
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.layoutPosition
 
-            currentRecording?.let {
+                val recording = recordingsAdapter.listOfRecordings[position]
 
-                if(it.id == recording.id){
-                    animator.cancel()
+                currentRecording?.let {
 
-                    currentItemSeekbar = null
-                    currentItemTvDuration = null
+                    if(it.id == recording.id){
+                        animator.cancel()
+
+                        currentItemSeekbar = null
+                        currentItemTvDuration = null
 
                         recordingsAdapter.apply {
                             playingRecordingId = "null"
@@ -340,50 +330,54 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
                             previousTvTimeValue = 0
                         }
 
-                    currentRecording = null
-                    mainViewModel.stopPlay()
+                        currentRecording = null
+                        mainViewModel.stopPlay()
 
-                    (activity as MainActivity).bindPlayer.root.apply {
-                        visibility = View.GONE
-                        slideAnim(300, 0, R.anim.fade_out_anim)
+                        (activity as MainActivity).bindPlayer.root.apply {
+                            visibility = View.GONE
+                            slideAnim(300, 0, R.anim.fade_out_anim)
 
                         }
                     }
                 }
 
 
-            databaseViewModel.deleteRecording(recording.id)
+                databaseViewModel.deleteRecording(recording.id)
 
 
-            Snackbar.make(
-                requireActivity().findViewById(R.id.rootLayout),
-                "Recording was deleted",
-                Snackbar.LENGTH_LONG
+                Snackbar.make(
+                    requireActivity().findViewById(R.id.rootLayout),
+                    "Recording was deleted",
+                    Snackbar.LENGTH_LONG
                 ).apply {
 
                     addCallback(object: BaseTransientBottomBar.BaseCallback<Snackbar>(){
-        override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-            super.onDismissed(transientBottomBar, event)
+                        override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                            super.onDismissed(transientBottomBar, event)
 
-            if(event == DISMISS_EVENT_CONSECUTIVE ||
-               event == DISMISS_EVENT_TIMEOUT ||
-               event == DISMISS_EVENT_SWIPE ) {
+                            if(event == DISMISS_EVENT_CONSECUTIVE ||
+                                event == DISMISS_EVENT_TIMEOUT ||
+                                event == DISMISS_EVENT_SWIPE ) {
 
-                databaseViewModel.removeRecordingFile(recording.id)
+                                databaseViewModel.removeRecordingFile(recording.id)
 
-                }
+                            }
+                        }
+                    }
+                    )
+                    setAction("UNDO"){
+                        databaseViewModel.insertNewRecording(recording)
+                    }
+                }.show()
+
             }
         }
-    )
-                setAction("UNDO"){
-                    databaseViewModel.insertNewRecording(recording)
-                }
-            }.show()
 
-        }
     }
 
-    private val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
+    private val itemTouchHelper by lazy {
+        ItemTouchHelper(itemTouchCallback)
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

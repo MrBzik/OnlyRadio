@@ -67,7 +67,9 @@
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+
+        />
 
     <TextView
         android:id="@+id/tvExpandHideText"
@@ -98,6 +100,7 @@
         android:layout_height="65dp"
         android:layout_marginEnd="@dimen/player_view_bottom_margin"
         android:src="@drawable/ic_play_pause"
+        android:background="?android:attr/selectableItemBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

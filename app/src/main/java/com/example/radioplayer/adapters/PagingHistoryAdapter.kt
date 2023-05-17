@@ -300,7 +300,7 @@ class PagingHistoryAdapter @Inject constructor(
 
 
     fun updateOnStationChange(station : RadioStation,
-                              holder : PagingHistoryAdapter.StationViewHolder?
+                              holder : StationViewHolder?
     ){
         if(station.stationuuid != currentRadioStationID) {
 
@@ -311,6 +311,8 @@ class PagingHistoryAdapter @Inject constructor(
         }
         holder?.let {
            previousItemHolder = holder
+
+           selectedAdapterPosition = holder.absoluteAdapterPosition
 
            handleStationPlaybackState(holder.bind)
 

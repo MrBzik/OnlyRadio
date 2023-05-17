@@ -22,8 +22,12 @@ abstract class BaseFragment<VB: ViewBinding>(
      val bind : VB
      get() = _bind!!
 
-    lateinit var databaseViewModel : DatabaseViewModel
-    lateinit var mainViewModel: MainViewModel
+    val databaseViewModel : DatabaseViewModel by lazy {
+        (activity as MainActivity).databaseViewModel
+    }
+    val mainViewModel: MainViewModel by lazy {
+        (activity as MainActivity).mainViewModel
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,12 +41,10 @@ abstract class BaseFragment<VB: ViewBinding>(
         return bind.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        databaseViewModel = (activity as MainActivity).databaseViewModel
-        mainViewModel = (activity as MainActivity).mainViewModel
-    }
+//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+//        super.onViewCreated(view, savedInstanceState)
+//
+//    }
 
 
 

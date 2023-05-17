@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -20,7 +21,6 @@ import com.example.radioplayer.adapters.ViewPagerStationsAdapter
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.entities.Title
-import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.databinding.FragmentStationDetailsBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.exoPlayer.RadioSource
@@ -35,6 +35,7 @@ import com.example.radioplayer.utils.Constants.FRAG_FAV
 import com.example.radioplayer.utils.Constants.FRAG_HISTORY
 import com.example.radioplayer.utils.Constants.FRAG_REC
 import com.example.radioplayer.utils.Constants.FRAG_SEARCH
+import com.example.radioplayer.utils.Constants.NO_PLAYLIST
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
@@ -47,6 +48,7 @@ import com.example.radioplayer.utils.addAction
 import com.example.radioplayer.utils.toRadioStation
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -55,7 +57,9 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 )
 {
 
-    lateinit var pixabayViewModel: PixabayViewModel
+     private val pixabayViewModel: PixabayViewModel by lazy {
+         ViewModelProvider(requireActivity())[PixabayViewModel::class.java]
+    }
 
     lateinit var viewPagerAdapter : ViewPagerStationsAdapter
 
@@ -68,27 +72,29 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     private var isFavoured = false
 
+    private var isInitialLaunch = true
+
     private var songTitle = ""
 
     private var isToTogglePlayStation = true
+
+    private var isFavStateObserverSet = false
 
     private val clipBoard : ClipboardManager? by lazy {
         ContextCompat.getSystemService(requireContext(), ClipboardManager::class.java)
     }
 
-
     private var isViewPagerCallbackSet = false
+    private var isPagerTransAnimSet = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-        pixabayViewModel = ViewModelProvider(requireActivity())[PixabayViewModel::class.java]
-
-
-        observeIfNewStationFavoured()
+        RadioService.isInStationDetails = true
 
         observeCurrentSongTitle()
+
+        observeIfNewStationFavoured()
 
         updateListOfPlaylists()
 
@@ -115,6 +121,8 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     }
 
 
+
+
     private fun setSystemBarsColor(){
 
         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
@@ -138,41 +146,113 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     private fun getCurrentPlaylistItems(){
 
-        val list = when(RadioService.currentPlaylist){
-            SEARCH_FROM_API -> mainViewModel.radioSource.stationsFromApi.map {
-                it.toRadioStation()
-        }
-            SEARCH_FROM_FAVOURITES -> mainViewModel.radioSource.stationsFavoured
 
-            SEARCH_FROM_PLAYLIST -> RadioSource.stationsInPlaylist
 
-            SEARCH_FROM_HISTORY -> mainViewModel.radioSource.stationsFromHistory
+        val list = when(RadioService.currentMediaItems){
+            SEARCH_FROM_API -> {
+                bind.tvPlaylistTitle.text = "From search"
 
-            SEARCH_FROM_HISTORY_ONE_DATE -> mainViewModel.radioSource.stationsFromHistoryOneDate
+                mainViewModel.radioSource.stationsFromApi.map {
+                    it.toRadioStation()
+                }
+            }
 
+
+            SEARCH_FROM_FAVOURITES -> {
+
+                bind.tvPlaylistTitle.text = "From favoured"
+
+                if(databaseViewModel.isStationFavoured.value == false){
+                    RadioService.currentPlayingStation.value?.let {
+                        listOf(it)
+                    } ?: emptyList()
+                }
+                else
+                mainViewModel.radioSource.stationsFavoured
+
+            }
+
+            SEARCH_FROM_PLAYLIST -> {
+                bind.tvPlaylistTitle.text = "\"${RadioService.currentPlaylistName}\""
+                RadioSource.stationsInPlaylist
+            }
+
+
+
+            SEARCH_FROM_HISTORY -> {
+                bind.tvPlaylistTitle.text = "From history"
+
+                mainViewModel.radioSource.stationsFromHistory
+            }
+
+            SEARCH_FROM_HISTORY_ONE_DATE -> {
+
+              val calendar = Calendar.getInstance()
+              calendar.time = Date(databaseViewModel.selectedDate)
+
+              val string = Utils.fromDateToStringShort(calendar)
+
+                bind.tvPlaylistTitle.text = "$string"
+                RadioSource.stationsFromHistoryOneDate
+            }
+
+            NO_PLAYLIST -> {
+                Log.d("CHECKTAGS", "am i here?")
+                bind.tvPlaylistTitle.text = "In fall out"
+                RadioService.currentPlayingStation.value?.let {
+                    listOf(it)
+                } ?: emptyList()
+
+            }
             else -> emptyList()
+
        }
 
         viewPagerAdapter.listOfStations = list
 
+//        var position = 0
+//
+//
+//        RadioService.currentPlayingStation.value?.let { station ->
+//
+//            if(list.size <= RadioService.currentPlayingItemPosition){
+//                viewPagerAdapter.listOfStations = listOf(station)
+//                mainViewModel.clearMediaItems()
+//
+//            } else if(station.stationuuid != list[RadioService.currentPlayingItemPosition].stationuuid){
+//                viewPagerAdapter.listOfStations = listOf(station)
+//                mainViewModel.clearMediaItems()
+//            }
+//            else {
+//                position = RadioService.currentPlayingItemPosition
+//                viewPagerAdapter.listOfStations = list
+//            }
+//        }
+
         bind.viewPager.apply {
             post {
                 setCurrentItem(RadioService.currentPlayingItemPosition, false)
-                if(!isViewPagerCallbackSet){
-                    isViewPagerCallbackSet = true
                     observePlayingRadioStation()
                     bind.viewPager.registerOnPageChangeCallback(pageChangeCallback)
+                post {
+                    setPageTransformer(PagerZoomOutSlideTransformer())
+                    reduceDragSensitivity(2)
                 }
             }
         }
     }
 
 
+
     private val pageChangeCallback = object: ViewPager2.OnPageChangeCallback(){
+
 
         override fun onPageScrollStateChanged(state: Int) {
             super.onPageScrollStateChanged(state)
             when(state){
+
+
+
                 SCROLL_STATE_DRAGGING -> {
 
                     bind.ivSwipeLeft.apply {
@@ -204,17 +284,19 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                 val playWhenReady = mainViewModel.playbackState.value?.isPlaying ?: true
 
                 mainViewModel.playOrToggleStation(
-                    station =  newStation, searchFlag =  RadioService.currentPlaylist,
-                    playWhenReady = playWhenReady, itemIndex = position
-
+                    station =  newStation, searchFlag =  RadioService.currentMediaItems,
+                    playWhenReady = playWhenReady, itemIndex = position,
+                    isToChangeMediaItems = false
                 )
             } else {
                 isToTogglePlayStation = true
             }
-
-
         }
     }
+
+
+
+
 
     private fun setupPagerView(){
 
@@ -227,9 +309,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             adapter = viewPagerAdapter
             orientation = ORIENTATION_HORIZONTAL
             offscreenPageLimit = 1
-            setPageTransformer(PagerZoomOutSlideTransformer())
-            reduceDragSensitivity(2)
-
         }
     }
 
@@ -237,7 +316,9 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         bind.ivSwipeLeft.apply {
 
-            if(RadioService.currentPlayingItemPosition != 0){
+            if(bind.viewPager.currentItem != 0 &&
+                    viewPagerAdapter.listOfStations.size != 1
+                    ){
                 if(!isVisible){
                     visibility = View.VISIBLE
                     slideAnim(300, 100, R.anim.fade_in_anim)
@@ -247,7 +328,9 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         }
 
         bind.ivSwipeRight.apply {
-            if(RadioService.currentPlayingItemPosition < viewPagerAdapter.listOfStations.size - 1){
+            if(viewPagerAdapter.listOfStations.size != 1 &&
+                bind.viewPager.currentItem < viewPagerAdapter.listOfStations.size - 1
+            ){
                 if(!isVisible){
                     visibility = View.VISIBLE
                     slideAnim(300, 100, R.anim.fade_in_anim)
@@ -258,18 +341,25 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
 
     private fun observePlayingRadioStation(){
+
         RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
+
             currentRadioStation = station
             checkIfStationFavoured(station)
             bind.viewPager.apply {
-                if(currentItem != RadioService.currentPlayingItemPosition){
-                    isToTogglePlayStation = false
-                    setCurrentItem(RadioService.currentPlayingItemPosition, true)
+
+                if(station.stationuuid != viewPagerAdapter.listOfStations[currentItem].stationuuid){
+                    if(viewPagerAdapter.listOfStations.size == 1){
+                        viewPagerAdapter.listOfStations = listOf(station)
+                    } else {
+
+                        isToTogglePlayStation = false
+                        setCurrentItem(RadioService.currentPlayingItemPosition, true)
+                    }
                 }
             }
             handleSwipeIconsVisibility()
 
-//            updateUiForRadioStation(station)
         }
     }
 
@@ -300,6 +390,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
                 bind.ivCopy.visibility = View.VISIBLE
                 bind.ivBookmark.visibility = View.VISIBLE
+
             }
         }
     }
@@ -610,17 +701,26 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         currentRadioStation?.let { station ->
 
-            databaseViewModel.insertStationPlaylistCrossRef(
-                StationPlaylistCrossRef(
-                    station.stationuuid, playlistName, System.currentTimeMillis()
-                )
-            )
+            databaseViewModel.checkAndInsertStationPlaylistCrossRef(
+                station.stationuuid, playlistName
+            ) {
 
-            Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
-                "Station was added to $playlistName",
-                Snackbar.LENGTH_SHORT).show()
+                val message = if(it) "Already in $playlistName"
+                               else "Station added to $playlistName"
+
+                    Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
+                        message, Snackbar.LENGTH_SHORT).show()
+
+            }
         }
     }
+
+
+    private fun callFavPlaylistUpdateIfNeeded(){
+        if(RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES)
+            mainViewModel.updateFavPlaylist()
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -631,6 +731,16 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         bind.viewPager.adapter = null
         _bind = null
         isViewPagerCallbackSet = false
+        isInitialLaunch = false
+        isFavStateObserverSet = false
+        RadioService.isInStationDetails = false
+        callFavPlaylistUpdateIfNeeded()
+        isPagerTransAnimSet = false
+        if(RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES && !isFavoured){
+            RadioService.currentMediaItems = NO_PLAYLIST
+            mainViewModel.clearMediaItems()
+        }
+
     }
 
 

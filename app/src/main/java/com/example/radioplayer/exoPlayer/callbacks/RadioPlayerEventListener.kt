@@ -7,6 +7,7 @@ import androidx.core.text.isDigitsOnly
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.exoPlayer.RadioSource
+import com.example.radioplayer.utils.Constants.NO_PLAYLIST
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
@@ -16,7 +17,6 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.Constants.TITLE_UNKNOWN
 import com.example.radioplayer.utils.toRadioStation
 import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.metadata.Metadata
 
 class RadioPlayerEventListener (
     private val radioService : RadioService
@@ -39,11 +39,12 @@ class RadioPlayerEventListener (
                     val withoutWalm = lastTitle
                         .replace("WALMRadio.com", "")
 
-                    if(!RadioService.isFromRecording){
+
                         if(withoutWalm.equals("NULL", ignoreCase = true) || withoutWalm.isBlank()
                             || withoutWalm.length < 3 || withoutWalm.isDigitsOnly() ||
                             withoutWalm.equals("unknown", true)
-                            || withoutWalm.contains("{\"STATUS\"", true)
+                            || withoutWalm.contains("{\"STATUS\"", true) ||
+                            RadioService.isFromRecording
                         ){
                             RadioService.currentSongTitle.postValue("")
                             RadioService.currentlyPlaingSong = TITLE_UNKNOWN
@@ -57,7 +58,7 @@ class RadioPlayerEventListener (
 
                             RadioService.currentlyPlaingSong = withoutWalm
                         }
-                    }
+
                     radioService.invalidateNotification()
 //                    isMetadataUpdating = false
 //                }
@@ -84,15 +85,23 @@ class RadioPlayerEventListener (
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
         super.onMediaItemTransition(mediaItem, reason)
 
-        val uri = radioService.exoPlayer.currentMediaItem?.localConfiguration?.uri
+//        val uri = radioService.exoPlayer.currentMediaItem?.localConfiguration?.uri.toString()
         val index = radioService.exoPlayer.currentMediaItemIndex
         var station : RadioStation? = null
         RadioService.currentPlayingItemPosition = index
 
 
-        when(RadioService.currentPlaylist){
+
+        when(RadioService.currentMediaItems){
+
+            NO_PLAYLIST -> {
+
+                station = radioService.currentRadioStation
+
+            }
 
             SEARCH_FROM_API -> {
+
                 station = radioService.radioSource.stationsFromApi[index].toRadioStation()
                 radioService.insertRadioStation(station)
 
@@ -101,14 +110,19 @@ class RadioPlayerEventListener (
             SEARCH_FROM_FAVOURITES ->
                 station = radioService.radioSource.stationsFavoured[index]
 
+
+
             SEARCH_FROM_PLAYLIST ->
                 station = RadioSource.stationsInPlaylist[index]
 
             SEARCH_FROM_HISTORY ->
                 station = radioService.radioSource.stationsFromHistory[index]
+//                station = radioService.radioSource.stationsFromHistory.first {
+//                    it.url == uri
+//                }
 
             SEARCH_FROM_HISTORY_ONE_DATE ->
-                station = radioService.radioSource.stationsFromHistoryOneDate[index]
+                station = RadioSource.stationsFromHistoryOneDate[index]
 
             SEARCH_FROM_RECORDINGS -> {
                 val recording = radioService.stationsFromRecordings[index]
@@ -120,7 +134,9 @@ class RadioPlayerEventListener (
 
         station?.let { radioService.currentRadioStation = it
 
-            if(RadioService.currentPlaylist != SEARCH_FROM_RECORDINGS){
+            RadioService.currentPlayingStation.postValue(it)
+
+            if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
 
                 radioService.checkDateAndUpdateHistory(it.stationuuid)
 
@@ -128,9 +144,6 @@ class RadioPlayerEventListener (
 
         }
 
-
-
-        RadioService.currentPlayingStation.postValue(station)
 
         if(radioService.radioSource.exoRecordState.value == true){
             radioService.stopRecording()
@@ -159,7 +172,7 @@ class RadioPlayerEventListener (
 
             radioService.isPlaybackStatePlaying = true
             radioService.listenToRecordDuration()
-            if(RadioService.currentPlaylist != SEARCH_FROM_RECORDINGS){
+            if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
                 radioService.fadeInPlayer()
             } else {
                 radioService.exoPlayer.volume = 1f

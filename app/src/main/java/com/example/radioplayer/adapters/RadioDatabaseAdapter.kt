@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipDescription
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,7 @@ import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.ItemRadioWithTextBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.animations.fadeOut
+import com.example.radioplayer.ui.fragments.FavStationsFragment
 import com.example.radioplayer.utils.RandomColors
 import javax.inject.Inject
 
@@ -40,15 +42,16 @@ class RadioDatabaseAdapter @Inject constructor(
             )
        )
 
-
-
         holder.itemView.setOnLongClickListener {
-            val clipText = listOfStations[holder.absoluteAdapterPosition].stationuuid
+            val station =  listOfStations[holder.absoluteAdapterPosition]
+            val clipText = station.stationuuid
             val item = ClipData.Item(clipText)
             val mimeTypes = arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN)
             val data = ClipData("STATION_ID", mimeTypes, item)
             val dragShadowBuilder = View.DragShadowBuilder(it)
             it.startDragAndDrop(data, dragShadowBuilder, it, 0)
+            FavStationsFragment.dragAndDropItemPos = holder.absoluteAdapterPosition
+            FavStationsFragment.dragAndDropStation = station
             true
         }
 
@@ -148,13 +151,14 @@ class RadioDatabaseAdapter @Inject constructor(
         }
 
         if(station.stationuuid == currentRadioStationId) {
+            selectedAdapterPosition = holder.absoluteAdapterPosition
             previousItemHolder = holder
             handleStationPlaybackState(holder.bind)
         } else
             restoreState(holder.bind)
     }
 
-
+    private var selectedAdapterPosition = -2
 
     var defaultTextColor = 0
     var selectedTextColor = 0
@@ -182,6 +186,7 @@ class RadioDatabaseAdapter @Inject constructor(
     }
 
     private fun handleStationPlaybackState(bind: ItemRadioWithTextBinding){
+
         if(currentPlaybackState){
             bind.apply {
                 radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
@@ -207,7 +212,7 @@ class RadioDatabaseAdapter @Inject constructor(
 
     fun updateStationPlaybackState(){
         previousItemHolder?.let{
-            if(it.absoluteAdapterPosition == RadioService.currentPlayingItemPosition){
+            if(it.absoluteAdapterPosition == selectedAdapterPosition){
                 handleStationPlaybackState(it.bind)
             }
         }
@@ -217,17 +222,19 @@ class RadioDatabaseAdapter @Inject constructor(
                               isClicked : Boolean = false
     ){
         if(station.stationuuid != currentRadioStationId) {
-
             currentRadioStationId = station.stationuuid
             previousItemHolder?.bind?.let {
                 restoreState(it)
             }
         }
         holder?.let {
+            selectedAdapterPosition = holder.absoluteAdapterPosition
             previousItemHolder = holder
             if(!isClicked){
                 handleStationPlaybackState(holder.bind)
             }
+        } ?: kotlin.run {
+            selectedAdapterPosition = -2
         }
     }
 

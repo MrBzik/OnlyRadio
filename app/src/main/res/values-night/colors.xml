@@ -27,6 +27,9 @@
 
     <color name="color_changed_on_interaction">#FC2E20</color>
     <color name="color_warning_text">#99FC2E20</color>
+    <color name="color_swipe_bg">#AA4D06</color>
+
+
     <color name="transparent">#00000000</color>
     <color name="regular_text_color">#80FFFFFF</color>
     <color name="search_text_color">#989696</color>

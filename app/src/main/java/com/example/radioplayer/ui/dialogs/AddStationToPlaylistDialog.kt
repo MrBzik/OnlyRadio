@@ -69,6 +69,7 @@ class AddStationToPlaylistDialog(
             playlistsAdapter.differ.submitList(listOfPlaylists)
 
             playlistsAdapter.setPlaylistClickListener { playlist, _ ->
+
                 insertStationInPlaylist(playlist.playlistName)
 
                 dismiss()

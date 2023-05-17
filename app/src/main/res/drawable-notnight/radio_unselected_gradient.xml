@@ -2,11 +2,11 @@
 <layer-list  xmlns:android="http://schemas.android.com/apk/res/android">
 <item android:height="75dp">
     <shape>
-        <solid android:color="#0D606D83"/>
+        <solid android:color="#eaeaea"/>
     </shape>
 </item>
 <item
-    android:drawable="@drawable/ic_music_note_inactive"
+    android:drawable="@drawable/ic_music_note"
     android:gravity="end"
     android:height="75dp"
     android:width="75dp"

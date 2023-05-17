@@ -48,10 +48,13 @@ interface  RadioDAO {
     @Query("SELECT * FROM Playlist")
     fun getAllPlaylists() : LiveData<List<Playlist>>
 
+    @Query("SELECT EXISTS(SELECT * FROM StationPlaylistCrossRef WHERE stationuuid =:stationID AND playlistName=:playlistName)")
+    suspend fun checkIfAlreadyInPlaylist(stationID : String, playlistName : String) : Boolean
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStationPlaylistCrossRef(stationPlaylistCrossRef: StationPlaylistCrossRef)
 
-    @Query("SELECT addedAt FROM stationplaylistcrossref WHERE stationuuid =:stationID AND playlistName=:playlistName")
+    @Query("SELECT addedAt FROM StationPlaylistCrossRef WHERE stationuuid =:stationID AND playlistName=:playlistName")
     suspend fun getTimeOfStationPlaylistInsertion(stationID : String, playlistName : String) : Long
 
 

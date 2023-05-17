@@ -16,7 +16,7 @@ import com.example.radioplayer.adapters.SelectingOptionAdapter
 import com.example.radioplayer.databinding.DialogRecordingSettingsBinding
 
 import com.example.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
-
+import com.example.radioplayer.utils.Constants.REC_QUALITY_DEF
 
 
 class RecordingSettingsDialog (
@@ -81,7 +81,7 @@ class RecordingSettingsDialog (
     private fun setupRecyclerView(){
 
         optionsAdapter = SelectingOptionAdapter(listOfOptions)
-        val recQuality = recordingQualityPref.getFloat(RECORDING_QUALITY_PREF, 0.4f)
+        val recQuality = recordingQualityPref.getFloat(RECORDING_QUALITY_PREF, REC_QUALITY_DEF)
         val toInt = (recQuality*10).toInt() -1
         setTvQualityText(toInt)
         optionsAdapter.currentOption = toInt
