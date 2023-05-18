@@ -2,6 +2,7 @@ package com.example.radioplayer.ui.viewmodels
 
 import android.app.Application
 import android.util.Log
+import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.example.radioplayer.adapters.datasources.*
@@ -17,6 +18,7 @@ import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.COMMAND_ON_DROP_STATION_IN_PLAYLIST
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_HISTORY_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS
+import com.example.radioplayer.utils.Constants.IS_TO_CLEAR_HISTORY_ITEMS
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Utils.fromDateToString
@@ -220,12 +222,14 @@ class DatabaseViewModel @Inject constructor(
 
     var selectedDate = 0L
 
-    private suspend fun getStationsInDate(limit: Int, offset: Int): List<StationWithDateModel> {
+    private suspend fun getStationsInAllDates(limit: Int, offset: Int): List<StationWithDateModel> {
 
         val response = radioSource.getStationsInAllDates(limit, offset)
 
         if(RadioService.currentMediaItems == SEARCH_FROM_HISTORY){
-            radioServiceConnection.sendCommand(COMMAND_UPDATE_HISTORY_MEDIA_ITEMS, null)
+            radioServiceConnection.sendCommand(COMMAND_UPDATE_HISTORY_MEDIA_ITEMS,
+            bundleOf(Pair(IS_TO_CLEAR_HISTORY_ITEMS, offset == 0))
+            )
         }
 
 
@@ -346,7 +350,7 @@ class DatabaseViewModel @Inject constructor(
 
 
     private val allHistoryLoader : HistoryDateLoader = { dateIndex ->
-        getStationsInDate(1, dateIndex)
+        getStationsInAllDates(1, dateIndex)
     }
 
     private val oneDateHistoryLoader : HistoryOneDateLoader = {
@@ -548,33 +552,6 @@ class DatabaseViewModel @Inject constructor(
     }
 
 
-
-    // Cleaning up database
-
-    fun removeUnusedStations() = viewModelScope.launch {
-
-        if(RadioService.isCleanUpNeeded){
-
-            val stations = repository.gatherStationsForCleaning()
-
-            stations.forEach {
-
-                    val checkIfInPlaylists = repository.checkIfInPlaylists(it.stationuuid)
-
-                    if(!checkIfInPlaylists) {
-
-                        val checkIfInHistory =  repository.checkIfRadioStationInHistory(it.stationuuid)
-
-                        if(!checkIfInHistory){
-
-                            repository.deleteRadioStation(it)
-                        }
-                    }
-                }
-
-            RadioService.isCleanUpNeeded
-        }
-    }
 
 
     // Recordings

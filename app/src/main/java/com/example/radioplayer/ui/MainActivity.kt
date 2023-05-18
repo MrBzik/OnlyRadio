@@ -179,7 +179,6 @@ class MainActivity : AppCompatActivity() {
             bind.root.doOnLayout {
                 flHeight = bind.viewHeight.height
             }
-        RadioService.canOnDestroyBeCalled = false
 
 
 
@@ -797,7 +796,6 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         this.cacheDir.deleteRecursively()
-        databaseViewModel.removeUnusedStations()
 
         mainViewModel.searchPreferences.edit().apply {
             putString(SEARCH_PREF_TAG, mainViewModel.searchParamTag.value)
@@ -827,11 +825,12 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onDestroy() {
-        mainViewModel.disconnectMediaBrowser()
-        Log.d("CHECKTAGS", "activity on destroy")
-        super.onDestroy()
-    }
+
+//    override fun onDestroy() {
+//        mainViewModel.disconnectMediaBrowser()
+//        Log.d("CHECKTAGS", "activity on destroy")
+//        super.onDestroy()
+//    }
 
 }
 

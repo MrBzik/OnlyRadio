@@ -334,21 +334,15 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             setupDatesSpinner(dates)
 
-            val pos = dates.indexOfFirst { historyDate ->
+            var pos = dates.indexOfFirst { historyDate ->
                 historyDate.time == databaseViewModel.selectedDate
             }
+
 
             datesAdapter.selectedItemPosition = pos
             setSliderHeaderText(databaseViewModel.selectedDate)
 
             bind.spinnerDates.setSelection(pos)
-
-//            if(pos <= 0) {
-//                databaseViewModel.updateHistory.postValue(true)
-//            } else {
-//                databaseViewModel.updateHistory.postValue(false)
-//            }
-
 
             setDatesSpinnerSelectListener()
 

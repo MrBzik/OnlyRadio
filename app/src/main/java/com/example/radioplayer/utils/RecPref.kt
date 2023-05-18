@@ -13,8 +13,8 @@ object RecPref {
         return if(value == REC_QUALITY_LOW) 1
         else if(value == REC_QUALITY_MEDIUM) 2
         else if(value == REC_QUALITY_DEF) 3
-        else if(value < REC_QUALITY_HIGH) 4
-        else if(value < REC_QUALITY_ULTRA) 5
+        else if(value == REC_QUALITY_HIGH) 4
+        else if(value == REC_QUALITY_ULTRA) 5
         else 6
     }
 

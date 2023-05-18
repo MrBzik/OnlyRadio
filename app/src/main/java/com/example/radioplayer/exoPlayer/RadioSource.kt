@@ -154,7 +154,7 @@ class RadioSource @Inject constructor(
             RadioService.currentPlayingItemPosition = 0
         }
 
-        if (date == RadioService.currentDateLong) {
+        if (offset == 0) {
 
             allHistoryMap.clear()
 

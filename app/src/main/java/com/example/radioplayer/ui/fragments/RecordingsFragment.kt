@@ -190,7 +190,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
             if(RadioService.currentMediaItems == SEARCH_FROM_RECORDINGS){
 
                 if(isToHandleNewRecording){
-                    Log.d("CHECKTAGS", "recording handler")
+
                     bind.rvRecordings.apply {
                         smoothScrollToPosition(RadioService.currentPlayingItemPosition)
                         post {

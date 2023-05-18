@@ -173,9 +173,9 @@ class HistoryOptionsDialog (
                historyPref.edit().putInt(HISTORY_PREF_DATES, newDatesNumber).apply()
                RadioService.historyDatesPref = newDatesNumber
 
-                if(newDatesNumber < initialDatesNumber){
-                    mainViewModel.compareDatesWithPrefAndCLeanIfNeeded()
-                }
+//                if(newDatesNumber < initialDatesNumber){
+//                    mainViewModel.compareDatesWithPrefAndCLeanIfNeeded()
+//                }
             }
 
             dismiss()

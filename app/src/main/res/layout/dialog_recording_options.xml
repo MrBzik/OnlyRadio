@@ -73,6 +73,17 @@
         app:layout_constraintTop_toBottomOf="@+id/tvRecQualityValue" />
 
 
+    <TextView
+        android:id="@+id/tvSpaceHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:fontFamily="@font/aldrich"
+        android:text="For some streams, especially podcasts, space occupied can be much smaller"
+        android:textColor="@color/default_secondary_text_color"
+        android:textSize="13sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rangeSliderRecQuality" />
 
 
     <TextView
@@ -83,7 +94,7 @@
         android:gravity="center_vertical"
         android:text="@string/dialog_back_button"
         android:textAppearance="@style/dialogTextButtons"
-        app:layout_constraintTop_toBottomOf="@+id/rangeSliderRecQuality"
+        app:layout_constraintTop_toBottomOf="@+id/tvSpaceHint"
         app:layout_constraintStart_toStartOf="parent" />
 
 
@@ -95,7 +106,7 @@
         android:gravity="center_vertical"
         android:text="@string/dialog_accept_button"
         android:textAppearance="@style/dialogTextButtons"
-        app:layout_constraintTop_toBottomOf="@+id/rangeSliderRecQuality"
+        app:layout_constraintTop_toBottomOf="@+id/tvSpaceHint"
         app:layout_constraintEnd_toEndOf="parent" />
 
 

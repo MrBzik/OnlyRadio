@@ -123,7 +123,7 @@ class RecordingOptionsDialog (
             3 -> "1 minute ~ 1mb"
             4 -> "1 minute ~ 1.5mb"
             5 -> "1 minute ~ 2mb"
-            else -> "1 minute ~ 2.5mb"
+            else -> "1 minute ~ 2.8mb"
         }
     }
 

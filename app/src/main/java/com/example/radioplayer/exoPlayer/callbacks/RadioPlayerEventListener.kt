@@ -90,47 +90,52 @@ class RadioPlayerEventListener (
         var station : RadioStation? = null
         RadioService.currentPlayingItemPosition = index
 
+        try {
+            when(RadioService.currentMediaItems){
+
+                NO_PLAYLIST -> {
+
+                    station = radioService.currentRadioStation
+
+                }
+
+                SEARCH_FROM_API -> {
+
+                    station = radioService.radioSource.stationsFromApi[index].toRadioStation()
+                    radioService.insertRadioStation(station)
+
+                }
+
+                SEARCH_FROM_FAVOURITES ->
+                    station = radioService.radioSource.stationsFavoured[index]
 
 
-        when(RadioService.currentMediaItems){
 
-            NO_PLAYLIST -> {
+                SEARCH_FROM_PLAYLIST ->
+                    station = RadioSource.stationsInPlaylist[index]
 
-                station = radioService.currentRadioStation
-
-            }
-
-            SEARCH_FROM_API -> {
-
-                station = radioService.radioSource.stationsFromApi[index].toRadioStation()
-                radioService.insertRadioStation(station)
-
-            }
-
-            SEARCH_FROM_FAVOURITES ->
-                station = radioService.radioSource.stationsFavoured[index]
-
-
-
-            SEARCH_FROM_PLAYLIST ->
-                station = RadioSource.stationsInPlaylist[index]
-
-            SEARCH_FROM_HISTORY ->
-                station = radioService.radioSource.stationsFromHistory[index]
+                SEARCH_FROM_HISTORY ->
+                    station = radioService.radioSource.stationsFromHistory[index]
 //                station = radioService.radioSource.stationsFromHistory.first {
 //                    it.url == uri
 //                }
 
-            SEARCH_FROM_HISTORY_ONE_DATE ->
-                station = RadioSource.stationsFromHistoryOneDate[index]
+                SEARCH_FROM_HISTORY_ONE_DATE ->
+                    station = RadioSource.stationsFromHistoryOneDate[index]
 
-            SEARCH_FROM_RECORDINGS -> {
-                val recording = radioService.stationsFromRecordings[index]
-                radioService.currentRecording = recording
-                RadioService.currentPlayingRecording.postValue(recording)
+                SEARCH_FROM_RECORDINGS -> {
+                    val recording = radioService.stationsFromRecordings[index]
+                    radioService.currentRecording = recording
+                    RadioService.currentPlayingRecording.postValue(recording)
 
+                }
             }
+        } catch (e : Exception){
+            Log.d("CHECKTAGS", e.stackTraceToString())
         }
+
+
+
 
         station?.let { radioService.currentRadioStation = it
 

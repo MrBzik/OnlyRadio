@@ -34,20 +34,19 @@ class HistoryDataSource(
 
                     pagesLoaded += 1
 
-
-
                  }
 
 
                 HistoryFragment.isNewHistoryQuery = false
             }
 
-
+            val nextKey = dateIndex +pagesLoaded
 
             LoadResult.Page(
                 data = stations,
                 prevKey = if (dateIndex == 0) null else dateIndex - 1,
-                nextKey = dateIndex +pagesLoaded
+                nextKey = if(nextKey < HistoryFragment.numberOfDates) nextKey
+                            else null
             )
 
         } catch (e: Exception) {

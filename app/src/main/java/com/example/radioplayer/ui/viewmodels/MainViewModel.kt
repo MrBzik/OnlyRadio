@@ -21,7 +21,6 @@ import com.example.radioplayer.ui.dialogs.*
 import com.example.radioplayer.ui.fragments.RadioSearchFragment.Companion.listOfCountries
 import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.COMMAND_ADD_MEDIA_ITEM
-import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_BASS_LEVEL
 import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_REVERB_MODE
 import com.example.radioplayer.utils.Constants.COMMAND_CLEAR_MEDIA_ITEMS
@@ -108,10 +107,10 @@ class MainViewModel @Inject constructor(
        var isSmoothTransitionNeeded = false
 
 
-     fun disconnectMediaBrowser(){
+//     fun disconnectMediaBrowser(){
 //            radioServiceConnection.sendCommand(COMMAND_STOP_SERVICE, null)
-         radioServiceConnection.disconnectBrowser()
-    }
+//         radioServiceConnection.disconnectBrowser()
+//    }
 
     fun connectMediaBrowser(){
         radioServiceConnection.connectBrowser()
@@ -594,17 +593,17 @@ class MainViewModel @Inject constructor(
 
                 if(isToChangeMediaItems){
 
-                    radioServiceConnection.sendCommand(COMMAND_CHANGE_MEDIA_ITEMS, bundleOf(
-                        Pair(SEARCH_FLAG, searchFlag),
-                        Pair(PLAY_WHEN_READY, isToPlay),
-                        Pair(ITEM_INDEX, itemIndex)
+                    radioServiceConnection.transportControls
+                        .playFromMediaId(id, bundleOf(
+                            Pair(SEARCH_FLAG, searchFlag),
+                            Pair(PLAY_WHEN_READY, isToPlay),
+                            Pair(ITEM_INDEX, itemIndex),
+                            Pair(IS_CHANGE_MEDIA_ITEMS, true)
                         ))
                 }
 
                 return false
             } else {
-
-                Log.d("CHECKTAGS", "1, play from media id?")
 
                 RadioService.currentMediaItems = searchFlag
                 radioServiceConnection.transportControls
@@ -632,10 +631,9 @@ class MainViewModel @Inject constructor(
             radioServiceConnection.sendCommand(COMMAND_UPDATE_RADIO_PLAYBACK_PITCH, null)
         }
 
-        fun compareDatesWithPrefAndCLeanIfNeeded() {
-            radioServiceConnection.sendCommand(COMMAND_COMPARE_DATES_PREF_AND_CLEAN, null)
-
-         }
+//        fun compareDatesWithPrefAndCLeanIfNeeded() {
+//            radioServiceConnection.sendCommand(COMMAND_COMPARE_DATES_PREF_AND_CLEAN, null)
+//         }
 
         fun updateFavPlaylist(){
             radioServiceConnection.sendCommand(COMMAND_UPDATE_FAV_PLAYLIST, null)

@@ -18,6 +18,7 @@ import android.util.Log
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
 import androidx.media.MediaBrowserServiceCompat
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.data.local.entities.*
@@ -33,7 +34,6 @@ import com.example.radioplayer.utils.Constants.BUFFER_PREF
 import com.example.radioplayer.utils.Constants.BUFFER_SIZE_IN_MILLS
 import com.example.radioplayer.utils.Constants.COMMAND_ADD_MEDIA_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_BASS_LEVEL
-import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_REVERB_MODE
 import com.example.radioplayer.utils.Constants.COMMAND_CLEAR_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants.COMMAND_COMPARE_DATES_PREF_AND_CLEAN
@@ -61,6 +61,7 @@ import com.example.radioplayer.utils.Constants.HISTORY_PREF_BOOKMARK
 import com.example.radioplayer.utils.Constants.HISTORY_PREF_DATES
 import com.example.radioplayer.utils.Constants.IS_ADAPTIVE_LOADER_TO_USE
 import com.example.radioplayer.utils.Constants.IS_NEW_SEARCH
+import com.example.radioplayer.utils.Constants.IS_TO_CLEAR_HISTORY_ITEMS
 import com.example.radioplayer.utils.Constants.ITEM_INDEX
 import com.example.radioplayer.utils.Constants.NO_PLAYLIST
 import com.example.radioplayer.utils.Constants.PLAY_WHEN_READY
@@ -120,6 +121,9 @@ class RadioService : MediaBrowserServiceCompat() {
 
     @Inject
     lateinit var dataSourceFactory : Factory
+
+    @Inject
+    lateinit var radioServiceConnection: RadioServiceConnection
 
     @Inject
     lateinit var renderersFactory: DefaultRenderersFactory
@@ -216,7 +220,6 @@ class RadioService : MediaBrowserServiceCompat() {
 
     companion object{
 
-        var isCleanUpNeeded = false
         var historyDatesPref = 3
         var historyPrefBookmark = 20
 
@@ -238,7 +241,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
         var isFromRecording = false
 
-        var canOnDestroyBeCalled = false
+//        var canOnDestroyBeCalled = false
 
         var isToKillServiceOnAppClose = false
 
@@ -431,9 +434,9 @@ class RadioService : MediaBrowserServiceCompat() {
                     changeVirtualizerLevel()
                 }
 
-                COMMAND_COMPARE_DATES_PREF_AND_CLEAN -> {
-                    compareDatesWithPrefAndCLeanIfNeeded(null)
-                }
+//                COMMAND_COMPARE_DATES_PREF_AND_CLEAN -> {
+//                    compareDatesWithPrefAndCLeanIfNeeded()
+//                }
 
                 COMMAND_UPDATE_FAV_PLAYLIST -> {
 
@@ -530,44 +533,59 @@ class RadioService : MediaBrowserServiceCompat() {
 
                 COMMAND_UPDATE_HISTORY_MEDIA_ITEMS -> {
 
-                    clearMediaItems(false)
+                    val isToClearMediaItems = extras?.getBoolean(IS_TO_CLEAR_HISTORY_ITEMS) ?: true
 
-                    for(i in 1 until radioSource.stationsFromHistoryMediaItems.size){
+                    if(isToClearMediaItems){
 
-                        exoPlayer.addMediaItem(
-                            radioSource.stationsFromHistoryMediaItems[i]
-                        )
+                        clearMediaItems(false)
+
+                        for(i in 1 until radioSource.stationsFromHistoryMediaItems.size){
+
+
+                            exoPlayer.addMediaItem(
+                                radioSource.stationsFromHistoryMediaItems[i]
+                            )
+                        }
+
+                    } else {
+
+                        for(i in exoPlayer.mediaItemCount until radioSource.stationsFromHistoryMediaItems.size){
+                            exoPlayer.addMediaItem(
+                                radioSource.stationsFromHistoryMediaItems[i]
+                            )
+                        }
                     }
-
                     radioSource.isStationsFromHistoryUpdated = false
                 }
 
-                COMMAND_CHANGE_MEDIA_ITEMS -> {
-
-
-                    val playWhenReady = extras?.getBoolean(PLAY_WHEN_READY) ?: false
-
-                    val flag = extras?.getInt(SEARCH_FLAG) ?: -1
-
-                    var index = extras?.getInt(Constants.ITEM_INDEX, -1) ?: 0
-
-
-                    updateMediaItems(false, flag)
-
-
-                    currentMediaItems = flag
-
-                    if(flag == SEARCH_FROM_HISTORY){
-                        index = adjustIndexFromHistory(index)
-                    }
-
-                    exoPlayer.seekTo(index, 0L)
-
-                    exoPlayer.prepare()
-
-                    exoPlayer.playWhenReady = playWhenReady
-
-                }
+//                COMMAND_CHANGE_MEDIA_ITEMS -> {
+//
+//                    val playWhenReady = extras?.getBoolean(PLAY_WHEN_READY) ?: false
+//
+//                    val flag = extras?.getInt(SEARCH_FLAG) ?: -1
+//
+//                    var index = extras?.getInt(Constants.ITEM_INDEX, -1) ?: 0
+//
+//
+//                    isFromRecording = flag == SEARCH_FROM_RECORDINGS
+//
+//
+//                    updateMediaItems(true, flag)
+//
+//
+//                    currentMediaItems = flag
+//
+//                    if(flag == SEARCH_FROM_HISTORY){
+//                        index = adjustIndexFromHistory(index)
+//                    }
+//
+//                    exoPlayer.seekTo(index, 0L)
+//
+//                    exoPlayer.prepare()
+//
+//                    exoPlayer.playWhenReady = playWhenReady
+//
+//                }
 
                 COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS -> {
 
@@ -1035,22 +1053,35 @@ class RadioService : MediaBrowserServiceCompat() {
 
                     val pos = mediaSession.controller.playbackState.currentPlaybackPosition
 
-                    if(exoPlayer.duration in 0..pos) {
-
-                       exoPlayer.seekTo(currentPlayingItemPosition, 0)
-                        exoPlayer.pause()
-                       recordingPlaybackPosition.postValue(0)
-
-                        break
-                    }
+//                    if(exoPlayer.duration in 0..pos) {
+//
+//                       exoPlayer.seekTo(currentPlayingItemPosition, 0)
+//                        exoPlayer.pause()
+//                       recordingPlaybackPosition.postValue(0)
+//
+//                        break
+//                    }
 
                     recordingPlaybackPosition.postValue(pos)
+
                     if(exoPlayer.duration > 0){
                         recordingDuration.postValue(exoPlayer.duration)
+
+                        val delay = exoPlayer.duration - pos
+
+                        if(delay > 510){
+                            delay(500)
+                        } else {
+                            delay(delay)
+                            exoPlayer.seekTo(0)
+                            exoPlayer.pause()
+                            recordingPlaybackPosition.postValue(0)
+                            break
+                        }
+                    } else {
+                        delay(500)
                     }
 
-
-                    delay(500)
                 }
                 isRecordingDurationListenerRunning = false
 //                      isToSkip = true
@@ -1314,9 +1345,6 @@ class RadioService : MediaBrowserServiceCompat() {
         serviceScope.launch {
             delay(200)
 
-
-            Log.d("CHECKTAGS", "2, prepare player?. isSamePlaylist = $isToChangeMediaItems")
-
            updateMediaItems(isToChangeMediaItems, currentMediaItems)
 
             if(itemIndex != -1){
@@ -1344,7 +1372,6 @@ class RadioService : MediaBrowserServiceCompat() {
                 if(isToChangeMediaItems || radioSource.isStationsFromApiUpdated){
                     radioSource.isStationsFromApiUpdated = false
                     exoPlayer.setMediaItems(radioSource.stationsFromApiMediaItems)
-                    Log.d("CHECKTAGS", "3 setting media items??")
                 }
             }
 
@@ -1410,9 +1437,12 @@ class RadioService : MediaBrowserServiceCompat() {
     override fun onTaskRemoved(rootIntent: Intent?) {
             super.onTaskRemoved(rootIntent)
 
-        canOnDestroyBeCalled = true
+//        canOnDestroyBeCalled = true
+
+        radioServiceConnection.disconnectBrowser()
 
         if(isToKillServiceOnAppClose){
+
             exoPlayer.stop()
         }
 
@@ -1437,7 +1467,7 @@ class RadioService : MediaBrowserServiceCompat() {
         mediaSessionConnector.setQueueNavigator(null)
         mediaSessionConnector.setPlaybackPreparer(null)
 
-        if(canOnDestroyBeCalled){
+//        if(canOnDestroyBeCalled){
             Log.d("CHECKTAGS", "on destroy")
             mediaSession.run {
                 isActive = false
@@ -1461,23 +1491,9 @@ class RadioService : MediaBrowserServiceCompat() {
 
             serviceScope.cancel()
             android.os.Process.killProcess(android.os.Process.myPid())
-        }
+//        }
     }
 
-//    override fun onBind(intent: Intent?): IBinder? {
-//        Log.d("CHECKTAGS", "intent:  ${ intent?.action }")
-//        return super.onBind(intent)
-//    }
-//
-//    override fun onUnbind(intent: Intent?): Boolean {
-//        Log.d("CHECKTAGS", "intent unbind:  ${ intent?.action }")
-//        return super.onUnbind(intent)
-//    }
-//
-//    override fun onRebind(intent: Intent?) {
-//        Log.d("CHECKTAGS", "intent rebind:  ${ intent?.action }")
-//        super.onRebind(intent)
-//    }
 
     override fun onGetRoot(
         clientPackageName: String,
@@ -1535,7 +1551,7 @@ class RadioService : MediaBrowserServiceCompat() {
     private var isLastDateUpToDate = true
 
 
-    private fun getLastDateAndCheck() = serviceScope.launch {
+    private fun getLastDateAndCheck() = serviceScope.launch(Dispatchers.IO) {
 
         val date = databaseRepository.getLastDate()
         date?.let {
@@ -1552,6 +1568,8 @@ class RadioService : MediaBrowserServiceCompat() {
             currentDateLong = newTime
             isLastDateUpToDate = false
         }
+
+        compareDatesWithPrefAndCLeanIfNeeded()
     }
 
 
@@ -1559,36 +1577,51 @@ class RadioService : MediaBrowserServiceCompat() {
 
         if(!isLastDateUpToDate){
             isLastDateUpToDate = true
-            compareDatesWithPrefAndCLeanIfNeeded(HistoryDate(initialDate, currentDateLong))
+            val newDate = HistoryDate(initialDate, currentDateLong)
+            databaseRepository.insertNewDate(newDate)
+
         }
         databaseRepository.insertStationDateCrossRef(StationDateCrossRef(stationID, initialDate))
 
     }
 
 
-    private fun compareDatesWithPrefAndCLeanIfNeeded(newDate: HistoryDate?)
-            = serviceScope.launch(Dispatchers.IO) {
+    private suspend fun compareDatesWithPrefAndCLeanIfNeeded() {
 
-        newDate?.let {
-            databaseRepository.insertNewDate(newDate)
-        }
+        val numberOfDatesInDB = databaseRepository.getNumberOfDates()
+
+        if(historyDatesPref < numberOfDatesInDB) {
 
 
-        val numberOfDatesInDB =  databaseRepository.getNumberOfDates()
-
-        if(historyDatesPref >= numberOfDatesInDB) return@launch
-        else {
-            isCleanUpNeeded = true
             val numberOfDatesToDelete = numberOfDatesInDB - historyDatesPref
             val deleteList = databaseRepository.getDatesToDelete(numberOfDatesToDelete)
 
             deleteList.forEach {
+
                 databaseRepository.deleteAllCrossRefWithDate(it.date)
                 databaseRepository.deleteDate(it)
                 databaseRepository.deleteTitlesWithDate(it.time)
             }
+
+            val stations = databaseRepository.gatherStationsForCleaning()
+
+            stations.forEach {
+
+                val checkIfInPlaylists = databaseRepository.checkIfInPlaylists(it.stationuuid)
+
+                if(!checkIfInPlaylists) {
+
+                    val checkIfInHistory = databaseRepository.checkIfRadioStationInHistory(it.stationuuid)
+
+                    if(!checkIfInHistory){
+
+                        databaseRepository.deleteRadioStation(it)
+                    }
+                }
+            }
         }
     }
+
 
 
     private val newDateIntentFilter = IntentFilter().apply {
