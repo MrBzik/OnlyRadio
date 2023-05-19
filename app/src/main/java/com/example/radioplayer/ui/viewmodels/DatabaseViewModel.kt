@@ -520,9 +520,17 @@ class DatabaseViewModel @Inject constructor(
 
     val bookmarkedTitlesLivedata = repository.bookmarkedTitlesLiveData()
 
+    fun deleteBookmarkTitle (title: BookmarkedTitle) = viewModelScope.launch {
+        repository.deleteBookmarkTitle(title)
+    }
+
+    fun restoreBookmarkTitle (title: BookmarkedTitle) = viewModelScope.launch {
+        repository.insertNewBookmarkedTitle(title)
+    }
+
     fun upsertBookmarkedTitle(title : Title) = viewModelScope.launch {
 
-        repository.deleteBookmarkedTitle(title.title)
+        repository.deleteBookmarksByTitle(title.title)
 
         repository.insertNewBookmarkedTitle(
             BookmarkedTitle(

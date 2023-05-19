@@ -43,7 +43,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
     private var isSeekBarToUpdate = true
 
-    private var isRecordingToUpdate = false
+//    private var isRecordingToUpdate = false
 
     private val calendar = Calendar.getInstance()
 
@@ -57,7 +57,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
         setRecordingsRenameClickListener()
 
-        observeRecordingPlaylistUpdate()
+//        observeRecordingPlaylistUpdate()
 
         setPlaybackSpeedButtons()
 
@@ -196,18 +196,18 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
 
 
-    private fun observeRecordingPlaylistUpdate(){
-
-        mainViewModel.isRecordingUpdated.observe(viewLifecycleOwner){
-            if(isRecordingToUpdate && currentRecording != null){
-                mainViewModel.playOrToggleRecording(
-                    rec = currentRecording!!,
-                    playWhenReady = false
-                )
-                isRecordingToUpdate = false
-            }
-        }
-    }
+//    private fun observeRecordingPlaylistUpdate(){
+//
+//        mainViewModel.isRecordingUpdated.observe(viewLifecycleOwner){
+//            if(isRecordingToUpdate && currentRecording != null){
+//                mainViewModel.playOrToggleRecording(
+//                    rec = currentRecording!!,
+//                    playWhenReady = false
+//                )
+//                isRecordingToUpdate = false
+//            }
+//        }
+//    }
 
 
 
@@ -277,7 +277,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
     override fun onDestroyView() {
         super.onDestroyView()
-        isRecordingToUpdate = false
+//        isRecordingToUpdate = false
         _bind = null
     }
 

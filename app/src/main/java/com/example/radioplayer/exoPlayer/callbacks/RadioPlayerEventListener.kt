@@ -47,7 +47,7 @@ class RadioPlayerEventListener (
                             RadioService.isFromRecording
                         ){
                             RadioService.currentSongTitle.postValue("")
-                            RadioService.currentlyPlaingSong = TITLE_UNKNOWN
+                            RadioService.currentlyPlayingSong = TITLE_UNKNOWN
 
                         } else {
                             RadioService.currentSongTitle.postValue(withoutWalm)
@@ -56,7 +56,7 @@ class RadioPlayerEventListener (
                                 radioService.insertNewTitle(withoutWalm)
                             }
 
-                            RadioService.currentlyPlaingSong = withoutWalm
+                            RadioService.currentlyPlayingSong = withoutWalm
                         }
 
                     radioService.invalidateNotification()
@@ -71,9 +71,9 @@ class RadioPlayerEventListener (
     override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
         super.onPlayWhenReadyChanged(playWhenReady, reason)
         if(playWhenReady){
-            if(RadioService.currentlyPlaingSong != radioService.lastInsertedSong &&
-               RadioService.currentlyPlaingSong != TITLE_UNKNOWN){
-                radioService.insertNewTitle(RadioService.currentlyPlaingSong)
+            if(RadioService.currentlyPlayingSong != radioService.lastInsertedSong &&
+               RadioService.currentlyPlayingSong != TITLE_UNKNOWN){
+                radioService.insertNewTitle(RadioService.currentlyPlayingSong)
             }
         }
 
@@ -127,7 +127,6 @@ class RadioPlayerEventListener (
                     val recording = radioService.stationsFromRecordings[index]
                     radioService.currentRecording = recording
                     RadioService.currentPlayingRecording.postValue(recording)
-
                 }
             }
         } catch (e : Exception){

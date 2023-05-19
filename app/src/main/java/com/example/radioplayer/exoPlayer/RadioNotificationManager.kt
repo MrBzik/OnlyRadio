@@ -7,7 +7,6 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
@@ -165,6 +164,8 @@ class RadioNotificationManager (
     }
 
 
+
+
     fun updateNotification(){
 
         notificationManager.invalidate()
@@ -208,7 +209,7 @@ class RadioNotificationManager (
         }
 
         override fun getCurrentContentText(player: Player): CharSequence? {
-            return RadioService.currentlyPlaingSong
+            return RadioService.currentlyPlayingSong
 //            return newSong()
         }
 

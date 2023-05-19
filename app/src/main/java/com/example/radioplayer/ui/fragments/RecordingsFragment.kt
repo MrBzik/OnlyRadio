@@ -186,7 +186,9 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
     private fun observeCurrentRecording(){
 
         RadioService.currentPlayingRecording.observe(viewLifecycleOwner){
+
             currentRecording = it
+
             if(RadioService.currentMediaItems == SEARCH_FROM_RECORDINGS){
 
                 if(isToHandleNewRecording){
@@ -206,22 +208,6 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
         }
     }
 
-
-//    private fun observePlayingItem(){
-//
-//        mainViewModel.newPlayingItem.observe(viewLifecycleOwner){
-//
-//            if(it is PlayingItem.FromRecordings){
-//
-//                currentRecording = it.recording
-//
-//                recordingsAdapter.playingRecordingId = it.recording.id
-//
-//            } else {
-//                recordingsAdapter.playingRecordingId = "null"
-//            }
-//        }
-//    }
 
 
     private fun setAdapterClickListener(){
@@ -273,6 +259,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
                     playingRecordingId = RadioService.currentPlayingRecording.value?.id ?: ""
                 } else {
                     playingRecordingId = ""
+                    Log.d("CHECKTAGS", "current id should be blank")
                 }
             }
 
@@ -320,25 +307,32 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
                     if(it.id == recording.id){
                         animator.cancel()
 
+
                         currentItemSeekbar = null
                         currentItemTvDuration = null
 
                         recordingsAdapter.apply {
-                            playingRecordingId = "null"
+                            playingRecordingId = ""
                             previousSeekbar = null
                             previousTvTime = null
                             previousTvTimeValue = 0
                         }
 
                         currentRecording = null
-                        mainViewModel.stopPlay()
+
+//                        mainViewModel.stopPlay()
 
                         (activity as MainActivity).bindPlayer.root.apply {
-                            visibility = View.GONE
+                            visibility = View.INVISIBLE
                             slideAnim(300, 0, R.anim.fade_out_anim)
 
                         }
+
                     }
+                }
+
+                if(RadioService.currentMediaItems == SEARCH_FROM_RECORDINGS){
+                    mainViewModel.removeRecordingMediaItem(position)
                 }
 
 
@@ -347,7 +341,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
                 Snackbar.make(
                     requireActivity().findViewById(R.id.rootLayout),
-                    "Recording was deleted",
+                    "Recording deleted",
                     Snackbar.LENGTH_LONG
                 ).apply {
 
@@ -367,6 +361,10 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
                     )
                     setAction("UNDO"){
                         databaseViewModel.insertNewRecording(recording)
+                        if(RadioService.currentMediaItems == SEARCH_FROM_RECORDINGS){
+                            mainViewModel.restoreRecordingMediaItem(position)
+                        }
+
                     }
                 }.show()
 

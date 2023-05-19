@@ -34,6 +34,7 @@ import com.example.radioplayer.databinding.ItemDateSeparatorEnclosingBinding
 import com.example.radioplayer.databinding.ItemRadioWithTextBinding
 import com.example.radioplayer.databinding.ItemTitleBinding
 import com.example.radioplayer.databinding.RadioItemBinding
+import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.animations.fadeOut
 import com.example.radioplayer.utils.RandomColors
 import com.example.radioplayer.utils.Utils
@@ -121,7 +122,7 @@ class TitleAdapter @Inject constructor(
 
         if(item is TitleWithDateModel.TitleDateSeparator)
             (holder as DateSeparatorViewHolder).apply {
-                if(currentDate == item.date){
+                if(RadioService.currentDateString == item.date){
                     bind.tvDate.text = "Today"
                 } else {
                     bind.tvDate.text = item.date
@@ -130,7 +131,7 @@ class TitleAdapter @Inject constructor(
 
         else if(item is TitleWithDateModel.TitleDateSeparatorEnclosing)
             (holder as DateSeparatorEnclosingViewHolder).apply {
-                if(currentDate == item.date){
+                if(RadioService.currentDateString == item.date){
                     bind.tvDate.text = "Today"
                 } else {
                     bind.tvDate.text = item.date
@@ -296,7 +297,5 @@ class TitleAdapter @Inject constructor(
 
         }
     }
-
-    var currentDate : String = ""
 
 }

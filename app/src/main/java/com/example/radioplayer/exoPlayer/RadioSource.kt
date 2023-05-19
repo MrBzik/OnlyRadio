@@ -255,12 +255,12 @@ class RadioSource @Inject constructor(
 
     }
 
-    val isRecordingUpdated : MutableLiveData<Boolean> = MutableLiveData()
+//    val isRecordingUpdated : MutableLiveData<Boolean> = MutableLiveData()
 
 
-    fun handleRecordingsUpdates(
-        listOfRecordings : List<Recording>
-    ){
+//    fun handleRecordingsUpdates(
+//        listOfRecordings : List<Recording>
+//    ){
 //        if(deleteAt != -1){
 //            recordings.removeAt(deleteAt)
 //        }
@@ -276,11 +276,11 @@ class RadioSource @Inject constructor(
 //                MediaItem.fromUri(it.id)
 //            }
 
-            recordings = listOfRecordings.map { recording ->
-                createMediaMetadataCompatFromRecording(recording)
-            }.toMutableList()
-            isRecordingUpdated.postValue(true)
-    }
+//            recordings = listOfRecordings.map { recording ->
+//                createMediaMetadataCompatFromRecording(recording)
+//            }.toMutableList()
+//            isRecordingUpdated.postValue(true)
+//    }
 
 
     private fun createMediaMetadataCompatFromRecording(recording : Recording) : MediaMetadataCompat{

@@ -12,6 +12,7 @@ import com.example.radioplayer.exoPlayer.RadioService
 
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.utils.Constants
 
 import com.example.radioplayer.utils.Constants.HISTORY_PREF_BOOKMARK
 import com.example.radioplayer.utils.Constants.HISTORY_PREF_DATES
@@ -29,7 +30,9 @@ class HistoryOptionsDialog (
                 ){
 
 
-    private val initialDatesNumber = RadioService.historyDatesPref
+    private val initialDatesNumber = historyPref.getInt(HISTORY_PREF_DATES,
+        Constants.HISTORY_DATES_PREF_DEFAULT
+    )
     private val initialBookmarkNumber =  RadioService.historyPrefBookmark
 
     private var newDatesNumber = initialDatesNumber
@@ -171,8 +174,6 @@ class HistoryOptionsDialog (
             if(newDatesNumber != initialDatesNumber){
 
                historyPref.edit().putInt(HISTORY_PREF_DATES, newDatesNumber).apply()
-               RadioService.historyDatesPref = newDatesNumber
-
 //                if(newDatesNumber < initialDatesNumber){
 //                    mainViewModel.compareDatesWithPrefAndCLeanIfNeeded()
 //                }

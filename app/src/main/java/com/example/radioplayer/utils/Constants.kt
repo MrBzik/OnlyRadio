@@ -47,7 +47,10 @@ object Constants {
     const val COMMAND_NEW_SEARCH = "new search"
     const val COMMAND_START_RECORDING = "start exoRecord recording"
     const val COMMAND_STOP_RECORDING = "stop exoRecord recording"
-    const val COMMAND_REMOVE_CURRENT_PLAYING_ITEM = "remove playing item from exoplayer"
+
+    const val COMMAND_REMOVE_RECORDING_MEDIA_ITEM = "remove playing item from exoplayer"
+    const val COMMAND_RESTORE_RECORDING_MEDIA_ITEM = "command restore rec media item"
+
     const val COMMAND_UPDATE_REC_PLAYBACK_SPEED = "update recordings playback speed"
     const val COMMAND_UPDATE_RADIO_PLAYBACK_SPEED = "update radio playback speed"
     const val COMMAND_UPDATE_RADIO_PLAYBACK_PITCH= "update radio playback pitch"
@@ -90,6 +93,7 @@ object Constants {
 
     const val IS_NEW_SEARCH = "is new search"
 
+    const val NO_ITEMS = -2
     const val NO_PLAYLIST = -1
     const val SEARCH_FROM_API = 0
     const val SEARCH_FROM_FAVOURITES = 1

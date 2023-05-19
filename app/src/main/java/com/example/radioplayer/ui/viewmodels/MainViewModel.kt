@@ -24,15 +24,15 @@ import com.example.radioplayer.utils.Constants.COMMAND_ADD_MEDIA_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_BASS_LEVEL
 import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_REVERB_MODE
 import com.example.radioplayer.utils.Constants.COMMAND_CLEAR_MEDIA_ITEMS
-import com.example.radioplayer.utils.Constants.COMMAND_COMPARE_DATES_PREF_AND_CLEAN
 
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
 import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
 
-import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_CURRENT_PLAYING_ITEM
+import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_RECORDING_MEDIA_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_MEDIA_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_RESTART_PLAYER
+import com.example.radioplayer.utils.Constants.COMMAND_RESTORE_RECORDING_MEDIA_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_FAV_PLAYLIST
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
@@ -92,6 +92,8 @@ class MainViewModel @Inject constructor(
 
 //       val newPlayingItem : MutableLiveData<PlayingItem> = MutableLiveData()
 
+
+       var isInSettingsExtras = false
 
 
        var isInDetailsFragment = false
@@ -495,12 +497,17 @@ class MainViewModel @Inject constructor(
 
         }
 
-        fun stopPlay(){
+        fun removeRecordingMediaItem(index : Int){
 
-            radioServiceConnection.transportControls.stop()
-            radioServiceConnection.sendCommand(COMMAND_REMOVE_CURRENT_PLAYING_ITEM, null)
-
+            radioServiceConnection.sendCommand(COMMAND_REMOVE_RECORDING_MEDIA_ITEM,
+                bundleOf(Pair(ITEM_INDEX, index)))
         }
+
+        fun restoreRecordingMediaItem(index : Int){
+            radioServiceConnection.sendCommand(COMMAND_RESTORE_RECORDING_MEDIA_ITEM,
+                bundleOf(Pair(ITEM_INDEX, index)))
+        }
+
 
         fun playOrToggleRecording(
             rec : Recording,
@@ -671,7 +678,7 @@ class MainViewModel @Inject constructor(
         val exoRecordState = radioSource.exoRecordState
         val exoRecordTimer = radioSource.exoRecordTimer
 
-        val isRecordingUpdated = radioSource.isRecordingUpdated
+//        val isRecordingUpdated = radioSource.isRecordingUpdated
 
 
         fun updateRecPlaybackSpeed(){

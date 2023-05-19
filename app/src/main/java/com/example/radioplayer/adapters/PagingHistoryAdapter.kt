@@ -3,6 +3,7 @@ package com.example.radioplayer.adapters
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.provider.MediaStore.Audio.Radio
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -30,6 +31,7 @@ import com.example.radioplayer.databinding.ItemDateSeparatorBinding
 import com.example.radioplayer.databinding.ItemDateSeparatorEnclosingBinding
 import com.example.radioplayer.databinding.ItemRadioWithTextBinding
 import com.example.radioplayer.databinding.RadioItemBinding
+import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.animations.fadeOut
 import com.example.radioplayer.utils.RandomColors
 import javax.inject.Inject
@@ -125,7 +127,7 @@ class PagingHistoryAdapter @Inject constructor(
 
         if(item is StationWithDateModel.DateSeparator)
             (holder as DateSeparatorViewHolder).apply {
-                if(currentDate == item.date){
+                if(RadioService.currentDateString == item.date){
                     bind.tvDate.text = "Today"
                 } else {
                     bind.tvDate.text = item.date
@@ -134,7 +136,7 @@ class PagingHistoryAdapter @Inject constructor(
 
         else if(item is StationWithDateModel.DateSeparatorEnclosing)
             (holder as DateSeparatorEnclosingViewHolder).apply {
-                if(currentDate == item.date){
+                if(RadioService.currentDateString == item.date){
                     bind.tvDate.text = "Today"
                 } else {
                     bind.tvDate.text = item.date
@@ -392,6 +394,5 @@ class PagingHistoryAdapter @Inject constructor(
         }
     }
 
-    var currentDate : String = ""
 
 }

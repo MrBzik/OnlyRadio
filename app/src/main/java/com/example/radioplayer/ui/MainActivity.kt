@@ -157,9 +157,10 @@ class MainActivity : AppCompatActivity() {
         bind = ActivityMainBinding.inflate(layoutInflater)
         setContentView(bind.root)
 
-        bind.stubPlayer.setOnInflateListener{ _, inflated ->
-                bindPlayer = StubPlayerActivityMainBinding.bind(inflated)
+        bind.stubPlayer.setOnInflateListener{ _, view ->
+                bindPlayer = StubPlayerActivityMainBinding.bind(view)
         }
+
 
         window.navigationBarColor = ContextCompat.getColor(this, R.color.toolbar)
 
@@ -313,7 +314,7 @@ class MainActivity : AppCompatActivity() {
 
         if(!isStubPlayerBindInflated) {
             inflatePlayerStubAndCallRelatedMethods()
-        } else if(bindPlayer.root.visibility == View.GONE){
+        } else if(bindPlayer.root.visibility == View.INVISIBLE){
 
             bindPlayer.root.visibility = View.VISIBLE
             bindPlayer.root.slideAnim(500, 0, R.anim.fade_in_anim)
@@ -338,6 +339,8 @@ class MainActivity : AppCompatActivity() {
 
 
         RadioService.currentPlayingRecording.observe(this){ recording ->
+
+            Log.d("CHECKTAGS", "new rec on main activity?")
 
             currentPlayingRecording = recording
 
@@ -678,7 +681,7 @@ class MainActivity : AppCompatActivity() {
 
             currentPlayingRecording?.apply {
                 isRecording = true
-                bindPlayer.tvStationTitle.text = "From recordings"
+                bindPlayer.tvStationTitle.text = name
                 bindPlayer.tvBitrate.text = ""
                 newName = name
                 newImage = iconUri

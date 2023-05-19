@@ -19,6 +19,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.paging.PagingData
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
@@ -34,7 +35,9 @@ import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
+import com.example.radioplayer.ui.animations.SwipeToDeleteCallback
 import com.example.radioplayer.ui.animations.objectSizeScaleAnimation
+import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
@@ -43,6 +46,7 @@ import com.example.radioplayer.utils.TextViewOutlined
 import com.example.radioplayer.utils.Utils
 import com.example.radioplayer.utils.Utils.fromDateToString
 import com.example.radioplayer.utils.addAction
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.sql.Date
@@ -54,8 +58,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     FragmentHistoryBinding::inflate
 ) {
 
-
-    private var dateForAdapters = ""
 
     private lateinit var datesAdapter : HistoryDatesAdapter
 
@@ -99,8 +101,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         observeIsInBookmarks()
 
         observeIsInStationsTab()
-
-        updateCurrentDate()
 
         setupRecyclerView()
 
@@ -348,6 +348,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             subscribeToHistory()
 
+            Log.d("CHECKTAGS", "check if with adding new date this code is running twice")
+
         }
     }
 
@@ -559,8 +561,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 }
             }
         }
-
     }
+
 
     private fun setStationsHistoryAdapter(){
 
@@ -572,7 +574,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             stationsHistoryAdapter?.apply {
 
-                currentDate = dateForAdapters
                 defaultTextColor = ContextCompat.getColor(requireContext(), R.color.default_text_color)
                 selectedTextColor = ContextCompat.getColor(requireContext(), R.color.selected_text_color)
 
@@ -604,6 +605,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             adapter = stationsHistoryAdapter
             setHasFixedSize(true)
         }
+
+        itemTouchHelper.attachToRecyclerView(null)
     }
 
     private fun setTitlesHistoryAdapter(){
@@ -612,7 +615,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             titlesHistoryAdapter = TitleAdapter(glide)
             setTitlesAdapterLoadStateListener()
             titlesHistoryAdapter?.apply {
-                currentDate = dateForAdapters
                 alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
                 titleSize = mainViewModel.stationsTitleSize
                 setOnClickListener { title ->
@@ -636,6 +638,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             adapter = titlesHistoryAdapter
             setHasFixedSize(false)
         }
+
+        itemTouchHelper.attachToRecyclerView(null)
     }
 
 
@@ -741,8 +745,10 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         bind.rvHistory.apply {
             adapter = bookmarkedTitlesAdapter
             setHasFixedSize(false)
-
         }
+
+        itemTouchHelper.attachToRecyclerView(bind.rvHistory)
+
 
         if(!isBookmarkedTitlesObserverSet){
 
@@ -906,14 +912,40 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     }
 
 
-    private fun updateCurrentDate(){
 
-        val time = System.currentTimeMillis()
-        calendar.time = Date(time)
-        val parsedDate = fromDateToString(calendar)
-        dateForAdapters =  parsedDate
+    private val itemTouchCallback by lazy {
 
+        object : SwipeToDeleteCallback(requireContext()) {
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+
+                val position = viewHolder.layoutPosition
+
+                val bookmark = bookmarkedTitlesAdapter.listOfTitles[position]
+
+                databaseViewModel.deleteBookmarkTitle(bookmark)
+
+                Snackbar.make(
+                    requireActivity().findViewById(R.id.rootLayout),
+                    "Bookmark deleted",
+                    Snackbar.LENGTH_LONG
+                ).apply {
+
+                    setAction("UNDO"){
+                        databaseViewModel.restoreBookmarkTitle(bookmark)
+                    }
+                }.show()
+            }
+        }
     }
+
+
+    private val itemTouchHelper by lazy {
+        ItemTouchHelper(itemTouchCallback)
+    }
+
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()

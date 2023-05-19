@@ -176,8 +176,11 @@ interface  RadioDAO {
 
     // Bookmarked titles
 
+    @Delete
+    suspend fun deleteBookmarkTitle(title : BookmarkedTitle)
+
     @Query("DELETE FROM BookmarkedTitle WHERE title =:title")
-    suspend fun deleteBookmarkedTitle(title : String)
+    suspend fun deleteBookmarksByTitle(title : String)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNewBookmarkedTitle(title : BookmarkedTitle)
