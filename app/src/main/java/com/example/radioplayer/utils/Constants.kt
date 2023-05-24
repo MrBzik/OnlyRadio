@@ -8,6 +8,8 @@ object Constants {
 
     const val BASE_RADIO_URL3 = "https://at1.api.radio-browser.info"
 
+    const val ADD_RADIO_STATION_URL = "https://www.radio-browser.info/add"
+
 //    const val BASE_RADIO_URLTEST = "https://ts1.api.radio-browser.info"
 
 
@@ -45,6 +47,9 @@ object Constants {
     const val NETWORK_ERROR = "network error"
 
     const val COMMAND_NEW_SEARCH = "new search"
+
+    const val COMMAND_UPDATE_HISTORY = "command update history"
+
     const val COMMAND_START_RECORDING = "start exoRecord recording"
     const val COMMAND_STOP_RECORDING = "stop exoRecord recording"
 
@@ -103,6 +108,8 @@ object Constants {
     const val SEARCH_FROM_RECORDINGS = 5
     const val PLAY_WHEN_READY = "play when ready"
     const val ITEM_INDEX = "index of item"
+    const val ITEM_ID = "id of item"
+
     const val IS_CHANGE_MEDIA_ITEMS = "id of station from history"
 
     const val TITLE_UNKNOWN = "Playing: no info"
@@ -157,12 +164,12 @@ object Constants {
     //Recording preferences
 
     const val RECORDING_QUALITY_PREF = "recording quality pref"
-    const val REC_QUALITY_LOW = 0.1f
-    const val REC_QUALITY_MEDIUM = 0.25f
+    const val REC_QUALITY_LOW = 0.0001f
+    const val REC_QUALITY_MEDIUM = 0.2f
     const val REC_QUALITY_DEF = 0.4f
     const val REC_QUALITY_HIGH = 0.6f
     const val REC_QUALITY_ULTRA = 0.8f
-    const val REC_QUALITY_MAX = 1f
+    const val REC_QUALITY_MAX = 0.9f
 
 
 

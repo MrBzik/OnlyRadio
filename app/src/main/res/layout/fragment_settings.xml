@@ -34,7 +34,7 @@
         android:gravity="center"
         android:text="General"
         android:inflatedId="@id/stubTvGeneral"
-        android:layout="@layout/stub_tv_general"
+        android:layout="@layout/stub_tv_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/guidelineMiddle"
@@ -46,7 +46,7 @@
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:inflatedId="@id/stubTvExtras"
-        android:layout="@layout/stub_tv_extras"
+        android:layout="@layout/stub_tv_title"
         app:layout_constraintStart_toStartOf="@id/guidelineMiddle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
@@ -69,6 +69,16 @@
         android:layout="@layout/stub_settings_general"
         app:layout_constraintTop_toBottomOf="@+id/viewToolbar"
         app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+
+    <ViewStub
+        android:id="@+id/stubSettingsExtras"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inflatedId="@id/stubSettingsExtras"
+        android:layout="@layout/stub_settings_extras"
+        app:layout_constraintTop_toBottomOf="@+id/viewToolbar"
         />
 
 

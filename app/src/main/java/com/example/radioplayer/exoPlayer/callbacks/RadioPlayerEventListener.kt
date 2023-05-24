@@ -25,6 +25,8 @@ class RadioPlayerEventListener (
     private var isMetadataUpdating = false
     private var lastTitle = ""
 
+
+
     override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
 
         if(lastTitle != mediaMetadata.title.toString()){
@@ -82,10 +84,13 @@ class RadioPlayerEventListener (
         }
     }
 
+
+
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
         super.onMediaItemTransition(mediaItem, reason)
 
-//        val uri = radioService.exoPlayer.currentMediaItem?.localConfiguration?.uri.toString()
+        val uri = radioService.exoPlayer.currentMediaItem?.localConfiguration?.uri.toString()
+
         val index = radioService.exoPlayer.currentMediaItemIndex
         var station : RadioStation? = null
         RadioService.currentPlayingItemPosition = index
@@ -134,18 +139,9 @@ class RadioPlayerEventListener (
         }
 
 
-
-
         station?.let { radioService.currentRadioStation = it
 
             RadioService.currentPlayingStation.postValue(it)
-
-            if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
-
-                radioService.checkDateAndUpdateHistory(it.stationuuid)
-
-            }
-
         }
 
 

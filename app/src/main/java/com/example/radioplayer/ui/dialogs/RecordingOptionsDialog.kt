@@ -118,12 +118,12 @@ class RecordingOptionsDialog (
     private fun setTvEstimateText(value : Int) : String  {
 
       return when(value){
-            1 -> "1 minute ~ 600kb"
-            2 -> "1 minute ~ 800kb"
+            1 -> "1 minute ~ 500kb"
+            2 -> "1 minute ~ 750kb"
             3 -> "1 minute ~ 1mb"
             4 -> "1 minute ~ 1.5mb"
             5 -> "1 minute ~ 2mb"
-            else -> "1 minute ~ 2.8mb"
+            else -> "1 minute ~ 2.3mb"
         }
     }
 

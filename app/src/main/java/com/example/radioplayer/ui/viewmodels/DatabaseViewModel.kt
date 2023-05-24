@@ -24,6 +24,7 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Utils.fromDateToString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.sql.Date
 import java.util.*
@@ -580,6 +581,37 @@ class DatabaseViewModel @Inject constructor(
 //            )
 //    }
 
+
+    var isRecordingsCheckNeeded = true
+
+    fun checkRecordingsForCleanUp(recList : List<Recording>){
+
+        if(isRecordingsCheckNeeded){
+
+            viewModelScope.launch(Dispatchers.IO){
+
+                val fileList = app.fileList()
+
+                if(fileList.size != recList.size){
+
+                    fileList.forEach { fileName ->
+
+                        val rec = recList.find { rec ->
+                            rec.id == fileName
+                        }
+
+                        if(rec == null){
+                            app.deleteFile(fileName)
+                        }
+                    }
+                }
+
+                isRecordingsCheckNeeded = false
+            }
+        }
+    }
+
+
     fun insertNewRecording(rec : Recording) =
         viewModelScope.launch {
             repository.insertRecording(rec)
@@ -598,9 +630,10 @@ class DatabaseViewModel @Inject constructor(
 
 
 
-    fun removeRecordingFile(recordingID : String){
+    fun removeRecordingFile(recordingID : String) = viewModelScope.launch(Dispatchers.IO) {
         app.deleteFile(recordingID)
     }
+
 
     fun renameRecording(id : String, newName: String) = viewModelScope.launch {
         repository.renameRecording(id, newName)

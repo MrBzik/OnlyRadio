@@ -92,6 +92,7 @@ object ServiceModule {
             enableAudioTrackPlaybackParams: Boolean,
             enableOffload: Boolean
         ): AudioSink {
+
             return DefaultAudioSink.Builder()
                 .setAudioCapabilities(getCapabilities(app))
                 .setAudioProcessorChain(DefaultAudioSink

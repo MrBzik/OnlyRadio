@@ -79,7 +79,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:fontFamily="@font/aldrich"
-        android:text="For some streams, especially podcasts, space occupied can be much smaller"
+        android:text="For some radio stations which steam in mono or odd sample rate space occupied will be smaller (usually podcasts)"
         android:textColor="@color/default_secondary_text_color"
         android:textSize="13sp"
         app:layout_constraintStart_toStartOf="parent"

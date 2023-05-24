@@ -15,6 +15,7 @@
 
     <dimen name="dialog_top_margin">18dp</dimen>
 
+    <dimen name="extras_fab_size">40dp</dimen>
 
 
 </resources>

@@ -5,6 +5,8 @@ package com.example.radioplayer.ui.fragments
 
 
 import android.content.res.Configuration
+import android.media.MediaExtractor
+import android.media.MediaFormat
 import android.os.Bundle
 import android.text.format.Formatter
 import android.util.Log
@@ -18,6 +20,7 @@ import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.databinding.FragmentRecordingDetailsBinding
 import com.example.radioplayer.exoPlayer.RadioService
+import com.example.radioplayer.exoPlayer.audiocalc.AudioCalculator
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.dialogs.RenameRecordingDialog
 import com.example.radioplayer.utils.Constants
@@ -62,6 +65,8 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
         setPlaybackSpeedButtons()
 
         setSystemBarsColor()
+
+
 
     }
 
@@ -164,6 +169,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
     }
 
 
+
     private fun observeCurrentRecording(){
 
         RadioService.currentPlayingRecording.observe(viewLifecycleOwner) {
@@ -181,17 +187,57 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
                 withContext(Dispatchers.Main){
                     bind.tvOccupiedSpace.text = length
                 }
+
             }
 
             calendar.time = Date(it.timeStamp)
 
            bind.tvDate.text = Utils.fromDateToStringShortWithTime(calendar)
 
+//            getDecibels()
 
         }
     }
 
 
+
+//    private fun getDecibels(){
+//       currentRecording?.let {
+//
+//           val path = "${requireContext().filesDir}/${it.id.replace("ogg", "wav")}"
+//
+//
+//           val file = File(path)
+//
+//
+//          val byteArray = file.readBytes()
+//
+//           val calc = AudioCalculator()
+//
+//           calc.setBytes(byteArray)
+//
+//           val ampl = calc.getAmplitude(byteArray)
+//           val ampls = calc.getAmplitudes(byteArray)
+//           val decs = calc.getDecibels()
+
+//           val dec = calc.getDecibel()
+//
+//           Log.d("CHECKTAGS", "decibel? : $dec")
+//           Log.d("CHECKTAGS", "ampl? : $ampl")
+
+//           ampls.forEach {
+//
+//               Log.d("CHECKTAGS", "ampls? : $it")
+//           }
+//
+//           decs.forEach {
+//
+//               Log.d("CHECKTAGS", "decs? : $it")
+//           }
+
+//
+//       }
+//    }
 
 
 

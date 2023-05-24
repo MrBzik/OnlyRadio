@@ -10,6 +10,7 @@ import android.view.animation.LinearInterpolator
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +29,8 @@ import com.example.radioplayer.utils.Utils
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -240,8 +243,14 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
             recordingsAdapter.listOfRecordings = it
 
+            databaseViewModel.checkRecordingsForCleanUp(it)
+
+
         }
     }
+
+
+
 
     private fun setupRecyclerView(){
         bind.rvRecordings.apply {
@@ -259,7 +268,6 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
                     playingRecordingId = RadioService.currentPlayingRecording.value?.id ?: ""
                 } else {
                     playingRecordingId = ""
-                    Log.d("CHECKTAGS", "current id should be blank")
                 }
             }
 
@@ -336,6 +344,8 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
                 }
 
 
+
+
                 databaseViewModel.deleteRecording(recording.id)
 
 
@@ -353,6 +363,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
                                 event == DISMISS_EVENT_TIMEOUT ||
                                 event == DISMISS_EVENT_SWIPE ) {
 
+//                                val filePath = "${requireContext().filesDir}/${recording.id}"
                                 databaseViewModel.removeRecordingFile(recording.id)
 
                             }

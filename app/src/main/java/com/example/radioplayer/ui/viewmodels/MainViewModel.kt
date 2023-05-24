@@ -34,6 +34,7 @@ import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_MEDIA_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_RESTART_PLAYER
 import com.example.radioplayer.utils.Constants.COMMAND_RESTORE_RECORDING_MEDIA_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_FAV_PLAYLIST
+import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_HISTORY
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_REC_PLAYBACK_SPEED
@@ -44,6 +45,7 @@ import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.IS_NAME_EXACT
 import com.example.radioplayer.utils.Constants.IS_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.IS_TAG_EXACT
+import com.example.radioplayer.utils.Constants.ITEM_ID
 import com.example.radioplayer.utils.Constants.ITEM_INDEX
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
 import com.example.radioplayer.utils.Constants.PLAY_WHEN_READY
@@ -569,6 +571,7 @@ class MainViewModel @Inject constructor(
         ) : Boolean {
 
 
+
             val isPrepared = playbackState.value?.isPrepared ?: false
 
             val id = station?.stationuuid
@@ -611,6 +614,13 @@ class MainViewModel @Inject constructor(
 
                 return false
             } else {
+
+                id?.let {
+                    radioServiceConnection.sendCommand(COMMAND_UPDATE_HISTORY,
+                    bundleOf(Pair(ITEM_ID, it))
+                    )
+                }
+
 
                 RadioService.currentMediaItems = searchFlag
                 radioServiceConnection.transportControls

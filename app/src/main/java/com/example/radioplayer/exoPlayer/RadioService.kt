@@ -7,8 +7,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
+import android.media.AudioManager
+import android.media.MediaExtractor
+import android.media.MediaFormat
 import android.media.audiofx.EnvironmentalReverb
 import android.media.audiofx.Virtualizer
+import android.media.audiofx.Visualizer
+import android.media.audiofx.Visualizer.MEASUREMENT_MODE_PEAK_RMS
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
@@ -46,6 +51,7 @@ import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_MEDIA_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_RESTART_PLAYER
 import com.example.radioplayer.utils.Constants.COMMAND_RESTORE_RECORDING_MEDIA_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_FAV_PLAYLIST
+import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_HISTORY
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_HISTORY_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH
@@ -60,6 +66,7 @@ import com.example.radioplayer.utils.Constants.HISTORY_PREF_DATES
 import com.example.radioplayer.utils.Constants.IS_ADAPTIVE_LOADER_TO_USE
 import com.example.radioplayer.utils.Constants.IS_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.IS_TO_CLEAR_HISTORY_ITEMS
+import com.example.radioplayer.utils.Constants.ITEM_ID
 import com.example.radioplayer.utils.Constants.ITEM_INDEX
 import com.example.radioplayer.utils.Constants.NO_ITEMS
 import com.example.radioplayer.utils.Constants.NO_PLAYLIST
@@ -79,10 +86,14 @@ import com.example.radioplayer.utils.Utils
 import com.example.radioplayer.utils.setPreset
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.DefaultLoadControl.*
+import com.google.android.exoplayer2.analytics.AnalyticsListener
+import com.google.android.exoplayer2.analytics.PlaybackStats
+import com.google.android.exoplayer2.analytics.PlaybackStatsListener
 import com.google.android.exoplayer2.audio.*
 import com.google.android.exoplayer2.drm.DrmSessionManagerProvider
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
+import com.google.android.exoplayer2.extractor.ExtractorOutput
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -142,10 +153,6 @@ class RadioService : MediaBrowserServiceCompat() {
     @Inject
     lateinit var databaseRepository: DatabaseRepository
 
-
-//    @Inject
-//    lateinit var radioServiceConnection: RadioServiceConnection
-
     private val serviceJob = SupervisorJob()
 
     val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
@@ -168,6 +175,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
     private val calendar = Calendar.getInstance()
+
+//    private lateinit var visualizer: Visualizer
 
 
     private val recordingCheck : SharedPreferences by lazy {
@@ -355,6 +364,14 @@ class RadioService : MediaBrowserServiceCompat() {
 
                 }
 
+                COMMAND_UPDATE_HISTORY -> {
+                    val id = extras?.getString(ITEM_ID)
+                    id?.let{
+                        checkDateAndUpdateHistory(it)
+                    }
+                }
+
+
                 COMMAND_START_RECORDING -> {
 
                     if(isPlaybackStatePlaying){
@@ -438,6 +455,7 @@ class RadioService : MediaBrowserServiceCompat() {
 //                }
 
                 COMMAND_UPDATE_FAV_PLAYLIST -> {
+
 
                     if(isFavPlaylistPendingUpdate){
                         isFavPlaylistPendingUpdate = false
@@ -698,6 +716,9 @@ class RadioService : MediaBrowserServiceCompat() {
 
         getLastDateAndCheck()
 
+//        visualizer = Visualizer(exoPlayer.audioSessionId)
+
+
     }
 
 
@@ -918,7 +939,10 @@ class RadioService : MediaBrowserServiceCompat() {
             .build().apply {
                 addListener(radioPlayerEventListener)
             }
+
     }
+
+
 
 
 
@@ -978,6 +1002,25 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
 
+    private fun getRecordingDuration(id : String) : Long {
+        var duration = 0L
+
+        try {
+
+            val filePath = this@RadioService.filesDir.absolutePath + "/" + id
+            val extractor = MediaExtractor()
+            extractor.setDataSource(filePath)
+            val format = extractor.getTrackFormat(0)
+            val dur = format.getLong(MediaFormat.KEY_DURATION)
+            duration = dur
+
+        } catch (e : Exception){
+            Log.d("CHECKTAGS", e.stackTraceToString())
+        }
+
+        return duration
+    }
+
 
     private fun checkRecordingAndRecoverIfNeeded(){
 
@@ -985,15 +1028,20 @@ class RadioService : MediaBrowserServiceCompat() {
 
         if(!check){
 
+            serviceScope.launch(Dispatchers.IO){
+                val recId = recordingCheck.getString(RECORDING_FILE_NAME, "")
+                recId?.let { id ->
+                    val duration = getRecordingDuration(id)
 
-
-            convertRecording(
-                recordingCheck.getString(RECORDING_FILE_NAME, "") ?: "",
-                recordingCheck.getInt(RECORDING_SAMPLE_RATE, 44100),
-                recordingCheck.getInt(RECORDING_CHANNELS_COUNT, 2),
-                recordingCheck.getLong(RECORDING_TIMESTAMP, 0),
-                300000
-            )
+                    convertRecording(
+                        id,
+                        recordingCheck.getInt(RECORDING_SAMPLE_RATE, 44100),
+                        recordingCheck.getInt(RECORDING_CHANNELS_COUNT, 2),
+                        recordingCheck.getLong(RECORDING_TIMESTAMP, System.currentTimeMillis()),
+                        duration / 1000
+                    )
+                }
+            }
         }
     }
 
@@ -1037,7 +1085,16 @@ class RadioService : MediaBrowserServiceCompat() {
     var isPlaybackStatePlaying = false
 
 
+
+
     fun listenToRecordDuration ()  {
+
+
+        val format = exoPlayer.audioFormat
+        val sampleRate = format?.sampleRate ?: 0
+        val channels = format?.channelCount ?: 0
+
+        Log.d("CHECKTAGS", "sampleRate is $sampleRate, channels : $channels")
 
 
         if(reverbMode != 0)
@@ -1047,10 +1104,23 @@ class RadioService : MediaBrowserServiceCompat() {
             exoPlayer.setAuxEffectInfo(AuxEffectInfo(effectVirtualizer.id, 1f))
 
 
+//        visualizer.measurementMode = MEASUREMENT_MODE_PEAK_RMS
+//
+//        visualizer.enabled = true
+
+
+
         serviceScope.launch {
 
 
+
+
+
             while (true){
+
+//                val peaks = visualizer.getMeasurementPeakRms(android.media.audiofx.Visualizer.MeasurementPeakRms())
+//
+//            Log.d("CHECKTAGS", "peaks are : $peaks")
 
                 val format = exoPlayer.audioFormat
 //
@@ -1069,6 +1139,32 @@ class RadioService : MediaBrowserServiceCompat() {
             }
 
         }
+
+
+//        val rate = Visualizer.getMaxCaptureRate()
+//
+//        visualizer.setDataCaptureListener(object : Visualizer.OnDataCaptureListener{
+//            override fun onWaveFormDataCapture(
+//                visualizer: Visualizer?,
+//                waveform: ByteArray?,
+//                samplingRate: Int
+//            ) {
+//                waveform?.let{
+//                    val intensity = (it[0].toFloat() + 128f) / 256
+//                    Log.d("CHECKTAGS", "intensity is: $intensity")
+//                }
+//            }
+//
+//            override fun onFftDataCapture(
+//                visualizer: Visualizer?,
+//                fft: ByteArray?,
+//                samplingRate: Int
+//            ) {
+//
+//            }
+//        }, rate,  true, false)
+
+
 
 
 
@@ -1121,8 +1217,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
                         val delay = exoPlayer.duration - pos
 
-                        if(delay > 510){
-                            delay(500)
+                        if(delay > 500){
+                            delay(400)
                         } else {
                             delay(delay)
                             exoPlayer.seekTo(0)
@@ -1131,7 +1227,7 @@ class RadioService : MediaBrowserServiceCompat() {
                             break
                         }
                     } else {
-                        delay(500)
+                        delay(400)
                     }
 
                 }
@@ -1229,6 +1325,10 @@ class RadioService : MediaBrowserServiceCompat() {
         ){ progress ->
 
             if(progress == 100.0f){
+
+                Log.d("CHECKTAGS", "progress is 100")
+
+
                 try {
                     insertNewRecording(
                         filePath,
@@ -1249,16 +1349,25 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
     private suspend fun insertNewRecording(
-        filePath : String, timeStamp : Long, duration : Long
+        recId : String, timeStamp : Long, duration : Long
     ) {
 
-        val id = filePath.replace(".wav", ".ogg")
+        Log.d("CHECKTAGS", "inserting new recording")
+
+        val id = recId.replace(".wav", ".ogg")
         val iconUri = recordingCheck.getString(RECORDING_ICON_URL, "") ?: ""
         val name = "Rec. ${ recordingCheck.getString(RECORDING_NAME, "") ?: ""}"
 
+        var dur = duration
+
+        if(duration == 0L){
+            dur = getRecordingDuration(id)
+        }
+
+
         radioSource.insertRecording(
             Recording(
-                id, iconUri, timeStamp, name, duration
+                id, iconUri, timeStamp, name, dur
             )
         )
     }
@@ -1280,6 +1389,7 @@ class RadioService : MediaBrowserServiceCompat() {
             val format = exoPlayer.audioFormat
             val sampleRate = format?.sampleRate ?: 0
             val channels = format?.channelCount ?: 0
+
 
 //            Log.d("CHECKTAGS", "$sampleRate, $channels")
 
