@@ -5,6 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.media.MediaFormat
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Debug
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
@@ -26,9 +29,18 @@ class RadioApplication : Application() {
         super.onCreate()
 
 
-        handleDarkMode()
+
+//        handleDarkMode()
 
     }
+
+
+
+
+
+
+
+
 
 
     private fun handleDarkMode(){

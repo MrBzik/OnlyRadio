@@ -46,6 +46,7 @@ object Constants {
 
     const val NETWORK_ERROR = "network error"
 
+
     const val COMMAND_NEW_SEARCH = "new search"
 
     const val COMMAND_UPDATE_HISTORY = "command update history"
@@ -142,7 +143,6 @@ object Constants {
 
     const val SEARCH_PREF_TAG = "search preferences tag"
     const val SEARCH_PREF_NAME = "search preferences name"
-    const val SEARCH_PREF_NAME_AUTO = "search pref name auto search"
     const val SEARCH_PREF_COUNTRY = "search preferences country"
     const val SEARCH_FULL_COUNTRY_NAME = "full country name for no result message"
     const val SEARCH_PREF_ORDER = "search preference for order"
@@ -151,6 +151,10 @@ object Constants {
     const val IS_TAG_EXACT = "is tag exact"
     const val IS_NAME_EXACT = "is name exact"
     const val IS_SEARCH_FILTER_LANGUAGE = "is to filter by system language"
+
+
+    const val SEARCH_PREF_NAME_AUTO = "search pref name auto search"
+    const val SEARCH_PREF_FULL_AUTO = "search pref fully auto"
 
 
     // SearchFragment Floating button positioning

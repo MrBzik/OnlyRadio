@@ -28,6 +28,7 @@ import com.example.radioplayer.utils.KeyboardObserver.observeKeyboardState
 class TagPickerDialog (
     private val requireContext : Context,
     private val mainViewModel: MainViewModel,
+    private val handleNewParams : () -> Unit
 )
     : BaseDialog<DialogPickTagBinding>(
     requireContext,
@@ -149,6 +150,8 @@ class TagPickerDialog (
 
 
             } else if(tag is TagWithGenre.Tag) {
+
+                handleNewParams()
 
                 mainViewModel.searchParamTag.postValue(tag.tag)
 
@@ -302,6 +305,8 @@ class TagPickerDialog (
 
     private fun setupButtons(){
         bind.tvClearSelection.setOnClickListener{
+
+            handleNewParams()
 
             mainViewModel.searchParamTag.postValue("")
 

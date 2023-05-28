@@ -20,7 +20,9 @@ import java.util.TimerTask
 
 class NameAutoDialog (
     requireContext : Context,
-    private val mainViewModel: MainViewModel) : BaseDialog<DialogPickNameAutoBinding>(
+    private val mainViewModel: MainViewModel,
+    private val initiateSearch : () -> Unit
+    ) : BaseDialog<DialogPickNameAutoBinding>(
     requireContext,
     DialogPickNameAutoBinding::inflate
     ) {
@@ -52,22 +54,25 @@ class NameAutoDialog (
             val newName = bind.etNewName.text.toString()
 
             if(newName.isNotBlank()){
-                mainViewModel.searchParamName.postValue(newName)
+                initiateSearch()
             }
         }
     }
 
 
-    private var timer : Timer? = null
-
     private var handler = Handler(Looper.getMainLooper())
 
     private val runnable = kotlinx.coroutines.Runnable {
-        mainViewModel.searchParamName.postValue(newName?.toString())
+
+        initiateSearch()
+
+//        newName?.let { editable ->
+//
+//        }
     }
 
 
-    private var newName : Editable? = null
+//    private var newName : Editable? = null
 
     private fun setEditTextChangedListener(){
 
@@ -79,50 +84,25 @@ class NameAutoDialog (
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
 
-            override fun afterTextChanged(s: Editable?) {
-//                        timer?.cancel()
+            override fun afterTextChanged(newName: Editable?) {
                 handler.removeCallbacks(runnable)
-                newName = s
 
-                newName?.let{ newName ->
-                    if(newName.isBlank() || newName.length > 2){
+//                newName = s
 
-                        handler.postDelayed(runnable, 1000)
+                newName?.let{ name ->
 
-//                        timer = Timer()
-//                        timer?.schedule(object : TimerTask(){
-//                            override fun run() {
-//                                mainViewModel.searchParamName.postValue(newName.toString())
-//                            }
-//                        }, 1000)
-                    }
+                    mainViewModel.searchParamName.postValue(name.toString())
+                    handler.postDelayed(runnable, 1000)
+
+
+//                    if(newName.isBlank() || newName.length > 2){
+//                    }
                 }
             }
         })
     }
 
 
-//
-//    private fun setEditTextChangeListener(){
-//
-//        bind.etNewName.addTextChangedListener {
-//
-//            it?.let {
-//
-//                val newName = it.toString()
-//
-//                if(newName.isBlank() || newName.length > 2){
-//
-//                    lifecycleScope.launch(Dispatchers.IO){
-//
-//                        delay(1000)
-//
-//                        mainViewModel.searchParamName.postValue(newName)
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     private fun setEditText(){
 

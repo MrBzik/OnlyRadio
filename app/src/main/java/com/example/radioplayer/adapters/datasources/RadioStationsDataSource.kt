@@ -23,9 +23,8 @@ class RadioStationsDataSource (
 
             val stations = loader(pageIndex, params.loadSize)
 
-//            val sortedStations = stations.distinctBy {
-//                it.name
-//            }
+
+
 
             LoadResult.Page(
                 data = stations,

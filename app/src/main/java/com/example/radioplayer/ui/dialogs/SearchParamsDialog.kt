@@ -59,7 +59,8 @@ val bitrateCalclList = arrayListOf(7000, 60, 230, 20, 1300, 2600, 3300, 500, 200
 
 class SearchParamsDialog (
     private val requireContext : Context,
-    private val mainViewModel: MainViewModel
+    private val mainViewModel: MainViewModel,
+    private val handleNewParams : () -> Unit
         ) : BaseDialog<DialogSearchParamsBinding>(
     requireContext, DialogSearchParamsBinding::inflate
         )
@@ -126,6 +127,7 @@ class SearchParamsDialog (
 
             mainViewModel.isSearchFilterLanguage = bind.switchLanguagePref.isChecked
 
+            handleNewParams()
 
             dismiss()
 

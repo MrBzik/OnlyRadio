@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
+import com.example.radioplayer.RadioApplication
 import com.example.radioplayer.adapters.datasources.RadioStationsDataSource
 import com.example.radioplayer.adapters.datasources.StationsPageLoader
 import com.example.radioplayer.adapters.models.CountryWithRegion
@@ -15,6 +16,7 @@ import com.example.radioplayer.connectivityObserver.ConnectivityObserver
 import com.example.radioplayer.connectivityObserver.NetworkConnectivityObserver
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.entities.Recording
+import com.example.radioplayer.data.remote.entities.RadioStations
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.ui.dialogs.*
@@ -55,6 +57,7 @@ import com.example.radioplayer.utils.Constants.SEARCH_FLAG
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.Constants.SEARCH_FULL_COUNTRY_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
+import com.example.radioplayer.utils.Constants.SEARCH_PREF_FULL_AUTO
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_MAX_BIT
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_MIN_BIT
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
@@ -70,6 +73,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 
 @HiltViewModel
@@ -148,22 +152,24 @@ class MainViewModel @Inject constructor(
 //    }
 
 
+    val connectivityObserver = NetworkConnectivityObserver(getApplication())
 
-    var hasInternetConnection : MutableLiveData<Boolean> = MutableLiveData(false)
+    var hasInternetConnection : MutableLiveData<Boolean> = MutableLiveData(
+        connectivityObserver.isNetworkAvailable()
+    )
 
     private fun setConnectivityObserver() {
-
-       val connectivityObserver = NetworkConnectivityObserver(getApplication())
 
         connectivityObserver.observe().onEach {
 
             when (it) {
                 ConnectivityObserver.Status.Available -> {
                     hasInternetConnection.postValue(true)
-                    if(wasSearchInterrupted){
-                        wasSearchInterrupted = false
-                        searchBy.postValue(true)
-                    }
+
+//                    if(wasSearchInterrupted){
+//                        wasSearchInterrupted = false
+//                        searchBy.postValue(true)
+//                    }
                 }
                 ConnectivityObserver.Status.Unavailable -> {
                     hasInternetConnection.postValue(false)
@@ -190,6 +196,7 @@ class MainViewModel @Inject constructor(
        val searchParamCountry : MutableLiveData<String> = MutableLiveData()
 
        var isNameAutoSearch = searchPreferences.getBoolean(SEARCH_PREF_NAME_AUTO, true)
+       var isFullAutoSearch = searchPreferences.getBoolean(SEARCH_PREF_FULL_AUTO, true)
 
        var lastSearchCountry = searchPreferences.getString(SEARCH_PREF_COUNTRY, "") ?: ""
        var lastSearchName = searchPreferences.getString(SEARCH_PREF_NAME, "")?: ""
@@ -297,30 +304,34 @@ class MainViewModel @Inject constructor(
 
     private val searchBy : MutableLiveData<Boolean> = MutableLiveData()
 
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val stationsFlow = searchBy.asFlow()
         .flatMapLatest {
+            if(it)
             searchStationsPaging()
+            else {
+                searchBy.postValue(true)
+
+//                if(hasInternetConnection.value == true){
+//
+//                } else {
+//                    wasSearchInterrupted = true
+//                }
+                flowOf(PagingData.empty())
+            }
         }
         .cachedIn(viewModelScope)
 
-    private var wasSearchInterrupted = false
+//     var wasSearchInterrupted = false
 
 
        init {
            searchParamTag.postValue(lastSearchTag)
            searchParamName.postValue(lastSearchName)
            searchParamCountry.postValue(lastSearchCountry)
-           Log.d("CHECKTAGS", System.currentTimeMillis().toString())
-           searchBy.postValue(true)
 
-           viewModelScope.launch {
-               delay(600)
-               if(hasInternetConnection.value == false){
-                   wasSearchInterrupted = true
-               }
-               this.cancel()
-           }
+           searchBy.postValue(true)
        }
 
 
@@ -340,8 +351,25 @@ class MainViewModel @Inject constructor(
 
 
 
+//       var isWaitingForNewPage = false
+//       var isWaitingForNewSearch = false
+//       val isServerNotResponding : MutableLiveData<Boolean> = MutableLiveData(false)
+//
+
+       val searchLoadingState : MutableLiveData<Boolean> = MutableLiveData()
+
+
+        var searchJob : Job = SupervisorJob()
+
+
+
        private suspend fun searchWithNewParams(
+
             limit : Int, offset : Int) : List<RadioStation> {
+
+            searchLoadingState.postValue(true)
+
+           Log.d("CHECKTAGS", "is new search? $isNewSearch")
 
                val calcOffset = limit * offset
 
@@ -364,7 +392,15 @@ class MainViewModel @Inject constructor(
            val lang = if(isSearchFilterLanguage) Locale.getDefault().isO3Language
                         else ""
 
-                   val response = radioSource.getRadioStationsSource(
+           var response : RadioStations? = null
+           var listOfStations = emptyList<RadioStation>()
+
+           searchJob = viewModelScope.launch {
+               while(true){
+
+//                   Log.d("CHECKTAGS", "search is looping")
+
+                   response = radioSource.getRadioStationsSource(
                        offset = calcOffset,
                        pageSize = limit,
                        country = lastSearchCountry,
@@ -377,39 +413,54 @@ class MainViewModel @Inject constructor(
                        minBit = minBitrateNew,
                        maxBit = maxBitrateNew,
 
-                   )
+                       )
 
-                   if(isNewSearch && response?.size == 0){
-                       noResultDetection.postValue(true)
-                   } else {
-                       noResultDetection.postValue(false)
+                   if(response == null) {
+
+                    hasInternetConnection.postValue(false)
+
+                       delay(1000)
                    }
 
+                   else {
 
-                    val listOfStations = response?.let {
+                   hasInternetConnection.postValue(true)
 
-                       it.map { station ->
-
-                           station.toRadioStation()
+                       if(isNewSearch && response?.size == 0){
+                           noResultDetection.postValue(true)
+                       } else {
+                           noResultDetection.postValue(false)
                        }
-                   } ?: emptyList()
+
+                          listOfStations = response?.let {
+
+                           it.map { station ->
+
+                               station.toRadioStation()
+                           }
+                       } ?: emptyList()
 
 
 
-                while(!RadioServiceConnection.isConnected){
-                    Log.d("CHECKTAGS", "not connected")
-                    delay(50)
-                }
+                       while(!RadioServiceConnection.isConnected){
+                           Log.d("CHECKTAGS", "not connected")
+                           delay(50)
+                       }
 
-           val firstRunBundle = Bundle().apply {
+                       radioServiceConnection.sendCommand(COMMAND_NEW_SEARCH,
+                       bundleOf(Pair(IS_NEW_SEARCH, isNewSearch)))
 
-             this.putBoolean(IS_NEW_SEARCH, isNewSearch)
+                       isNewSearch = false
 
+                       searchLoadingState.postValue(false)
+
+                       break
+                   }
+
+               }
            }
 
-           radioServiceConnection.sendCommand(COMMAND_NEW_SEARCH, firstRunBundle)
-
-           isNewSearch = false
+           searchJob.join()
 
            return listOfStations
 
@@ -465,19 +516,14 @@ class MainViewModel @Inject constructor(
                 maxBitrateOld = maxBitrateNew
                 wasSearchFilterLanguage = isSearchFilterLanguage
 
-
-
-                if(hasInternetConnection.value == true){
-
-                    searchBy.postValue(true)
-
-                } else {
-                    wasSearchInterrupted = true
+                if(searchJob.isActive){
+                    searchJob.cancel()
                 }
+
+
+                searchBy.postValue(false)
+
             }
-
-
-
     }
 
         fun changeReverbMode(){

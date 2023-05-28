@@ -24,7 +24,8 @@ import com.example.radioplayer.utils.*
 
 class CountryPickerDialog(
    private val requireContext : Context,
-   private val mainViewModel: MainViewModel
+   private val mainViewModel: MainViewModel,
+   private val handleNewParams : () -> Unit
 )
     : BaseDialog<DialogPickCountryBinding>(
     requireContext,
@@ -154,6 +155,7 @@ class CountryPickerDialog(
 
             } else if(countryItem is CountryWithRegion.Country) {
 
+                handleNewParams()
                 mainViewModel.searchParamCountry.postValue(countryItem.countryCode)
                 mainViewModel.searchFullCountryName = countryItem.countryName
 
@@ -303,6 +305,8 @@ class CountryPickerDialog(
         }
 
         bind.tvClearSelection.setOnClickListener{
+
+            handleNewParams()
 
             mainViewModel.searchParamCountry.postValue("")
             mainViewModel.searchFullCountryName = ""

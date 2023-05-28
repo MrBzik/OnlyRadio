@@ -156,6 +156,8 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         setAutoSearchByName()
 
+        setFullAutoSearch()
+
         setStationTitleSize()
 
         setAddStationClickListener()
@@ -316,6 +318,18 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
             setOnCheckedChangeListener { _, isChecked ->
 
                 mainViewModel.isNameAutoSearch = isChecked
+            }
+        }
+    }
+
+    private fun setFullAutoSearch(){
+
+        bindGeneral.switchFullAutoSearchPref.apply {
+            isChecked = mainViewModel.isFullAutoSearch
+
+            setOnCheckedChangeListener { _, isChecked ->
+
+                mainViewModel.isFullAutoSearch = isChecked
             }
         }
     }

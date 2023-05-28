@@ -13,7 +13,10 @@ import com.example.radioplayer.ui.viewmodels.MainViewModel
 
 class NameDialog (
     requireContext : Context,
-    private val mainViewModel: MainViewModel) : BaseDialog<DialogPickNameBinding>(
+    private val mainViewModel: MainViewModel,
+    private val handleNewParams : () -> Unit
+    )
+    : BaseDialog<DialogPickNameBinding>(
     requireContext,
     DialogPickNameBinding::inflate
     ) {
@@ -46,6 +49,8 @@ class NameDialog (
 
         bind.tvClearName.setOnClickListener {
 
+            handleNewParams()
+
             mainViewModel.searchParamName.postValue("")
 
             dismiss()
@@ -56,9 +61,9 @@ class NameDialog (
 
             val newName = bind.etNewName.text.toString()
 
-//            if(newName.isNotBlank()){
+                handleNewParams()
                 mainViewModel.searchParamName.postValue(newName)
-//            }
+
             dismiss()
         }
 

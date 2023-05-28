@@ -55,6 +55,7 @@ import com.example.radioplayer.utils.Constants.IS_TAG_EXACT
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.Constants.SEARCH_FULL_COUNTRY_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
+import com.example.radioplayer.utils.Constants.SEARCH_PREF_FULL_AUTO
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_MAX_BIT
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_MIN_BIT
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
@@ -812,6 +813,7 @@ class MainActivity : AppCompatActivity() {
             putInt(SEARCH_PREF_MAX_BIT, mainViewModel.maxBitrateNew)
             putBoolean(IS_SEARCH_FILTER_LANGUAGE, mainViewModel.isSearchFilterLanguage)
             putBoolean(SEARCH_PREF_NAME_AUTO, mainViewModel.isNameAutoSearch)
+            putBoolean(SEARCH_PREF_FULL_AUTO, mainViewModel.isFullAutoSearch)
 
         }.apply()
 
