@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="75dp"
     android:background="@color/main_background"
-
+    android:paddingStart="8dp"
     >
 
     <ImageView
@@ -46,6 +46,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:textColor="@color/default_text_color"
+            android:text="Some station name"
             android:fontFamily="sans-serif-smallcaps"
             android:gravity="center|start"
             android:maxLines="2"

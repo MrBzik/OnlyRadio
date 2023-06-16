@@ -124,9 +124,9 @@ class BufferSettingsDialog (
 
     private fun setRangePlaybackBuffer(){
         bind.rangeSliderPlaybackBuffer.apply {
-            valueFrom = 100f
-            valueTo = 3000f
-            stepSize = 100f
+            valueFrom = 500f
+            valueTo = 10000f
+            stepSize = 500f
 
             val initialValue = RadioService.bufferForPlayback
 

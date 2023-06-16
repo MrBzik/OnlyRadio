@@ -26,9 +26,7 @@ import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.databinding.FragmentFavStationsBinding
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.ui.MainActivity
-import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
-import com.example.radioplayer.ui.animations.SwipeToDeleteCallback
-import com.example.radioplayer.ui.animations.slideAnim
+import com.example.radioplayer.ui.animations.*
 import com.example.radioplayer.ui.dialogs.CreatePlaylistDialog
 import com.example.radioplayer.ui.dialogs.EditPlaylistDialog
 import com.example.radioplayer.ui.dialogs.RemovePlaylistDialog
@@ -175,11 +173,11 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
                 when{
                     it.isPlaying -> {
-                        mainAdapter.currentPlaybackState = true
+                        mainAdapter.utils.currentPlaybackState = true
                         mainAdapter.updateStationPlaybackState()
                     }
                     it.isPlayEnabled -> {
-                        mainAdapter.currentPlaybackState = false
+                        mainAdapter.utils.currentPlaybackState = false
                         mainAdapter.updateStationPlaybackState()
                     }
                 }
@@ -268,7 +266,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     private fun setArrowToFavClickListener(){
 
         bind.ivArrowBackToFav.setOnClickListener {
-
 
             databaseViewModel.getAllFavouredStations()
 
@@ -511,7 +508,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     private fun setMainAdapterClickListener(){
 
-        mainAdapter.setOnClickListener { station, position ->
+        mainAdapter.utils.setOnClickListener { station, position ->
 
             var isToChangeMediaItems = false
 
@@ -543,18 +540,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             setHasFixedSize(true)
             ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this)
 
-            mainAdapter.apply {
-                defaultTextColor = ContextCompat.getColor(requireContext(), R.color.default_text_color)
-                selectedTextColor = ContextCompat.getColor(requireContext(), R.color.selected_text_color)
+            setAdapterValues(mainAdapter.utils)
 
-                defaultSecondaryTextColor = ContextCompat.getColor(requireContext(), R.color.default_secondary_text_color)
-                selectedSecondaryTextColor = ContextCompat.getColor(requireContext(), R.color.selected_secondary_text_color)
-
-                alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
-                titleSize = mainViewModel.stationsTitleSize
-
-                separatorDefault = ContextCompat.getColor(requireContext(), R.color.station_bottom_separator_default)
-            }
 
             if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
                 RadioService.currentPlayingStation.value?.let {

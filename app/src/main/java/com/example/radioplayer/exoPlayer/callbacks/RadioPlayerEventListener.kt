@@ -156,6 +156,10 @@ class RadioPlayerEventListener (
 
         super.onPlayWhenReadyChanged(playWhenReady, playbackState)
 
+        radioService.radioSource.isPlayerBuffering.postValue(
+            playbackState == Player.STATE_BUFFERING
+        )
+
         if(playbackState == Player.STATE_READY && !playWhenReady || playbackState == Player.STATE_IDLE && !playWhenReady) {
 
             radioService.isPlaybackStatePlaying = false

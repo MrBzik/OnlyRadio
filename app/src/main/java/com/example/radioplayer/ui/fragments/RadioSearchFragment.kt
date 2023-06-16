@@ -11,6 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnLayout
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
@@ -23,6 +24,8 @@ import com.example.radioplayer.adapters.models.CountryWithRegion
 import com.example.radioplayer.adapters.models.TagWithGenre
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
+import com.example.radioplayer.databinding.StubNoResultMessageBinding
+import com.example.radioplayer.databinding.StubTvTitleBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
@@ -62,6 +65,10 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private var isToInitiateNewSearch = false
 
+    private lateinit var bindNoResultMessage : StubNoResultMessageBinding
+    private var isBindNoResultMessageInflated = false
+
+    private var isNoResultClickLogicSet = false
 
     companion object {
 
@@ -132,13 +139,15 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             }
         }
-
-
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        bind.stubTvNoResultMessage.setOnInflateListener{ _, bindView ->
+            bindNoResultMessage = StubNoResultMessageBinding.bind(bindView)
+        }
 
         setSearchParamsObservers()
 
@@ -172,11 +181,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         observeSearchState()
 
+        textLoadAnim = TextLoadAnim(requireContext(), bind.tvLoading)
 
-        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
-            textLoadAnim = TextLoadAnim(
-                requireContext(), bind.tvLoading!!)
-        }
     }
 
 
@@ -232,35 +238,126 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             if(noResult){
 
-                val tagExact = if(mainViewModel.isTagExact) "(Exact)" else ""
-                val nameExact = if(mainViewModel.isNameExact) "(Exact)" else ""
+                if(!isBindNoResultMessageInflated){
+                    isBindNoResultMessageInflated = true
+                    bind.stubTvNoResultMessage.inflate()
+                }
 
-                val tag = if(mainViewModel.lastSearchTag.isBlank()) ""
-                else "tag $tagExact: ${mainViewModel.lastSearchTag}\n\n"
+                bindNoResultMessage.apply {
 
-                val name = if(mainViewModel.lastSearchName.isBlank()) ""
-                else "name $nameExact: ${mainViewModel.lastSearchName}\n\n"
+                    if(mainViewModel.lastSearchTag.isBlank()){
+                        llTag.visibility = View.GONE
+                    } else {
+                        llTag.visibility = View.VISIBLE
+                        val tagExact = if(mainViewModel.isTagExact) "(Exact)" else ""
+                        tvTag.text = "${mainViewModel.lastSearchTag} $tagExact"
+                    }
 
-                val country = if(mainViewModel.searchFullCountryName.isBlank()) ""
-                else "country: ${mainViewModel.searchFullCountryName}\n\n"
+                    if(mainViewModel.lastSearchName.isBlank()){
+                        llName.visibility = View.GONE
+                    } else {
+                        llName.visibility = View.VISIBLE
+                        val nameExact = if(mainViewModel.isNameExact) "(Exact)" else ""
+                        tvName.text = "${mainViewModel.lastSearchName} $nameExact"
+                    }
 
-                val language = if(!mainViewModel.isSearchFilterLanguage) ""
-                else "Language: ${Locale.getDefault().displayLanguage}\n\n"
+                    if(mainViewModel.searchFullCountryName.isBlank()){
+                        llCountry.visibility = View.GONE
+                    } else {
+                        llCountry.visibility = View.VISIBLE
+                        tvCountry.text = mainViewModel.searchFullCountryName
+                    }
 
-                val bitrateMin = if(mainViewModel.minBitrateOld == BITRATE_0) ""
-                else "Min bitrate: ${mainViewModel.minBitrateOld} kbps\n\n"
+                    if(mainViewModel.isSearchFilterLanguage){
+                        llLanguage.visibility = View.VISIBLE
+                        tvLanguage.text = Locale.getDefault().displayLanguage
+                    } else {
+                        llLanguage.visibility = View.GONE
+                    }
 
-                val bitrateMax = if(mainViewModel.maxBitrateOld == BITRATE_MAX) ""
-                else "Max bitrate: ${mainViewModel.maxBitrateOld} kbps"
+                    if(mainViewModel.minBitrateOld == BITRATE_0){
+                        llBitrateMin.visibility = View.GONE
+                    } else {
+                        llBitrateMin.visibility = View.VISIBLE
+                        tvBitrateMin.text = "${mainViewModel.minBitrateOld} kbps"
+                    }
 
-                val message = "No results for\n\n\n$tag$name$country$language$bitrateMin$bitrateMax"
+                    if(mainViewModel.maxBitrateOld == BITRATE_MAX){
+                        llBitrateMax.visibility = View.GONE
+                    } else {
+                        llBitrateMax.visibility = View.VISIBLE
+                        tvBitrateMax.text = "${mainViewModel.maxBitrateOld} kbps"
+                    }
+                }
 
-                bind.tvResultMessage.visibility = View.VISIBLE
+                bindNoResultMessage.llRootLayout.visibility = View.VISIBLE
 
-                bind.tvResultMessage.text = message
+                bindNoResultMessage.llRootLayout.slideAnim(350, 0, R.anim.fade_in_anim)
+
+                if(!isNoResultClickLogicSet) setNoResultClickLogic()
+
+            }
+//            else bind.stubTvNoResultMessage.visibility = View.GONE
+
+        }
+    }
 
 
-            }   else bind.tvResultMessage.visibility = View.INVISIBLE
+    private fun setNoResultClickLogic(){
+        isNoResultClickLogicSet = true
+
+        bindNoResultMessage.apply {
+
+            llTag.setOnClickListener {
+                if(mainViewModel.isFullAutoSearch) isToInitiateNewSearch = true
+
+                mainViewModel.searchParamTag.postValue("")
+                llTag.visibility = View.INVISIBLE
+            }
+
+            llName.setOnClickListener {
+                if(mainViewModel.isFullAutoSearch) isToInitiateNewSearch = true
+
+                mainViewModel.searchParamName.postValue("")
+                llName.visibility = View.INVISIBLE
+            }
+
+            llCountry.setOnClickListener {
+                if(mainViewModel.isFullAutoSearch) isToInitiateNewSearch = true
+
+                mainViewModel.searchParamCountry.postValue("")
+                mainViewModel.searchFullCountryName = ""
+                llCountry.visibility = View.INVISIBLE
+            }
+
+            llLanguage.setOnClickListener {
+                llLanguage.visibility = View.INVISIBLE
+                mainViewModel.isSearchFilterLanguage = false
+
+                if(mainViewModel.isFullAutoSearch){
+                    mainViewModel.initiateNewSearch()
+                    clearAdapter(true)
+                }
+            }
+
+
+            llBitrateMin.setOnClickListener {
+                llBitrateMin.visibility = View.INVISIBLE
+                mainViewModel.minBitrateNew = BITRATE_0
+                if(mainViewModel.isFullAutoSearch) {
+                    mainViewModel.initiateNewSearch()
+                    clearAdapter(true)
+                }
+            }
+
+            llBitrateMax.setOnClickListener {
+                llBitrateMax.visibility = View.INVISIBLE
+                mainViewModel.maxBitrateNew = BITRATE_MAX
+                if(mainViewModel.isFullAutoSearch) {
+                    mainViewModel.initiateNewSearch()
+                    clearAdapter(true)
+                }
+            }
         }
     }
 
@@ -342,13 +439,13 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
                     when{
                         it.isPlaying -> {
-                            pagingRadioAdapter.currentPlaybackState = true
+                            pagingRadioAdapter.utils.currentPlaybackState = true
 
                             pagingRadioAdapter.updateStationPlaybackState()
 
                         }
                         it.isPlayEnabled -> {
-                            pagingRadioAdapter.currentPlaybackState = false
+                            pagingRadioAdapter.utils.currentPlaybackState = false
 
                             pagingRadioAdapter.updateStationPlaybackState()
                         }
@@ -405,7 +502,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private fun setAdapterOnClickListener(){
 
-        pagingRadioAdapter.setOnClickListener { station, index ->
+        pagingRadioAdapter.utils.setOnClickListener { station, index ->
 
 
            val isToChangeMediaItems = RadioService.currentMediaItems != SEARCH_FROM_API
@@ -426,18 +523,9 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             adapter = pagingRadioAdapter
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
-            pagingRadioAdapter.apply {
-                defaultTextColor = ContextCompat.getColor(requireContext(), R.color.default_text_color)
-                selectedTextColor = ContextCompat.getColor(requireContext(), R.color.selected_text_color)
 
-                defaultSecondaryTextColor = ContextCompat.getColor(requireContext(), R.color.default_secondary_text_color)
-                selectedSecondaryTextColor = ContextCompat.getColor(requireContext(), R.color.selected_secondary_text_color)
+            setAdapterValues(pagingRadioAdapter.utils)
 
-                alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
-                titleSize = mainViewModel.stationsTitleSize
-                separatorDefault = ContextCompat.getColor(requireContext(), R.color.station_bottom_separator_default)
-
-            }
 
             itemAnimator = null
 
@@ -479,9 +567,11 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                 if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
                     (activity as MainActivity).endSeparatorsLoadAnim()
                 } else {
-                    textLoadAnim?.endLoadingAnim()
                     (activity as MainActivity).bind.progressBarBottom?.hide()
                 }
+
+                textLoadAnim?.endLoadingAnim()
+
             }
         }
     }
@@ -628,12 +718,13 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                 if(isToShowLoadingMessage || mainViewModel.isInitialLaunchOfTheApp){
                     mainViewModel.isInitialLaunchOfTheApp = false
 
-                    if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES)
-                        showLoadingResultsMessage()
-                    else {
-                        bind.tvResultMessage.visibility = View.INVISIBLE
-                        textLoadAnim?.startLoadingAnim()
-                    }
+                    textLoadAnim?.startLoadingAnim()
+
+//                    if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES)
+//                        showLoadingResultsMessage()
+//                    else {
+//                        bind.tvResultMessage.visibility = View.INVISIBLE
+//                    }
                 }
 
                 pagingRadioAdapter.submitData(it)
@@ -644,13 +735,13 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
 
 
-    private fun showLoadingResultsMessage(){
-        bind.tvResultMessage.apply {
-            visibility = View.VISIBLE
-            text = "Waiting for response from servers..."
-            slideAnim(100, 0, R.anim.fade_in_anim)
-        }
-    }
+//    private fun showLoadingResultsMessage(){
+//        bind.tvResultMessage.apply {
+//            visibility = View.VISIBLE
+//            text = "Waiting for response from servers..."
+//            slideAnim(100, 0, R.anim.fade_in_anim)
+//        }
+//    }
 
 
     private fun setSearchToolbar() {
@@ -728,7 +819,14 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private fun clearAdapter(check : Boolean){
         if(check){
-            Log.d("CHECKTAGS", "is clearing adapter")
+
+            if(isBindNoResultMessageInflated){
+                if(bindNoResultMessage.llRootLayout.isVisible){
+                    bindNoResultMessage.llRootLayout.visibility = View.GONE
+                    bindNoResultMessage.llRootLayout.slideAnim(150, 0, R.anim.fade_out_anim)
+                }
+            }
+
 
             isNewSearchForAnimations = true
             isToShowLoadingMessage = true
@@ -762,8 +860,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             handleNewParams()
 
             (bind.tvSelectedCountry as TextView).text = it.ifBlank {"Country"}
-
-            bind.fabInitiateSearch
         }
     }
 
@@ -780,7 +876,9 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     private fun observeInternetConnection() {
 
         mainViewModel.hasInternetConnection.observe(viewLifecycleOwner){
+
             bind.ivNoInternet.isVisible = !it
+
 
 //            if(mainViewModel.isWaitingForNewSearch || mainViewModel.isWaitingForNewPage){
 //                bind.ivNoInternet.isVisible = true
@@ -796,6 +894,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     override fun onDestroyView() {
         super.onDestroyView()
+        isNoResultClickLogicSet = false
+        isBindNoResultMessageInflated = false
         bind.rvSearchStations.adapter = null
         textLoadAnim = null
         _bind = null

@@ -43,11 +43,10 @@ private const val TYPE_DATE_SEPARATOR_ENCLOSING = 2
 
 
 class PagingHistoryAdapter @Inject constructor(
-    private val glide : RequestManager
-
+   glide : RequestManager
 ) : PagingDataAdapter<StationWithDateModel, RecyclerView.ViewHolder>(StationsComparator) {
 
-    private val randColors = RandomColors()
+    val utils = BaseAdapter(glide)
 
     class StationViewHolder (val bind: ItemRadioWithTextBinding)
         : RecyclerView.ViewHolder(bind.root)
@@ -70,11 +69,12 @@ class PagingHistoryAdapter @Inject constructor(
                     )
                 )
 
+
                 holder.itemView.setOnClickListener {
 
                     val item = getItem(holder.absoluteAdapterPosition) as StationWithDateModel.Station
 
-                    onItemClickListener?.let { click ->
+                    utils.onItemClickListener?.let { click ->
 
                         click(item.radioStation, holder.absoluteAdapterPosition)
                     }
@@ -84,7 +84,7 @@ class PagingHistoryAdapter @Inject constructor(
                         if(selectedAdapterPosition != holder.absoluteAdapterPosition){
 
                             previousItemHolder?.bind?.let {
-                                restoreState(it)
+                                utils.restoreState(it)
                             }
                         }
                     }
@@ -95,7 +95,7 @@ class PagingHistoryAdapter @Inject constructor(
 
                         previousItemHolder?.bind?.let {
 
-                            restoreState(it)
+                            utils.restoreState(it)
                         }
 
                     }
@@ -148,154 +148,38 @@ class PagingHistoryAdapter @Inject constructor(
 
                 val station = item.radioStation
 
-                tvPrimary.text = station.name
-                tvPrimary.textSize = titleSize
-
-                tvSecondary.apply {
-                    if(station.country?.isNotBlank() == true){
-                        visibility = View.VISIBLE
-                        text = station.country
+                utils.handleBinding(this, station, position){pos ->
+                    if(pos != holder.bindingAdapterPosition) {
+                        tvPlaceholder.alpha = utils.alpha
                     }
-
-                    else visibility = View.GONE
-                }
-
-                station.name?.let { name ->
-                    var char = 'X'
-
-                    for(l in name.indices){
-                        if(name[l].isLetter()){
-                            char = name[l]
-                            break
-                        }
-                    }
-
-                    val color = randColors.getColor()
-
-                    tvPlaceholder.text = char.toString().uppercase()
-                    tvPlaceholder.setBackgroundColor(color)
-                    tvPlaceholder.alpha = alpha
-                }
-
-
-                if(station.favicon.isNullOrBlank()) {
-
-                    ivItemImage.visibility = View.GONE
-
-                } else {
-
-                    glide
-                        .load(station.favicon)
-                        .listener(object : RequestListener<Drawable> {
-                            override fun onLoadFailed(
-                                e: GlideException?,
-                                model: Any?,
-                                target: Target<Drawable>?,
-                                isFirstResource: Boolean
-                            ): Boolean {
-
-                                return true
-                            }
-
-                            override fun onResourceReady(
-                                resource: Drawable?,
-                                model: Any?,
-                                target: Target<Drawable>?,
-                                dataSource: DataSource?,
-                                isFirstResource: Boolean
-                            ): Boolean {
-
-                                if(dataSource?.name == "REMOTE"){
-
-                                    tvPlaceholder.fadeOut(300, alpha, position){ pos ->
-                                        if(pos != holder.bindingAdapterPosition) {
-                                            tvPlaceholder.alpha = alpha
-                                        }
-                                    }
-
-                                }
-                                else {
-
-                                    tvPlaceholder.alpha = 0f
-                                }
-                                ivItemImage.visibility = View.VISIBLE
-                                return false
-                            }
-                        })
-                        .transition(DrawableTransitionOptions.withCrossFade())
-                        .apply(RequestOptions().override(65, 65))
-                        .into(ivItemImage)
                 }
 
 
                 if(station.stationuuid == currentRadioStationID){
 
                         previousItemHolder?.bind?.let {
-                            restoreState(it)
+                            utils.restoreState(it)
                         }
 
                         previousItemHolder = holder
                         selectedAdapterPosition = holder.absoluteAdapterPosition
-                        handleStationPlaybackState(this)
+                        utils.handleStationPlaybackState(this)
 
                 } else
 
-                    restoreState(this)
+                    utils.restoreState(this)
 
             }
         }
     }
 
-    var defaultTextColor = 0
-    var selectedTextColor = 0
-
-    var defaultSecondaryTextColor = 0
-    var selectedSecondaryTextColor = 0
-
-    var alpha = 0.1f
-    var titleSize = 20f
-
-    var separatorDefault = 0
-
-    private fun restoreState(bind: ItemRadioWithTextBinding){
-        bind.apply {
-            radioItemRootLayout.setBackgroundResource(R.color.main_background)
-            tvPrimary.setTextColor(defaultTextColor)
-
-            tvSecondary.setTextColor(defaultSecondaryTextColor)
-            viewBottomSeparator?.setBackgroundColor(separatorDefault)
-        }
-    }
-
-    private fun handleStationPlaybackState(bind: ItemRadioWithTextBinding){
-
-        if(currentPlaybackState){
-            bind.apply {
-                radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
-                tvPrimary.setTextColor(selectedTextColor)
-
-                tvSecondary.setTextColor(selectedSecondaryTextColor)
-
-                viewBottomSeparator?.setBackgroundResource(R.color.station_bottom_separator_active)
-            }
-
-        } else {
-            bind.apply {
-                radioItemRootLayout.setBackgroundResource(R.drawable.radio_unselected_gradient)
-                tvPrimary.setTextColor(defaultTextColor)
-
-                tvSecondary.setTextColor(defaultSecondaryTextColor)
-
-                viewBottomSeparator?.setBackgroundResource(R.color.station_bottom_separator_selected)
-            }
-        }
-    }
+//    var separatorDefault = 0
 
 
     fun updateStationPlaybackState(){
        previousItemHolder?.let{
            if(it.absoluteAdapterPosition == selectedAdapterPosition){
-               handleStationPlaybackState(it.bind)
+               utils.handleStationPlaybackState(it.bind)
            }
        }
     }
@@ -308,35 +192,23 @@ class PagingHistoryAdapter @Inject constructor(
 
             currentRadioStationID = station.stationuuid
             previousItemHolder?.bind?.let {
-                restoreState(it)
+                utils.restoreState(it)
             }
         }
         holder?.let {
-           previousItemHolder = holder
+            selectedAdapterPosition = holder.absoluteAdapterPosition
+            previousItemHolder = holder
 
-           selectedAdapterPosition = holder.absoluteAdapterPosition
-
-           handleStationPlaybackState(holder.bind)
+            utils.handleStationPlaybackState(holder.bind)
 
         }
     }
 
 
-
     var currentRadioStationID : String? = null
-    var currentPlaybackState = false
     private var selectedAdapterPosition = -2
+
     private var previousItemHolder : StationViewHolder? = null
-
-
-
-    private var onItemClickListener : ((RadioStation, Int) -> Unit)? = null
-
-    fun setOnClickListener(listener : (RadioStation, Int) -> Unit){
-        onItemClickListener = listener
-    }
-
-
 
 
 

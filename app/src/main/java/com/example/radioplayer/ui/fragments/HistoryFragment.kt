@@ -439,13 +439,13 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 when{
                     it.isPlaying -> {
-                        stationsHistoryAdapter?.currentPlaybackState = true
+                        stationsHistoryAdapter?.utils?.currentPlaybackState = true
 
                             stationsHistoryAdapter?.updateStationPlaybackState()
 
                     }
                     it.isPlayEnabled -> {
-                        stationsHistoryAdapter?.currentPlaybackState = false
+                        stationsHistoryAdapter?.utils?.currentPlaybackState = false
 
                             stationsHistoryAdapter?.updateStationPlaybackState()
 
@@ -574,16 +574,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             stationsHistoryAdapter?.apply {
 
-                defaultTextColor = ContextCompat.getColor(requireContext(), R.color.default_text_color)
-                selectedTextColor = ContextCompat.getColor(requireContext(), R.color.selected_text_color)
-
-                defaultSecondaryTextColor = ContextCompat.getColor(requireContext(), R.color.default_secondary_text_color)
-                selectedSecondaryTextColor = ContextCompat.getColor(requireContext(), R.color.selected_secondary_text_color)
-
-                alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
-                titleSize = mainViewModel.stationsTitleSize
-
-                separatorDefault = ContextCompat.getColor(requireContext(), R.color.station_bottom_separator_default)
+                setAdapterValues(utils)
 
                 if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
                     RadioService.currentPlayingStation.value?.let {
@@ -882,7 +873,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private fun setupAdapterClickListener(){
 
-        stationsHistoryAdapter?.setOnClickListener { station, position ->
+        stationsHistoryAdapter?.utils?.setOnClickListener { station, position ->
 
             val flag = if(databaseViewModel.selectedDate == 0L){
                 SEARCH_FROM_HISTORY

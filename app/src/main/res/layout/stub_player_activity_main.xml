@@ -51,12 +51,22 @@
         android:id="@+id/tvBitrate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="40dp"
         android:layout_marginStart="83dp"
-
         android:textAppearance="@style/dialogItemText"
+        android:textSize="14sp"
 
     />
+
+
+    <ProgressBar
+        android:id="@+id/progressBuffer"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="6dp"
+        />
+
 
     <TextView
         android:id="@+id/tvExpandHideText"

@@ -5,9 +5,7 @@ import com.example.radioplayer.data.remote.entities.Languages
 import com.example.radioplayer.data.remote.entities.RadioStations
 import com.example.radioplayer.data.remote.entities.RadioTags
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
-import org.json.JSONObject
 import retrofit2.Response
-import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 import retrofit2.http.Url

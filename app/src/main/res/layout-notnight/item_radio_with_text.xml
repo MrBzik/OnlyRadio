@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="75dp"
     android:background="@color/main_background"
-
+    android:paddingStart="8dp"
     >
 
     <ImageView
@@ -71,6 +71,7 @@
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_gravity="bottom"
+        android:background="@color/station_bottom_separator_default"
         />
 
 </FrameLayout>

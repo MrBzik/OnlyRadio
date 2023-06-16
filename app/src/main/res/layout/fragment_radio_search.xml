@@ -18,23 +18,20 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-
-        <TextView
-            android:id="@+id/tvTag"
-            android:layout_width="0dp"
-            android:layout_height="60dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginHorizontal="8dp"
-            android:ellipsize="middle"
-            android:gravity="center"
-            android:maxLines="1"
-            android:text="Tag"
-            android:textAppearance="@style/mainTextButtons"
-            app:layout_constraintEnd_toStartOf="@+id/guideline33"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
-
+    <TextView
+        android:id="@+id/tvTag"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginHorizontal="8dp"
+        android:ellipsize="middle"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="Tag"
+        android:textAppearance="@style/mainTextButtons"
+        app:layout_constraintEnd_toStartOf="@+id/guideline33"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <View
@@ -42,53 +39,52 @@
         android:layout_height="60dp"
         android:background="@drawable/gradient_for_separators"
         app:layout_constraintStart_toStartOf="@id/guideline33"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:layout_width="2dp"
         android:layout_height="60dp"
         android:background="@drawable/gradient_for_separators"
         app:layout_constraintStart_toStartOf="@id/guideline66"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
-<!--    <TextView-->
-<!--        android:id="@+id/tvSeparatorFirst"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="60dp"-->
-<!--        android:layout_marginStart="-2dp"-->
-<!--        android:gravity="center"-->
-<!--        android:text=":"-->
-<!--        android:textAppearance="@style/mainTextTitle"-->
-<!--        app:layout_constraintStart_toStartOf="@id/guideline33"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
+    <!--    <TextView-->
+    <!--        android:id="@+id/tvSeparatorFirst"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="60dp"-->
+    <!--        android:layout_marginStart="-2dp"-->
+    <!--        android:gravity="center"-->
+    <!--        android:text=":"-->
+    <!--        android:textAppearance="@style/mainTextTitle"-->
+    <!--        app:layout_constraintStart_toStartOf="@id/guideline33"-->
+    <!--        app:layout_constraintTop_toTopOf="parent" />-->
 
-<!--    <TextView-->
-<!--        android:id="@+id/tvSeparatorSecond"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="60dp"-->
-<!--        android:layout_marginStart="-2dp"-->
-<!--        android:gravity="center"-->
-<!--        android:text=":"-->
-<!--        android:textAppearance="@style/mainTextTitle"-->
-<!--        app:layout_constraintStart_toStartOf="@id/guideline66"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
+    <!--    <TextView-->
+    <!--        android:id="@+id/tvSeparatorSecond"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="60dp"-->
+    <!--        android:layout_marginStart="-2dp"-->
+    <!--        android:gravity="center"-->
+    <!--        android:text=":"-->
+    <!--        android:textAppearance="@style/mainTextTitle"-->
+    <!--        app:layout_constraintStart_toStartOf="@id/guideline66"-->
+    <!--        app:layout_constraintTop_toTopOf="parent" />-->
 
 
-        <TextView
-            android:id="@+id/tvName"
-            android:layout_width="0dp"
-            android:layout_height="60dp"
-            android:layout_marginHorizontal="8dp"
-            android:layout_gravity="center_horizontal"
-            android:ellipsize="middle"
-            android:gravity="center"
-            android:maxLines="1"
-            android:text="Name"
-            android:textAppearance="@style/mainTextButtons"
-            app:layout_constraintEnd_toEndOf="@id/guideline66"
-            app:layout_constraintStart_toStartOf="@id/guideline33"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginHorizontal="8dp"
+        android:ellipsize="middle"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="Name"
+        android:textAppearance="@style/mainTextButtons"
+        app:layout_constraintEnd_toEndOf="@id/guideline66"
+        app:layout_constraintStart_toStartOf="@id/guideline33"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <TextView
@@ -129,8 +125,7 @@
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="2dp"
+        android:layout_marginHorizontal="2dp"
         android:layout_marginTop="60dp"
         android:backgroundTint="@color/floating_buttons"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -149,13 +144,29 @@
 
 
     <TextView
-        android:id="@+id/tvResultMessage"
+        android:id="@+id/tvLoading"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="40dp"
-        android:textAppearance="@style/dialogSearchText"
-        android:textColor="@color/Separator"
-        android:visibility="invisible"
+        android:fontFamily="@font/aldrich"
+        android:textSize="20sp"
+        android:textColor="@color/transparent"
+        android:text="Waiting for response from servers..."
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
+
+
+    <ViewStub
+        android:id="@+id/stubTvNoResultMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inflatedId="@id/stubTvNoResultMessage"
+        android:layout="@layout/stub_no_result_message"
+        android:layout_marginHorizontal="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -184,9 +195,9 @@
         android:layout_marginTop="70dp"
         android:layout_marginEnd="10dp"
         android:scaleType="centerCrop"
-        app:fabCustomSize="52dp"
         android:src="@drawable/ic_search_order"
         app:backgroundTint="@color/floating_buttons"
+        app:fabCustomSize="52dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

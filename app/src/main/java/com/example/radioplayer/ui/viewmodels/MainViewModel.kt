@@ -115,6 +115,9 @@ class MainViewModel @Inject constructor(
        var isSmoothTransitionNeeded = false
 
 
+       val isPlayerBuffering = radioSource.isPlayerBuffering
+
+
 //     fun disconnectMediaBrowser(){
 //            radioServiceConnection.sendCommand(COMMAND_STOP_SERVICE, null)
 //         radioServiceConnection.disconnectBrowser()
@@ -330,7 +333,6 @@ class MainViewModel @Inject constructor(
            searchParamTag.postValue(lastSearchTag)
            searchParamName.postValue(lastSearchName)
            searchParamCountry.postValue(lastSearchCountry)
-
            searchBy.postValue(true)
        }
 
@@ -396,6 +398,7 @@ class MainViewModel @Inject constructor(
            var listOfStations = emptyList<RadioStation>()
 
            searchJob = viewModelScope.launch {
+
                while(true){
 
 //                   Log.d("CHECKTAGS", "search is looping")
@@ -422,42 +425,37 @@ class MainViewModel @Inject constructor(
                        delay(1000)
                    }
 
-                   else {
-
-                   hasInternetConnection.postValue(true)
-
-                       if(isNewSearch && response?.size == 0){
-                           noResultDetection.postValue(true)
-                       } else {
-                           noResultDetection.postValue(false)
-                       }
-
-                          listOfStations = response?.let {
-
-                           it.map { station ->
-
-                               station.toRadioStation()
-                           }
-                       } ?: emptyList()
-
-
-
-                       while(!RadioServiceConnection.isConnected){
-                           Log.d("CHECKTAGS", "not connected")
-                           delay(50)
-                       }
-
-                       radioServiceConnection.sendCommand(COMMAND_NEW_SEARCH,
-                       bundleOf(Pair(IS_NEW_SEARCH, isNewSearch)))
-
-                       isNewSearch = false
-
-                       searchLoadingState.postValue(false)
-
-                       break
-                   }
-
+                   else break
                }
+
+
+               hasInternetConnection.postValue(true)
+
+               if(isNewSearch && response?.size == 0){
+                   noResultDetection.postValue(true)
+               } else {
+                   noResultDetection.postValue(false)
+               }
+
+               listOfStations = response?.let {
+
+                   it.map { station ->
+
+                       station.toRadioStation()
+                   }
+               } ?: emptyList()
+
+               while(!RadioServiceConnection.isConnected){
+                   Log.d("CHECKTAGS", "not connected")
+                   delay(50)
+               }
+
+               radioServiceConnection.sendCommand(COMMAND_NEW_SEARCH,
+                   bundleOf(Pair(IS_NEW_SEARCH, isNewSearch)))
+
+               isNewSearch = false
+
+               searchLoadingState.postValue(false)
            }
 
            searchJob.join()

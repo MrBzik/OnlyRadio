@@ -28,10 +28,10 @@ import com.example.radioplayer.utils.RandomColors
 import javax.inject.Inject
 
 class RadioDatabaseAdapter @Inject constructor(
-    private val glide : RequestManager
+    glide : RequestManager
 ) : RecyclerView.Adapter<RadioDatabaseAdapter.RadioItemHolder>() {
 
-    private val randColors = RandomColors()
+    val utils = BaseAdapter(glide)
 
     class RadioItemHolder (val bind : ItemRadioWithTextBinding) : RecyclerView.ViewHolder(bind.root)
 
@@ -58,7 +58,7 @@ class RadioDatabaseAdapter @Inject constructor(
 
         holder.itemView.setOnClickListener {
             val station = listOfStations[holder.absoluteAdapterPosition]
-            onItemClickListener?.let { click ->
+            utils.onItemClickListener?.let { click ->
                 click(station, holder.absoluteAdapterPosition)
 
                 updateOnStationChange(station, holder, true)
@@ -72,148 +72,37 @@ class RadioDatabaseAdapter @Inject constructor(
         val station = listOfStations[position]
 
         holder.bind.apply {
-
-            tvPrimary.text = station.name
-            tvPrimary.textSize = titleSize
-            tvSecondary.apply {
-                if(station.country?.isNotBlank() == true){
-                    visibility = View.VISIBLE
-                    text = station.country
-                }
-
-                else visibility = View.GONE
-            }
-
-            station.name?.let { name ->
-                var char = 'X'
-
-                for(l in name.indices){
-                    if(name[l].isLetter()){
-                        char = name[l]
-                        break
-                    }
-                }
-
-                val color = randColors.getColor()
-
-                tvPlaceholder.text = char.toString().uppercase()
-                tvPlaceholder.setBackgroundColor(color)
-                tvPlaceholder.alpha = alpha
-            }
-
-            if(station.favicon.isNullOrBlank()) {
-
-                ivItemImage.visibility = View.GONE
-
-            } else {
-
-                glide
-                    .load(station.favicon)
-                    .listener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-
-                            return true
-                        }
-
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-
-                            if(dataSource?.name == "REMOTE"){
-
-                                tvPlaceholder.fadeOut(300, alpha, position){ pos ->
-                                    if(pos != holder.bindingAdapterPosition) {
-                                        tvPlaceholder.alpha = alpha
-                                    }
-                                }
-
-                            }
-                            else {
-
-                                tvPlaceholder.alpha = 0f
-                            }
-                            ivItemImage.visibility = View.VISIBLE
-                            return false
-                        }
-                    })
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(ivItemImage)
-            }
+           utils.handleBinding(holder.bind, station, position){pos ->
+               if(pos != holder.bindingAdapterPosition) {
+                   tvPlaceholder.alpha = utils.alpha
+               }
+           }
         }
 
         if(station.stationuuid == currentRadioStationId) {
             selectedAdapterPosition = holder.absoluteAdapterPosition
             previousItemHolder = holder
-            handleStationPlaybackState(holder.bind)
+            utils.handleStationPlaybackState(holder.bind)
         } else
-            restoreState(holder.bind)
+            utils.restoreState(holder.bind)
     }
 
     private var selectedAdapterPosition = -2
 
-    var defaultTextColor = 0
-    var selectedTextColor = 0
-    var defaultSecondaryTextColor = 0
-    var selectedSecondaryTextColor = 0
 
-    var separatorDefault = 0
-
-    var alpha = 0.1f
-    var titleSize = 20f
+//    var separatorDefault = 0
 
     var currentRadioStationId : String? = null
-    var currentPlaybackState = false
+
     private var previousItemHolder : RadioItemHolder? = null
 
-    private fun restoreState(bind: ItemRadioWithTextBinding){
-        bind.apply {
-            radioItemRootLayout.setBackgroundResource(R.color.main_background)
-            tvPrimary.setTextColor(defaultTextColor)
 
-            tvSecondary.setTextColor(defaultSecondaryTextColor)
 
-            viewBottomSeparator?.setBackgroundColor(separatorDefault)
-        }
-    }
-
-    private fun handleStationPlaybackState(bind: ItemRadioWithTextBinding){
-
-        if(currentPlaybackState){
-            bind.apply {
-                radioItemRootLayout.setBackgroundResource(R.drawable.radio_selected_gradient)
-                tvPrimary.setTextColor(selectedTextColor)
-
-                tvSecondary.setTextColor(selectedSecondaryTextColor)
-
-                viewBottomSeparator?.setBackgroundResource(R.color.station_bottom_separator_active)
-            }
-
-        } else {
-            bind.apply {
-                radioItemRootLayout.setBackgroundResource(R.drawable.radio_unselected_gradient)
-                tvPrimary.setTextColor(defaultTextColor)
-
-                tvSecondary.setTextColor(defaultSecondaryTextColor)
-
-                viewBottomSeparator?.setBackgroundResource(R.color.station_bottom_separator_selected)
-            }
-
-        }
-    }
 
     fun updateStationPlaybackState(){
         previousItemHolder?.let{
             if(it.absoluteAdapterPosition == selectedAdapterPosition){
-                handleStationPlaybackState(it.bind)
+                utils.handleStationPlaybackState(it.bind)
             }
         }
     }
@@ -224,26 +113,20 @@ class RadioDatabaseAdapter @Inject constructor(
         if(station.stationuuid != currentRadioStationId) {
             currentRadioStationId = station.stationuuid
             previousItemHolder?.bind?.let {
-                restoreState(it)
+                utils.restoreState(it)
             }
         }
         holder?.let {
             selectedAdapterPosition = holder.absoluteAdapterPosition
             previousItemHolder = holder
             if(!isClicked){
-                handleStationPlaybackState(holder.bind)
+                utils.handleStationPlaybackState(holder.bind)
             }
         } ?: kotlin.run {
             selectedAdapterPosition = -2
         }
     }
 
-
-    private var onItemClickListener : ((RadioStation, Int) -> Unit)? = null
-
-    fun setOnClickListener(listener : (RadioStation, Int) -> Unit){
-        onItemClickListener = listener
-    }
 
     override fun getItemCount(): Int {
        return listOfStations.size

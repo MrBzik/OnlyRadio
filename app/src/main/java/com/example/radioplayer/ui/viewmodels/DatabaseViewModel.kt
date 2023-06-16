@@ -590,9 +590,11 @@ class DatabaseViewModel @Inject constructor(
 
             viewModelScope.launch(Dispatchers.IO){
 
-                val fileList = app.fileList()
+                val fileList = app.fileList().filter {
+                    it.endsWith(".ogg")
+                }
 
-                if(fileList.size != recList.size){
+                if(fileList.size > recList.size){
 
                     fileList.forEach { fileName ->
 

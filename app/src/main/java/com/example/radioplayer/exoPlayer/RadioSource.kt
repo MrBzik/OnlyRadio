@@ -38,6 +38,10 @@ class RadioSource @Inject constructor(
 
 ) {
 
+
+    val isPlayerBuffering : MutableLiveData<Boolean> = MutableLiveData()
+
+
     // Search tab
 
     var stationsFromLastSearch: RadioStations? = RadioStations()

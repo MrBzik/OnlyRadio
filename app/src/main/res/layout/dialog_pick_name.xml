@@ -16,7 +16,7 @@
         android:layout_height="50dp"
         android:gravity="center_vertical"
         android:layout_marginTop="@dimen/dialog_top_margin"
-        android:text="Name of radio station"
+        android:text="Search by name"
         android:textAppearance="@style/dialogTitleText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

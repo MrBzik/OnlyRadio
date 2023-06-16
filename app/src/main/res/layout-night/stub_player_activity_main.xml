@@ -12,12 +12,12 @@
         android:layout_width="65dp"
         android:layout_height="65dp"
         android:layout_marginStart="8dp"
+        app:cardBackgroundColor="@color/black"
+        app:cardCornerRadius="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5"
-        app:cardCornerRadius="15dp"
-        app:cardBackgroundColor="@color/black"
 
         >
 
@@ -25,9 +25,8 @@
             android:id="@+id/ivCurrentStationImage"
             android:layout_width="65dp"
             android:layout_height="65dp"
-            android:src="@color/color_changed_on_interaction"
             android:alpha="0.7"
-            />
+            android:src="@color/color_changed_on_interaction" />
 
         <TextView
             android:id="@+id/tvPlaceholder"
@@ -36,40 +35,58 @@
 
             android:fontFamily="@font/ranchers"
 
-            android:textColor="@color/main_background"
-            android:textSize="40sp"
             android:gravity="center"
-            />
+            android:textColor="@color/main_background"
+            android:textSize="40sp" />
     </com.google.android.material.card.MaterialCardView>
-
-
-
-
-
-
 
 
     <TextView
         android:id="@+id/tvStationTitle"
         android:layout_width="0dp"
         android:layout_height="60dp"
+        android:layout_marginStart="75dp"
+        android:layout_marginEnd="60dp"
         android:ellipsize="marquee"
-        android:marqueeRepeatLimit="marquee_forever"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:fontFamily="sans-serif-smallcaps"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:maxLines="1"
         android:paddingHorizontal="8dp"
         android:paddingTop="8dp"
-        android:layout_marginEnd="60dp"
-        android:focusable="true"
-        android:maxLines="1"
-        android:focusableInTouchMode="true"
         android:textSize="14sp"
-        android:layout_marginStart="75dp"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
 
         />
+
+    <TextView
+        android:id="@+id/tvBitrate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="83dp"
+        android:layout_marginBottom="6dp"
+        android:text="240 kbps"
+        android:textAppearance="@style/dialogItemText"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <ProgressBar
+        android:id="@+id/progressBuffer"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:indeterminateTint="@color/color_non_interactive"
+        app:layout_constraintStart_toEndOf="@+id/tvBitrate"
+        app:layout_constraintEnd_toStartOf="@+id/tvExpandHideText"
+        app:layout_constraintTop_toTopOf="@+id/tvExpandHideText"
+        app:layout_constraintBottom_toBottomOf="@id/tvExpandHideText"
+        />
+
 
     <TextView
         android:id="@+id/tvExpandHideText"
@@ -82,16 +99,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <TextView
-        android:id="@+id/tvBitrate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="83dp"
-        android:layout_marginBottom="5dp"
 
-        android:textAppearance="@style/dialogItemText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
 
     <ImageView
@@ -99,8 +107,8 @@
         android:layout_width="60dp"
         android:layout_height="65dp"
         android:layout_marginEnd="@dimen/player_view_bottom_margin"
-        android:src="@drawable/ic_play_pause"
         android:background="?android:attr/selectableItemBackground"
+        android:src="@drawable/ic_play_pause"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

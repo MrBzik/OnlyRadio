@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/llRootLayout"
+    android:visibility="gone"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:textAppearance="@style/noResultTitlesText"
+        android:text="No results for:"
+        />
+
+
+    <LinearLayout
+        android:id="@+id/llTag"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginVertical="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/noResultTitlesText"
+            android:text="Tag: "
+           />
+
+        <TextView
+            android:id="@+id/tvTag"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/noResultValuesText"
+            android:text="jazz"
+            app:drawableEndCompat="@drawable/ic_remove" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/llName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginVertical="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/noResultTitlesText"
+            android:text="Name: "
+            />
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/noResultValuesText"
+            android:text="fallout"
+            app:drawableEndCompat="@drawable/ic_remove" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llCountry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginVertical="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/noResultTitlesText"
+            android:text="Country: "
+            />
+
+        <TextView
+            android:id="@+id/tvCountry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/noResultValuesText"
+            android:text="USA"
+            app:drawableEndCompat="@drawable/ic_remove" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llLanguage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginVertical="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/noResultTitlesText"
+            android:text="Language: "
+            />
+
+        <TextView
+            android:id="@+id/tvLanguage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/noResultValuesText"
+            android:text="english"
+            app:drawableEndCompat="@drawable/ic_remove" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llBitrateMin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginVertical="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/noResultTitlesText"
+            android:text="Bitrate min: "
+            />
+
+        <TextView
+            android:id="@+id/tvBitrateMin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/noResultValuesText"
+            android:text="24 kbps"
+            app:drawableEndCompat="@drawable/ic_remove" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llBitrateMax"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginVertical="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/noResultTitlesText"
+            android:text="Bitrate max: "
+            />
+
+        <TextView
+            android:id="@+id/tvBitrateMax"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/noResultValuesText"
+            android:text="320 kbps"
+            app:drawableEndCompat="@drawable/ic_remove" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

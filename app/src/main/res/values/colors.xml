@@ -66,6 +66,8 @@
     <color name="switch_track_selected">#99698E03</color>
     <color name="switch_track_unselected">#80DADADA</color>
 
+    <color name="remove_icon">#000000</color>
+
 
 <!--    Navigation bar colors -->
 <!--    #758EB7-->

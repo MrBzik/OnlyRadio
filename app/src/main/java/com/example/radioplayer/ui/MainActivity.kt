@@ -19,6 +19,7 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnLayout
+import androidx.core.view.isVisible
 import androidx.transition.Fade
 import androidx.transition.Slide
 import com.bumptech.glide.RequestManager
@@ -322,6 +323,12 @@ class MainActivity : AppCompatActivity() {
             bindPlayer.tvStationTitle.isSingleLine = true
             bindPlayer.tvStationTitle.isSelected = true
         }
+
+
+        updateImage()
+
+        setInitialDetailsText()
+
     }
 
 
@@ -333,23 +340,14 @@ class MainActivity : AppCompatActivity() {
 
             handleStubPlayer()
 
-            updateImage()
-
-            setInitialDetailsText()
         }
 
 
         RadioService.currentPlayingRecording.observe(this){ recording ->
 
-            Log.d("CHECKTAGS", "new rec on main activity?")
-
             currentPlayingRecording = recording
 
             handleStubPlayer()
-
-            updateImage()
-
-            setInitialDetailsText()
 
         }
 
@@ -395,6 +393,14 @@ class MainActivity : AppCompatActivity() {
 
         observeCurrentSongTitle()
 
+        observePlayerBufferingState()
+
+    }
+
+    private fun observePlayerBufferingState(){
+        mainViewModel.isPlayerBuffering.observe(this){
+            bindPlayer.progressBuffer.isVisible = it
+        }
     }
 
 

@@ -59,6 +59,8 @@
     <color name="switch_track_selected">#99698E03</color>
     <color name="switch_track_unselected">#121111</color>
 
+    <color name="remove_icon">#698E03</color>
+
 
     <color name="text_button_rec">#FDB750</color>
 

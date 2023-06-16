@@ -20,6 +20,7 @@ import com.example.radioplayer.ui.fragments.RadioSearchFragment.Companion.countr
 import com.example.radioplayer.ui.fragments.RadioSearchFragment.Companion.listOfCountries
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.utils.*
+import kotlin.system.measureTimeMillis
 
 
 class CountryPickerDialog(
@@ -37,7 +38,6 @@ class CountryPickerDialog(
 //    private var _bind : DialogPickCountryBinding? = null
 //    private val bind get() = _bind!!
 
-    private val countries = listOfCountries
 
     lateinit var countryAdapter : FilterCountriesAdapter
 
@@ -49,6 +49,7 @@ class CountryPickerDialog(
         super.onCreate(savedInstanceState)
 
 //        setContentView(bind.root)
+
 
         setupRecyclerView()
 

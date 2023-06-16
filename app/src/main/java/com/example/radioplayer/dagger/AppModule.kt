@@ -57,7 +57,7 @@ object AppModule {
     @Singleton
     fun providesRadioDAO(
         radioDB: RadioDB
-    ) : RadioDAO =  radioDB.getRadioDAO()
+    ) : RadioDAO = radioDB.getRadioDAO()
 
     @Provides
     @Singleton
