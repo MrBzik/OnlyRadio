@@ -18,6 +18,7 @@ import com.example.radioplayer.R
 import com.example.radioplayer.databinding.DialogPickTagBinding
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.slideAnim
+import com.example.radioplayer.utils.dpToP
 import com.google.android.material.card.MaterialCardView
 
 abstract class BaseDialog<VB : ViewBinding> (
@@ -47,19 +48,11 @@ abstract class BaseDialog<VB : ViewBinding> (
 
     }
 
-    val dp8 = TypedValue.applyDimension(
-        TypedValue.COMPLEX_UNIT_DIP,
-        8f,
-        requireContext.resources.displayMetrics
-    ).toInt()
+    val dp8 = 8f.dpToP(requireContext)
 
     fun adjustDialogHeight(view : ConstraintLayout){
 
-        val bottomNanViewShift = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            20f,
-            requireContext.resources.displayMetrics
-        ).toInt()
+        val bottomNanViewShift = 20f.dpToP(requireContext)
 
         view.minHeight = MainActivity.flHeight + bottomNanViewShift
 

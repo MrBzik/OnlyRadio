@@ -6,6 +6,7 @@ import android.os.ResultReceiver
 import android.support.v4.media.session.PlaybackStateCompat
 import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.utils.Constants.IS_CHANGE_MEDIA_ITEMS
+import com.example.radioplayer.utils.Constants.IS_SAME_STATION
 import com.example.radioplayer.utils.Constants.ITEM_INDEX
 import com.example.radioplayer.utils.Constants.PLAY_WHEN_READY
 import com.example.radioplayer.utils.Constants.SEARCH_FLAG
@@ -17,8 +18,9 @@ class RadioPlaybackPreparer (
     private val radioSource: RadioSource,
     private val playerPrepared : (
 //        MediaMetadataCompat?,
-                                  flag: Int,
-                                  playWhenReady : Boolean, itemIndex : Int, isToChangeMediaItems : Boolean
+                                  flag: Int, playWhenReady : Boolean,
+                                  itemIndex : Int, isToChangeMediaItems : Boolean,
+                                  isSameStation : Boolean
     ) -> Unit,
     private val onCommand : (String, Bundle?) -> Unit
         ) : MediaSessionConnector.PlaybackPreparer {
@@ -52,6 +54,8 @@ class RadioPlaybackPreparer (
 
         var isToChangeMediaItems = false
 
+        var isSameStation = false
+
 //        var historyId = ""
 
         extras?.let {
@@ -59,6 +63,7 @@ class RadioPlaybackPreparer (
             isToPlay = it.getBoolean(PLAY_WHEN_READY, true)
             index = it.getInt(ITEM_INDEX, -1)
             isToChangeMediaItems = it.getBoolean(IS_CHANGE_MEDIA_ITEMS, false)
+            isSameStation = it.getBoolean(IS_SAME_STATION, false)
         }
 
 //        if(flag == SEARCH_FROM_HISTORY){
@@ -99,7 +104,7 @@ class RadioPlaybackPreparer (
 
             playerPrepared(
 //                itemToPlay,
-                flag, isToPlay, index, isToChangeMediaItems)
+                flag, isToPlay, index, isToChangeMediaItems, isSameStation)
 //        }
 
     }

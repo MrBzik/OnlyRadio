@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/flRoot"
     android:layout_width="100dp"
-    android:layout_height="130dp"
+    android:layout_height="100dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardView"
         android:layout_width="90dp"
         android:layout_height="90dp"
         app:cardCornerRadius="10dp"
         android:layout_marginTop="5dp"
         android:layout_marginStart="5dp"
+        android:background="?android:attr/selectableItemBackground"
         >
 
         <ImageView
@@ -18,27 +22,41 @@
             android:layout_width="90dp"
             android:layout_height="90dp"
             android:scaleType="centerCrop"
-
-            android:src="@color/black"
+            android:src="@color/ChosenGreen"
+            android:background="?android:attr/selectableItemBackground"
             />
 
+<!--        <View-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:background="@drawable/dark_gradient"-->
+<!--            android:layout_marginTop="50dp"/>-->
+
+        <com.example.radioplayer.utils.TextCutIn
+            android:id="@+id/tvPlaylistName"
+            android:layout_width="match_parent"
+            android:paddingHorizontal="4dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="60dp"
+            android:textSize="13sp"
+            android:fontFamily="@font/aldrich"
+            android:gravity="center"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:text="some name"
+            android:textAlignment="center"
+
+     />
 
     </com.google.android.material.card.MaterialCardView>
 
 
 
-    <TextView
-        android:id="@+id/tvPlaylistName"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:textColor="@color/color_non_interactive"
-        android:textSize="13sp"
-        android:fontFamily="@font/aldrich"
-        android:gravity="center"
-        android:text="cover"
-        android:maxLines="2"
-        android:ellipsize="end"
-        android:textAlignment="center"
-        />
 
-</LinearLayout>
+
+</FrameLayout>
+
+<!--    android:shadowDx="0"-->
+<!--    android:shadowDy="0"-->
+<!--    android:shadowRadius="5.6"-->
+<!--    android:shadowColor="#000000"-->

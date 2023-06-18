@@ -34,6 +34,7 @@ import com.example.radioplayer.ui.viewmodels.PixabayViewModel
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
+import com.example.radioplayer.utils.dpToP
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -62,7 +63,9 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     @Inject
     lateinit var mainAdapter: RadioDatabaseAdapter
 
-    lateinit var playlistAdapter : PlaylistsAdapter
+    val playlistAdapter : PlaylistsAdapter by lazy {
+        PlaylistsAdapter(glide, true)
+    }
 
     @Inject
     lateinit var glide : RequestManager
@@ -190,30 +193,33 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         bind.tvPlaylistEdit.setOnClickListener {
 
-            var isDeletePlaylistCalled = false
+            if(!isInFavouriteTab){
 
-            val dialog =  EditPlaylistDialog (
-                requireContext(), listOfPlaylists,
-                currentPlaylistName,
-                currentPlaylistPosition,
-                databaseViewModel, pixabayViewModel, glide
-            ) {
-                isDeletePlaylistCalled = it
-            }
+                var isDeletePlaylistCalled = false
 
-            dialog.show()
+                val dialog =  EditPlaylistDialog (
+                    requireContext(), listOfPlaylists,
+                    currentPlaylistName,
+                    currentPlaylistPosition,
+                    databaseViewModel, pixabayViewModel, glide
+                ) {
+                    isDeletePlaylistCalled = it
+                }
 
-            dialog.setOnDismissListener {
+                dialog.show()
 
-                if(isDeletePlaylistCalled){
+                dialog.setOnDismissListener {
 
-                    RemovePlaylistDialog(requireContext(), currentPlaylistName){
+                    if(isDeletePlaylistCalled){
 
-                        databaseViewModel.deletePlaylistAndContent(currentPlaylistName)
+                        RemovePlaylistDialog(requireContext(), currentPlaylistName){
 
-                        databaseViewModel.getAllFavouredStations()
+                            databaseViewModel.deletePlaylistAndContent(currentPlaylistName)
 
-                    }.show()
+                            databaseViewModel.getAllFavouredStations()
+
+                        }.show()
+                    }
                 }
             }
         }
@@ -266,6 +272,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     private fun setArrowToFavClickListener(){
 
         bind.ivArrowBackToFav.setOnClickListener {
+
+            playlistAdapter.unselectPlaylist()
 
             databaseViewModel.getAllFavouredStations()
 
@@ -341,6 +349,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             bind.tvPlaylistName.text = it
             currentPlaylistName = it
+            playlistAdapter.currentPlaylistName = it
+
         }
 
         observeFavOrPlaylistState()
@@ -411,6 +421,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
 
             isInFavouriteTab = it
+            playlistAdapter.isInFavouriteTab = it
 
 
             if(it){
@@ -563,7 +574,10 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     private fun setupPlaylistRecycleView(){
 
-        playlistAdapter = PlaylistsAdapter(glide, true)
+        playlistAdapter.apply {
+            strokeWidth = 2f.dpToP(requireContext())
+            strokeColor = ContextCompat.getColor(requireContext(), R.color.recording_seekbar_progress)
+        }
 
         bind.rvPlaylists.apply {
             adapter = playlistAdapter

@@ -35,6 +35,9 @@
 
     <color name="Cursor">#000000</color>
 
+    <color name="playlist_cover_text">#000000</color>
+
+    <color name="playlist_cover_bg">#33000000</color>
 
 
 

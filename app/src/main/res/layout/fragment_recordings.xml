@@ -79,7 +79,7 @@
         android:gravity="center"
         android:visibility="invisible"
         android:paddingHorizontal="10dp"
-        android:text="New recording can be start in Details. Stop recording in Details or notification"
+        android:text="@string/recordings_frag_tip"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

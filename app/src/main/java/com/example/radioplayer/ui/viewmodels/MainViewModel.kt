@@ -46,6 +46,7 @@ import com.example.radioplayer.utils.Constants.IS_CHANGE_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.IS_NAME_EXACT
 import com.example.radioplayer.utils.Constants.IS_NEW_SEARCH
+import com.example.radioplayer.utils.Constants.IS_SAME_STATION
 import com.example.radioplayer.utils.Constants.IS_TAG_EXACT
 import com.example.radioplayer.utils.Constants.ITEM_ID
 import com.example.radioplayer.utils.Constants.ITEM_INDEX
@@ -614,8 +615,6 @@ class MainViewModel @Inject constructor(
             isToChangeMediaItems : Boolean
         ) : Boolean {
 
-
-
             val isPrepared = playbackState.value?.isPrepared ?: false
 
             val id = station?.stationuuid
@@ -652,7 +651,8 @@ class MainViewModel @Inject constructor(
                             Pair(SEARCH_FLAG, searchFlag),
                             Pair(PLAY_WHEN_READY, isToPlay),
                             Pair(ITEM_INDEX, itemIndex),
-                            Pair(IS_CHANGE_MEDIA_ITEMS, true)
+                            Pair(IS_CHANGE_MEDIA_ITEMS, true),
+                            Pair(IS_SAME_STATION, true)
                         ))
                 }
 
@@ -665,20 +665,18 @@ class MainViewModel @Inject constructor(
                     )
                 }
 
-
                 RadioService.currentMediaItems = searchFlag
                 radioServiceConnection.transportControls
                     .playFromMediaId(id, bundleOf(
                         Pair(SEARCH_FLAG, searchFlag),
                         Pair(PLAY_WHEN_READY, playWhenReady),
                         Pair(ITEM_INDEX, itemIndex),
-                        Pair(IS_CHANGE_MEDIA_ITEMS, isToChangeMediaItems)
+                        Pair(IS_CHANGE_MEDIA_ITEMS, isToChangeMediaItems),
+                        Pair(IS_SAME_STATION, false)
                     ))
 
                 return true
             }
-
-
         }
 
 //        var isRadioTrueRecordingFalse = true

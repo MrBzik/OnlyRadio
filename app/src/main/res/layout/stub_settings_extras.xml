@@ -27,17 +27,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvPlaybackSpeedRecHint" />
 
-
     <TextView
         android:id="@+id/tvPlaybackSpeedTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="27dp"
+        android:text="speed :"
+        android:textAppearance="@style/dialogItemText"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineHorizontal"
+        app:layout_constraintTop_toBottomOf="@+id/tvPlaybackSpeedHint" />
+
+
+    <TextView
+        android:id="@+id/tvPlaybackSpeedValue"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="-61dp"
         android:layout_marginTop="27dp"
-        android:text="speed : 100%"
+        android:text=" 100%"
         android:textAppearance="@style/dialogItemText"
+        app:layout_constraintStart_toStartOf="@+id/guidelineHorizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/guidelineHorizontal"
         app:layout_constraintTop_toBottomOf="@+id/tvPlaybackSpeedHint" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -88,14 +97,24 @@
 
     <TextView
         android:id="@+id/tvPlaybackPitchTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="pitch :"
+        android:textAppearance="@style/dialogItemText"
+        app:layout_constraintEnd_toEndOf="@+id/guidelineHorizontal"
+        app:layout_constraintTop_toBottomOf="@+id/ivLink" />
+
+
+    <TextView
+        android:id="@+id/tvPlaybackPitchValue"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="-55dp"
         android:layout_marginTop="8dp"
-        android:text="pitch : 100%"
+        android:text=" 100%"
         android:textAppearance="@style/dialogItemText"
+        app:layout_constraintStart_toEndOf="@+id/guidelineHorizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/guidelineHorizontal"
         app:layout_constraintTop_toBottomOf="@+id/ivLink" />
 
 
@@ -172,46 +191,32 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabBassBoostLess"
-        android:layout_width="@dimen/extras_fab_size"
-        android:layout_height="@dimen/extras_fab_size"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="36dp"
-        android:src="@drawable/playback_speed_minus"
-        app:backgroundTint="@color/floating_buttons"
-        app:fabCustomSize="@dimen/extras_fab_size"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fabNextReverb" />
+
 
     <TextView
-        android:id="@+id/tvBassBoostValue"
+        android:id="@+id/tvRangeTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="-65dp"
-        android:text="Virtualizer : 0"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="36dp"
+        android:text="Distance effect"
         android:textAppearance="@style/dialogItemText"
-        app:layout_constraintBottom_toBottomOf="@+id/fabBassBoostLess"
-        app:layout_constraintStart_toEndOf="@id/guidelineHorizontal"
-        app:layout_constraintTop_toTopOf="@id/fabBassBoostLess" />
+        app:layout_constraintTop_toBottomOf="@+id/fabNextReverb"
+        app:layout_constraintStart_toStartOf="parent"
+        />
 
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabBassBoostMore"
-        android:layout_width="@dimen/extras_fab_size"
-        android:layout_height="@dimen/extras_fab_size"
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchWideRange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="30dp"
-        android:src="@drawable/playback_speed_plus"
-        app:backgroundTint="@color/floating_buttons"
-        app:fabCustomSize="@dimen/extras_fab_size"
-        app:layout_constraintBottom_toBottomOf="@+id/fabBassBoostLess"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:minHeight="48dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvRangeTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvRangeTitle"
+        app:thumbTint="@color/switch_thumb_color"
+        app:trackTint="@color/switch_track_color" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fabBassBoostMore" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

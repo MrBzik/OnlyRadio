@@ -42,6 +42,7 @@
     <color name="recording_seekbar_base">#1E1B1B</color>
     <color name="recording_seekbar_progress">#99698E03</color>
 
+    <color name="playlist_cover_text">#FFFFFFFF</color>
     <color name="default_text_color">#B3FFFFFF</color>
     <color name="default_secondary_text_color">#80FFFFFF</color>
 

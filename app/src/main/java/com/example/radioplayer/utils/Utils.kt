@@ -2,11 +2,21 @@ package com.example.radioplayer.utils
 
 import android.content.Context
 import android.content.res.Configuration
+import android.util.TypedValue
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.ListPopupWindow
 import java.text.DateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
+
+
+fun Float.dpToP(context: Context) : Int {
+    return TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        this,
+        context.resources.displayMetrics
+    ).toInt()
+}
 
 object Utils {
 

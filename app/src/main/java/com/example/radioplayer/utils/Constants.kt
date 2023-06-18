@@ -112,6 +112,7 @@ object Constants {
     const val ITEM_ID = "id of item"
 
     const val IS_CHANGE_MEDIA_ITEMS = "id of station from history"
+    const val IS_SAME_STATION = "is same radio station"
 
     const val TITLE_UNKNOWN = "Playing: no info"
 

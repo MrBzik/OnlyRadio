@@ -337,41 +337,16 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
     private fun setVirtualizerClickListeners(){
 
-        setBassBoostText()
+        bindExtras.switchWideRange.apply{
+            isChecked = RadioService.isVirtualizerEnabled
+            setOnCheckedChangeListener { _, isChecked ->
 
-        bindExtras.fabBassBoostLess.setOnClickListener {
-
-            if(RadioService.virtualizerLevel > 0){
-                RadioService.virtualizerLevel -= 500
+                RadioService.isVirtualizerEnabled = isChecked
                 mainViewModel.changeVirtualizerLevel()
-                setBassBoostText()
             }
         }
-
-        bindExtras.fabBassBoostMore.setOnClickListener {
-
-            if(RadioService.virtualizerLevel < 1000){
-                RadioService.virtualizerLevel += 500
-                mainViewModel.changeVirtualizerLevel()
-                setBassBoostText()
-            }
-        }
-
-
     }
 
-    private fun setBassBoostText(){
-        bindExtras.tvBassBoostValue.text = when(RadioService.virtualizerLevel){
-
-            0 -> "Range : normal"
-            500 -> "Range : broad"
-            else -> "Range : widest"
-
-        }
-
-
-
-    }
 
 
     private fun setReverbClickListeners(){
@@ -648,17 +623,17 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
     private fun updatePlaybackSpeedDisplayValue(){
 
-        bindExtras.tvPlaybackSpeedTitle.text = "speed : ${RadioService.playbackSpeedRadio}%"
+        bindExtras.tvPlaybackSpeedValue.text = " ${RadioService.playbackSpeedRadio}%"
         if(RadioService.isSpeedPitchLinked)
-            bindExtras.tvPlaybackPitchTitle.text = "pitch : ${RadioService.playbackSpeedRadio}%"
+            bindExtras.tvPlaybackPitchValue.text = " ${RadioService.playbackSpeedRadio}%"
 
     }
 
     private fun updatePlaybackPitchDisplayValue(){
 
-        bindExtras.tvPlaybackPitchTitle.text = "pitch : ${RadioService.playbackPitchRadio}%"
+        bindExtras.tvPlaybackPitchValue.text = " ${RadioService.playbackPitchRadio}%"
         if(RadioService.isSpeedPitchLinked)
-            bindExtras.tvPlaybackSpeedTitle.text = "speed : ${RadioService.playbackPitchRadio}%"
+            bindExtras.tvPlaybackSpeedValue.text = " ${RadioService.playbackPitchRadio}%"
 
     }
 

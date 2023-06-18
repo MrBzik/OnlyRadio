@@ -1,14 +1,12 @@
 package com.example.radioplayer.adapters
 
 import android.content.ClipDescription
-import android.util.Log
+import android.content.res.Configuration
+import android.graphics.drawable.ColorDrawable
 import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +15,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.databinding.ItemPlaylistCoverBinding
+import com.example.radioplayer.ui.MainActivity
 import javax.inject.Inject
 
 
@@ -30,6 +29,43 @@ class PlaylistsAdapter @Inject constructor(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
+    var strokeWidth = 0
+    var strokeColor = 0
+    var isDarkMode = MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES
+    var highlightedViewHolder : PlaylistHolder? = null
+    var currentPlaylistName = ""
+    var isInFavouriteTab = true
+
+    private fun highlightPlaylist(bind : ItemPlaylistCoverBinding){
+
+        if(isDarkMode){
+            bind.ivPlaylistCover.alpha = 1f
+        } else {
+            bind.ivPlaylistCover.foreground = ColorDrawable(0x33000000)
+        }
+
+        bind.cardView.strokeWidth = strokeWidth
+        bind.cardView.strokeColor = strokeColor
+    }
+
+    private fun defaultPlaylist(bind : ItemPlaylistCoverBinding) {
+
+        if(isDarkMode){
+            bind.ivPlaylistCover.alpha = 0.6f
+        } else {
+            bind.ivPlaylistCover.foreground = ColorDrawable(0xFFFFFF)
+        }
+
+        bind.cardView.strokeWidth = 0
+    }
+
+    fun unselectPlaylist(){
+        highlightedViewHolder?.let {
+            defaultPlaylist(it.bind)
+        }
+    }
+
+
      class FooterViewHolder (itemView : View) : RecyclerView.ViewHolder(itemView)
 
      class PlaylistHolder (itemView: View) : RecyclerView.ViewHolder(itemView){
@@ -39,8 +75,9 @@ class PlaylistsAdapter @Inject constructor(
          init {
              bind = ItemPlaylistCoverBinding.bind(itemView)
          }
-
      }
+
+
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -58,31 +95,24 @@ class PlaylistsAdapter @Inject constructor(
         }
 
 
-             val view = LayoutInflater.from(parent.context)
+             val inflatedView = LayoutInflater.from(parent.context)
                  .inflate(R.layout.item_playlist_cover, parent, false)
-            val playlist = PlaylistHolder(view)
-            playlist.itemView.setOnClickListener {
+            val playlist = PlaylistHolder(inflatedView)
+            playlist.bind.cardView.setOnClickListener {
 
                 playlistClickListener?.let { click ->
                     click(differ.currentList[playlist.absoluteAdapterPosition],
                             playlist.absoluteAdapterPosition
                         )
+                    highlightedViewHolder?.let {
+                        defaultPlaylist(it.bind)
+                    }
+                    highlightedViewHolder = playlist
+                    highlightPlaylist(playlist.bind)
                 }
             }
-            return playlist
-    }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-
-        if(holder is PlaylistHolder) {
-            val playlist = differ.currentList[position]
-            holder.bind.tvPlaylistName.text = playlist.playlistName
-            glide
-                .load(playlist.coverURI)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(holder.bind.ivPlaylistCover)
-
-            holder.itemView.setOnDragListener { view, event ->
+            playlist.itemView.setOnDragListener { view, event ->
 
                 when(event.action){
 
@@ -90,35 +120,65 @@ class PlaylistsAdapter @Inject constructor(
                         event.clipDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)
                     }
                     DragEvent.ACTION_DRAG_ENTERED ->{
+
+                        playlist.bind.cardView.isPressed = true
                         view.invalidate()
                         true
                     }
                     DragEvent.ACTION_DRAG_LOCATION -> true
                     DragEvent.ACTION_DRAG_EXITED -> {
+
+                        playlist.bind.cardView.isPressed = false
                         view.invalidate()
                         true
                     }
                     DragEvent.ACTION_DROP ->{
 
+                        playlist.bind.cardView.isPressed = false
+
                         val item = event.clipData.getItemAt(0)
                         val data = item.text
 
                         handleDragAndDrop?.let {
-                            it(data.toString(), holder.bind.tvPlaylistName.text.toString())
+                            it(data.toString(), playlist.bind.tvPlaylistName.text.toString())
                         }
 
                         view.invalidate()
                         true
                     } DragEvent.ACTION_DRAG_ENDED -> {
-                        view.invalidate()
-                        true
-                    }
+                    view.invalidate()
+                    true
+                }
                     else -> false
 
                 }
 
             }
 
+
+            return playlist
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+
+        if(holder is PlaylistHolder) {
+            val playlist = differ.currentList[position]
+            holder.bind.apply {
+                tvPlaylistName.text = playlist.playlistName
+
+                if(!isInFavouriteTab && currentPlaylistName == playlist.playlistName){
+                    highlightedViewHolder = holder
+                    highlightPlaylist(holder.bind)
+                } else {
+                    defaultPlaylist(holder.bind)
+                }
+
+                glide
+                    .load(playlist.coverURI)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(ivPlaylistCover)
+
+            }
         }
     }
 

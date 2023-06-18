@@ -278,7 +278,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
         var reverbMode = 0
 
-        var virtualizerLevel = 0
+        var isVirtualizerEnabled = false
 
 
     }
@@ -334,7 +334,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
         val radioPlaybackPreparer = RadioPlaybackPreparer(
-            radioSource, { flag, playWhenReady, itemIndex, isToChangeMediaItems ->
+            radioSource, { flag, playWhenReady, itemIndex, isToChangeMediaItems, isSameStation ->
 
              var index = itemIndex
 
@@ -349,7 +349,8 @@ class RadioService : MediaBrowserServiceCompat() {
                 playNow = playWhenReady,
                 itemIndex =  index,
                 isToChangeMediaItems = isToChangeMediaItems,
-                isFromRecordings = isFromRecordings
+                isFromRecordings = isFromRecordings,
+                isSameStation = isSameStation
             )
 
         }, {
@@ -835,11 +836,11 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private fun changeVirtualizerLevel() {
 
-        if(virtualizerLevel == 0){
+        if(!isVirtualizerEnabled){
             effectVirtualizer.enabled = false
         } else {
 
-            effectVirtualizer.setStrength(virtualizerLevel.toShort())
+            effectVirtualizer.setStrength(666)
 
             if(!effectVirtualizer.enabled){
                 effectVirtualizer.enabled = true
@@ -997,7 +998,8 @@ class RadioService : MediaBrowserServiceCompat() {
             playNow = isToPlay,
             itemIndex = currentPlayingItemPosition,
             isToChangeMediaItems = true,
-            isFromRecordings = currentMediaItems == SEARCH_FROM_RECORDINGS
+            isFromRecordings = currentMediaItems == SEARCH_FROM_RECORDINGS,
+            isSameStation = false
             )
     }
 
@@ -1101,7 +1103,7 @@ class RadioService : MediaBrowserServiceCompat() {
         if(reverbMode != 0)
             exoPlayer.setAuxEffectInfo(AuxEffectInfo(environmentalReverb.id, 1f))
 
-        if(virtualizerLevel != 0)
+        if(isVirtualizerEnabled)
             exoPlayer.setAuxEffectInfo(AuxEffectInfo(effectVirtualizer.id, 1f))
 
 
@@ -1463,6 +1465,15 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private fun clearMediaItems(isNoList : Boolean = true){
 
+//        if(exoPlayer.mediaItemCount != 1){
+//
+//            if(exoPlayer.currentMediaItemIndex != 0)
+//                exoPlayer.moveMediaItem(exoPlayer.currentMediaItemIndex, 0)
+//
+//            exoPlayer.removeMediaItems(1, exoPlayer.mediaItemCount)
+//        }
+//
+
 
         if(exoPlayer.currentMediaItemIndex != 0){
 
@@ -1488,6 +1499,7 @@ class RadioService : MediaBrowserServiceCompat() {
         itemIndex : Int = -1,
         isToChangeMediaItems : Boolean = true,
         isFromRecordings : Boolean = false,
+        isSameStation : Boolean
 
     ){
 
@@ -1508,18 +1520,17 @@ class RadioService : MediaBrowserServiceCompat() {
         serviceScope.launch {
             delay(200)
 
-           updateMediaItems(isToChangeMediaItems, currentMediaItems)
+           updateMediaItems(isToChangeMediaItems, currentMediaItems, isSameStation, itemIndex)
 
-            if(itemIndex != -1){
-                exoPlayer.seekTo(itemIndex, 0L)
+            if(!isSameStation){
+                if(itemIndex != -1){
+                    exoPlayer.seekTo(itemIndex, 0L)
+                }
+                exoPlayer.prepare()
             }
-
-            exoPlayer.prepare()
 
             exoPlayer.playWhenReady = playNow
         }
-
-
 
 
 //        playFromUri(uri, playNow, itemIndex, isSamePlaylist)
@@ -1527,52 +1538,79 @@ class RadioService : MediaBrowserServiceCompat() {
       }
 
 
-    private fun updateMediaItems(isToChangeMediaItems : Boolean, flag : Int){
+    private fun updateMediaItems(
+        isToChangeMediaItems: Boolean,
+        flag: Int,
+        isSameStation: Boolean,
+        itemIndex : Int
+    ){
+
 
         when(flag){
 
             SEARCH_FROM_API -> {
                 if(isToChangeMediaItems || radioSource.isStationsFromApiUpdated){
                     radioSource.isStationsFromApiUpdated = false
-                    exoPlayer.setMediaItems(radioSource.stationsFromApiMediaItems)
+                    handleMediaItemsUpdate(radioSource.stationsFromApiMediaItems, isSameStation, itemIndex)
                 }
             }
 
             SEARCH_FROM_FAVOURITES -> {
                 if(isToChangeMediaItems|| radioSource.isStationsFavouredUpdated){
                     radioSource.isStationsFavouredUpdated = false
-                    exoPlayer.setMediaItems(radioSource.stationsFavouredMediaItems)
+                    handleMediaItemsUpdate(radioSource.stationsFavouredMediaItems, isSameStation, itemIndex)
                 }
             }
 
             SEARCH_FROM_PLAYLIST -> {
                 if(isToChangeMediaItems || RadioSource.isStationsInPlaylistUpdated){
                     RadioSource.isStationsInPlaylistUpdated = false
-                    exoPlayer.setMediaItems(RadioSource.stationsInPlaylistMediaItems)
+                    handleMediaItemsUpdate(RadioSource.stationsInPlaylistMediaItems, isSameStation, itemIndex)
                 }
             }
 
             SEARCH_FROM_HISTORY -> {
                 if(isToChangeMediaItems || radioSource.isStationsFromHistoryUpdated){
                     radioSource.isStationsFromHistoryUpdated = false
-                    exoPlayer.setMediaItems(radioSource.stationsFromHistoryMediaItems)
+                    handleMediaItemsUpdate(radioSource.stationsFromHistoryMediaItems, isSameStation, itemIndex)
                 }
             }
 
             SEARCH_FROM_HISTORY_ONE_DATE -> {
                 if(isToChangeMediaItems || RadioSource.isStationsFromHistoryOneDateUpdated){
                     RadioSource.isStationsFromHistoryOneDateUpdated = false
-                    exoPlayer.setMediaItems(RadioSource.stationsFromHistoryOneDateMediaItems)
+                    handleMediaItemsUpdate(RadioSource.stationsFromHistoryOneDateMediaItems, isSameStation, itemIndex)
                 }
             }
 
             SEARCH_FROM_RECORDINGS -> {
                 if(isToChangeMediaItems || isStationsFromRecordingUpdated){
                     isStationsFromRecordingUpdated = false
-                    exoPlayer.setMediaItems(stationsFromRecordingsMediaItems)
-
+                    handleMediaItemsUpdate(stationsFromRecordingsMediaItems, isSameStation, itemIndex)
                 }
             }
+        }
+    }
+
+
+    private fun handleMediaItemsUpdate(items : List<MediaItem>, isSameStation: Boolean, index : Int){
+
+        if(isSameStation){
+
+            clearMediaItems(false)
+
+            items.forEach {
+                exoPlayer.addMediaItem(it)
+            }
+
+            if(index != 0) {
+                exoPlayer.moveMediaItem(0, index)
+            }
+
+            currentPlayingItemPosition = index
+
+        } else {
+            exoPlayer.setMediaItems(items)
         }
     }
 
