@@ -38,6 +38,8 @@ import com.example.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
 import com.example.radioplayer.utils.Constants.REC_QUALITY_DEF
 import com.example.radioplayer.utils.RecPref
 import com.example.radioplayer.utils.TextViewOutlined
+import com.example.radioplayer.utils.addImage
+import com.example.radioplayer.utils.dpToP
 
 
 class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
@@ -153,8 +155,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         setSearchBtnResetListener()
 
         setBufferSettingsClickListener()
-
-        setAutoSearchByName()
 
         setFullAutoSearch()
 
@@ -310,19 +310,30 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
     }
 
 
-    private fun setAutoSearchByName(){
-
-        bindGeneral.switchNameAutoSearchPref.apply {
-            isChecked = mainViewModel.isNameAutoSearch
-
-            setOnCheckedChangeListener { _, isChecked ->
-
-                mainViewModel.isNameAutoSearch = isChecked
-            }
-        }
-    }
+//    private fun setAutoSearchByName(){
+//
+//        bindGeneral.switchNameAutoSearchPref.apply {
+//            isChecked = mainViewModel.isNameAutoSearch
+//
+//            setOnCheckedChangeListener { _, isChecked ->
+//
+//                mainViewModel.isNameAutoSearch = isChecked
+//            }
+//        }
+//    }
 
     private fun setFullAutoSearch(){
+
+
+        bindGeneral.tvFullAutoSearchHint.text =
+            "(Default: start new searches manually by Swipe-up or with [icon] button)"
+
+        bindGeneral.tvFullAutoSearchHint.addImage(
+            atText = "[icon]",
+            imgSrc = R.drawable.ic_new_radio_search,
+            imgWidth = 30f.dpToP(requireContext()),
+            imgHeight = 30f.dpToP(requireContext())
+            )
 
         bindGeneral.switchFullAutoSearchPref.apply {
             isChecked = mainViewModel.isFullAutoSearch

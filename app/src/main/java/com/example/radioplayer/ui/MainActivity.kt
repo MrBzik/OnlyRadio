@@ -818,7 +818,7 @@ class MainActivity : AppCompatActivity() {
             putInt(SEARCH_PREF_MIN_BIT, mainViewModel.minBitrateNew)
             putInt(SEARCH_PREF_MAX_BIT, mainViewModel.maxBitrateNew)
             putBoolean(IS_SEARCH_FILTER_LANGUAGE, mainViewModel.isSearchFilterLanguage)
-            putBoolean(SEARCH_PREF_NAME_AUTO, mainViewModel.isNameAutoSearch)
+//            putBoolean(SEARCH_PREF_NAME_AUTO, mainViewModel.isNameAutoSearch)
             putBoolean(SEARCH_PREF_FULL_AUTO, mainViewModel.isFullAutoSearch)
 
         }.apply()

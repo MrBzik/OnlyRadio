@@ -22,7 +22,7 @@ import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
         Title::class,
         BookmarkedTitle::class
                ],
-        version = 18,
+        version = 19,
          autoMigrations = [
         AutoMigration(from = 9, to = 10, spec = RadioDB.Migration9To10::class),
         AutoMigration(from = 11, to = 12, spec = RadioDB.Migration11To12::class),
@@ -30,6 +30,7 @@ import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
         AutoMigration(from = 13, to = 14, spec = RadioDB.Migration13To14::class),
          AutoMigration(from = 14, to = 15, spec = RadioDB.Migration14To15::class),
          AutoMigration(from = 16, to = 17, spec = RadioDB.Migration16To17::class),
+         AutoMigration(from = 18, to = 19, spec = RadioDB.Migration18To19::class)
     ]
 )
 
@@ -53,6 +54,8 @@ abstract class RadioDB : RoomDatabase() {
     class Migration14To15 : AutoMigrationSpec
 
     class Migration16To17 : AutoMigrationSpec
+
+    class Migration18To19 : AutoMigrationSpec
 
     companion object{
 

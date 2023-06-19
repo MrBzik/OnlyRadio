@@ -757,19 +757,26 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         bind.tvName.setOnClickListener {
 
-            if(mainViewModel.isNameAutoSearch){
-                NameAutoDialog(requireContext(), mainViewModel){
+            NameAutoDialog(requireContext(), mainViewModel){
+                if(mainViewModel.isFullAutoSearch)
+                    isToInitiateNewSearch = true
+            }.show()
 
-                    val check = mainViewModel.initiateNewSearch()
-                    clearAdapter(check)
 
-                }.show()
-            } else {
-                NameDialog(requireContext(), mainViewModel){
-                    if(mainViewModel.isFullAutoSearch)
-                        isToInitiateNewSearch = true
-                }.show()
-            }
+
+//            if(mainViewModel.isNameAutoSearch){
+//                NameAutoDialog(requireContext(), mainViewModel){
+//
+//                    val check = mainViewModel.initiateNewSearch()
+//                    clearAdapter(check)
+//
+//                }.show()
+//            } else {
+//                NameDialog(requireContext(), mainViewModel){
+//                    if(mainViewModel.isFullAutoSearch)
+//                        isToInitiateNewSearch = true
+//                }.show()
+//            }
 
         }
 

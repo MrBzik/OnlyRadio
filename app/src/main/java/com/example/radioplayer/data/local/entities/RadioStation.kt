@@ -22,8 +22,12 @@ data class RadioStation (
     @ColumnInfo(name = "state", defaultValue = "")
     val state : String?,
     @ColumnInfo(name = "bitrate", defaultValue = "0")
-    val bitrate : Int?
-        )
+    val bitrate : Int?,
+    @ColumnInfo(name = "lastClicked", defaultValue = "0")
+    val lastClicked : Long,
+    @ColumnInfo(name = "listenedDuration", defaultValue = "0")
+    val playedDuration : Long
+    )
 
 /*  version 9 - 10 :
         val inPlaylists : Int - deleted;

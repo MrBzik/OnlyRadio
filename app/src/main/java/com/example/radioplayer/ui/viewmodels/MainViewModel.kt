@@ -199,7 +199,7 @@ class MainViewModel @Inject constructor(
        val searchParamName : MutableLiveData<String> = MutableLiveData()
        val searchParamCountry : MutableLiveData<String> = MutableLiveData()
 
-       var isNameAutoSearch = searchPreferences.getBoolean(SEARCH_PREF_NAME_AUTO, true)
+//       var isNameAutoSearch = searchPreferences.getBoolean(SEARCH_PREF_NAME_AUTO, true)
        var isFullAutoSearch = searchPreferences.getBoolean(SEARCH_PREF_FULL_AUTO, true)
 
        var lastSearchCountry = searchPreferences.getString(SEARCH_PREF_COUNTRY, "") ?: ""
