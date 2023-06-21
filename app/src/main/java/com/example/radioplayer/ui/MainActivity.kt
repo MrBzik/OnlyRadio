@@ -112,7 +112,6 @@ class MainActivity : AppCompatActivity() {
     companion object{
         var uiMode = 0
         var flHeight = 0
-
     }
 
 
@@ -747,7 +746,11 @@ class MainActivity : AppCompatActivity() {
 
             } else {
 
-                currentPlayingStation?.let { mainViewModel.playOrToggleStation(it, isToChangeMediaItems = false) }
+                currentPlayingStation?.let { mainViewModel.playOrToggleStation(
+                    it,
+                    isToChangeMediaItems = false,
+                    searchFlag = RadioService.currentMediaItems
+                ) }
 
 
             }

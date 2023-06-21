@@ -366,12 +366,12 @@ class RadioService : MediaBrowserServiceCompat() {
 
                 }
 
-                COMMAND_UPDATE_HISTORY -> {
-                    val id = extras?.getString(ITEM_ID)
-                    id?.let{
-                        checkDateAndUpdateHistory(it)
-                    }
-                }
+//                COMMAND_UPDATE_HISTORY -> {
+//                    val id = extras?.getString(ITEM_ID)
+//                    id?.let{
+//                        checkDateAndUpdateHistory(it)
+//                    }
+//                }
 
 
                 COMMAND_START_RECORDING -> {
@@ -1597,23 +1597,41 @@ class RadioService : MediaBrowserServiceCompat() {
 
         if(isSameStation){
 
+//            Log.d("CHECKTAGS", "on same station. Index: $index")
+
             clearMediaItems(false)
 
-            items.forEach {
-                exoPlayer.addMediaItem(it)
-            }
+//            items.forEach {
+//                exoPlayer.addMediaItem(it)
+//            }
+//
+//            if(index != 0) {
+//                exoPlayer.moveMediaItem(0, index)
+//            }
 
-            if(index != 0) {
-                exoPlayer.moveMediaItem(0, index)
+            if(index == 0){
+                exoPlayer.addMediaItems(items.subList(1, items.lastIndex))
+            } else {
+
+                exoPlayer.addMediaItems(0, items.subList(0, index))
+
+                if(index < items.lastIndex){
+                    exoPlayer.addMediaItems(items.subList(index + 1, items.lastIndex))
+                }
             }
 
             currentPlayingItemPosition = index
 
         } else {
+
+            if(index != 0)
+                isToIgnoreMediaItem = true
+
             exoPlayer.setMediaItems(items)
         }
     }
 
+    var isToIgnoreMediaItem = false
 
     private fun adjustIndexFromHistory(index : Int) : Int {
 
@@ -1733,6 +1751,45 @@ class RadioService : MediaBrowserServiceCompat() {
 //               }
 //           }
 //       }
+    }
+
+
+    fun updateStationLastClicked(stationId : String) = serviceScope.launch(Dispatchers.IO){
+        databaseRepository.updateRadioStationLastClicked(stationId)
+    }
+
+    private var previousPlayedStationId = ""
+    private var stationStartPlayingTime = 0L
+
+    fun updateStationPlayedDuration() = serviceScope.launch(Dispatchers.IO){
+
+        if(isPlaybackStatePlaying){
+            if(previousPlayedStationId.isBlank()){
+                previousPlayedStationId = currentRadioStation?.stationuuid ?: ""
+                stationStartPlayingTime = System.currentTimeMillis()
+
+                Log.d("CHECKTAGS", "duration start for id : $previousPlayedStationId")
+
+            } else {
+                durationUpdateHelper()
+                stationStartPlayingTime = System.currentTimeMillis()
+                previousPlayedStationId = currentRadioStation?.stationuuid ?: ""
+            }
+
+        } else {
+            durationUpdateHelper()
+            previousPlayedStationId = ""
+        }
+    }
+    private suspend fun durationUpdateHelper(){
+        val duration = System.currentTimeMillis() - stationStartPlayingTime
+        if(duration > 20000 && previousPlayedStationId.isNotBlank()){
+            Log.d("CHECKTAGS", "duration endin for id : $previousPlayedStationId")
+            Log.d("CHECKTAGS", "updating duration : $duration")
+            databaseRepository.updateRadioStationPlayedDuration(
+                previousPlayedStationId, duration
+            )
+        }
     }
 
 

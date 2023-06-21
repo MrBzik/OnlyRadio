@@ -26,8 +26,8 @@ fun RadioStationsItem.toRadioStation() : RadioStation{
         favouredAt = 0,
         state = state,
         bitrate = bitrate,
-       lastClicked = 0,
-       playedDuration = 0
+       lastClick = 0,
+       playDuration = 0
     )
 
 }

@@ -23,6 +23,14 @@ interface  RadioDAO {
     @Query("SELECT * FROM RadioStation WHERE stationuuid =:stationID LIMIT 1")
     suspend fun getCurrentRadioStation(stationID: String) : RadioStation
 
+    @Query("UPDATE RadioStation SET lastClick =:newTime WHERE stationuuid =:stationID")
+    suspend fun updateStationLastClicked(newTime : Long, stationID: String)
+
+    @Query("UPDATE RadioStation SET playDuration = playDuration + :duration WHERE stationuuid =:stationID")
+    suspend fun updateRadioStationPlayedDuration(stationID: String, duration : Long)
+
+    @Query("SELECT playDuration FROM RadioStation WHERE stationuuid =:stationID LIMIT 1")
+    suspend fun getRadioStationPlayDuration(stationID: String) : Long
 
     // For favoured stations
 

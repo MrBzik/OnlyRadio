@@ -608,7 +608,7 @@ class MainViewModel @Inject constructor(
 
         fun playOrToggleStation(
             station : RadioStation? = null,
-            searchFlag : Int = 0,
+            searchFlag : Int,
             playWhenReady : Boolean = true,
             itemIndex : Int = -1,
 //            historyItemId : String? = null,
@@ -659,11 +659,11 @@ class MainViewModel @Inject constructor(
                 return false
             } else {
 
-                id?.let {
-                    radioServiceConnection.sendCommand(COMMAND_UPDATE_HISTORY,
-                    bundleOf(Pair(ITEM_ID, it))
-                    )
-                }
+//                id?.let {
+//                    radioServiceConnection.sendCommand(COMMAND_UPDATE_HISTORY,
+//                    bundleOf(Pair(ITEM_ID, it))
+//                    )
+//                }
 
                 RadioService.currentMediaItems = searchFlag
                 radioServiceConnection.transportControls

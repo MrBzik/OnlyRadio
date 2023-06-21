@@ -35,9 +35,12 @@ import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
+import com.example.radioplayer.ui.animations.SwapTitlesUi
 import com.example.radioplayer.ui.animations.SwipeToDeleteCallback
 import com.example.radioplayer.ui.animations.objectSizeScaleAnimation
 import com.example.radioplayer.ui.animations.slideAnim
+import com.example.radioplayer.utils.Constants
+import com.example.radioplayer.utils.Constants.FRAG_HISTORY
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
@@ -802,59 +805,15 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
 
 
-    private fun switchTitlesStationsUi(isToAnimate : Boolean){
-
-        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
-            if(databaseViewModel.isInStationsTab){
-                (bind.tvStations as TextView).setTextAppearance(R.style.selectedTitle)
-                (bind.tvTitles as TextView).setTextAppearance(R.style.unselectedTitle)
-
-                if(isToAnimate){
-                    (bind.tvStations as TextView).objectSizeScaleAnimation(15f, 18f)
-                    (bind.tvTitles as TextView).objectSizeScaleAnimation(18f, 15f)
-                }
-
-            } else {
-                (bind.tvStations as TextView).setTextAppearance(R.style.unselectedTitle)
-                (bind.tvTitles as TextView).setTextAppearance(R.style.selectedTitle)
-
-                if(isToAnimate){
-                    (bind.tvStations as TextView).objectSizeScaleAnimation(18f, 15f)
-                    (bind.tvTitles as TextView).objectSizeScaleAnimation(15f, 18f)
-                }
-
-            }
-        } else {
-
-            if(databaseViewModel.isInStationsTab){
-                bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_history_stations_protected)
-
-                (bind.tvStations as TextViewOutlined).apply {
-                    isSingleColor = true
-                     setTextColor(Color.BLACK)
-                }
-
-                (bind.tvTitles as TextViewOutlined).apply {
-                    isSingleColor = false
-                    invalidate()
-                }
-            } else {
-                bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_history_titles_vector)
-
-                (bind.tvTitles as TextViewOutlined).apply {
-                    isSingleColor = true
-                    setTextColor(Color.BLACK)
-                }
-
-                (bind.tvStations as TextViewOutlined).apply {
-                    isSingleColor = false
-                    invalidate()
-                }
-            }
-        }
-    }
-
-
+    private fun switchTitlesStationsUi(isToAnimate: Boolean) =
+        SwapTitlesUi.swap(
+            conditionA = databaseViewModel.isInStationsTab,
+            textViewA = bind.tvStations as TextView,
+            textViewB = bind.tvTitles as TextView,
+            isToAnimate = isToAnimate,
+            toolbar = bind.viewToolbar,
+            fragment = FRAG_HISTORY
+        )
 
     private fun subscribeToHistory(){
 
@@ -862,7 +821,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 stationsHistoryAdapter?.submitData(lifecycle, it)
             }
-
 
         databaseViewModel.observableTitles.observe(viewLifecycleOwner){
 

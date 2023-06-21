@@ -14,9 +14,7 @@ fun View.slideAnim(duration : Long, offset : Long, anim : Int){
         this.startOffset = offset
 
     }
-
         startAnimation(slideRight)
-
 }
 
 

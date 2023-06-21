@@ -49,12 +49,18 @@ class DatabaseViewModel @Inject constructor(
 //    }
 
 
+    fun getRadioStationPlayDuration(stationID: String, handleResult: (Long) -> Unit) =
+        viewModelScope.launch {
+        val result = repository.getRadioStationPlayDuration(stationID)
+        handleResult(result)
+    }
+
+
+
+
     val isStationFavoured: MutableLiveData<Boolean> = MutableLiveData()
 
     var currentPlaylistName: MutableLiveData<String> = MutableLiveData("")
-
-
-
 
 
     fun checkIfStationIsFavoured(stationID: String) = viewModelScope.launch {

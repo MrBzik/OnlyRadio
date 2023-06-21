@@ -345,6 +345,14 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
 
             currentRadioStation = station
+
+
+            databaseViewModel.getRadioStationPlayDuration(station.stationuuid){dur ->
+                bind.tvDuration.text = "${dur/ 1000}s"
+            }
+
+
+
             checkIfStationFavoured(station)
             bind.viewPager.apply {
 

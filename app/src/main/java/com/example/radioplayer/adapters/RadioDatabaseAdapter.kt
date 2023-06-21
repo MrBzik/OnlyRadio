@@ -22,6 +22,7 @@ import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.ItemRadioWithTextBinding
 import com.example.radioplayer.exoPlayer.RadioService
+import com.example.radioplayer.ui.animations.AdapterAnimator
 import com.example.radioplayer.ui.animations.fadeOut
 import com.example.radioplayer.ui.fragments.FavStationsFragment
 import com.example.radioplayer.utils.RandomColors
@@ -32,6 +33,8 @@ class RadioDatabaseAdapter @Inject constructor(
 ) : RecyclerView.Adapter<RadioDatabaseAdapter.RadioItemHolder>() {
 
     val utils = BaseAdapter(glide)
+
+    val animator = AdapterAnimator()
 
     class RadioItemHolder (val bind : ItemRadioWithTextBinding) : RecyclerView.ViewHolder(bind.root)
 
@@ -85,6 +88,11 @@ class RadioDatabaseAdapter @Inject constructor(
             utils.handleStationPlaybackState(holder.bind)
         } else
             utils.restoreState(holder.bind)
+
+        if(position == 0) animator.resetAnimator()
+
+        animator.animateAppearance(holder.itemView)
+
     }
 
     private var selectedAdapterPosition = -2

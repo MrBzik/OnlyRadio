@@ -89,66 +89,73 @@ class RadioPlayerEventListener (
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
         super.onMediaItemTransition(mediaItem, reason)
 
-        val uri = radioService.exoPlayer.currentMediaItem?.localConfiguration?.uri.toString()
 
-        val index = radioService.exoPlayer.currentMediaItemIndex
-        var station : RadioStation? = null
-        RadioService.currentPlayingItemPosition = index
+//        val uri = radioService.exoPlayer.currentMediaItem?.localConfiguration?.uri.toString()
 
-        try {
-            when(RadioService.currentMediaItems){
+        if(radioService.isToIgnoreMediaItem){
+            radioService.isToIgnoreMediaItem = false
+        } else {
 
-                NO_PLAYLIST -> {
+            val index = radioService.exoPlayer.currentMediaItemIndex
 
-                    station = radioService.currentRadioStation
+            var station : RadioStation? = null
+            RadioService.currentPlayingItemPosition = index
 
-                }
+            try {
+                when(RadioService.currentMediaItems){
 
-                SEARCH_FROM_API -> {
+                    NO_PLAYLIST -> {
 
-                    station = radioService.radioSource.stationsFromApi[index].toRadioStation()
-                    radioService.insertRadioStation(station)
+                        station = radioService.currentRadioStation
 
-                }
+                    }
 
-                SEARCH_FROM_FAVOURITES ->
-                    station = radioService.radioSource.stationsFavoured[index]
+                    SEARCH_FROM_API -> {
+
+                        station = radioService.radioSource.stationsFromApi[index].toRadioStation()
+                        radioService.insertRadioStation(station)
+
+                    }
+
+                    SEARCH_FROM_FAVOURITES ->
+                        station = radioService.radioSource.stationsFavoured[index]
 
 
+                    SEARCH_FROM_PLAYLIST ->
+                        station = RadioSource.stationsInPlaylist[index]
 
-                SEARCH_FROM_PLAYLIST ->
-                    station = RadioSource.stationsInPlaylist[index]
-
-                SEARCH_FROM_HISTORY ->
-                    station = radioService.radioSource.stationsFromHistory[index]
+                    SEARCH_FROM_HISTORY ->
+                        station = radioService.radioSource.stationsFromHistory[index]
 //                station = radioService.radioSource.stationsFromHistory.first {
 //                    it.url == uri
 //                }
 
-                SEARCH_FROM_HISTORY_ONE_DATE ->
-                    station = RadioSource.stationsFromHistoryOneDate[index]
+                    SEARCH_FROM_HISTORY_ONE_DATE ->
+                        station = RadioSource.stationsFromHistoryOneDate[index]
 
-                SEARCH_FROM_RECORDINGS -> {
-                    val recording = radioService.stationsFromRecordings[index]
-                    radioService.currentRecording = recording
-                    RadioService.currentPlayingRecording.postValue(recording)
+                    SEARCH_FROM_RECORDINGS -> {
+                        val recording = radioService.stationsFromRecordings[index]
+                        radioService.currentRecording = recording
+                        RadioService.currentPlayingRecording.postValue(recording)
+                    }
                 }
+            } catch (e : Exception){
+                Log.d("CHECKTAGS", e.stackTraceToString())
             }
-        } catch (e : Exception){
-            Log.d("CHECKTAGS", e.stackTraceToString())
+
+
+            station?.let {
+
+                radioService.currentRadioStation = it
+                RadioService.currentPlayingStation.postValue(it)
+                radioService.updateStationLastClicked(it.stationuuid)
+                radioService.checkDateAndUpdateHistory(it.stationuuid)
+            }
+
+            if(radioService.radioSource.exoRecordState.value == true){
+                radioService.stopRecording()
+            }
         }
-
-
-        station?.let { radioService.currentRadioStation = it
-
-            RadioService.currentPlayingStation.postValue(it)
-        }
-
-
-        if(radioService.radioSource.exoRecordState.value == true){
-            radioService.stopRecording()
-        }
-
     }
 
 
@@ -160,15 +167,16 @@ class RadioPlayerEventListener (
             playbackState == Player.STATE_BUFFERING
         )
 
+
         if(playbackState == Player.STATE_READY && !playWhenReady || playbackState == Player.STATE_IDLE && !playWhenReady) {
 
             radioService.isPlaybackStatePlaying = false
 
+            radioService.updateStationPlayedDuration()
+
             radioService.stopForeground(STOP_FOREGROUND_DETACH)
 
             radioService.isForegroundService = false
-
-
 
 //            radioService.exoPlayer.volume = 0f
         }
@@ -176,12 +184,14 @@ class RadioPlayerEventListener (
 
             radioService.isPlaybackStatePlaying = true
             radioService.listenToRecordDuration()
+
+            radioService.updateStationPlayedDuration()
+
             if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
                 radioService.fadeInPlayer()
             } else {
                 radioService.exoPlayer.volume = 1f
             }
-
          }
 
 //        else if(playbackState == Player.STATE_IDLE){

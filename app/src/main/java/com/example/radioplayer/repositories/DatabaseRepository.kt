@@ -14,6 +14,15 @@ class DatabaseRepository @Inject constructor(
 
     suspend fun insertRadioStation (station : RadioStation) = radioDAO.insertRadioStation(station)
 
+    suspend fun updateRadioStationLastClicked (stationId : String) = radioDAO.updateStationLastClicked(
+        System.currentTimeMillis(), stationId
+    )
+
+    suspend fun updateRadioStationPlayedDuration (stationId : String, duration : Long) =
+        radioDAO.updateRadioStationPlayedDuration(stationId, duration)
+
+    suspend fun getRadioStationPlayDuration(stationID: String) = radioDAO.getRadioStationPlayDuration(stationID)
+
     suspend fun checkIfStationIsFavoured (stationID: String) = radioDAO.checkIfStationIsFavoured(stationID)
 
     suspend fun updateIsFavouredState (value : Long, stationID: String)

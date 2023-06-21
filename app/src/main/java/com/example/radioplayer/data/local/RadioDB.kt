@@ -1,5 +1,6 @@
 package com.example.radioplayer.data.local
 
+import android.provider.MediaStore.Audio.Radio
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.DeleteColumn
@@ -22,7 +23,7 @@ import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
         Title::class,
         BookmarkedTitle::class
                ],
-        version = 19,
+        version = 21,
          autoMigrations = [
         AutoMigration(from = 9, to = 10, spec = RadioDB.Migration9To10::class),
         AutoMigration(from = 11, to = 12, spec = RadioDB.Migration11To12::class),
@@ -30,7 +31,9 @@ import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
         AutoMigration(from = 13, to = 14, spec = RadioDB.Migration13To14::class),
          AutoMigration(from = 14, to = 15, spec = RadioDB.Migration14To15::class),
          AutoMigration(from = 16, to = 17, spec = RadioDB.Migration16To17::class),
-         AutoMigration(from = 18, to = 19, spec = RadioDB.Migration18To19::class)
+         AutoMigration(from = 18, to = 19, spec = RadioDB.Migration18To19::class),
+         AutoMigration(from = 19, to = 20, spec = RadioDB.Migration19To20::class),
+         AutoMigration(from = 20, to = 21, spec = RadioDB.Migration20To21::class)
     ]
 )
 
@@ -44,6 +47,14 @@ abstract class RadioDB : RoomDatabase() {
     )
     class Migration9To10 : AutoMigrationSpec
 
+
+    @DeleteColumn.Entries(
+        DeleteColumn(tableName = "RadioStation", columnName = "lastClicked"),
+        DeleteColumn(tableName = "RadioStation", columnName = "playedDuration"),
+    )
+    class Migration19To20 : AutoMigrationSpec
+
+
     class Migration11To12 : AutoMigrationSpec
 
     @DeleteColumn(tableName = "Recording", columnName = "duration")
@@ -56,6 +67,8 @@ abstract class RadioDB : RoomDatabase() {
     class Migration16To17 : AutoMigrationSpec
 
     class Migration18To19 : AutoMigrationSpec
+
+    class Migration20To21 : AutoMigrationSpec
 
     companion object{
 
@@ -96,7 +109,6 @@ abstract class RadioDB : RoomDatabase() {
                 )
             }
         }
-
     }
 
 

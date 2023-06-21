@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PlaylistsAdapter
@@ -31,6 +32,7 @@ import com.example.radioplayer.ui.dialogs.CreatePlaylistDialog
 import com.example.radioplayer.ui.dialogs.EditPlaylistDialog
 import com.example.radioplayer.ui.dialogs.RemovePlaylistDialog
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
+import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
@@ -59,6 +61,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     private var isPlaylistsVisible = false
 
     private var searchFlag : Int = 1
+
+    private var currentStation : RadioStation? = null
 
     @Inject
     lateinit var mainAdapter: RadioDatabaseAdapter
@@ -111,38 +115,26 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     }
 
+
+
+
     private fun observeNewStation(){
 
         RadioService.currentPlayingStation.observe(viewLifecycleOwner) { station ->
+
+            currentStation = station
 
             if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
 
                 if (isToHandleNewStationObserver) {
 
-                    var index = -1
-
-
-                    if (RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES && isInFavouriteTab ||
-                        RadioService.currentMediaItems == SEARCH_FROM_PLAYLIST && !isInFavouriteTab &&
-                                RadioService.currentPlaylistName == currentPlaylistName
-                    ) {
-
-                        index  = RadioService.currentPlayingItemPosition
-
-                    } else {
-
-                         index = mainAdapter.listOfStations
-                            .indexOfFirst {
-                                it.stationuuid == station.stationuuid
-                            }
-                    }
+                    val index = getCurrentItemPosition(station)
 
                     if (index != -1) {
                         handleNewRadioStation(index, station)
                     } else {
                         mainAdapter.updateOnStationChange(station, null)
                     }
-
 
                 } else{
                     isToHandleNewStationObserver = true
@@ -151,6 +143,18 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         }
     }
 
+    private fun getCurrentItemPosition(station : RadioStation?) : Int{
+        if(isInFavouriteTab && RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES ||
+            !isInFavouriteTab && RadioService.currentMediaItems == SEARCH_FROM_PLAYLIST &&
+            currentPlaylistName == RadioService.currentPlaylistName
+        )
+            return RadioService.currentPlayingItemPosition
+
+        else return mainAdapter.listOfStations
+            .indexOfFirst {
+                it.stationuuid == station?.stationuuid
+            }
+    }
 
     private fun handleNewRadioStation(position : Int, station : RadioStation){
 
@@ -244,8 +248,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                         setCompoundDrawablesWithIntrinsicBounds(0,0, R.drawable.ic_playlists_arrow_expand, 0)
                     }
                 }
-
-
         }
     }
 
@@ -277,13 +279,22 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             databaseViewModel.getAllFavouredStations()
 
-            bind.rvFavStations.post {
+            mainAdapter.animator.resetAnimator()
 
-                bind.rvFavStations.scheduleLayoutAnimation()
+            bind.rvFavStations.apply {
 
+
+                post {
+
+//                    scheduleLayoutAnimation()
+                }
             }
         }
     }
+
+
+
+
 
     private fun setPlaylistAdapterClickListeners(){
 
@@ -305,9 +316,11 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                     databaseViewModel.subscribeToStationsInPlaylist(playlist.playlistName)
                     currentPlaylistPosition = position
 
+                    mainAdapter.animator.resetAnimator()
+
                     bind.rvFavStations.post {
 
-                        bind.rvFavStations.scheduleLayoutAnimation()
+//                        bind.rvFavStations.scheduleLayoutAnimation()
                     }
                 }
             }
@@ -564,11 +577,27 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             }
 
 
-            layoutAnimation = (activity as MainActivity).layoutAnimationController
+//            layoutAnimation = (activity as MainActivity).layoutAnimationController
 
                 post {
-                    scheduleLayoutAnimation()
+
+                    val index = getCurrentItemPosition(RadioService.currentPlayingStation.value)
+
+                    if(index != -1){
+                        scrollToPosition(index)
+                    }
+
+//                    scheduleLayoutAnimation()
                 }
+
+            addOnScrollListener(object : RecyclerView.OnScrollListener(){
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if(newState == SCROLL_STATE_DRAGGING)
+                        mainAdapter.animator.cancelAnimator()
+                }
+            })
+
         }
     }
 
@@ -701,6 +730,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         bind.rvPlaylists.adapter = null
         _bind = null
         isToHandleNewStationObserver = false
+        mainAdapter.animator.resetAnimator()
     }
 
 }

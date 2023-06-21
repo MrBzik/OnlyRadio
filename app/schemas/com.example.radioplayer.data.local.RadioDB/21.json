@@ -1,7 +1,7 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 19,
+    "version": 21,
     "identityHash": "f6e45983b5b1eec705e906611c1e48ad",
     "entities": [
       {
@@ -78,15 +78,15 @@
             "defaultValue": "0"
           },
           {
-            "fieldPath": "lastClicked",
-            "columnName": "lastClicked",
+            "fieldPath": "lastClick",
+            "columnName": "lastClick",
             "affinity": "INTEGER",
             "notNull": true,
             "defaultValue": "0"
           },
           {
-            "fieldPath": "playedDuration",
-            "columnName": "playedDuration",
+            "fieldPath": "playDuration",
+            "columnName": "playDuration",
             "affinity": "INTEGER",
             "notNull": true,
             "defaultValue": "0"

@@ -21,6 +21,7 @@ import com.example.radioplayer.databinding.StubTvTitleBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
+import com.example.radioplayer.ui.animations.SwapTitlesUi
 import com.example.radioplayer.ui.animations.objectSizeScaleAnimation
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.BufferSettingsDialog
@@ -31,6 +32,7 @@ import com.example.radioplayer.utils.Constants.ADD_RADIO_STATION_URL
 import com.example.radioplayer.utils.Constants.BUFFER_PREF
 import com.example.radioplayer.utils.Constants.DARK_MODE_PREF
 import com.example.radioplayer.utils.Constants.FOREGROUND_PREF
+import com.example.radioplayer.utils.Constants.FRAG_OPTIONS
 import com.example.radioplayer.utils.Constants.HISTORY_PREF
 import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.RECONNECT_PREF
@@ -40,6 +42,7 @@ import com.example.radioplayer.utils.RecPref
 import com.example.radioplayer.utils.TextViewOutlined
 import com.example.radioplayer.utils.addImage
 import com.example.radioplayer.utils.dpToP
+import org.w3c.dom.Text
 
 
 class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
@@ -222,60 +225,14 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
     }
 
-
-    private fun swapTitlesUi(isToAnimate : Boolean){
-
-        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
-            if(mainViewModel.isInSettingsExtras){
-                (bindTvGeneral.tvTitle as TextView).setTextAppearance(R.style.unselectedTitle)
-                (bindTvExtras.tvTitle as TextView).setTextAppearance(R.style.selectedTitle)
-
-                if(isToAnimate){
-                    (bindTvGeneral.tvTitle as TextView).objectSizeScaleAnimation(18f, 15f)
-                    (bindTvExtras.tvTitle as TextView).objectSizeScaleAnimation(15f, 18f)
-                }
-            } else {
-
-                (bindTvGeneral.tvTitle as TextView).setTextAppearance(R.style.selectedTitle)
-                (bindTvExtras.tvTitle as TextView).setTextAppearance(R.style.unselectedTitle)
-
-                if(isToAnimate){
-                    (bindTvGeneral.tvTitle as TextView).objectSizeScaleAnimation(15f, 18f)
-                    (bindTvExtras.tvTitle as TextView).objectSizeScaleAnimation(18f, 15f)
-                }
-            }
-        } else {
-
-            if(mainViewModel.isInSettingsExtras){
-
-                bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_settings_extras_vector)
-
-                (bindTvExtras.tvTitle as TextViewOutlined).apply {
-                    isSingleColor = true
-                    setTextColor(Color.BLACK)
-                }
-
-                (bindTvGeneral.tvTitle as TextViewOutlined).apply {
-                    isSingleColor = false
-                    invalidate()
-                }
-
-            } else {
-
-                bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_settings_vector)
-
-                (bindTvGeneral.tvTitle as TextViewOutlined).apply {
-                    isSingleColor = true
-                    setTextColor(Color.BLACK)
-                }
-
-                (bindTvExtras.tvTitle as TextViewOutlined).apply {
-                    isSingleColor = false
-                    invalidate()
-                }
-            }
-        }
-    }
+    private fun swapTitlesUi(isToAnimate: Boolean) = SwapTitlesUi.swap(
+        conditionA = mainViewModel.isInSettingsExtras,
+        textViewA = bindTvExtras.tvTitle as TextView,
+        textViewB = bindTvGeneral.tvTitle as TextView,
+        isToAnimate = isToAnimate,
+        toolbar = bind.viewToolbar,
+        fragment = FRAG_OPTIONS
+    )
 
 
     private fun setAddStationClickListener(){

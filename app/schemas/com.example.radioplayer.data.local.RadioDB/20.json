@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 19,
-    "identityHash": "f6e45983b5b1eec705e906611c1e48ad",
+    "version": 20,
+    "identityHash": "211afad26860926b84d78596036e1098",
     "entities": [
       {
         "tableName": "RadioStation",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`stationuuid` TEXT NOT NULL, `favicon` TEXT, `name` TEXT, `country` TEXT, `url` TEXT, `homepage` TEXT, `tags` TEXT, `language` TEXT, `favouredAt` INTEGER NOT NULL DEFAULT 0, `state` TEXT DEFAULT '', `bitrate` INTEGER DEFAULT 0, `lastClick` INTEGER NOT NULL DEFAULT 0, `playDuration` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`stationuuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`stationuuid` TEXT NOT NULL, `favicon` TEXT, `name` TEXT, `country` TEXT, `url` TEXT, `homepage` TEXT, `tags` TEXT, `language` TEXT, `favouredAt` INTEGER NOT NULL DEFAULT 0, `state` TEXT DEFAULT '', `bitrate` INTEGER DEFAULT 0, PRIMARY KEY(`stationuuid`))",
         "fields": [
           {
             "fieldPath": "stationuuid",
@@ -75,20 +75,6 @@
             "columnName": "bitrate",
             "affinity": "INTEGER",
             "notNull": false,
-            "defaultValue": "0"
-          },
-          {
-            "fieldPath": "lastClicked",
-            "columnName": "lastClicked",
-            "affinity": "INTEGER",
-            "notNull": true,
-            "defaultValue": "0"
-          },
-          {
-            "fieldPath": "playedDuration",
-            "columnName": "playedDuration",
-            "affinity": "INTEGER",
-            "notNull": true,
             "defaultValue": "0"
           }
         ],
@@ -358,7 +344,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f6e45983b5b1eec705e906611c1e48ad')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '211afad26860926b84d78596036e1098')"
     ]
   }
 }
