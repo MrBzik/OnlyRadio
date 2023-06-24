@@ -31,28 +31,28 @@
 <!--        android:background="@drawable/toolbar_history_titles_protected"-->
 <!--        />-->
 
-    <com.example.radioplayer.utils.TextViewOutlined
-        android:id="@+id/tvSliderHeader"
-        android:layout_width="wrap_content"
-        android:layout_height="60dp"
-        android:layout_marginStart="-6dp"
-        android:gravity="center"
-        android:text="All dates"
-        android:textAppearance="@style/mainTextButtons"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/guideline66"
-        app:layout_constraintTop_toTopOf="parent" />
+<!--    <com.example.radioplayer.utils.TextViewOutlined-->
+<!--        android:id="@+id/tvSliderHeader"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:layout_marginStart="-6dp"-->
+<!--        android:gravity="center"-->
+<!--        android:text="All dates"-->
+<!--        android:textAppearance="@style/mainTextButtons"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="@id/guideline66"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
 
 
-    <TextView
-        android:id="@+id/tvShrinkArrow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:drawableEndCompat="@drawable/ic_playlists_arrow_expand"
-        app:layout_constraintBottom_toBottomOf="@id/tvSliderHeader"
-        app:layout_constraintStart_toEndOf="@id/tvSliderHeader"
-        app:layout_constraintTop_toTopOf="parent" />
+<!--    <TextView-->
+<!--        android:id="@+id/tvShrinkArrow"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:drawableEndCompat="@drawable/ic_playlists_arrow_expand"-->
+<!--        app:layout_constraintBottom_toBottomOf="@id/tvSliderHeader"-->
+<!--        app:layout_constraintStart_toEndOf="@id/tvSliderHeader"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
 
 <!--    <TextView-->
@@ -68,13 +68,13 @@
 <!--        app:layout_constraintTop_toTopOf="parent" />-->
 
 
-    <View
-        android:id="@+id/viewSpinnerClickBox"
-        android:layout_width="0dp"
-        android:layout_height="60dp"
-        app:layout_constraintStart_toStartOf="@id/guideline66"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+<!--    <View-->
+<!--        android:id="@+id/viewSpinnerClickBox"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="60dp"-->
+<!--        app:layout_constraintStart_toStartOf="@id/guideline66"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"/>-->
 
 
 <!--    <TextView-->
@@ -97,11 +97,23 @@
         android:gravity="center"
         android:text="Titles"
         android:textAppearance="@style/mainTextTitle"
-        app:layout_constraintStart_toStartOf="@id/guideline33"
+        app:layout_constraintStart_toStartOf="@id/guidelineMid"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/guideline66"
+        app:layout_constraintEnd_toEndOf="parent"
         />
 
+
+<!--    <com.example.radioplayer.utils.TextViewOutlined-->
+<!--        android:id="@+id/tvBookmarks"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:gravity="center"-->
+<!--        android:text="Bookmarks"-->
+<!--        android:textAppearance="@style/mainTextTitle"-->
+<!--        app:layout_constraintStart_toStartOf="@id/guideline66"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        />-->
 
 
     <com.example.radioplayer.utils.SpinnerExt
@@ -161,7 +173,7 @@
         android:text="Stations"
         android:textAppearance="@style/mainTextButtons"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/guideline33"
+        app:layout_constraintEnd_toEndOf="@id/guidelineMid"
         app:layout_constraintTop_toTopOf="parent"
         />
 
@@ -202,12 +214,25 @@
         app:layout_constraintGuide_percent="0.66"
         />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabDatePick"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="73dp"
+        android:layout_marginEnd="10dp"
+        android:scaleType="centerCrop"
+        app:fabCustomSize="50dp"
+        android:src="@drawable/ic_history_pick_date"
+        app:backgroundTint="@color/floating_buttons"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabBookmarkedTitles"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="140dp"
         android:layout_marginEnd="10dp"
         android:scaleType="centerCrop"
         app:fabCustomSize="50dp"
@@ -215,6 +240,7 @@
         app:backgroundTint="@color/floating_buttons"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 
 
 

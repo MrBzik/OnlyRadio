@@ -26,8 +26,9 @@ data class RadioStation (
     @ColumnInfo(name = "lastClick", defaultValue = "0")
     val lastClick : Long,
     @ColumnInfo(name = "playDuration", defaultValue = "0")
-    val playDuration : Long
-
+    val playDuration : Long,
+    @ColumnInfo(name = "inPlaylistsCount", defaultValue = "0")
+    val inPlaylistsCount : Int
 
 
 //    @ColumnInfo(name = "lastClicked", defaultValue = "0")

@@ -63,7 +63,7 @@
         android:ellipsize="end"
         android:textAppearance="@style/mainTextTitle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/guideline33"
+        app:layout_constraintEnd_toEndOf="@id/guidelineMiddle"
         app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -118,7 +118,7 @@
         android:textAppearance="@style/mainTextButtons"
         app:drawableEndCompat="@drawable/ic_playlists_arrow_expand"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/guideline66"
+        app:layout_constraintStart_toStartOf="@id/guidelineMiddle"
         app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -144,7 +144,7 @@
         android:visibility="invisible"
         android:paddingHorizontal="10dp"
         android:gravity="center"
-        android:text="Add new stations in Details. Drag and drop to move stations between playlists"
+        android:text="@string/fav_frag_hint"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -166,18 +166,31 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.66" />
 
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineMiddle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5"
+        />
+
     <View
+        android:id="@+id/separatorLeft"
         android:layout_width="2dp"
         android:layout_height="60dp"
         android:background="@drawable/gradient_for_separators"
-        app:layout_constraintStart_toStartOf="@id/guideline33"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <View
+        android:id="@+id/separatorRight"
         android:layout_width="2dp"
         android:layout_height="60dp"
         android:background="@drawable/gradient_for_separators"
-        app:layout_constraintStart_toStartOf="@id/guideline66"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
 

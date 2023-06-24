@@ -46,7 +46,7 @@ object SwapTitlesUi {
             if(conditionA){
 
                 val drawable = when (fragment){
-                    FRAG_HISTORY -> R.drawable.toolbar_history_stations_protected
+                    FRAG_HISTORY -> R.drawable.toolbar_history_stations_vector
                     FRAG_OPTIONS -> R.drawable.toolbar_settings_extras_vector
                     else -> 0
                 }

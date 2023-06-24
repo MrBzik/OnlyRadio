@@ -5,6 +5,7 @@ import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.DeleteColumn
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -23,7 +24,7 @@ import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
         Title::class,
         BookmarkedTitle::class
                ],
-        version = 21,
+        version = 22,
          autoMigrations = [
         AutoMigration(from = 9, to = 10, spec = RadioDB.Migration9To10::class),
         AutoMigration(from = 11, to = 12, spec = RadioDB.Migration11To12::class),
@@ -33,7 +34,8 @@ import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
          AutoMigration(from = 16, to = 17, spec = RadioDB.Migration16To17::class),
          AutoMigration(from = 18, to = 19, spec = RadioDB.Migration18To19::class),
          AutoMigration(from = 19, to = 20, spec = RadioDB.Migration19To20::class),
-         AutoMigration(from = 20, to = 21, spec = RadioDB.Migration20To21::class)
+         AutoMigration(from = 20, to = 21, spec = RadioDB.Migration20To21::class),
+         AutoMigration(from = 21, to = 22, spec = RadioDB.Migration21To22::class)
     ]
 )
 
@@ -69,6 +71,8 @@ abstract class RadioDB : RoomDatabase() {
     class Migration18To19 : AutoMigrationSpec
 
     class Migration20To21 : AutoMigrationSpec
+
+    class Migration21To22 : AutoMigrationSpec
 
     companion object{
 

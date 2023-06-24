@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -34,12 +35,15 @@ import com.example.radioplayer.ui.dialogs.RemovePlaylistDialog
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
 import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_LAZY_LIST
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.dpToP
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -56,7 +60,9 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     private lateinit var listOfPlaylists : List<Playlist>
     lateinit var pixabayViewModel: PixabayViewModel
 
-    private var isInFavouriteTab = false
+//    private var isInFavouriteTab = false
+
+    private var currentTab = SEARCH_FROM_FAVOURITES
 
     private var isPlaylistsVisible = false
 
@@ -113,6 +119,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         editPlaylistClickListener()
 
+
+
     }
 
 
@@ -144,9 +152,10 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     }
 
     private fun getCurrentItemPosition(station : RadioStation?) : Int{
-        if(isInFavouriteTab && RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES ||
-            !isInFavouriteTab && RadioService.currentMediaItems == SEARCH_FROM_PLAYLIST &&
-            currentPlaylistName == RadioService.currentPlaylistName
+        if(currentTab == SEARCH_FROM_FAVOURITES && RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES ||
+            currentTab == SEARCH_FROM_PLAYLIST && RadioService.currentMediaItems == SEARCH_FROM_PLAYLIST &&
+            currentPlaylistName == RadioService.currentPlaylistName ||
+            currentTab == SEARCH_FROM_LAZY_LIST && RadioService.currentMediaItems == SEARCH_FROM_LAZY_LIST
         )
             return RadioService.currentPlayingItemPosition
 
@@ -197,7 +206,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         bind.tvPlaylistEdit.setOnClickListener {
 
-            if(!isInFavouriteTab){
+            if(currentTab == SEARCH_FROM_PLAYLIST){
 
                 var isDeletePlaylistCalled = false
 
@@ -238,7 +247,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             bind.rvPlaylists.isVisible = it
             
-            bind.ivArrowBackToFav.isVisible = it && !isInFavouriteTab
+            bind.ivArrowBackToFav.isVisible = it && currentTab != SEARCH_FROM_FAVOURITES
 
 
             (bind.tvPlaylistsExpand as TextView).apply {
@@ -277,22 +286,17 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             playlistAdapter.unselectPlaylist()
 
-            databaseViewModel.getAllFavouredStations()
-
             mainAdapter.animator.resetAnimator()
 
-            bind.rvFavStations.apply {
+            databaseViewModel.getAllFavouredStations()
 
-
-                post {
-
+//            bind.rvFavStations.apply {
+//                post {
 //                    scheduleLayoutAnimation()
-                }
-            }
+//                }
+//            }
         }
     }
-
-
 
 
 
@@ -306,28 +310,37 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 ).show()
             }
 
+
+            setLazyListClickListener {
+
+                playlistAdapter.unselectPlaylist()
+
+                mainAdapter.animator.resetAnimator()
+
+                databaseViewModel.getLazyPlaylist()
+
+            }
+
+
             setPlaylistClickListener { playlist, position ->
 
                 if(
-                   !isInFavouriteTab && playlist.playlistName == currentPlaylistName
+                   currentTab != SEARCH_FROM_FAVOURITES && playlist.playlistName == currentPlaylistName
                         ) {/*DO NOTHING*/ }
                 else {
-
+                    mainAdapter.animator.resetAnimator()
                     databaseViewModel.subscribeToStationsInPlaylist(playlist.playlistName)
                     currentPlaylistPosition = position
 
-                    mainAdapter.animator.resetAnimator()
-
-                    bind.rvFavStations.post {
-
+//                    bind.rvFavStations.post {
 //                        bind.rvFavStations.scheduleLayoutAnimation()
-                    }
+//                    }
                 }
             }
 
             handleDragAndDrop = { stationID, playlistName ->
 
-                if(isInFavouriteTab){
+                if(currentTab == SEARCH_FROM_FAVOURITES){
                     if(RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES){
 
                         mainViewModel.removeMediaItem(dragAndDropItemPos)
@@ -370,129 +383,163 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         observeStations()
 
-        observeUnfilteredPlaylist()
+//        observeUnfilteredPlaylist()
 
     }
 
     private fun observeStations(){
 
-        databaseViewModel.observableListOfStations.observe(viewLifecycleOwner){
-
-
-            bind.tvPlaylistMessage.apply {
-                if(it.isEmpty()){
-                    visibility = View.VISIBLE
-                    slideAnim(400, 0, R.anim.fade_in_anim)
-                }
-                else {
-                    visibility = View.INVISIBLE
-                }
-            }
-
-            mainAdapter.listOfStations = it
-
-        }
-    }
-
-    private fun observeUnfilteredPlaylist(){
-        databaseViewModel.stationsInPlaylist.observe(viewLifecycleOwner){ playlist ->
-            playlist?.radioStations?.let { stations ->
-                sortStationsInPlaylist(stations)
-               }
-            }
-        }
-
-
-    private fun sortStationsInPlaylist(stations : List<RadioStation>){
 
         lifecycleScope.launch {
+            databaseViewModel.favFragStationsFlow.collectLatest {
 
-            val result: MutableList<RadioStation> = mutableListOf()
-
-            val stationIndexMap = stations.withIndex().associate { it.value.stationuuid to it.index }
-
-            val order = databaseViewModel.getPlaylistOrder(currentPlaylistName)
-
-            order.forEach { crossref ->
-                val index = stationIndexMap[crossref.stationuuid]
-                if (index != null) {
-                    result.add(stations[index])
+                withContext(Dispatchers.Main){
+                    bind.tvPlaylistMessage.apply {
+                        if(it.isEmpty()){
+                            visibility = View.VISIBLE
+                            slideAnim(400, 0, R.anim.fade_in_anim)
+                        }
+                        else {
+                            visibility = View.INVISIBLE
+                        }
+                    }
                 }
+
+                mainAdapter.listOfStations = it
+
             }
-            databaseViewModel.playlist.postValue(result)
         }
+
+
+//        databaseViewModel.observableListOfStations.observe(viewLifecycleOwner){
+
+
+//            bind.tvPlaylistMessage.apply {
+//                if(it.isEmpty()){
+//                    visibility = View.VISIBLE
+//                    slideAnim(400, 0, R.anim.fade_in_anim)
+//                }
+//                else {
+//                    visibility = View.INVISIBLE
+//                }
+//            }
+
+//            mainAdapter.listOfStations = it
+
+//        }
     }
 
+//    private fun observeUnfilteredPlaylist(){
+//        databaseViewModel.stationsInPlaylist.observe(viewLifecycleOwner){ playlist ->
+//            playlist?.radioStations?.let { stations ->
+//                sortStationsInPlaylist(stations)
+//               }
+//            }
+//        }
 
+
+//    private fun sortStationsInPlaylist(stations : List<RadioStation>){
+//
+//        lifecycleScope.launch {
+//
+//            val result: MutableList<RadioStation> = mutableListOf()
+//
+//            val stationIndexMap = stations.withIndex().associate { it.value.stationuuid to it.index }
+//
+//            val order = databaseViewModel.getPlaylistOrder(currentPlaylistName)
+//
+//            order.forEach { crossref ->
+//                val index = stationIndexMap[crossref.stationuuid]
+//                if (index != null) {
+//                    result.add(stations[index])
+//                }
+//            }
+//            databaseViewModel.playlist.postValue(result)
+//        }
+//    }
 
 
     private fun observeFavOrPlaylistState(){
 
-        databaseViewModel.isInFavouriteTab.observe(viewLifecycleOwner){
+        databaseViewModel.favFragStationsSwitch.observe(viewLifecycleOwner){
 
-            bind.ivArrowBackToFav.isVisible = !it && isPlaylistsVisible
+            updateUiOnTabChange(it)
 
+            currentTab = it
 
-            isInFavouriteTab = it
-            playlistAdapter.isInFavouriteTab = it
+            playlistAdapter.currentTab = it
 
+            searchFlag = it
 
-            if(it){
-               bind.tvPlaylistName.text = ""
-
-                (bind.tvPlaylistEdit as TextView).text = ""
-
-               bind.tvFavouredTitle.text = "Favoured"
-
-               searchFlag = SEARCH_FROM_FAVOURITES
+        }
+    }
 
 
-                if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
+    private fun updateUiOnTabChange(newTab : Int){
 
-                    bind.tvPlaylistsExpand.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        startToStart = bind.guidelineMiddle!!.id
-                        endToEnd = bind.clFavFrag.id
-                        topToTop = bind.clFavFrag.id
+        bind.ivArrowBackToFav.isVisible = newTab != SEARCH_FROM_FAVOURITES && isPlaylistsVisible
 
-//                        val dp24 = TypedValue.applyDimension(
-//                            TypedValue.COMPLEX_UNIT_DIP,
-//                            24f,
-//                            requireContext().resources.displayMetrics
-//                        ).toInt()
-//
-//                       marginStart = dp24
+        if(newTab == SEARCH_FROM_FAVOURITES){
 
-                    }
-                }
+            bind.tvPlaylistName.text = ""
+
+            (bind.tvPlaylistEdit as TextView).text = ""
+
+            bind.tvFavouredTitle.text = "Favoured"
 
 
-            } else{
-
-                bind.tvFavouredTitle.text = ""
-
-                if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
-
-                    bind.tvPlaylistsExpand.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        startToStart = bind.guideline66.id
-                        endToEnd = bind.clFavFrag.id
-                        topToTop = bind.clFavFrag.id
-                    }
-                }
-
-
-                (bind.tvPlaylistEdit as TextView).text = "Edit"
-
-                searchFlag = SEARCH_FROM_PLAYLIST
-
+            bind.tvPlaylistsExpand.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                startToStart = bind.guidelineMiddle.id
+                endToEnd = bind.clFavFrag.id
+                topToTop = bind.clFavFrag.id
 
             }
 
-            setToolbar(it)
+            bind.separatorLeft?.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                startToStart = bind.clFavFrag.id
+                endToEnd = bind.clFavFrag.id
+                topToTop = bind.clFavFrag.id
+            }
 
+            bind.separatorRight?.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                startToStart = bind.clFavFrag.id
+                endToEnd = bind.clFavFrag.id
+                topToTop = bind.clFavFrag.id
+            }
+
+            setToolbar(true)
+
+        } else if(currentTab + newTab != SEARCH_FROM_PLAYLIST + SEARCH_FROM_LAZY_LIST){
+
+            bind.tvFavouredTitle.text = ""
+            bind.tvPlaylistsExpand.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                startToStart = bind.guideline66.id
+                endToEnd = bind.clFavFrag.id
+                topToTop = bind.clFavFrag.id
+            }
+
+            bind.separatorLeft?.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                startToStart = bind.guideline33.id
+                endToEnd = bind.guideline33.id
+                topToTop = bind.clFavFrag.id
+            }
+
+            bind.separatorRight?.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                startToStart = bind.guideline66.id
+                endToEnd = bind.guideline66.id
+                topToTop = bind.clFavFrag.id
+            }
+
+            setToolbar(false)
+        }
+
+        if(newTab == SEARCH_FROM_LAZY_LIST){
+            (bind.tvPlaylistEdit as TextView).text = "Export"
+        } else if(newTab == SEARCH_FROM_PLAYLIST) {
+            (bind.tvPlaylistEdit as TextView).text = "Edit"
         }
 
     }
-
 
     private fun setToolbar(isInFav : Boolean){
 
@@ -519,15 +566,17 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     private fun observeListOfPlaylists (){
 
-        databaseViewModel.listOfAllPlaylists.observe(viewLifecycleOwner){
+        databaseViewModel.listOfAllPlaylists.observe(viewLifecycleOwner){ originalList ->
 
-            playlistAdapter.differ.submitList(it)
+            val listWithHeader = mutableListOf(Playlist("", ""))
 
-            listOfPlaylists = it
+            listWithHeader.addAll(originalList)
 
+            playlistAdapter.differ.submitList(listWithHeader)
+
+            listOfPlaylists = originalList
 
         }
-
     }
 
     private fun setMainAdapterClickListener(){
@@ -537,9 +586,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             var isToChangeMediaItems = false
 
 
-
            // When click on station from playlist and before that was another playlist
-            if(currentPlaylistName != RadioService.currentPlaylistName && !isInFavouriteTab) {
+            if(currentPlaylistName != RadioService.currentPlaylistName && currentTab == SEARCH_FROM_PLAYLIST) {
                 RadioSource.updatePlaylistStations(mainAdapter.listOfStations)
                 RadioService.currentPlaylistName = currentPlaylistName
                 isToChangeMediaItems = true
@@ -626,15 +674,15 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 val position = viewHolder.layoutPosition
                 val stationID = mainAdapter.listOfStations[position].stationuuid
                 val favouredAt =  mainAdapter.listOfStations[position].favouredAt
-                if(databaseViewModel.isInFavouriteTab.value == true){
+                if(currentTab == SEARCH_FROM_FAVOURITES){
                     handleSwipeOnFavStation(stationID, favouredAt, viewHolder.absoluteAdapterPosition)
-                } else{
+                } else if(currentTab == SEARCH_FROM_PLAYLIST){
                     handleSwipeOnPlaylistStation(stationID, viewHolder.absoluteAdapterPosition)
+                } else {
+
                 }
             }
         }
-
-
     }
 
     private fun handleSwipeOnFavStation(stationID : String, favouredAt : Long, pos : Int){
@@ -695,6 +743,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                         )
                     }
 
+
                 }.show()
             }
         }
@@ -720,7 +769,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
 
             }
-
 
     }
 

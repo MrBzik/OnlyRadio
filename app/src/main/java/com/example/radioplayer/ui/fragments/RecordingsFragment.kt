@@ -359,13 +359,10 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
                         override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                             super.onDismissed(transientBottomBar, event)
 
-                            if(event == DISMISS_EVENT_CONSECUTIVE ||
-                                event == DISMISS_EVENT_TIMEOUT ||
-                                event == DISMISS_EVENT_SWIPE ) {
+                            if(event != DISMISS_EVENT_ACTION) {
 
 //                                val filePath = "${requireContext().filesDir}/${recording.id}"
                                 databaseViewModel.removeRecordingFile(recording.id)
-
                             }
                         }
                     }

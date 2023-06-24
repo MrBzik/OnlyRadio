@@ -52,7 +52,8 @@ class RadioSource @Inject constructor(
 
     // Favoured tab
 
-    val subscribeToFavouredStations = radioDAO.getAllFavouredStations()
+    val subscribeToFavouredStations = radioDAO.getAllFavStationsDistinct()
+
     var stationsFavoured = mutableListOf<RadioStation>()
     var stationsFavouredMetadata = mutableListOf<MediaMetadataCompat>()
     var stationsFavouredMediaItems = mutableListOf<MediaItem>()
@@ -97,6 +98,10 @@ class RadioSource @Inject constructor(
             }.toMutableList()
             isStationsFromHistoryOneDateUpdated = true
         }
+
+
+        var lazyListStations = mutableListOf<RadioStation>()
+
     }
 
 
@@ -211,22 +216,18 @@ class RadioSource @Inject constructor(
 
 
 
-    suspend fun getStationsInOneDate(time : Long) : List<RadioStation> {
-        val response = radioDAO.getStationsInOneDate(time).radioStations.reversed()
+    suspend fun getStationsInOneDate(time : Long) : DateWithStations {
+        return radioDAO.getStationsInOneDate(time)
+    }
 
-        stationInOneDateResponse = response
-
-        return response
+    fun updateStationsInOneDate(list : List<RadioStation>){
+        stationInOneDateResponse = list
     }
 
 
+    fun createMediaItemsFromDB(player : ExoPlayer, currentStation : RadioStation?){
 
-
-    fun createMediaItemsFromDB(listOfStations : List<RadioStation>, player : ExoPlayer, currentStation : RadioStation?){
-
-        stationsFavoured = listOfStations.toMutableList()
-
-        stationsFavouredMetadata = listOfStations.map { station ->
+        stationsFavouredMetadata = stationsFavoured.map { station ->
             station.toMediaMetadataCompat()
         }.toMutableList()
 
@@ -237,7 +238,7 @@ class RadioSource @Inject constructor(
 
             var index = 0
 
-            stationsFavouredMediaItems = listOfStations.map{ station ->
+            stationsFavouredMediaItems = stationsFavoured.map{ station ->
 
                 val item = MediaItem.fromUri(station.url!!)
 
@@ -251,12 +252,10 @@ class RadioSource @Inject constructor(
                 item
             }.toMutableList()
         } else {
-            stationsFavouredMediaItems = listOfStations.map{ station ->
+            stationsFavouredMediaItems = stationsFavoured.map{ station ->
                 MediaItem.fromUri(station.url!!)
             }.toMutableList()
         }
-
-
     }
 
 //    val isRecordingUpdated : MutableLiveData<Boolean> = MutableLiveData()

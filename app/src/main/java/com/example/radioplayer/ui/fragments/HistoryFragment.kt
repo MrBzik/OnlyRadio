@@ -117,7 +117,10 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
 //        setTvSelectDateClickListener()
 
-        setSpinnerOpenCloseListener()
+
+        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
+            setSpinnerOpenCloseListener()
+        }
 
         setToolbar()
 
@@ -129,8 +132,22 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         setBookmarksFabClickListener()
 
+        setFabPickDateClickListener()
 
     }
+
+
+    private fun setFabPickDateClickListener(){
+        bind.fabDatePick.setOnClickListener {
+
+            if(!databaseViewModel.isInStationsTab && databaseViewModel.isInBookmarks){
+                /*DO NOTHING*/
+            } else {
+                bind.spinnerDates.performClick()
+            }
+        }
+    }
+
 
     private fun observeIsInStationsTab(){
 
@@ -169,15 +186,17 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     private fun switchButtonsVisibilityWithBookmarks(){
 
         if(!databaseViewModel.isInStationsTab && databaseViewModel.isInBookmarks){
-            bind.tvSliderHeader.isVisible = false
+            bind.fabDatePick.setImageResource(R.drawable.ic_history_pick_date_inactive)
+//            bind.tvSliderHeader.isVisible = false
             bind.spinnerDates.isVisible = false
-            bind.tvShrinkArrow.isVisible = false
-            bind.viewSpinnerClickBox?.isVisible = false
+//            bind.tvShrinkArrow.isVisible = false
+//            bind.viewSpinnerClickBox?.isVisible = false
         } else {
-            bind.tvSliderHeader.isVisible = true
+            bind.fabDatePick.setImageResource(R.drawable.ic_history_pick_date)
+//            bind.tvSliderHeader.isVisible = true
             bind.spinnerDates.isVisible = true
-            bind.tvShrinkArrow.isVisible = true
-            bind.viewSpinnerClickBox?.isVisible = true
+//            bind.tvShrinkArrow.isVisible = true
+//            bind.viewSpinnerClickBox?.isVisible = true
         }
     }
 
@@ -193,21 +212,23 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 window.statusBarColor = color
             }
 
-            bind.viewSpinnerClickBox?.setOnTouchListener { v, event ->
 
-                if (event.action == MotionEvent.ACTION_DOWN){
-                    bind.tvSliderHeader.isPressed = true
-                bind.spinnerDates.performClick()
-                }
 
-                true
-            }
+//            bind.viewSpinnerClickBox?.setOnTouchListener { v, event ->
+//
+//                if (event.action == MotionEvent.ACTION_DOWN){
+//                    bind.tvSliderHeader.isPressed = true
+//                bind.spinnerDates.performClick()
+//                }
+//
+//                true
+//            }
 
-        } else {
-            bind.viewToolbar.setBackgroundColor(Color.BLACK)
-            bind.tvSliderHeader.setOnClickListener {
-                bind.spinnerDates.performClick()
-            }
+//        } else {
+//            bind.viewToolbar.setBackgroundColor(Color.BLACK)
+//            bind.tvSliderHeader.setOnClickListener {
+//                bind.spinnerDates.performClick()
+//            }
         }
     }
 
@@ -283,7 +304,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                }
            }
         )
-
     }
 
 
@@ -292,18 +312,24 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         bind.spinnerDates.setSpinnerEventsListener( object : SpinnerExt.OnSpinnerEventsListener{
             override fun onSpinnerOpened(spinner: Spinner?) {
 
-                bind.tvShrinkArrow.
-                    setCompoundDrawablesWithIntrinsicBounds(0, 0,
-                        R.drawable.ic_playlists_arrow_shrink,0)
+//                bind.tvShrinkArrow.
+//                    setCompoundDrawablesWithIntrinsicBounds(0, 0,
+//                        R.drawable.ic_playlists_arrow_shrink,0)
 
-
+                bind.separatorDefault?.visibility = View.INVISIBLE
+                bind.separatorDefault?.slideAnim(200, 100, R.anim.fade_out_anim)
 
             }
 
             override fun onSpinnerClosed(spinner: Spinner?) {
-                bind.tvShrinkArrow.
-                setCompoundDrawablesWithIntrinsicBounds(0, 0,
-                    R.drawable.ic_playlists_arrow_expand,0)
+//                bind.tvShrinkArrow.
+//                setCompoundDrawablesWithIntrinsicBounds(0, 0,
+//                    R.drawable.ic_playlists_arrow_expand,0)
+
+                bind.separatorDefault?.visibility = View.VISIBLE
+
+                bind.separatorDefault?.slideAnim(300, 0, R.anim.fade_in_anim)
+
             }
         })
     }
@@ -343,7 +369,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
 
             datesAdapter.selectedItemPosition = pos
-            setSliderHeaderText(databaseViewModel.selectedDate)
+
+//            setSliderHeaderText(databaseViewModel.selectedDate)
 
             bind.spinnerDates.setSelection(pos)
 
@@ -373,7 +400,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                     datesAdapter.selectedItemPosition = position
 
-                    setSliderHeaderText(item.time)
+//                    setSliderHeaderText(item.time)
 
                     databaseViewModel.selectedDate = item.time
 
@@ -413,6 +440,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 if(isInStationsTab){
                     oneHistoryDateCaller.postValue(true)
                 } else {
+                    databaseViewModel.isTitleOneDateHeaderSet = false
                     oneTitleDateCaller.postValue(true)
                 }
             }
@@ -421,19 +449,19 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         isInitialLoad = true
     }
 
-    private fun setSliderHeaderText(time : Long){
-
-            if(time == 0L) (bind.tvSliderHeader as TextView).text = "All dates"
-
-            else{
-                calendar.time = Date(time)
-
-                val date = Utils.fromDateToStringShort(calendar)
-
-                (bind.tvSliderHeader as TextView).text = date
-            }
-
-    }
+//    private fun setSliderHeaderText(time : Long){
+//
+//            if(time == 0L) (bind.tvSliderHeader as TextView).text = "All dates"
+//
+//            else{
+//                calendar.time = Date(time)
+//
+//                val date = Utils.fromDateToStringShort(calendar)
+//
+//                (bind.tvSliderHeader as TextView).text = date
+//            }
+//
+//    }
 
 
     private fun observePlaybackState(){
@@ -471,7 +499,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                     val index =
 
                         if(databaseViewModel.selectedDate == RadioService.selectedHistoryDate){
-                            RadioService.currentPlayingItemPosition
+                            RadioService.currentPlayingItemPosition + 1
                         } else if(
                             databaseViewModel.selectedDate == 0L
                             && RadioService.currentMediaItems == SEARCH_FROM_HISTORY) {

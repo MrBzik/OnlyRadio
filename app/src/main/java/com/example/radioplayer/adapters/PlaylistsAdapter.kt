@@ -3,6 +3,7 @@ package com.example.radioplayer.adapters
 import android.content.ClipDescription
 import android.content.res.Configuration
 import android.graphics.drawable.ColorDrawable
+import android.util.Log
 import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -14,12 +15,15 @@ import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Playlist
+import com.example.radioplayer.databinding.ItemHeaderPlaylistBinding
 import com.example.radioplayer.databinding.ItemPlaylistCoverBinding
 import com.example.radioplayer.ui.MainActivity
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import javax.inject.Inject
 
 
 private const val FOOTER_ADD_PLAYLIST = 1
+private const val HEADER_LAZY_PLAYLIST = 2
 
 
 
@@ -34,7 +38,7 @@ class PlaylistsAdapter @Inject constructor(
     var isDarkMode = MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES
     var highlightedViewHolder : PlaylistHolder? = null
     var currentPlaylistName = ""
-    var isInFavouriteTab = true
+    var currentTab = SEARCH_FROM_FAVOURITES
 
     private fun highlightPlaylist(bind : ItemPlaylistCoverBinding){
 
@@ -66,16 +70,20 @@ class PlaylistsAdapter @Inject constructor(
     }
 
 
+     class HeaderViewHolder (val bind : ItemHeaderPlaylistBinding) : RecyclerView.ViewHolder(bind.root)
+
      class FooterViewHolder (itemView : View) : RecyclerView.ViewHolder(itemView)
 
-     class PlaylistHolder (itemView: View) : RecyclerView.ViewHolder(itemView){
+     class PlaylistHolder (val bind : ItemPlaylistCoverBinding) : RecyclerView.ViewHolder(bind.root)
 
-         var bind : ItemPlaylistCoverBinding
-
-         init {
-             bind = ItemPlaylistCoverBinding.bind(itemView)
-         }
-     }
+//     {
+//
+//         var bind : ItemPlaylistCoverBinding
+//
+//         init {
+//             bind = ItemPlaylistCoverBinding.bind(itemView)
+//         }
+//     }
 
 
 
@@ -88,21 +96,38 @@ class PlaylistsAdapter @Inject constructor(
             val footer = FooterViewHolder(view)
             footer.itemView.setOnClickListener {
                 addPlaylistClickListener?.let { click ->
-                    click(it)
+                    click()
                 }
             }
             return footer
+        } else
+            if(viewType == HEADER_LAZY_PLAYLIST){
+            val header = HeaderViewHolder(
+                ItemHeaderPlaylistBinding.inflate(
+                    LayoutInflater.from(parent.context), parent, false
+                )
+            )
+
+            header.bind.cardView.setOnClickListener {
+                lazyListClickListener?.let { click ->
+                    click()
+                }
+            }
+
+            return header
         }
 
+            val playlist = PlaylistHolder(
+                ItemPlaylistCoverBinding.inflate(
+                    LayoutInflater.from(parent.context),  parent, false
+                )
+            )
 
-             val inflatedView = LayoutInflater.from(parent.context)
-                 .inflate(R.layout.item_playlist_cover, parent, false)
-            val playlist = PlaylistHolder(inflatedView)
             playlist.bind.cardView.setOnClickListener {
 
                 playlistClickListener?.let { click ->
                     click(differ.currentList[playlist.absoluteAdapterPosition],
-                            playlist.absoluteAdapterPosition
+                            playlist.absoluteAdapterPosition - 1
                         )
                     highlightedViewHolder?.let {
                         defaultPlaylist(it.bind)
@@ -150,11 +175,8 @@ class PlaylistsAdapter @Inject constructor(
                     true
                 }
                     else -> false
-
                 }
-
             }
-
 
             return playlist
     }
@@ -166,7 +188,7 @@ class PlaylistsAdapter @Inject constructor(
             holder.bind.apply {
                 tvPlaylistName.text = playlist.playlistName
 
-                if(!isInFavouriteTab && currentPlaylistName == playlist.playlistName){
+                if(currentTab != SEARCH_FROM_FAVOURITES && currentPlaylistName == playlist.playlistName){
                     highlightedViewHolder = holder
                     highlightPlaylist(holder.bind)
                 } else {
@@ -193,8 +215,9 @@ class PlaylistsAdapter @Inject constructor(
 
         if(position == differ.currentList.size){
             return FOOTER_ADD_PLAYLIST
+        } else if(position == 0 && isFooterNeeded){
+            return HEADER_LAZY_PLAYLIST
         }
-
         return super.getItemViewType(position)
     }
 
@@ -213,13 +236,20 @@ class PlaylistsAdapter @Inject constructor(
     val differ = AsyncListDiffer(this, differCallback)
 
 
-    private var addPlaylistClickListener : ((View) -> Unit)? = null
+    private var addPlaylistClickListener : (() -> Unit)? = null
 
-    fun setAddPlaylistClickListener (listener : (View) -> Unit){
-
+    fun setAddPlaylistClickListener (listener : () -> Unit){
         addPlaylistClickListener = listener
 
     }
+
+
+    private var lazyListClickListener : (() -> Unit)? = null
+
+    fun setLazyListClickListener (listener : () -> Unit){
+        lazyListClickListener = listener
+    }
+
 
 
 

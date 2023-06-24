@@ -15,28 +15,17 @@
                 >
 
 
-
                 <item
                     android:color="#FFFFFF"
-                    android:offset="0" />
+                    android:offset="0.0" />
                 <item
                     android:color="#FFFFFF"
-                    android:offset="0.305" />
-
-
-
-                <item
-
-                    android:color="#F04F7489"
-                    android:offset="0.308" />
-                <item
-                    android:color="#F04F7489"
-                    android:offset="0.638" />
+                    android:offset="0.472" />
 
 
                 <item
                     android:color="#4F7489"
-                    android:offset="0.641" />
+                    android:offset="0.475" />
                 <item
                     android:color="#4F7489"
                     android:offset="1" />
@@ -47,3 +36,6 @@
         </aapt:attr>
     </path>
 </vector>
+
+
+

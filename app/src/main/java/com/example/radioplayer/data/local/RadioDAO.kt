@@ -1,5 +1,6 @@
 package com.example.radioplayer.data.local
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
@@ -12,7 +13,10 @@ import com.example.radioplayer.data.local.relations.DateWithStations
 import com.example.radioplayer.data.local.relations.PlaylistWithStations
 import com.example.radioplayer.data.local.relations.StationDateCrossRef
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 
+const val MIN_PLAY_DURATION = 300000L
 
 @Dao
 interface  RadioDAO {
@@ -37,8 +41,15 @@ interface  RadioDAO {
     @Query("SELECT EXISTS(SELECT * FROM RadioStation WHERE stationuuid =:stationID AND favouredAt > 0)")
     suspend fun checkIfStationIsFavoured(stationID : String) : Boolean
 
+//    @Query("SELECT * FROM RadioStation WHERE favouredAt > 0 ORDER BY favouredAt DESC")
+//    fun getAllFavouredStations() : LiveData<List<RadioStation>>
+
     @Query("SELECT * FROM RadioStation WHERE favouredAt > 0 ORDER BY favouredAt DESC")
-    fun getAllFavouredStations() : LiveData<List<RadioStation>>
+    fun getAllFavouredStationsFlow() : Flow<List<RadioStation>>
+
+    fun getAllFavStationsDistinct () = getAllFavouredStationsFlow().distinctUntilChanged { old, new ->
+            old.size == new.size
+    }
 
     @Query("UPDATE RadioStation SET favouredAt =:value WHERE stationuuid =:stationID")
     suspend fun updateIsFavouredState(value : Long, stationID: String)
@@ -62,21 +73,39 @@ interface  RadioDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStationPlaylistCrossRef(stationPlaylistCrossRef: StationPlaylistCrossRef)
 
+    @Query("UPDATE RadioStation SET inPlaylistsCount = inPlaylistsCount + 1 WHERE stationuuid =:stationID")
+    suspend fun incrementInPlaylistsCount(stationID: String)
+
+    @Query("UPDATE RadioStation SET inPlaylistsCount = inPlaylistsCount - 1 WHERE stationuuid =:stationID")
+    suspend fun decrementInPlaylistsCount(stationID: String)
+
     @Query("SELECT addedAt FROM StationPlaylistCrossRef WHERE stationuuid =:stationID AND playlistName=:playlistName")
     suspend fun getTimeOfStationPlaylistInsertion(stationID : String, playlistName : String) : Long
 
-
     @Query("DELETE FROM StationPlaylistCrossRef WHERE stationuuid =:stationID AND playlistName =:playlistName")
     suspend fun deleteStationPlaylistCrossRef(stationID : String, playlistName : String)
+
+
+    @Query("SELECT stationuuid FROM StationPlaylistCrossRef WHERE playlistName =:playlistName")
+    suspend fun getStationsIdsFromPlaylist(playlistName: String) : List<String>
 
     @Transaction
     @Query("SELECT * FROM Playlist WHERE playlistName =:playlistName LIMIT 1")
     suspend fun getStationsInPlaylist(playlistName : String) : PlaylistWithStations?
 
+//    @Transaction
+//    @Query("SELECT * FROM Playlist WHERE playlistName =:playlistName LIMIT 1")
+//    fun subscribeToStationsInPlaylist(playlistName : String) : LiveData<PlaylistWithStations?>
 
     @Transaction
     @Query("SELECT * FROM Playlist WHERE playlistName =:playlistName LIMIT 1")
-    fun subscribeToStationsInPlaylist(playlistName : String) : LiveData<PlaylistWithStations?>
+    fun getStationsInPlaylistFlow(playlistName : String) : Flow<PlaylistWithStations?>
+
+    fun getStationsInPlaylistFlowDistinct(playlistName : String) =
+        getStationsInPlaylistFlow(playlistName).distinctUntilChanged { old, new ->
+            old?.radioStations?.size == new?.radioStations?.size
+        }
+
 
     @Query("SELECT * FROM StationPlaylistCrossRef WHERE playlistName =:playlistName ORDER BY addedAt DESC")
     suspend fun subscribeToPlaylistOrder(playlistName: String) : List<StationPlaylistCrossRef>
@@ -96,6 +125,19 @@ interface  RadioDAO {
     @Query("UPDATE StationPlaylistCrossRef SET playlistName =:newName WHERE playlistName =:oldName")
     suspend fun editOldCrossRefWithPlaylist(oldName : String, newName : String)
 
+
+    // Lazy playlist
+
+
+    @Query("SELECT * FROM RadioStation WHERE playDuration > :duration AND " +
+            "favouredAt = 0 AND inPlaylistsCount = 0 ORDER BY playDuration DESC LIMIT 20")
+    suspend fun getStationsForLazyPlaylist(duration : Long = MIN_PLAY_DURATION) : List<RadioStation>
+
+    @Query("SELECT * FROM RadioStation WHERE inPlaylistsCount = 0 AND favouredAt = 0")
+    suspend fun getStationsForDurationCheck() : List<RadioStation>
+
+    @Query("UPDATE RadioStation SET playDuration =:newDuration WHERE stationuuid =:stationId")
+    suspend fun updateStationPlayDuration(newDuration : Long, stationId : String)
 
     // Date
 
@@ -127,11 +169,11 @@ interface  RadioDAO {
 
     // For database RadioStations cleaning
 
-    @Query("SELECT * FROM RadioStation WHERE favouredAt = 0")
-    suspend fun gatherStationsForCleaning() : List<RadioStation>
+    @Query("SELECT * FROM RadioStation WHERE favouredAt = 0 AND inPlaylistsCount = 0 AND playDuration < :duration")
+    suspend fun gatherStationsForCleaning(duration : Long = MIN_PLAY_DURATION) : List<RadioStation>
 
-    @Query("SELECT EXISTS(SELECT * FROM StationPlaylistCrossRef WHERE stationuuid =:stationID)")
-    suspend fun checkIfInPlaylists(stationID : String) : Boolean
+//    @Query("SELECT EXISTS(SELECT * FROM StationPlaylistCrossRef WHERE stationuuid =:stationID)")
+//    suspend fun checkIfInPlaylists(stationID : String) : Boolean
 
     @Query("SELECT EXISTS(SELECT * FROM StationDateCrossRef WHERE stationuuid =:stationID)")
     suspend fun checkIfRadioStationInHistory(stationID : String) : Boolean

@@ -1,6 +1,7 @@
 package com.example.radioplayer.repositories
 
 
+
 import com.example.radioplayer.data.local.RadioDAO
 import com.example.radioplayer.data.local.entities.*
 import com.example.radioplayer.data.local.relations.StationDateCrossRef
@@ -35,30 +36,49 @@ class DatabaseRepository @Inject constructor(
 
     suspend fun deletePlaylist (playlistName: String) = radioDAO.deletePlaylist(playlistName)
 
-    suspend fun checkIfInPlaylists (stationID : String)
-            = radioDAO.checkIfInPlaylists(stationID)
+//    suspend fun checkIfInPlaylists (stationID : String)
+//            = radioDAO.checkIfInPlaylists(stationID)
+
+
+    // Adding / removing station in / from playlist
 
     suspend fun insertStationPlaylistCrossRef (crossRef: StationPlaylistCrossRef)
             = radioDAO.insertStationPlaylistCrossRef(crossRef)
 
-    suspend fun checkIfAlreadyInPlaylist(stationID : String, playlistName : String)
-            = radioDAO.checkIfAlreadyInPlaylist(stationID, playlistName)
+    suspend fun incrementInPlaylistsCount(stationID: String) = radioDAO.incrementInPlaylistsCount(stationID)
+
+    suspend fun decrementInPlaylistsCount(stationID: String) = radioDAO.decrementInPlaylistsCount(stationID)
+
+
+//    suspend fun getStationsInPlaylist(playlistName: String) = radioDAO.getStationsInPlaylist(playlistName)
+//
+
+
+    suspend fun getStationsIdsFromPlaylist(playlistName: String) = radioDAO.getStationsIdsFromPlaylist(playlistName)
+
+    suspend fun deleteStationPlaylistCrossRef (stationID: String, playlistName: String)
+            = radioDAO.deleteStationPlaylistCrossRef(stationID, playlistName)
 
     suspend fun getTimeOfStationPlaylistInsertion(stationID : String, playlistName : String)
             = radioDAO.getTimeOfStationPlaylistInsertion(stationID, playlistName)
 
-    suspend fun deleteStationPlaylistCrossRef (stationID: String, playlistName: String)
-            = radioDAO.deleteStationPlaylistCrossRef(stationID, playlistName)
+    suspend fun checkIfAlreadyInPlaylist(stationID : String, playlistName : String)
+            = radioDAO.checkIfAlreadyInPlaylist(stationID, playlistName)
+
 
 
     fun getAllPlaylists () = radioDAO.getAllPlaylists()
 
 
+//    fun getAllFavouredStations() = radioDAO.getAllFavouredStations()
 
-    fun getAllFavouredStations() = radioDAO.getAllFavouredStations()
+    fun getAllFavStationsFlow () = radioDAO.getAllFavStationsDistinct()
 
 
-    fun subscribeToStationsInPlaylist(playlistName: String) = radioDAO.subscribeToStationsInPlaylist(playlistName)
+//
+//    fun subscribeToStationsInPlaylist(playlistName: String) = radioDAO.subscribeToStationsInPlaylist(playlistName)
+
+    fun getStationsInPlaylistFlow(playlistName: String) = radioDAO.getStationsInPlaylistFlowDistinct(playlistName)
 
    suspend fun getPlaylistOrder(playlistName : String) = radioDAO.subscribeToPlaylistOrder(playlistName)
 
@@ -79,6 +99,17 @@ class DatabaseRepository @Inject constructor(
 
     suspend fun editOldCrossRefWithPlaylist(oldName : String, newName : String)
         = radioDAO.editOldCrossRefWithPlaylist(oldName, newName)
+
+
+
+    // Lazy playlist
+
+    suspend fun getStationsForLazyPlaylist () = radioDAO.getStationsForLazyPlaylist()
+
+    suspend fun getStationsForDurationCheck() = radioDAO.getStationsForDurationCheck()
+
+    suspend fun updateStationPlayDuration(newDuration : Long, stationId : String) =
+        radioDAO.updateStationPlayDuration(newDuration, stationId)
 
 
 

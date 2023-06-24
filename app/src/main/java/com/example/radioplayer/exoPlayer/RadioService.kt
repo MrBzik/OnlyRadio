@@ -106,6 +106,7 @@ import dev.brookmg.exorecord.lib.IExoRecord
 import dev.brookmg.exorecordogg.ExoRecordOgg
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import java.sql.Date
 import java.util.*
@@ -124,7 +125,7 @@ private const val RECORDING_ICON_URL = "rec. url path"
 private const val RECORDING_SAMPLE_RATE = "rec. sample rate"
 private const val RECORDING_CHANNELS_COUNT = "rec. channels count"
 
-
+private const val PLAY_DURATION_MILLS_CHECK = 604800000
 
 @AndroidEntryPoint
 class RadioService : MediaBrowserServiceCompat() {
@@ -189,18 +190,20 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private var isFavPlaylistPendingUpdate = false
 
-    private val observerForDatabase by lazy {
-        Observer<List<RadioStation>>{
+    private var favStationsTemp : List<RadioStation> = emptyList()
 
-            if(currentMediaItems == SEARCH_FROM_FAVOURITES){
-                if(isInStationDetails)
-                isFavPlaylistPendingUpdate = true
-            } else {
-                radioSource.createMediaItemsFromDB(it, exoPlayer, currentRadioStation)
-            }
-
-        }
-    }
+//    private val observerForDatabase by lazy {
+//        Observer<List<RadioStation>>{
+//
+//            if(currentMediaItems == SEARCH_FROM_FAVOURITES){
+//                if(isInStationDetails)
+//                isFavPlaylistPendingUpdate = true
+//            } else {
+//                radioSource.createMediaItemsFromDB(it, exoPlayer, currentRadioStation)
+//            }
+//
+//        }
+//    }
 
 
 
@@ -269,6 +272,8 @@ class RadioService : MediaBrowserServiceCompat() {
         var isSpeedPitchLinked = true
 
         var isToReconnect = true
+
+        var isToUpdateLiveData = true
 
         var bufferSizeInMills = 0
 //        var bufferSizeInBytes = 0
@@ -341,8 +346,9 @@ class RadioService : MediaBrowserServiceCompat() {
             val isFromRecordings = flag == SEARCH_FROM_RECORDINGS
 
             if(flag == SEARCH_FROM_HISTORY && !isInStationDetails){
-
                 index = adjustIndexFromHistory(itemIndex)
+            } else if (flag == SEARCH_FROM_HISTORY_ONE_DATE && !isInStationDetails) {
+                index --
             }
 
             preparePlayer(
@@ -461,11 +467,14 @@ class RadioService : MediaBrowserServiceCompat() {
 
                     if(isFavPlaylistPendingUpdate){
                         isFavPlaylistPendingUpdate = false
-                        radioSource.subscribeToFavouredStations.value?.let {
-                            clearMediaItems(false)
-                            radioSource.createMediaItemsFromDB(it, exoPlayer, currentRadioStation)
 
-                        }
+                        radioSource.stationsFavoured = favStationsTemp.toMutableList()
+                        favStationsTemp = emptyList()
+
+                        clearMediaItems(false)
+
+                        radioSource.createMediaItemsFromDB(exoPlayer, currentRadioStation)
+
                     }
                 }
 
@@ -713,7 +722,22 @@ class RadioService : MediaBrowserServiceCompat() {
         registerNewDateReceiver()
 
 
-        radioSource.subscribeToFavouredStations.observeForever(observerForDatabase)
+        serviceScope.launch(Dispatchers.IO) {
+            radioSource.subscribeToFavouredStations.collectLatest {
+
+                if(currentMediaItems == SEARCH_FROM_FAVOURITES){
+                    if(isInStationDetails)
+                        isFavPlaylistPendingUpdate = true
+                        favStationsTemp = it
+                } else {
+                    radioSource.stationsFavoured = it.toMutableList()
+                    radioSource.createMediaItemsFromDB(exoPlayer, currentRadioStation)
+                }
+
+            }
+        }
+
+
         radioSource.allRecordingsLiveData.observeForever(observerForRecordings)
 
         getLastDateAndCheck()
@@ -1695,7 +1719,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
 //            NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
-            radioSource.subscribeToFavouredStations.removeObserver(observerForDatabase)
+
             radioSource.allRecordingsLiveData.removeObserver(observerForRecordings)
 
             exoRecord.removeExoRecordListener("MainListener")
@@ -1755,6 +1779,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
     fun updateStationLastClicked(stationId : String) = serviceScope.launch(Dispatchers.IO){
+        RadioService.isToUpdateLiveData = false
         databaseRepository.updateRadioStationLastClicked(stationId)
     }
 
@@ -1836,11 +1861,26 @@ class RadioService : MediaBrowserServiceCompat() {
             val newDate = HistoryDate(currentDateString, currentDateLong)
             databaseRepository.insertNewDate(newDate)
 
+            checkStationsAndReducePlayDurationIfNeeded()
+
         }
         databaseRepository.insertStationDateCrossRef(StationDateCrossRef(stationID, currentDateString))
 
     }
 
+
+
+    private suspend fun checkStationsAndReducePlayDurationIfNeeded(){
+
+        val stations = databaseRepository.getStationsForDurationCheck()
+
+        val time = System.currentTimeMillis()
+
+        stations.forEach {
+            if(time - it.lastClick > PLAY_DURATION_MILLS_CHECK)
+                databaseRepository.updateStationPlayDuration(it.playDuration / 2, it.stationuuid)
+        }
+    }
 
     private suspend fun compareDatesWithPrefAndCLeanIfNeeded() {
 
@@ -1865,16 +1905,12 @@ class RadioService : MediaBrowserServiceCompat() {
 
             stations.forEach {
 
-                val checkIfInPlaylists = databaseRepository.checkIfInPlaylists(it.stationuuid)
+//                val checkIfInPlaylists = databaseRepository.checkIfInPlaylists(it.stationuuid)
+                val checkIfInHistory = databaseRepository.checkIfRadioStationInHistory(it.stationuuid)
 
-                if(!checkIfInPlaylists) {
+                if(!checkIfInHistory){
 
-                    val checkIfInHistory = databaseRepository.checkIfRadioStationInHistory(it.stationuuid)
-
-                    if(!checkIfInHistory){
-
-                        databaseRepository.deleteRadioStation(it)
-                    }
+                    databaseRepository.deleteRadioStation(it)
                 }
             }
         }

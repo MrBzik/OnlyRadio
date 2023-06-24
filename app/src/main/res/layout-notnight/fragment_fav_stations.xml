@@ -173,7 +173,7 @@
         android:gravity="center"
         android:visibility="invisible"
         android:paddingHorizontal="10dp"
-        android:text="Add new stations in Details. Drag and drop to move stations between playlists"
+        android:text="@string/fav_frag_hint"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

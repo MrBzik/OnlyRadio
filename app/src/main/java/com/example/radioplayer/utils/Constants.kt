@@ -107,6 +107,7 @@ object Constants {
     const val SEARCH_FROM_HISTORY = 3
     const val SEARCH_FROM_HISTORY_ONE_DATE = 4
     const val SEARCH_FROM_RECORDINGS = 5
+    const val SEARCH_FROM_LAZY_LIST = 6
     const val PLAY_WHEN_READY = "play when ready"
     const val ITEM_INDEX = "index of item"
     const val ITEM_ID = "id of item"

@@ -8,6 +8,7 @@ import androidx.paging.*
 import com.example.radioplayer.adapters.datasources.*
 import com.example.radioplayer.adapters.models.StationWithDateModel
 import com.example.radioplayer.adapters.models.TitleWithDateModel
+
 import com.example.radioplayer.data.local.entities.*
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.exoPlayer.RadioService
@@ -20,11 +21,25 @@ import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_HISTORY_MEDIA_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants.IS_TO_CLEAR_HISTORY_ITEMS
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_LAZY_LIST
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.example.radioplayer.utils.Utils.fromDateToString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.cache
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import java.sql.Date
 import java.util.*
@@ -97,6 +112,7 @@ class DatabaseViewModel @Inject constructor(
                 stationID, playlistName, System.currentTimeMillis()
                 )
             )
+            repository.incrementInPlaylistsCount(stationID)
         }
     }
 
@@ -108,23 +124,24 @@ class DatabaseViewModel @Inject constructor(
     fun insertStationPlaylistCrossRef(
                     crossRef: StationPlaylistCrossRef
                     ) = viewModelScope.launch {
+        repository.incrementInPlaylistsCount(crossRef.stationuuid)
         repository.insertStationPlaylistCrossRef(crossRef)
-
     }
 
     suspend fun getTimeOfStationPlaylistInsertion(stationID : String, playlistName : String)
             = repository.getTimeOfStationPlaylistInsertion(stationID, playlistName)
 
     fun deleteStationPlaylistCrossRef(stationID: String, playlistName: String) = viewModelScope.launch {
+        repository.decrementInPlaylistsCount(stationID)
         repository.deleteStationPlaylistCrossRef(stationID, playlistName)
     }
 
 
     val listOfAllPlaylists = repository.getAllPlaylists()
 
+//    private val stationInFavoured = repository.getAllFavouredStations()
 
-
-    private val stationInFavoured = repository.getAllFavouredStations()
+//    private val stationsInLazyPlaylist = repository.getStationsForLazyPlaylist()
 
 
 //     var stationsPlaylistOrder = Transformations.switchMap(
@@ -138,43 +155,105 @@ class DatabaseViewModel @Inject constructor(
 
     suspend fun getPlaylistOrder(playlistName: String) = repository.getPlaylistOrder(playlistName)
 
+//     var stationsInPlaylist = Transformations.switchMap(
+//        currentPlaylistName) { playlistName ->
+//                repository.subscribeToStationsInPlaylist(playlistName)
+//        }
 
-     var stationsInPlaylist = Transformations.switchMap(
-        currentPlaylistName) { playlistName ->
-                repository.subscribeToStationsInPlaylist(playlistName)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    var stationsInPlaylistFlow = currentPlaylistName.asFlow().flatMapLatest { playlistName ->
+        repository.getStationsInPlaylistFlow(playlistName).map {
+            Log.d("CHECKTAGS", "mapping unflitered playlist stations")
+            it?.let {
+                sortStationsInPlaylist(it.radioStations, playlistName)
+            } ?: emptyList()
         }
+    }
+
+    private suspend fun sortStationsInPlaylist(stations : List<RadioStation>, playlistName: String)
+    : List<RadioStation>
+    {
+        val result: MutableList<RadioStation> = mutableListOf()
+        val stationIndexMap = stations.withIndex().associate { it.value.stationuuid to it.index }
+        val order = getPlaylistOrder(playlistName)
+        order.forEach { crossref ->
+            val index = stationIndexMap[crossref.stationuuid]
+            if (index != null) {
+                result.add(stations[index])
+            }
+        }
+        return result
+    }
 
 
-    var isInFavouriteTab: MutableLiveData<Boolean> = MutableLiveData(true)
+//    var isInFavouriteTab: MutableLiveData<Boolean> = MutableLiveData(true)
 
-    val observableListOfStations = MediatorLiveData<List<RadioStation>>()
+    var isInLazyPlaylist = false
 
+//    val observableListOfStations = MediatorLiveData<List<RadioStation>>()
 
     val playlist : MutableLiveData<List<RadioStation>> = MutableLiveData()
 
+//    var isLazyPlaylistSourceSet = false
 
-    init {
+    val favFragStationsSwitch : MutableLiveData<Int> = MutableLiveData(SEARCH_FROM_FAVOURITES)
 
-        observableListOfStations.addSource(stationInFavoured) { favStations ->
-            if (isInFavouriteTab.value == true) {
-                observableListOfStations.value = favStations
 
-            }
-        }
-        observableListOfStations.addSource(playlist) { playlistStations ->
-            if (isInFavouriteTab.value == false) {
-                observableListOfStations.value = playlistStations
+    var isToGenerateLazyList = true
 
-            }
+    val lazyListFlow = flow<List<RadioStation>>{
+        if(isToGenerateLazyList){
+            isToGenerateLazyList = false
+            val list = repository.getStationsForLazyPlaylist().toMutableList()
+            RadioSource.lazyListStations = list
+            emit(list)
+        } else
+            emit(RadioSource.lazyListStations)
+    }
+
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val favFragStationsFlow = favFragStationsSwitch.asFlow().flatMapLatest {
+        when (it) {
+            SEARCH_FROM_FAVOURITES -> getAllFavStationsFlow
+            SEARCH_FROM_PLAYLIST -> stationsInPlaylistFlow
+            else -> lazyListFlow
         }
     }
+
+    var getAllFavStationsFlow = repository.getAllFavStationsFlow()
+
+//    init {
+//
+//        observableListOfStations.addSource(stationInFavoured) { favStations ->
+//            if (isInFavouriteTab.value == true) {
+//                Log.d("CHECKTAGS", "on change of fav stations")
+//                observableListOfStations.value = favStations
+//
+//            }
+//        }
+//        observableListOfStations.addSource(playlist) { playlistStations ->
+//            if (isInFavouriteTab.value == false && !isInLazyPlaylist) {
+//
+//                observableListOfStations.value = playlistStations
+//            }
+//        }
+//
+//    }
+
+
+
 
 
     fun subscribeToStationsInPlaylist(playlistName: String)
             = viewModelScope.launch {
 
+            favFragStationsSwitch.postValue(SEARCH_FROM_PLAYLIST)
+
             currentPlaylistName.postValue(playlistName)
-            isInFavouriteTab.postValue(false)
+//            isInLazyPlaylist = false
+//            isInFavouriteTab.postValue(false)
 
             // to update service
             radioSource.getStationsInPlaylist(playlistName)
@@ -185,17 +264,46 @@ class DatabaseViewModel @Inject constructor(
 
     fun getAllFavouredStations() = viewModelScope.launch {
 
-        isInFavouriteTab.postValue(true)
+        favFragStationsSwitch.postValue(SEARCH_FROM_FAVOURITES)
 
-        observableListOfStations.value = stationInFavoured.value
+//        isInLazyPlaylist = false
+//        isInFavouriteTab.postValue(true)
 
+//        observableListOfStations.value = stationInFavoured.value
     }
+
+
+    fun getLazyPlaylist() {
+
+        favFragStationsSwitch.postValue(SEARCH_FROM_LAZY_LIST)
+
+//        isInLazyPlaylist = true
+//        isInFavouriteTab.postValue(false)
+        currentPlaylistName.postValue("Lazy list")
+
+//        if(isLazyPlaylistSourceSet){
+//            observableListOfStations.value = stationsInLazyPlaylist.value
+//        } else {
+//            observableListOfStations.addSource(stationsInLazyPlaylist){ lazyPlaylist ->
+//                Log.d("CHECKTAGS", "on change of lazy playlist")
+//                observableListOfStations.value = lazyPlaylist
+//            }
+//            isLazyPlaylistSourceSet = true
+//        }
+    }
+
 
 
     fun deletePlaylistAndContent(playlistName: String) =
         viewModelScope.launch {
 
+            val stationsIds = repository.getStationsIdsFromPlaylist(playlistName)
+
             repository.deleteAllCrossRefOfPlaylist(playlistName)
+
+           stationsIds.forEach {
+               repository.decrementInPlaylistsCount(it)
+           }
 
             repository.deletePlaylist(playlistName)
 
@@ -259,12 +367,20 @@ class DatabaseViewModel @Inject constructor(
 
         val response = radioSource.getStationsInOneDate(selectedDate)
 
+        val stations = response.radioStations.reversed()
+        val date = response.date.date
+
+        radioSource.updateStationsInOneDate(stations)
+
         val stationsWithDate: MutableList<StationWithDateModel> = mutableListOf()
 
-        response.forEach {
+        stationsWithDate.add(StationWithDateModel.DateSeparator(date))
+
+        stations.forEach {
             stationsWithDate.add(StationWithDateModel.Station(it))
         }
 
+        stationsWithDate.add(StationWithDateModel.DateSeparatorEnclosing(date))
 
         if(selectedDate == RadioService.currentDateLong &&
             RadioService.currentMediaItems == Constants.SEARCH_FROM_HISTORY_ONE_DATE
@@ -283,11 +399,10 @@ class DatabaseViewModel @Inject constructor(
     private var isTitleHeaderSet = false
     private var dateToString = ""
 
+    private val calendar = Calendar.getInstance()
+
     private suspend fun getTitlesInAllDates(pageIndex : Int, pageSize : Int) : List<TitleWithDateModel>{
 
-        Log.d("CHECKTAGS", "getting all titles")
-
-        val calendar = Calendar.getInstance()
         val response = repository.getTitlesPage(pageIndex * PAGE_SIZE, pageSize)
         val titlesWithDates: MutableList<TitleWithDateModel> = mutableListOf()
 
@@ -317,15 +432,25 @@ class DatabaseViewModel @Inject constructor(
     }
 
 
-    private suspend fun getTitlesInOneDate(pageIndex : Int, pageSize : Int): List<TitleWithDateModel> {
+     var isTitleOneDateHeaderSet = false
 
-        Log.d("CHECKTAGS", "getting titles in one date")
+    private suspend fun getTitlesInOneDate(pageIndex : Int, pageSize : Int): List<TitleWithDateModel> {
 
         val response = repository.getTitlesInOneDatePage(pageIndex * PAGE_SIZE, pageSize, selectedDate)
         val titlesWithDates: MutableList<TitleWithDateModel> = mutableListOf()
 
+        if(!isTitleOneDateHeaderSet){
+            isTitleOneDateHeaderSet = true
+            calendar.time = Date(selectedDate)
+            titlesWithDates.add(TitleWithDateModel.TitleDateSeparator(fromDateToString(calendar)))
+        }
+
         response.forEach { title ->
             titlesWithDates.add(TitleWithDateModel.TitleItem(title))
+        }
+
+        if(response.size < PAGE_SIZE){
+            titlesWithDates.add(TitleWithDateModel.TitleDateSeparatorEnclosing(fromDateToString(calendar)))
         }
 
         return titlesWithDates
@@ -519,6 +644,7 @@ class DatabaseViewModel @Inject constructor(
 
         lastTitleDate = 0L
         isTitleHeaderSet = false
+        isTitleOneDateHeaderSet = false
 
     }
 
