@@ -46,7 +46,7 @@ class RadioSource @Inject constructor(
 
     var stationsFromLastSearch: RadioStations? = RadioStations()
     var stationsFromApi = mutableListOf<RadioStationsItem>()
-    var stationsFromApiMetadata = mutableListOf<MediaMetadataCompat>()
+//    var stationsFromApiMetadata = mutableListOf<MediaMetadataCompat>()
     var stationsFromApiMediaItems = mutableListOf<MediaItem>()
     var isStationsFromApiUpdated = false
 
@@ -101,7 +101,31 @@ class RadioSource @Inject constructor(
 
 
         var lazyListStations = mutableListOf<RadioStation>()
+        var lazyListMediaItems = mutableListOf<MediaItem>()
+        var isLazyListUpdated = false
 
+        fun initiateLazyList(list : List<RadioStation>){
+            lazyListStations = list.toMutableList()
+            lazyListMediaItems = lazyListStations.map {station ->
+            MediaItem.fromUri(station.url!!)
+            }.toMutableList()
+            isLazyListUpdated = true
+        }
+
+        fun removeItemFromLazyList(index : Int){
+            RadioService.lastDeletedStation = lazyListStations[index]
+            lazyListStations.removeAt(index)
+            lazyListMediaItems.removeAt(index)
+        }
+
+        fun restoreItemFromLazyList(index : Int){
+            RadioService.lastDeletedStation?.let {station ->
+                lazyListStations.add(index, station)
+                val mediaItem = MediaItem.fromUri(station.url!!)
+                lazyListMediaItems.add(index, mediaItem)
+
+            }
+        }
     }
 
 
@@ -180,10 +204,6 @@ class RadioSource @Inject constructor(
                     station.toMediaMetadataCompat()
                 }.toMutableList()
 
-                isStationsFromHistoryUpdated = true
-
-
-
 
         } else {
 
@@ -205,10 +225,10 @@ class RadioSource @Inject constructor(
                         MediaItem.fromUri(station.url!!)
                     )
                 }
-                isStationsFromHistoryUpdated = true
-
 
         }
+
+        isStationsFromHistoryUpdated = true
 
         return response
     }
@@ -437,11 +457,11 @@ class RadioSource @Inject constructor(
                       }.toMutableList()
 
 
-                      stationsFromApiMetadata = it.map { station ->
-                          stationItemToMediaMetadataCompat(station)
-                      }.toMutableList()
+//                      stationsFromApiMetadata = it.map { station ->
+//                          stationItemToMediaMetadataCompat(station)
+//                      }.toMutableList()
 
-                      isStationsFromApiUpdated = true
+//                      isStationsFromApiUpdated = true
 
                   } else {
 
@@ -452,9 +472,9 @@ class RadioSource @Inject constructor(
 
                           it.map { station ->
 
-                              stationsFromApiMetadata.add(
-                                  stationItemToMediaMetadataCompat(station)
-                              )
+//                              stationsFromApiMetadata.add(
+//                                  stationItemToMediaMetadataCompat(station)
+//                              )
 
                               val item = MediaItem.fromUri(station.url_resolved.toUri())
                               exoPlayer.addMediaItem(item)
@@ -467,16 +487,16 @@ class RadioSource @Inject constructor(
 
                           it.map { station ->
 
-                              stationsFromApiMetadata.add(
-                                  stationItemToMediaMetadataCompat(station)
-                              )
+//                              stationsFromApiMetadata.add(
+//                                  stationItemToMediaMetadataCompat(station)
+//                              )
 
                               stationsFromApiMediaItems.add(
                                   MediaItem.fromUri(station.url_resolved.toUri())
                               )
                           }
 
-                          isStationsFromApiUpdated = true
+//                          isStationsFromApiUpdated = true
 
                       }
                   }

@@ -12,6 +12,7 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_LAZY_LIST
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.Constants.TITLE_UNKNOWN
@@ -105,9 +106,7 @@ class RadioPlayerEventListener (
                 when(RadioService.currentMediaItems){
 
                     NO_PLAYLIST -> {
-
                         station = radioService.currentRadioStation
-
                     }
 
                     SEARCH_FROM_API -> {
@@ -132,6 +131,9 @@ class RadioPlayerEventListener (
 
                     SEARCH_FROM_HISTORY_ONE_DATE ->
                         station = RadioSource.stationsFromHistoryOneDate[index]
+
+                    SEARCH_FROM_LAZY_LIST ->
+                        station = RadioSource.lazyListStations[index]
 
                     SEARCH_FROM_RECORDINGS -> {
                         val recording = radioService.stationsFromRecordings[index]

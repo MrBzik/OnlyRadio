@@ -202,14 +202,17 @@ class DatabaseViewModel @Inject constructor(
 
     var isToGenerateLazyList = true
 
-    val lazyListFlow = flow<List<RadioStation>>{
+    private val lazyListFlow = flow{
         if(isToGenerateLazyList){
             isToGenerateLazyList = false
-            val list = repository.getStationsForLazyPlaylist().toMutableList()
-            RadioSource.lazyListStations = list
+            val list = repository.getStationsForLazyPlaylist()
+            RadioSource.initiateLazyList(list)
             emit(list)
-        } else
-            emit(RadioSource.lazyListStations)
+        } else {
+            val list = RadioSource.lazyListStations.toList()
+            emit(list)
+        }
+
     }
 
 

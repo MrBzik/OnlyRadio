@@ -331,7 +331,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 //                        mainViewModel.stopPlay()
 
                         (activity as MainActivity).bindPlayer.root.apply {
-                            visibility = View.INVISIBLE
+                            visibility = View.GONE
                             slideAnim(300, 0, R.anim.fade_out_anim)
 
                         }

@@ -15,6 +15,7 @@ import android.media.audiofx.Virtualizer
 import android.media.audiofx.Visualizer
 import android.media.audiofx.Visualizer.MEASUREMENT_MODE_PEAK_RMS
 import android.os.Bundle
+import android.provider.MediaStore.Audio.Radio
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
@@ -79,6 +80,7 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_LAZY_LIST
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.Constants.TITLE_UNKNOWN
@@ -558,6 +560,7 @@ class RadioService : MediaBrowserServiceCompat() {
                                 lastDeletedStation = RadioSource.stationsInPlaylist[index]
                                 RadioSource.stationsInPlaylist.removeAt(index)
                                 RadioSource.stationsInPlaylistMediaItems.removeAt(index)
+
                             }
                         }
                     }
@@ -576,14 +579,16 @@ class RadioService : MediaBrowserServiceCompat() {
                             if(index <= currentPlayingItemPosition)
                                 currentPlayingItemPosition ++
 
-                            if(currentMediaItems == SEARCH_FROM_FAVOURITES){
-                                radioSource.stationsFavoured.add(index, station)
-                                radioSource.stationsFavouredMediaItems.add(index, mediaItem)
+                            when (currentMediaItems) {
+                                SEARCH_FROM_FAVOURITES -> {
+                                    radioSource.stationsFavoured.add(index, station)
+                                    radioSource.stationsFavouredMediaItems.add(index, mediaItem)
 
-                            } else if(currentMediaItems == SEARCH_FROM_PLAYLIST){
-                                RadioSource.stationsInPlaylist.add(index, station)
-                                RadioSource.stationsInPlaylistMediaItems.add(index, mediaItem)
-
+                                }
+                                SEARCH_FROM_PLAYLIST -> {
+                                    RadioSource.stationsInPlaylist.add(index, station)
+                                    RadioSource.stationsInPlaylistMediaItems.add(index, mediaItem)
+                                }
                             }
                         }
                     }
@@ -1574,7 +1579,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
             SEARCH_FROM_API -> {
                 if(isToChangeMediaItems || radioSource.isStationsFromApiUpdated){
-                    radioSource.isStationsFromApiUpdated = false
+//                    radioSource.isStationsFromApiUpdated = false
                     handleMediaItemsUpdate(radioSource.stationsFromApiMediaItems, isSameStation, itemIndex)
                 }
             }
@@ -1607,6 +1612,13 @@ class RadioService : MediaBrowserServiceCompat() {
                 }
             }
 
+            SEARCH_FROM_LAZY_LIST -> {
+                if(isToChangeMediaItems || RadioSource.isLazyListUpdated){
+                    RadioSource.isLazyListUpdated = false
+                    handleMediaItemsUpdate(RadioSource.lazyListMediaItems, isSameStation, itemIndex)
+                }
+            }
+
             SEARCH_FROM_RECORDINGS -> {
                 if(isToChangeMediaItems || isStationsFromRecordingUpdated){
                     isStationsFromRecordingUpdated = false
@@ -1621,17 +1633,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
         if(isSameStation){
 
-//            Log.d("CHECKTAGS", "on same station. Index: $index")
-
             clearMediaItems(false)
 
-//            items.forEach {
-//                exoPlayer.addMediaItem(it)
-//            }
-//
-//            if(index != 0) {
-//                exoPlayer.moveMediaItem(0, index)
-//            }
 
             if(index == 0){
                 exoPlayer.addMediaItems(items.subList(1, items.lastIndex))

@@ -108,7 +108,11 @@ class PlaylistsAdapter @Inject constructor(
                 )
             )
 
-            header.bind.cardView.setOnClickListener {
+                if(isDarkMode){
+                    header.bind.ivPlaylistCover.alpha = 0.6f
+                }
+
+                header.bind.cardView.setOnClickListener {
                 lazyListClickListener?.let { click ->
                     click()
                 }

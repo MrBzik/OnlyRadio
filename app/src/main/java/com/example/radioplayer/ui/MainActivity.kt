@@ -315,7 +315,7 @@ class MainActivity : AppCompatActivity() {
 
         if(!isStubPlayerBindInflated) {
             inflatePlayerStubAndCallRelatedMethods()
-        } else if(bindPlayer.root.visibility == View.INVISIBLE){
+        } else if(bindPlayer.root.visibility == View.GONE){
 
             bindPlayer.root.visibility = View.VISIBLE
             bindPlayer.root.slideAnim(500, 0, R.anim.fade_in_anim)

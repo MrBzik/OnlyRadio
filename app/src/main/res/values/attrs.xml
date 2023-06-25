@@ -17,5 +17,8 @@
 
     <dimen name="extras_fab_size">40dp</dimen>
 
+    <dimen name="upper_fab_margin">73dp</dimen>
+    <dimen name="lower_fab_margin">140dp</dimen>
+
 
 </resources>

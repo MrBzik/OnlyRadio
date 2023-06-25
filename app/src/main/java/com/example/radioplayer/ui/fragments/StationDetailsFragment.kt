@@ -40,6 +40,7 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_LAZY_LIST
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.example.radioplayer.utils.Constants.TITLE_UNKNOWN
 import com.example.radioplayer.utils.RandomColors
@@ -147,10 +148,11 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     private fun getCurrentPlaylistItems(){
 
 
+        var listName = ""
 
         val list = when(RadioService.currentMediaItems){
             SEARCH_FROM_API -> {
-                bind.tvPlaylistTitle.text = "From search"
+                listName = "From search"
 
                 mainViewModel.radioSource.stationsFromApi.map {
                     it.toRadioStation()
@@ -160,7 +162,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
             SEARCH_FROM_FAVOURITES -> {
 
-                bind.tvPlaylistTitle.text = "From favoured"
+                listName = "From favoured"
 
                 if(databaseViewModel.isStationFavoured.value == false){
                     RadioService.currentPlayingStation.value?.let {
@@ -173,14 +175,19 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             }
 
             SEARCH_FROM_PLAYLIST -> {
-                bind.tvPlaylistTitle.text = "\"${RadioService.currentPlaylistName}\""
+                listName = "\"${RadioService.currentPlaylistName}\""
                 RadioSource.stationsInPlaylist
             }
 
 
+            SEARCH_FROM_LAZY_LIST -> {
+                listName = "Lazy list"
+                RadioSource.lazyListStations
+            }
+
 
             SEARCH_FROM_HISTORY -> {
-                bind.tvPlaylistTitle.text = "From history"
+                listName = "From history"
 
                 mainViewModel.radioSource.stationsFromHistory
             }
@@ -190,15 +197,15 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
               val calendar = Calendar.getInstance()
               calendar.time = Date(databaseViewModel.selectedDate)
 
-              val string = Utils.fromDateToStringShort(calendar)
+                listName = Utils.fromDateToStringShort(calendar)
 
-                bind.tvPlaylistTitle.text = "$string"
+
                 RadioSource.stationsFromHistoryOneDate
             }
 
             NO_PLAYLIST -> {
-                Log.d("CHECKTAGS", "am i here?")
-                bind.tvPlaylistTitle.text = "In fall out"
+
+                listName = "In fall out"
                 RadioService.currentPlayingStation.value?.let {
                     listOf(it)
                 } ?: emptyList()
@@ -208,6 +215,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
        }
 
+        bind.tvPlaylistTitle.text = listName
         viewPagerAdapter.listOfStations = list
 
 //        var position = 0
