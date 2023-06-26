@@ -163,8 +163,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         observeNewStation()
 
-        setAdapterLoadStateListener()
-
         setRecyclerViewAttachChildrenListener()
 
         setAdapterOnClickListener()
@@ -297,7 +295,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         }
     }
 
-
+    private var isNoResultClick = false
     private fun setNoResultClickLogic(){
         isNoResultClickLogicSet = true
 
@@ -313,6 +311,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             llName.setOnClickListener {
                 if(mainViewModel.isFullAutoSearch) isToInitiateNewSearch = true
 
+                isNoResultClick = true
                 mainViewModel.searchParamName.postValue("")
                 llName.visibility = View.INVISIBLE
             }
@@ -522,9 +521,19 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             setAdapterValues(pagingRadioAdapter.utils)
 
 
-            itemAnimator = null
+            addOnScrollListener(object : RecyclerView.OnScrollListener(){
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if(newState == RecyclerView.SCROLL_STATE_DRAGGING)
+                        pagingRadioAdapter.animator.cancelAnimator()
+                }
+            })
 
-            layoutAnimation = (activity as MainActivity).layoutAnimationController
+
+
+//            itemAnimator = null
+
+//            layoutAnimation = (activity as MainActivity).layoutAnimationController
 
 
             if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
@@ -573,77 +582,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
 
 
-    private fun setAdapterLoadStateListener(){
-
-        pagingRadioAdapter.addLoadStateListener {
-
-            if (it.refresh is LoadState.Loading ||
-                it.append is LoadState.Loading)
-
-            {
-//                if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
-//                    (activity as MainActivity).startSeparatorsLoadAnim()
-//                } else {
-//
-//                    if(!isNewSearchForAnimations)
-//                        (activity as MainActivity).bind.progressBarBottom?.show()
-//                    else
-//                        (activity as MainActivity).bind.progressBarBottom?.hide()
-//                }
-            }
-
-            else {
-
-//                if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
-//                    (activity as MainActivity).endSeparatorsLoadAnim()
-//
-//                } else {
-//                    textLoadAnim?.endLoadingAnim()
-//                    (activity as MainActivity).bind.progressBarBottom?.hide()
-//                }
-
-
-//                if(mainViewModel.isWaitingForNewSearch)
-//                    pagingRadioAdapter.submitData(lifecycle, PagingData.empty())
-
-
-//                if(isNewSearchForAnimations){
-//
-//                    isNewSearchForAnimations = false
-//                    isToShowLoadingMessage = false
-//
-//                    Log.d("CHECKTAGS", "is adapter load state listener")
-//
-//                    bind.rvSearchStations.apply {
-//                        if(isInitialLaunch){
-//
-//                            if(RadioService.currentPlayingItemPosition == -1){
-//                                startLayoutAnimation()
-//                            } else {
-//
-//                                post {
-//                                    val index = getCurrentItemPosition(null)
-//
-//                                    if(index != -1 ) scrollToPosition(index)
-//
-//                                    startLayoutAnimation()
-//                                }
-//
-//                            }
-//
-//                            isInitialLaunch = false
-//
-//                        } else {
-//                            scrollToPosition(0)
-//                            startLayoutAnimation()
-//                        }
-//                    }
-//
-//                }
-            }
-        }
-    }
-
 
     private fun setRecyclerViewAttachChildrenListener(){
         bind.rvSearchStations.addOnChildAttachStateChangeListener(
@@ -661,15 +599,16 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                             if(isInitialLaunch){
 
                                 if(RadioService.currentPlayingItemPosition == -1){
-                                    startLayoutAnimation()
+//                                    startLayoutAnimation()
                                 } else {
 
                                     post {
                                         val index = getCurrentItemPosition(null)
 
                                         if(index != -1 ) scrollToPosition(index)
+                                        pagingRadioAdapter.animator.resetAnimator()
 
-                                        startLayoutAnimation()
+//                                        startLayoutAnimation()
                                     }
 
                                 }
@@ -678,7 +617,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
                             } else {
                                 scrollToPosition(0)
-                                startLayoutAnimation()
+//                                startLayoutAnimation()
                             }
                         }
 
@@ -704,7 +643,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 mainViewModel.stationsFlow.collectLatest {
 
-                    Log.d("CHECKTAGS", "collecting latest")
 
 //                if(!isInitialLaunch){
 //                    launchRecyclerOutAnim()
@@ -721,6 +659,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 //                        bind.tvResultMessage.visibility = View.INVISIBLE
 //                    }
                     }
+
+                    pagingRadioAdapter.animator.resetAnimator()
 
                     pagingRadioAdapter.submitData(it)
 
@@ -754,8 +694,10 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         bind.tvName.setOnClickListener {
 
             NameAutoDialog(requireContext(), mainViewModel){
-                if(mainViewModel.isFullAutoSearch)
-                    isToInitiateNewSearch = true
+                if(mainViewModel.isFullAutoSearch){
+                    val check = mainViewModel.initiateNewSearch()
+                    clearAdapter(check)
+                }
             }.show()
 
 
@@ -845,14 +787,16 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             handleNewParams()
 
-
             (bind.tvTag as TextView).text  = it.ifBlank { "Tag" }
 
         }
 
         mainViewModel.searchParamName.observe(viewLifecycleOwner){
 
-            handleNewParams()
+            if(isNoResultClick){
+                isNoResultClick = false
+                handleNewParams()
+            }
 
             (bind.tvName as TextView).text = it.ifBlank { "Name" }
 
@@ -897,6 +841,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     override fun onDestroyView() {
         super.onDestroyView()
+        pagingRadioAdapter.animator.resetAnimator()
         isNoResultClickLogicSet = false
         isBindNoResultMessageInflated = false
         bind.rvSearchStations.adapter = null
