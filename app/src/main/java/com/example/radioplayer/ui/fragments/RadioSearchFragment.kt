@@ -13,7 +13,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -217,13 +219,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
             bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_search_vector)
-            val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_search_fragment)
-
-            (activity as MainActivity).apply {
-                window.navigationBarColor = color
-                window.statusBarColor = color
-            }
-
         }
 
         else {
@@ -706,29 +701,30 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     private fun subscribeToStationsFlow(){
 
         viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                mainViewModel.stationsFlow.collectLatest {
 
-            mainViewModel.stationsFlow.collectLatest {
-
-                Log.d("CHECKTAGS", "collecting latest")
+                    Log.d("CHECKTAGS", "collecting latest")
 
 //                if(!isInitialLaunch){
 //                    launchRecyclerOutAnim()
 //                }
 
-                if(isToShowLoadingMessage || mainViewModel.isInitialLaunchOfTheApp){
-                    mainViewModel.isInitialLaunchOfTheApp = false
+                    if(isToShowLoadingMessage || mainViewModel.isInitialLaunchOfTheApp){
+                        mainViewModel.isInitialLaunchOfTheApp = false
 
-                    textLoadAnim?.startLoadingAnim()
+                        textLoadAnim?.startLoadingAnim()
 
 //                    if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES)
 //                        showLoadingResultsMessage()
 //                    else {
 //                        bind.tvResultMessage.visibility = View.INVISIBLE
 //                    }
+                    }
+
+                    pagingRadioAdapter.submitData(it)
+
                 }
-
-                pagingRadioAdapter.submitData(it)
-
             }
         }
     }

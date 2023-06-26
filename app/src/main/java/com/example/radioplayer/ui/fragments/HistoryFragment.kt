@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -34,6 +35,7 @@ import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
+import com.example.radioplayer.ui.animations.AdapterAnimator
 import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
 import com.example.radioplayer.ui.animations.SwapTitlesUi
 import com.example.radioplayer.ui.animations.SwipeToDeleteCallback
@@ -67,8 +69,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     @Inject
     lateinit var glide : RequestManager
 
-    private val calendar = Calendar.getInstance()
-
     private var isInitialLoad = true
 
     private var stationsHistoryAdapter: PagingHistoryAdapter? = null
@@ -85,6 +85,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private var isBookmarkedTitlesObserverSet = false
 
+    private var rvState : Parcelable? = null
+
 
     private val clipBoard : ClipboardManager? by lazy {
         ContextCompat.getSystemService(requireContext(), ClipboardManager::class.java)
@@ -93,7 +95,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     companion object{
 
-       var isNewHistoryQuery = true
+        var adapterAnimator = AdapterAnimator()
+
+//       var isNewHistoryQuery = true
        var numberOfDates = 0
 
     }
@@ -122,7 +126,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             setSpinnerOpenCloseListener()
         }
 
-        setToolbar()
 
         setTitlesClickListener()
 
@@ -198,112 +201,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 //            bind.tvShrinkArrow.isVisible = true
 //            bind.viewSpinnerClickBox?.isVisible = true
         }
-    }
-
-
-    private fun setToolbar(){
-
-        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
-            val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_history_frag)
-//            val colorStatus = ContextCompat.getColor(requireContext(), R.color.status_bar_history_frag)
-
-            (activity as MainActivity).apply {
-                window.navigationBarColor = color
-                window.statusBarColor = color
-            }
-
-
-
-//            bind.viewSpinnerClickBox?.setOnTouchListener { v, event ->
-//
-//                if (event.action == MotionEvent.ACTION_DOWN){
-//                    bind.tvSliderHeader.isPressed = true
-//                bind.spinnerDates.performClick()
-//                }
-//
-//                true
-//            }
-
-//        } else {
-//            bind.viewToolbar.setBackgroundColor(Color.BLACK)
-//            bind.tvSliderHeader.setOnClickListener {
-//                bind.spinnerDates.performClick()
-//            }
-        }
-    }
-
-
-    private fun setStationsAdapterLoadStateListener(){
-
-        stationsHistoryAdapter?.addLoadStateListener {
-
-            if (it.refresh is LoadState.Loading ||
-                it.append is LoadState.Loading) { }
-            else {
-
-                if(isInitialLoad){
-                    bind.rvHistory.apply {
-
-                            Log.d("CHECKTAGS", "on layout")
-                            scrollToPosition(0)
-                            startLayoutAnimation()
-
-                    }
-                    isInitialLoad = false
-                }
-            }
-        }
-    }
-
-    private fun setTitlesAdapterLoadStateListener(){
-
-        titlesHistoryAdapter?.addLoadStateListener {
-
-            if (it.refresh is LoadState.Loading ||
-                it.append is LoadState.Loading) { }
-            else {
-
-                if(isInitialLoad){
-
-                    bind.rvHistory.apply {
-
-                            Log.d("CHECKTAGS", "child animate")
-                            scrollToPosition(0)
-                            startLayoutAnimation()
-
-                    }
-                    isInitialLoad = false
-                }
-            }
-        }
-    }
-
-
-
-    private fun setRvLoadChildrenListener(){
-
-        bind.rvHistory.addOnChildAttachStateChangeListener(
-           object : RecyclerView.OnChildAttachStateChangeListener{
-               override fun onChildViewAttachedToWindow(view: View) {
-
-                   if(isInitialLoad){
-
-                       bind.rvHistory.apply {
-
-                               scrollToPosition(0)
-                               startLayoutAnimation()
-
-                       }
-                       isInitialLoad = false
-                   }
-
-               }
-
-               override fun onChildViewDetachedFromWindow(view: View) {
-
-               }
-           }
-        )
     }
 
 
@@ -423,11 +320,18 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private fun loadHistory(isSameTab : Boolean = false){
 
+        isInitialLoad = true
+        adapterAnimator.resetAnimator()
+
+//        rvState?.let {
+//            bind.rvHistory.layoutManager?.onRestoreInstanceState(it)
+//        }
+
         databaseViewModel.apply {
 
-            if(!isInStationsTab && isSameTab){
-                titlesHistoryAdapter?.submitData(lifecycle, PagingData.empty())
-            }
+//            if(!isInStationsTab && isSameTab){
+//                titlesHistoryAdapter?.submitData(lifecycle, PagingData.empty())
+//            }
 
             if(selectedDate == 0L){
                 if(isInStationsTab){
@@ -446,7 +350,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             }
         }
 
-        isInitialLoad = true
+
+
     }
 
 //    private fun setSliderHeaderText(time : Long){
@@ -572,13 +477,22 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         bind.rvHistory.apply {
 
-
             layoutManager = LinearLayoutManager(requireContext())
-            edgeEffectFactory = BounceEdgeEffectFactory()
-            itemAnimator = null
-            layoutAnimation = (activity as MainActivity).layoutAnimationController
+            rvState = LinearLayoutManager(requireContext()).onSaveInstanceState()
 
-            setRvLoadChildrenListener()
+            edgeEffectFactory = BounceEdgeEffectFactory()
+//            itemAnimator = null
+//            layoutAnimation = (activity as MainActivity).layoutAnimationController
+
+//            setRvLoadChildrenListener()
+
+            addOnScrollListener(object : RecyclerView.OnScrollListener(){
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if(newState == RecyclerView.SCROLL_STATE_DRAGGING)
+                        adapterAnimator.cancelAnimator()
+                }
+            })
 
             if(databaseViewModel.isInStationsTab){
                 setStationsHistoryAdapter()
@@ -601,11 +515,19 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             stationsHistoryAdapter = PagingHistoryAdapter(glide)
 
-            setStationsAdapterLoadStateListener()
-
             stationsHistoryAdapter?.apply {
 
                 setAdapterValues(utils)
+
+                addOnPagesUpdatedListener {
+                    if(isInitialLoad){
+                        isInitialLoad = false
+                        bind.rvHistory.apply {
+                            scrollToPosition(0)
+                        }
+                    }
+                }
+
 
                 if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
                     RadioService.currentPlayingStation.value?.let {
@@ -635,7 +557,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         if(!isTitlesAdapterSet){
             titlesHistoryAdapter = TitleAdapter(glide)
-            setTitlesAdapterLoadStateListener()
+//            setTitlesAdapterLoadStateListener()
             titlesHistoryAdapter?.apply {
                 alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
                 titleSize = mainViewModel.stationsTitleSize
@@ -648,6 +570,18 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                     Toast.makeText(requireContext(), "Title bookmarked", Toast.LENGTH_SHORT).show()
 
                     databaseViewModel.upsertBookmarkedTitle(title)
+
+                }
+
+                addOnPagesUpdatedListener {
+                    Log.d("CHECKTAGS", "scrolling up every time pages updated?")
+
+                    if(isInitialLoad){
+                        isInitialLoad = false
+                        bind.rvHistory.apply {
+                            scrollToPosition(0)
+                        }
+                    }
 
                 }
 
@@ -730,9 +664,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         setTitlesHistoryAdapter()
 
-        if(databaseViewModel.selectedDate != 0L){
-            titlesHistoryAdapter?.submitData(lifecycle, PagingData.empty())
-        }
+//        if(databaseViewModel.selectedDate != 0L){
+//            titlesHistoryAdapter?.submitData(lifecycle, PagingData.empty())
+//        }
 
         loadHistory()
     }
@@ -747,6 +681,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 databaseViewModel.isInBookmarksLiveData.postValue(databaseViewModel.isInBookmarks)
 
+                adapterAnimator.resetAnimator()
 
                 if(databaseViewModel.isInBookmarks){
 
@@ -769,6 +704,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             setHasFixedSize(false)
         }
 
+
         itemTouchHelper.attachToRecyclerView(bind.rvHistory)
 
 
@@ -790,19 +726,11 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 bookmarkedTitlesAdapter.listOfTitles = it
 
             }
-
-            databaseViewModel.bookmarkedTitlesLivedata.value?.let {
-                bind.rvHistory.scheduleLayoutAnimation()
-            } ?: kotlin.run {
-                bind.rvHistory.post {
-                    bind.rvHistory.scheduleLayoutAnimation()
-                }
-            }
-
-
-        } else {
-            bind.rvHistory.scheduleLayoutAnimation()
         }
+
+//        else {
+//            bind.rvHistory.scheduleLayoutAnimation()
+//        }
     }
 
 
@@ -820,9 +748,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 setStationsHistoryAdapter()
 
-                if(databaseViewModel.selectedDate != 0L){
-                    stationsHistoryAdapter?.submitData(lifecycle, PagingData.empty())
-                }
+//                if(databaseViewModel.selectedDate != 0L){
+//                    stationsHistoryAdapter?.submitData(lifecycle, PagingData.empty())
+//                }
 
                 switchTitlesStationsUi(true)
 
@@ -848,6 +776,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             databaseViewModel.observableHistory.observe(viewLifecycleOwner){
 
                 stationsHistoryAdapter?.submitData(lifecycle, it)
+
             }
 
         databaseViewModel.observableTitles.observe(viewLifecycleOwner){
@@ -928,7 +857,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         super.onDestroyView()
 
         databaseViewModel.cleanHistoryTab()
-        isNewHistoryQuery = true
+//        isNewHistoryQuery = true
         isInitialLoad = true
         isStationsAdapterSet = false
         isTitlesAdapterSet = false
@@ -938,6 +867,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         _bind = null
         isToHandleNewStationObserver = false
         isBookmarkedTitlesObserverSet = false
+        adapterAnimator.resetAnimator()
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.radioplayer.ui.fragments
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,11 +15,13 @@ import com.example.radioplayer.adapters.BaseAdapter
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.utils.Constants
 
 abstract class BaseFragment<VB: ViewBinding>(
         private val bindingInflater : (inflater : LayoutInflater) -> VB
 )
     : Fragment() {
+
 
      var _bind : VB? = null
 
@@ -38,18 +41,17 @@ abstract class BaseFragment<VB: ViewBinding>(
         savedInstanceState: Bundle?
     ): View? {
 
+
         _bind = bindingInflater(inflater)
 
         ViewCompat.setTransitionName(bind.root, bind.javaClass.name)
         return bind.root
     }
 
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        super.onViewCreated(view, savedInstanceState)
-//
-//    }
-
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColor()
+    }
 
     fun setAdapterValues(utils : BaseAdapter){
 
@@ -66,5 +68,32 @@ abstract class BaseFragment<VB: ViewBinding>(
         }
     }
 
+    private fun setSystemBarsColor(){
+
+        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
+
+            var isToHandle = true
+
+            val color = when(mainViewModel.currentFragment){
+
+                Constants.FRAG_SEARCH -> ContextCompat.getColor(requireContext(), R.color.nav_bar_search_fragment)
+                Constants.FRAG_FAV -> ContextCompat.getColor(requireContext(), R.color.nav_bar_fav_fragment)
+                Constants.FRAG_HISTORY -> ContextCompat.getColor(requireContext(), R.color.nav_bar_history_frag)
+                Constants.FRAG_REC -> ContextCompat.getColor(requireContext(), R.color.nav_bar_rec_frag)
+                else -> {
+                    isToHandle = false
+                    0
+                }
+            }
+
+            if(isToHandle){
+                (activity as MainActivity).apply {
+                    window.navigationBarColor = color
+                    window.statusBarColor = color
+                }
+            }
+
+        }
+    }
 
 }

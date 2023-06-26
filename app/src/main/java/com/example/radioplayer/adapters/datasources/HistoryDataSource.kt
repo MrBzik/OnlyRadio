@@ -17,30 +17,28 @@ class HistoryDataSource(
 
         val dateIndex = params.key ?: 0
 
-        var pagesLoaded = 1
+//        var pagesLoaded = 1
 
         return try {
 
-
-
             val stations = loader(dateIndex).toMutableList()
 
-            if(HistoryFragment.isNewHistoryQuery){
-                while(stations.size < 9 && HistoryFragment.numberOfDates > pagesLoaded){
+//            if(HistoryFragment.isNewHistoryQuery){
+//                while(stations.size < 9 && HistoryFragment.numberOfDates > pagesLoaded){
+//
+//                    val moreStations = loader(dateIndex+pagesLoaded)
+//
+//                    stations.addAll(moreStations)
+//
+//                    pagesLoaded += 1
+//
+//                 }
+//
+//
+//                HistoryFragment.isNewHistoryQuery = false
+//            }
 
-                    val moreStations = loader(dateIndex+pagesLoaded)
-
-                    stations.addAll(moreStations)
-
-                    pagesLoaded += 1
-
-                 }
-
-
-                HistoryFragment.isNewHistoryQuery = false
-            }
-
-            val nextKey = dateIndex +pagesLoaded
+            val nextKey = dateIndex + 1
 
             LoadResult.Page(
                 data = stations,

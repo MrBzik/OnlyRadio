@@ -19,11 +19,14 @@ import com.example.radioplayer.databinding.ItemHeaderPlaylistBinding
 import com.example.radioplayer.databinding.ItemPlaylistCoverBinding
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_LAZY_LIST
+import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import javax.inject.Inject
 
 
 private const val FOOTER_ADD_PLAYLIST = 1
-private const val HEADER_LAZY_PLAYLIST = 2
+private const val HEADER_PLAYLIST = 2
+
 
 
 
@@ -52,6 +55,7 @@ class PlaylistsAdapter @Inject constructor(
         bind.cardView.strokeColor = strokeColor
     }
 
+
     private fun defaultPlaylist(bind : ItemPlaylistCoverBinding) {
 
         if(isDarkMode){
@@ -70,11 +74,12 @@ class PlaylistsAdapter @Inject constructor(
     }
 
 
-     class HeaderViewHolder (val bind : ItemHeaderPlaylistBinding) : RecyclerView.ViewHolder(bind.root)
-
      class FooterViewHolder (itemView : View) : RecyclerView.ViewHolder(itemView)
 
-     class PlaylistHolder (val bind : ItemPlaylistCoverBinding) : RecyclerView.ViewHolder(bind.root)
+     sealed class PlaylistHolder (val bind : ItemPlaylistCoverBinding) : RecyclerView.ViewHolder(bind.root){
+         class HeaderPlaylistHolder(binding : ItemPlaylistCoverBinding) : PlaylistHolder(binding)
+         class MainPlaylistHolder(binding : ItemPlaylistCoverBinding) : PlaylistHolder(binding)
+     }
 
 //     {
 //
@@ -86,6 +91,15 @@ class PlaylistsAdapter @Inject constructor(
 //     }
 
 
+    private fun handleHighlightOnPlaylistClick(holder : PlaylistHolder){
+
+        highlightedViewHolder?.let {
+            defaultPlaylist(it.bind)
+        }
+        highlightedViewHolder = holder
+        highlightPlaylist(holder.bind)
+
+    }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -100,48 +114,62 @@ class PlaylistsAdapter @Inject constructor(
                 }
             }
             return footer
-        } else
-            if(viewType == HEADER_LAZY_PLAYLIST){
-            val header = HeaderViewHolder(
-                ItemHeaderPlaylistBinding.inflate(
-                    LayoutInflater.from(parent.context), parent, false
-                )
-            )
-
-                if(isDarkMode){
-                    header.bind.ivPlaylistCover.alpha = 0.6f
-                }
-
-                header.bind.cardView.setOnClickListener {
-                lazyListClickListener?.let { click ->
-                    click()
-                }
-            }
-
-            return header
         }
 
-            val playlist = PlaylistHolder(
+        else if(viewType == HEADER_PLAYLIST){
+            val headerHolder = PlaylistHolder.HeaderPlaylistHolder(
                 ItemPlaylistCoverBinding.inflate(
                     LayoutInflater.from(parent.context),  parent, false
                 )
             )
 
-            playlist.bind.cardView.setOnClickListener {
+            headerHolder.bind.cardView.setOnClickListener {
 
-                playlistClickListener?.let { click ->
-                    click(differ.currentList[playlist.absoluteAdapterPosition],
-                            playlist.absoluteAdapterPosition - 1
-                        )
-                    highlightedViewHolder?.let {
-                        defaultPlaylist(it.bind)
+                lazyListClickListener?.let { click ->
+
+                    if(currentTab != SEARCH_FROM_LAZY_LIST){
+                        click()
+
+                        handleHighlightOnPlaylistClick(headerHolder)
                     }
-                    highlightedViewHolder = playlist
-                    highlightPlaylist(playlist.bind)
                 }
             }
 
-            playlist.itemView.setOnDragListener { view, event ->
+            return headerHolder
+        }
+
+
+        val playlistHolder = PlaylistHolder.MainPlaylistHolder(
+            ItemPlaylistCoverBinding.inflate(
+                LayoutInflater.from(parent.context),  parent, false
+            )
+        )
+
+        playlistHolder.bind.cardView.setOnClickListener {
+
+            playlistClickListener?.let { click ->
+
+                val playlist = differ.currentList[playlistHolder.absoluteAdapterPosition]
+
+                if(
+                    currentTab != SEARCH_FROM_PLAYLIST || playlist.playlistName != currentPlaylistName
+                ) {
+
+                    click(differ.currentList[playlistHolder.absoluteAdapterPosition],
+                        playlistHolder.absoluteAdapterPosition - 1
+                    )
+
+                    handleHighlightOnPlaylistClick(playlistHolder)
+                }
+            }
+
+
+            playlistHolder.itemView.setOnDragListener { view, event ->
+
+
+                if(isFooterNeeded && playlistHolder.absoluteAdapterPosition != 0){
+
+                }
 
                 when(event.action){
 
@@ -150,26 +178,26 @@ class PlaylistsAdapter @Inject constructor(
                     }
                     DragEvent.ACTION_DRAG_ENTERED ->{
 
-                        playlist.bind.cardView.isPressed = true
+                        playlistHolder.bind.cardView.isPressed = true
                         view.invalidate()
                         true
                     }
                     DragEvent.ACTION_DRAG_LOCATION -> true
                     DragEvent.ACTION_DRAG_EXITED -> {
 
-                        playlist.bind.cardView.isPressed = false
+                        playlistHolder.bind.cardView.isPressed = false
                         view.invalidate()
                         true
                     }
                     DragEvent.ACTION_DROP ->{
 
-                        playlist.bind.cardView.isPressed = false
+                        playlistHolder.bind.cardView.isPressed = false
 
                         val item = event.clipData.getItemAt(0)
                         val data = item.text
 
                         handleDragAndDrop?.let {
-                            it(data.toString(), playlist.bind.tvPlaylistName.text.toString())
+                            it(data.toString(), playlistHolder.bind.tvPlaylistName.text.toString())
                         }
 
                         view.invalidate()
@@ -181,13 +209,16 @@ class PlaylistsAdapter @Inject constructor(
                     else -> false
                 }
             }
+        }
 
-            return playlist
+        return playlistHolder
     }
+
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
         if(holder is PlaylistHolder) {
+
             val playlist = differ.currentList[position]
             holder.bind.apply {
                 tvPlaylistName.text = playlist.playlistName
@@ -199,11 +230,17 @@ class PlaylistsAdapter @Inject constructor(
                     defaultPlaylist(holder.bind)
                 }
 
-                glide
-                    .load(playlist.coverURI)
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(ivPlaylistCover)
+                if(holder is PlaylistHolder.HeaderPlaylistHolder){
 
+                    ivPlaylistCover.setImageResource(R.drawable.lazy_playlist_cover_cat)
+
+                } else {
+
+                    glide
+                        .load(playlist.coverURI)
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .into(ivPlaylistCover)
+                }
             }
         }
     }
@@ -219,9 +256,10 @@ class PlaylistsAdapter @Inject constructor(
 
         if(position == differ.currentList.size){
             return FOOTER_ADD_PLAYLIST
-        } else if(position == 0 && isFooterNeeded){
-            return HEADER_LAZY_PLAYLIST
-        }
+        } else if(
+            position == 0 && isFooterNeeded
+        ) return HEADER_PLAYLIST
+
         return super.getItemViewType(position)
     }
 

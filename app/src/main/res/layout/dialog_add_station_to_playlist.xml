@@ -23,7 +23,6 @@
         android:layout_marginHorizontal="8dp"
         android:layout_marginTop="@dimen/dialog_top_margin"
         android:gravity="center_vertical"
-        android:text="Select playlist or create new"
         android:textAppearance="@style/dialogTitleText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/guidelineMarginTop" />

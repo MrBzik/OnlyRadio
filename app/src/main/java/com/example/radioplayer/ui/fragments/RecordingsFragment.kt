@@ -82,14 +82,6 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
             bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_recordings_vector)
 
-            val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_rec_frag)
-//            val colorStatus = ContextCompat.getColor(requireContext(), R.color.status_bar_rec_frag)
-
-            (activity as MainActivity).apply {
-                window.navigationBarColor = color
-                window.statusBarColor = color
-            }
-
             (bind.tvEnableDeleting as TextViewOutlined).isSingleColor = true
             (bind.tvEnableDeleting as TextViewOutlined).setTextColor(Color.WHITE)
 

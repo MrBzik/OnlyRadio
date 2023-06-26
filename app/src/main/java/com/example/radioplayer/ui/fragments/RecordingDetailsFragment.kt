@@ -64,32 +64,32 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
         setPlaybackSpeedButtons()
 
-        setSystemBarsColor()
+//        setSystemBarsColor()
 
 
 
     }
 
 
-    private fun setSystemBarsColor(){
-
-        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
-
-            val color = when(mainViewModel.currentFragment){
-
-                Constants.FRAG_SEARCH -> ContextCompat.getColor(requireContext(), R.color.nav_bar_search_fragment)
-                Constants.FRAG_FAV -> ContextCompat.getColor(requireContext(), R.color.nav_bar_fav_fragment)
-                Constants.FRAG_HISTORY -> ContextCompat.getColor(requireContext(), R.color.nav_bar_history_frag)
-                Constants.FRAG_REC -> ContextCompat.getColor(requireContext(), R.color.nav_bar_rec_frag)
-                else -> ContextCompat.getColor(requireContext(), R.color.nav_bar_settings_frag)
-            }
-
-            (activity as MainActivity).apply {
-                window.navigationBarColor = color
-                window.statusBarColor = color
-            }
-        }
-    }
+//    private fun setSystemBarsColor(){
+//
+//        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
+//
+//            val color = when(mainViewModel.currentFragment){
+//
+//                Constants.FRAG_SEARCH -> ContextCompat.getColor(requireContext(), R.color.nav_bar_search_fragment)
+//                Constants.FRAG_FAV -> ContextCompat.getColor(requireContext(), R.color.nav_bar_fav_fragment)
+//                Constants.FRAG_HISTORY -> ContextCompat.getColor(requireContext(), R.color.nav_bar_history_frag)
+//                Constants.FRAG_REC -> ContextCompat.getColor(requireContext(), R.color.nav_bar_rec_frag)
+//                else -> ContextCompat.getColor(requireContext(), R.color.nav_bar_settings_frag)
+//            }
+//
+//            (activity as MainActivity).apply {
+//                window.navigationBarColor = color
+//                window.statusBarColor = color
+//            }
+//        }
+//    }
 
 
 

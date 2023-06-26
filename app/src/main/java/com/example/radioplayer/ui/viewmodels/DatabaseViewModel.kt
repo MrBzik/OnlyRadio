@@ -16,10 +16,12 @@ import com.example.radioplayer.exoPlayer.RadioServiceConnection
 import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.utils.Constants
+import com.example.radioplayer.utils.Constants.COMMAND_CLEAR_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants.COMMAND_ON_DROP_STATION_IN_PLAYLIST
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_HISTORY_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants.IS_TO_CLEAR_HISTORY_ITEMS
+import com.example.radioplayer.utils.Constants.LAZY_LIST_NAME
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
@@ -30,16 +32,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.cache
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import java.sql.Date
 import java.util.*
@@ -101,7 +96,11 @@ class DatabaseViewModel @Inject constructor(
     fun checkAndInsertStationPlaylistCrossRef(stationID: String, playlistName: String,
                     resultHandler : (Boolean) -> Unit)
         = viewModelScope.launch {
+        handleCheckAndInsertStationInPlaylist(stationID, playlistName, resultHandler)
+    }
 
+    private suspend fun handleCheckAndInsertStationInPlaylist(
+        stationID: String, playlistName: String, resultHandler : (Boolean) -> Unit){
         val check = repository.checkIfAlreadyInPlaylist(stationID, playlistName)
 
         resultHandler(check)
@@ -109,12 +108,13 @@ class DatabaseViewModel @Inject constructor(
         if(!check){
             repository.insertStationPlaylistCrossRef(
                 StationPlaylistCrossRef(
-                stationID, playlistName, System.currentTimeMillis()
+                    stationID, playlistName, System.currentTimeMillis()
                 )
             )
             repository.incrementInPlaylistsCount(stationID)
         }
     }
+
 
     fun addMediaItemOnDropToPlaylist(){
         radioServiceConnection.sendCommand(COMMAND_ON_DROP_STATION_IN_PLAYLIST, null)
@@ -164,7 +164,6 @@ class DatabaseViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     var stationsInPlaylistFlow = currentPlaylistName.asFlow().flatMapLatest { playlistName ->
         repository.getStationsInPlaylistFlow(playlistName).map {
-            Log.d("CHECKTAGS", "mapping unflitered playlist stations")
             it?.let {
                 sortStationsInPlaylist(it.radioStations, playlistName)
             } ?: emptyList()
@@ -197,7 +196,8 @@ class DatabaseViewModel @Inject constructor(
 
 //    var isLazyPlaylistSourceSet = false
 
-    val favFragStationsSwitch : MutableLiveData<Int> = MutableLiveData(SEARCH_FROM_FAVOURITES)
+    val favFragStationsSwitch = MutableLiveData(SEARCH_FROM_FAVOURITES)
+
 
 
     var isToGenerateLazyList = true
@@ -218,8 +218,13 @@ class DatabaseViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val favFragStationsFlow = favFragStationsSwitch.asFlow().flatMapLatest {
+        Log.d("CHECKTAGS", "switch is activated?")
+
         when (it) {
-            SEARCH_FROM_FAVOURITES -> getAllFavStationsFlow
+            SEARCH_FROM_FAVOURITES -> {
+                Log.d("CHECKTAGS", "getting all fav stations flow already?")
+                getAllFavStationsFlow
+            }
             SEARCH_FROM_PLAYLIST -> stationsInPlaylistFlow
             else -> lazyListFlow
         }
@@ -282,7 +287,7 @@ class DatabaseViewModel @Inject constructor(
 
 //        isInLazyPlaylist = true
 //        isInFavouriteTab.postValue(false)
-        currentPlaylistName.postValue("Lazy list")
+        currentPlaylistName.postValue(LAZY_LIST_NAME)
 
 //        if(isLazyPlaylistSourceSet){
 //            observableListOfStations.value = stationsInLazyPlaylist.value
@@ -295,6 +300,35 @@ class DatabaseViewModel @Inject constructor(
 //        }
     }
 
+
+    fun exportStationFromLazyList(playlistName : String) =
+        viewModelScope.launch{
+
+        for(i in RadioSource.lazyListStations.indices){
+            handleCheckAndInsertStationInPlaylist(
+                stationID = RadioSource.lazyListStations[i].stationuuid,
+                playlistName = playlistName
+            ) {}
+        }
+
+            if(RadioService.currentMediaItems == SEARCH_FROM_LAZY_LIST ||
+                    RadioService.currentMediaItems == SEARCH_FROM_PLAYLIST &&
+                    playlistName == RadioService.currentPlaylistName){
+                radioServiceConnection.sendCommand(COMMAND_CLEAR_MEDIA_ITEMS, null)
+            }
+
+            RadioSource.clearLazyList()
+            isToGenerateLazyList = true
+            favFragStationsSwitch.postValue(SEARCH_FROM_LAZY_LIST)
+
+    }
+
+
+    fun clearRadioStationPlayedDuration(stationID: String) = viewModelScope.launch{
+        repository.clearRadioStationPlayedDuration(
+            stationID
+        )
+    }
 
 
     fun deletePlaylistAndContent(playlistName: String) =

@@ -33,7 +33,8 @@ class AddStationToPlaylistDialog(
     private val listOfPlaylists : List<Playlist>,
     private val databaseViewModel: DatabaseViewModel,
     private val pixabayViewModel: PixabayViewModel,
-    private  val glide : RequestManager,
+    private val glide : RequestManager,
+    private val title : String,
     private val insertStationInPlaylist : (String) -> Unit
     ) : BaseDialog<DialogAddStationToPlaylistBinding>(requireContext,
         DialogAddStationToPlaylistBinding::inflate
@@ -49,6 +50,7 @@ class AddStationToPlaylistDialog(
 
         adjustDialogHeight(bind.clAddStationToPlaylistDialog)
 
+        bind.tvTitle.text = title
 
         if(listOfPlaylists.isEmpty()){
             bind.tvMessageNoPlaylists.isVisible = true

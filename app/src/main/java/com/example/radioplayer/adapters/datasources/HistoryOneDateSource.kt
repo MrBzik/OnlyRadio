@@ -33,6 +33,6 @@ class HistoryOneDateSource(
 
 
     override fun getRefreshKey(state: PagingState<Int, StationWithDateModel>): Int? {
-        return null
+        return 0
     }
 }

@@ -14,6 +14,8 @@
     <string name="text_placeholder_alpha">0.6</string>
     <string name="foreground_pref">Kill service on app close</string>
     <string name="recordings_frag_tip">New recording can be started in Details. Stop recording in Details or notification</string>
-    <string name="fav_frag_hint">Add new stations in Details. Drag and drop to move stations between playlists. Also use "Export" option of Lazy playlist</string>
+    <string name="fav_frag_hint">Add new stations in Details. Drag and drop to move stations into playlists. Also use "Export" option of Lazy playlist</string>
+    <string name="playlist__hint">Add new stations in Details. Drag and drop to move stations between playlists. Also use "Export" option of Lazy playlist</string>
+    <string name="lazy_list_hint">Recently most listened stations can be found here, excluding already favoured ones or added to playlists</string>
 
 </resources>

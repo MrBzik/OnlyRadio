@@ -48,7 +48,7 @@ class RadioSource @Inject constructor(
     var stationsFromApi = mutableListOf<RadioStationsItem>()
 //    var stationsFromApiMetadata = mutableListOf<MediaMetadataCompat>()
     var stationsFromApiMediaItems = mutableListOf<MediaItem>()
-    var isStationsFromApiUpdated = false
+//    var isStationsFromApiUpdated = false
 
     // Favoured tab
 
@@ -57,7 +57,7 @@ class RadioSource @Inject constructor(
     var stationsFavoured = mutableListOf<RadioStation>()
     var stationsFavouredMetadata = mutableListOf<MediaMetadataCompat>()
     var stationsFavouredMediaItems = mutableListOf<MediaItem>()
-    var isStationsFavouredUpdated = false
+//    var isStationsFavouredUpdated = false
 
 
 
@@ -67,7 +67,7 @@ class RadioSource @Inject constructor(
 
         var stationsInPlaylist = mutableListOf<RadioStation>()
         var stationsInPlaylistMediaItems = mutableListOf<MediaItem>()
-        var isStationsInPlaylistUpdated = false
+//        var isStationsInPlaylistUpdated = false
 
 
         fun updatePlaylistStations(list : List<RadioStation>){
@@ -75,7 +75,7 @@ class RadioSource @Inject constructor(
            stationsInPlaylistMediaItems = list.map {
                MediaItem.fromUri(it.url!!)
            }.toMutableList()
-            isStationsInPlaylistUpdated = true
+//            isStationsInPlaylistUpdated = true
         }
 
 
@@ -83,7 +83,7 @@ class RadioSource @Inject constructor(
         var stationsFromHistoryOneDate = listOf<RadioStation>()
         var stationsFromHistoryOneDateMetadata = listOf<MediaMetadataCompat>()
         var stationsFromHistoryOneDateMediaItems = listOf<MediaItem>()
-        var isStationsFromHistoryOneDateUpdated = false
+//        var isStationsFromHistoryOneDateUpdated = false
 
 
         fun updateHistoryOneDateStations(){
@@ -96,20 +96,20 @@ class RadioSource @Inject constructor(
             stationsFromHistoryOneDateMediaItems = stationInOneDateResponse.map { station ->
                 MediaItem.fromUri(station.url!!)
             }.toMutableList()
-            isStationsFromHistoryOneDateUpdated = true
+//            isStationsFromHistoryOneDateUpdated = true
         }
 
 
         var lazyListStations = mutableListOf<RadioStation>()
         var lazyListMediaItems = mutableListOf<MediaItem>()
-        var isLazyListUpdated = false
+//        var isLazyListUpdated = false
 
         fun initiateLazyList(list : List<RadioStation>){
             lazyListStations = list.toMutableList()
             lazyListMediaItems = lazyListStations.map {station ->
             MediaItem.fromUri(station.url!!)
             }.toMutableList()
-            isLazyListUpdated = true
+//            isLazyListUpdated = true
         }
 
         fun removeItemFromLazyList(index : Int){
@@ -125,6 +125,11 @@ class RadioSource @Inject constructor(
                 lazyListMediaItems.add(index, mediaItem)
 
             }
+        }
+
+        fun clearLazyList(){
+            lazyListStations = mutableListOf()
+            lazyListMediaItems = mutableListOf()
         }
     }
 
@@ -143,7 +148,7 @@ class RadioSource @Inject constructor(
 
 
 
-    var isStationsFromHistoryUpdated = false
+//    var isStationsFromHistoryUpdated = false
 
 
     // Recordings
@@ -228,7 +233,7 @@ class RadioSource @Inject constructor(
 
         }
 
-        isStationsFromHistoryUpdated = true
+//        isStationsFromHistoryUpdated = true
 
         return response
     }
@@ -252,7 +257,7 @@ class RadioSource @Inject constructor(
         }.toMutableList()
 
 
-        isStationsFavouredUpdated = true
+//        isStationsFavouredUpdated = true
 
         if(RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES){
 

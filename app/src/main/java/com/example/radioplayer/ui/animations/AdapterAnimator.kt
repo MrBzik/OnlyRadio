@@ -1,5 +1,6 @@
 package com.example.radioplayer.ui.animations
 
+import android.util.Log
 import android.view.View
 import com.example.radioplayer.R
 
@@ -13,6 +14,7 @@ class AdapterAnimator {
     fun animateAppearance(view : View){
 
         if(isToAnimate){
+
             view.slideAnim(350, (count * 35).toLong() + DELAY, R.anim.fall_down)
             count ++
         } else {

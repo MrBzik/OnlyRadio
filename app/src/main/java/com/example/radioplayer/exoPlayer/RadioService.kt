@@ -129,6 +129,11 @@ private const val RECORDING_CHANNELS_COUNT = "rec. channels count"
 
 private const val PLAY_DURATION_MILLS_CHECK = 604800000
 
+
+private const val DURATION_UPDATE_PREF = "duration update recovery shared pref"
+private const val LAST_PLAYED_STATION_ID = "last played station Id"
+private const val LAST_PLAYED_STATION_DURATION = "last played station duration"
+
 @AndroidEntryPoint
 class RadioService : MediaBrowserServiceCompat() {
 
@@ -173,6 +178,11 @@ class RadioService : MediaBrowserServiceCompat() {
         this@RadioService.getSharedPreferences(HISTORY_PREF, Context.MODE_PRIVATE)
     }
 
+    private val durationPref by lazy {
+        this@RadioService.getSharedPreferences(DURATION_UPDATE_PREF, Context.MODE_PRIVATE)
+    }
+
+
     var isForegroundService = false
 
 
@@ -211,7 +221,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
     var stationsFromRecordings = mutableListOf<Recording>()
     var stationsFromRecordingsMediaItems = mutableListOf<MediaItem>()
-    var isStationsFromRecordingUpdated = true
+//    var isStationsFromRecordingUpdated = true
 
     private val observerForRecordings = Observer<List<Recording>>{
 
@@ -221,7 +231,7 @@ class RadioService : MediaBrowserServiceCompat() {
             stationsFromRecordingsMediaItems = it.map { rec ->
                 MediaItem.fromUri("$fileDir/${rec.id}")
             }.toMutableList()
-            isStationsFromRecordingUpdated = true
+//            isStationsFromRecordingUpdated = true
         }
 
 
@@ -599,7 +609,6 @@ class RadioService : MediaBrowserServiceCompat() {
                 COMMAND_ON_DROP_STATION_IN_PLAYLIST -> {
 
 
-
                     val radioStation =  FavStationsFragment.dragAndDropStation
 
                     radioStation?.let { station ->
@@ -641,7 +650,7 @@ class RadioService : MediaBrowserServiceCompat() {
                             )
                         }
                     }
-                    radioSource.isStationsFromHistoryUpdated = false
+//                    radioSource.isStationsFromHistoryUpdated = false
                 }
 
 //                COMMAND_CHANGE_MEDIA_ITEMS -> {
@@ -686,7 +695,7 @@ class RadioService : MediaBrowserServiceCompat() {
                         )
                     }
 
-                    RadioSource.isStationsFromHistoryOneDateUpdated = false
+//                    RadioSource.isStationsFromHistoryOneDateUpdated = false
                 }
 
             }
@@ -1549,7 +1558,8 @@ class RadioService : MediaBrowserServiceCompat() {
         serviceScope.launch {
             delay(200)
 
-           updateMediaItems(isToChangeMediaItems, currentMediaItems, isSameStation, itemIndex)
+            if(isToChangeMediaItems)
+                updateMediaItems( currentMediaItems, isSameStation, itemIndex)
 
             if(!isSameStation){
                 if(itemIndex != -1){
@@ -1568,64 +1578,51 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
     private fun updateMediaItems(
-        isToChangeMediaItems: Boolean,
         flag: Int,
         isSameStation: Boolean,
         itemIndex : Int
     ){
 
-
-        when(flag){
+       val listOfMediaItems = when(flag){
 
             SEARCH_FROM_API -> {
-                if(isToChangeMediaItems || radioSource.isStationsFromApiUpdated){
-//                    radioSource.isStationsFromApiUpdated = false
-                    handleMediaItemsUpdate(radioSource.stationsFromApiMediaItems, isSameStation, itemIndex)
-                }
+                radioSource.stationsFromApiMediaItems
             }
 
             SEARCH_FROM_FAVOURITES -> {
-                if(isToChangeMediaItems|| radioSource.isStationsFavouredUpdated){
-                    radioSource.isStationsFavouredUpdated = false
-                    handleMediaItemsUpdate(radioSource.stationsFavouredMediaItems, isSameStation, itemIndex)
-                }
+
+                radioSource.stationsFavouredMediaItems
+
             }
 
             SEARCH_FROM_PLAYLIST -> {
-                if(isToChangeMediaItems || RadioSource.isStationsInPlaylistUpdated){
-                    RadioSource.isStationsInPlaylistUpdated = false
-                    handleMediaItemsUpdate(RadioSource.stationsInPlaylistMediaItems, isSameStation, itemIndex)
-                }
+
+                RadioSource.stationsInPlaylistMediaItems
+
             }
 
             SEARCH_FROM_HISTORY -> {
-                if(isToChangeMediaItems || radioSource.isStationsFromHistoryUpdated){
-                    radioSource.isStationsFromHistoryUpdated = false
-                    handleMediaItemsUpdate(radioSource.stationsFromHistoryMediaItems, isSameStation, itemIndex)
-                }
-            }
 
+                radioSource.stationsFromHistoryMediaItems
+
+            }
             SEARCH_FROM_HISTORY_ONE_DATE -> {
-                if(isToChangeMediaItems || RadioSource.isStationsFromHistoryOneDateUpdated){
-                    RadioSource.isStationsFromHistoryOneDateUpdated = false
-                    handleMediaItemsUpdate(RadioSource.stationsFromHistoryOneDateMediaItems, isSameStation, itemIndex)
-                }
-            }
 
+                RadioSource.stationsFromHistoryOneDateMediaItems
+
+            }
             SEARCH_FROM_LAZY_LIST -> {
-                if(isToChangeMediaItems || RadioSource.isLazyListUpdated){
-                    RadioSource.isLazyListUpdated = false
-                    handleMediaItemsUpdate(RadioSource.lazyListMediaItems, isSameStation, itemIndex)
-                }
-            }
+                RadioSource.lazyListMediaItems
 
-            SEARCH_FROM_RECORDINGS -> {
-                if(isToChangeMediaItems || isStationsFromRecordingUpdated){
-                    isStationsFromRecordingUpdated = false
-                    handleMediaItemsUpdate(stationsFromRecordingsMediaItems, isSameStation, itemIndex)
-                }
             }
+            SEARCH_FROM_RECORDINGS -> {
+                stationsFromRecordingsMediaItems
+            }
+           else -> emptyList()
         }
+
+        handleMediaItemsUpdate(listOfMediaItems, isSameStation, itemIndex)
+
     }
 
 
@@ -1637,6 +1634,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
             if(index == 0){
+                if(items.size != 1)
                 exoPlayer.addMediaItems(items.subList(1, items.lastIndex))
             } else {
 
@@ -1689,12 +1687,12 @@ class RadioService : MediaBrowserServiceCompat() {
 
         if(isToKillServiceOnAppClose){
 
+            savePlayDurationOnServiceKill()
+
             exoPlayer.stop()
         }
 
         if(!exoPlayer.isPlaying){
-
-            Log.d("CHECKTAGS", "not playing")
 
 //            NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
 
@@ -1782,7 +1780,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
     fun updateStationLastClicked(stationId : String) = serviceScope.launch(Dispatchers.IO){
-        RadioService.isToUpdateLiveData = false
+        isToUpdateLiveData = false
         databaseRepository.updateRadioStationLastClicked(stationId)
     }
 
@@ -1812,14 +1810,34 @@ class RadioService : MediaBrowserServiceCompat() {
     private suspend fun durationUpdateHelper(){
         val duration = System.currentTimeMillis() - stationStartPlayingTime
         if(duration > 20000 && previousPlayedStationId.isNotBlank()){
-            Log.d("CHECKTAGS", "duration endin for id : $previousPlayedStationId")
-            Log.d("CHECKTAGS", "updating duration : $duration")
             databaseRepository.updateRadioStationPlayedDuration(
                 previousPlayedStationId, duration
             )
         }
     }
 
+    private fun savePlayDurationOnServiceKill(){
+        if(isPlaybackStatePlaying){
+            val duration = System.currentTimeMillis() - stationStartPlayingTime
+            if(duration > 20000 && previousPlayedStationId.isNotBlank()){
+                durationPref.edit().apply {
+                    putString(LAST_PLAYED_STATION_ID, previousPlayedStationId)
+                    putLong(LAST_PLAYED_STATION_DURATION, duration)
+                }.commit()
+            }
+        }
+    }
+
+    private suspend fun recoverAndUpdateLastPlayDuration(){
+       val lastStationId = durationPref.getString(LAST_PLAYED_STATION_ID, "") ?: ""
+       if(lastStationId.isNotBlank()){
+           val duration = durationPref.getLong(LAST_PLAYED_STATION_DURATION, 0)
+           databaseRepository.updateRadioStationPlayedDuration(
+               lastStationId, duration
+           )
+           durationPref.edit().putString(LAST_PLAYED_STATION_ID, "").apply()
+       }
+    }
 
     fun insertRadioStation(station : RadioStation) = serviceScope.launch(Dispatchers.IO){
 
@@ -1852,6 +1870,8 @@ class RadioService : MediaBrowserServiceCompat() {
             currentDateLong = newTime
             isLastDateUpToDate = false
         }
+
+        recoverAndUpdateLastPlayDuration()
 
         compareDatesWithPrefAndCLeanIfNeeded()
     }

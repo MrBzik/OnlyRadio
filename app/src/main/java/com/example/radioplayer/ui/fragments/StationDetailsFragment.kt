@@ -117,32 +117,14 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         getCurrentPlaylistItems()
 
-        setSystemBarsColor()
+
 
     }
 
 
 
 
-    private fun setSystemBarsColor(){
 
-        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
-
-            val color = when(mainViewModel.currentFragment){
-
-                FRAG_SEARCH -> ContextCompat.getColor(requireContext(), R.color.nav_bar_search_fragment)
-                FRAG_FAV -> ContextCompat.getColor(requireContext(), R.color.nav_bar_fav_fragment)
-                FRAG_HISTORY -> ContextCompat.getColor(requireContext(), R.color.nav_bar_history_frag)
-                FRAG_REC -> ContextCompat.getColor(requireContext(), R.color.nav_bar_rec_frag)
-                else -> ContextCompat.getColor(requireContext(), R.color.nav_bar_settings_frag)
-            }
-
-            (activity as MainActivity).apply {
-                window.navigationBarColor = color
-                window.statusBarColor = color
-            }
-        }
-    }
 
 
     private fun getCurrentPlaylistItems(){
@@ -663,7 +645,8 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     private fun addToPlaylistLogic(){
 
         AddStationToPlaylistDialog(
-            requireContext(), listOfPlaylists, databaseViewModel, pixabayViewModel, glide
+            requireContext(), listOfPlaylists, databaseViewModel, pixabayViewModel, glide,
+            "Add station to an existing playlist or a new one"
         ) { playlistName ->
             insertStationInPlaylist(playlistName)
         }.show()
