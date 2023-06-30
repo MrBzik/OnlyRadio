@@ -14,7 +14,10 @@ import com.example.radioplayer.R
 import com.example.radioplayer.adapters.BaseAdapter
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
+import com.example.radioplayer.ui.viewmodels.HistoryViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.ui.viewmodels.RecordingsViewModel
+import com.example.radioplayer.ui.viewmodels.SettingsViewModel
 import com.example.radioplayer.utils.Constants
 
 abstract class BaseFragment<VB: ViewBinding>(
@@ -34,6 +37,19 @@ abstract class BaseFragment<VB: ViewBinding>(
     val mainViewModel: MainViewModel by lazy {
         (activity as MainActivity).mainViewModel
     }
+
+    val historyViewModel : HistoryViewModel by lazy {
+        (activity as MainActivity).historyViewModel
+    }
+
+    val recordingsViewModel : RecordingsViewModel by lazy {
+        (activity as MainActivity).recordingsViewModel
+    }
+
+    val settingsViewModel : SettingsViewModel by lazy {
+        (activity as MainActivity).settingsViewModel
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,7 +79,7 @@ abstract class BaseFragment<VB: ViewBinding>(
             defaultSecondaryTextColor = ContextCompat.getColor(requireContext(), R.color.default_secondary_text_color)
             selectedSecondaryTextColor = ContextCompat.getColor(requireContext(), R.color.selected_secondary_text_color)
             alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
-            titleSize = mainViewModel.stationsTitleSize
+            titleSize = settingsViewModel.stationsTitleSize
 
         }
     }

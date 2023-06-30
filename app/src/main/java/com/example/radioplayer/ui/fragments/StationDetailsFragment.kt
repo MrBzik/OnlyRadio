@@ -177,7 +177,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             SEARCH_FROM_HISTORY_ONE_DATE -> {
 
               val calendar = Calendar.getInstance()
-              calendar.time = Date(databaseViewModel.selectedDate)
+              calendar.time = Date(historyViewModel.selectedDate)
 
                 listName = Utils.fromDateToStringShort(calendar)
 
@@ -402,7 +402,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             val name = currentRadioStation?.name ?: ""
             val iconUri = currentRadioStation?.favicon ?: ""
 
-         databaseViewModel.upsertBookmarkedTitle(
+         historyViewModel.upsertBookmarkedTitle(
              Title(
                  System.currentTimeMillis(),
                  RadioService.currentDateLong,
@@ -462,7 +462,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     private fun observeExoRecordState(){
 
-        mainViewModel.exoRecordState.observe(viewLifecycleOwner){
+        recordingsViewModel.exoRecordState.observe(viewLifecycleOwner){
 
             if(it){
                  isRecording = true
@@ -470,7 +470,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                  bind.tvTimer.visibility = View.VISIBLE
 
                  if(!isTimerObserverSet){
-                     mainViewModel.exoRecordTimer.observe(viewLifecycleOwner){ time ->
+                     recordingsViewModel.exoRecordTimer.observe(viewLifecycleOwner){ time ->
                          bind.tvTimer.text = time as String
                      }
                      isTimerObserverSet = true
@@ -486,7 +486,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                 bind.fabRecording.setImageResource(R.drawable.ic_start_recording)
 
                 if(!isConverterCallbackSet){
-                    mainViewModel.exoRecordFinishConverting.observe(viewLifecycleOwner){ finished ->
+                    recordingsViewModel.exoRecordFinishConverting.observe(viewLifecycleOwner){ finished ->
 
                         if(finished){
 
@@ -504,9 +504,9 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     private fun setFabRecordListener(){
         bind.fabRecording.setOnClickListener{
             if(isRecording){
-                mainViewModel.stopRecording()
+                recordingsViewModel.stopRecording()
             } else {
-                mainViewModel.startRecording()
+                recordingsViewModel.startRecording()
             }
         }
     }
@@ -717,7 +717,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     private fun callFavPlaylistUpdateIfNeeded(){
         if(RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES)
-            mainViewModel.updateFavPlaylist()
+            databaseViewModel.updateFavPlaylist()
     }
 
 
@@ -737,7 +737,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         isPagerTransAnimSet = false
         if(RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES && !isFavoured){
             RadioService.currentMediaItems = NO_PLAYLIST
-            mainViewModel.clearMediaItems()
+            databaseViewModel.clearMediaItems()
         }
 
     }

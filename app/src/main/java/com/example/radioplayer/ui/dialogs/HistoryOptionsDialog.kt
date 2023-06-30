@@ -11,6 +11,7 @@ import com.example.radioplayer.databinding.DialogHistoryOptionsBinding
 import com.example.radioplayer.exoPlayer.RadioService
 
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
+import com.example.radioplayer.ui.viewmodels.HistoryViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.utils.Constants
 
@@ -20,10 +21,9 @@ import com.example.radioplayer.utils.Constants.HISTORY_PREF_DATES
 import com.google.android.material.slider.RangeSlider
 
 class HistoryOptionsDialog (
-    private val requireContext : Context,
+    requireContext : Context,
     private val historyPref : SharedPreferences,
-    private val databaseViewModel: DatabaseViewModel,
-    private val mainViewModel: MainViewModel
+    private val historyViewModel: HistoryViewModel
         ) : BaseDialog<DialogHistoryOptionsBinding> (
             requireContext,
     DialogHistoryOptionsBinding::inflate
@@ -165,7 +165,7 @@ class HistoryOptionsDialog (
                RadioService.historyPrefBookmark = newBookmarkNumber
 
                if(newBookmarkNumber < initialBookmarkNumber){
-                   databaseViewModel.checkAndCleanBookmarkTitles()
+                   historyViewModel.checkAndCleanBookmarkTitles()
                }
 
             }

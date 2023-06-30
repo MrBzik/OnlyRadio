@@ -41,15 +41,17 @@ import com.example.radioplayer.ui.animations.LoadingAnim
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.fragments.*
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
+import com.example.radioplayer.ui.viewmodels.HistoryViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
-import com.example.radioplayer.utils.Constants.FAB_POSITION_X
-import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
+import com.example.radioplayer.ui.viewmodels.RecordingsViewModel
+import com.example.radioplayer.ui.viewmodels.SettingsViewModel
+
 import com.example.radioplayer.utils.Constants.FRAG_FAV
 import com.example.radioplayer.utils.Constants.FRAG_HISTORY
 import com.example.radioplayer.utils.Constants.FRAG_OPTIONS
 import com.example.radioplayer.utils.Constants.FRAG_REC
 import com.example.radioplayer.utils.Constants.FRAG_SEARCH
-import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
+
 import com.example.radioplayer.utils.Constants.IS_NAME_EXACT
 import com.example.radioplayer.utils.Constants.IS_SEARCH_FILTER_LANGUAGE
 import com.example.radioplayer.utils.Constants.IS_TAG_EXACT
@@ -73,8 +75,11 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    val mainViewModel : MainViewModel by viewModels()
+    val mainViewModel: MainViewModel by viewModels()
     val databaseViewModel : DatabaseViewModel by viewModels()
+    val historyViewModel : HistoryViewModel by viewModels()
+    val recordingsViewModel : RecordingsViewModel by viewModels()
+    val settingsViewModel : SettingsViewModel by viewModels()
 
     lateinit var bind : ActivityMainBinding
     lateinit var bindPlayer : StubPlayerActivityMainBinding
@@ -742,7 +747,7 @@ class MainActivity : AppCompatActivity() {
 
             if(RadioService.isFromRecording){
 
-                currentPlayingRecording?.let { mainViewModel.playOrToggleRecording(rec = it) }
+                currentPlayingRecording?.let { recordingsViewModel.playOrToggleRecording(rec = it) }
 
             } else {
 
@@ -826,16 +831,16 @@ class MainActivity : AppCompatActivity() {
 
         }.apply()
 
-        mainViewModel.textSizePref.edit()
-            .putFloat(TEXT_SIZE_STATION_TITLE_PREF, mainViewModel.stationsTitleSize).apply()
+        settingsViewModel.textSizePref.edit()
+            .putFloat(TEXT_SIZE_STATION_TITLE_PREF, settingsViewModel.stationsTitleSize).apply()
 
-        if(mainViewModel.isFabUpdated){
-            mainViewModel.fabPref.edit().apply {
-                putFloat(FAB_POSITION_X, mainViewModel.fabX)
-                putFloat(FAB_POSITION_Y, mainViewModel.fabY)
-                putBoolean(IS_FAB_UPDATED, true)
-            }.apply()
-        }
+//        if(mainViewModel.isFabUpdated){
+//            mainViewModel.fabPref.edit().apply {
+//                putFloat(FAB_POSITION_X, mainViewModel.fabX)
+//                putFloat(FAB_POSITION_Y, mainViewModel.fabY)
+//                putBoolean(IS_FAB_UPDATED, true)
+//            }.apply()
+//        }
 
     }
 

@@ -162,10 +162,10 @@ object Constants {
 
 
     // SearchFragment Floating button positioning
-    const val FAB_POSITION_X = "FAB_POSITION_X"
-    const val FAB_POSITION_Y = "FAB_POSITION_Y"
-    const val IS_FAB_UPDATED = "IS_FAB_UPDATED"
-    const val SEARCH_BTN_PREF = "search button position pref"
+//    const val FAB_POSITION_X = "FAB_POSITION_X"
+//    const val FAB_POSITION_Y = "FAB_POSITION_Y"
+//    const val IS_FAB_UPDATED = "IS_FAB_UPDATED"
+//    const val SEARCH_BTN_PREF = "search button position pref"
 
 
 

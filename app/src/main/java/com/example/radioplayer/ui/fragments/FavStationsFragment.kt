@@ -343,7 +343,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 if(currentTab == SEARCH_FROM_FAVOURITES){
                     if(RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES){
 
-                        mainViewModel.removeMediaItem(dragAndDropItemPos)
+                        databaseViewModel.removeMediaItem(dragAndDropItemPos)
                     }
                     databaseViewModel.updateIsFavouredState(0, stationID)
 
@@ -354,7 +354,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
                         if(currentPlaylistName == RadioService.currentPlaylistName &&
                             RadioService.currentMediaItems == SEARCH_FROM_PLAYLIST){
-                            mainViewModel.removeMediaItem(dragAndDropItemPos)
+                            databaseViewModel.removeMediaItem(dragAndDropItemPos)
                         }
                         databaseViewModel.deleteStationPlaylistCrossRef(
                             stationID, currentPlaylistName)
@@ -365,7 +365,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                     // LAZY PLAYLIST
                 else {
                     if(RadioService.currentMediaItems == SEARCH_FROM_LAZY_LIST){
-                        mainViewModel.removeMediaItem(dragAndDropItemPos)
+                        databaseViewModel.removeMediaItem(dragAndDropItemPos)
                     }
 
                     RadioSource.removeItemFromLazyList(dragAndDropItemPos)
@@ -705,7 +705,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     private fun handleSwipeOnFavStation(stationID : String, favouredAt : Long, pos : Int){
 
         if(RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES){
-           mainViewModel.removeMediaItem(pos)
+            databaseViewModel.removeMediaItem(pos)
         }
 
         databaseViewModel.updateIsFavouredState(0, stationID).also{
@@ -718,7 +718,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                     databaseViewModel.updateIsFavouredState(favouredAt, stationID)
 
                     if(RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES){
-                       mainViewModel.restoreMediaItem(pos)
+                        databaseViewModel.restoreMediaItem(pos)
                     }
                 }
             }.show()
@@ -730,7 +730,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         if(RadioService.currentMediaItems == SEARCH_FROM_PLAYLIST
             && currentPlaylistName == RadioService.currentPlaylistName){
-            mainViewModel.removeMediaItem(pos)
+            databaseViewModel.removeMediaItem(pos)
         }
 
         val playlistName = currentPlaylistName
@@ -746,7 +746,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
                         if(RadioService.currentMediaItems == SEARCH_FROM_PLAYLIST
                             && currentPlaylistName == RadioService.currentPlaylistName){
-                            mainViewModel.restoreMediaItem(pos)
+                            databaseViewModel.restoreMediaItem(pos)
                         }
                         databaseViewModel.insertStationPlaylistCrossRef(
                             StationPlaylistCrossRef(
@@ -762,7 +762,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     private fun handleSwipeOnLazyList(stationID : String, pos : Int){
 
         if(RadioService.currentMediaItems == SEARCH_FROM_LAZY_LIST){
-            mainViewModel.removeMediaItem(pos)
+            databaseViewModel.removeMediaItem(pos)
         }
 
         RadioSource.removeItemFromLazyList(pos)
@@ -785,7 +785,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 }
 
                 if(RadioService.currentMediaItems == SEARCH_FROM_LAZY_LIST){
-                    mainViewModel.restoreMediaItem(pos)
+                    databaseViewModel.restoreMediaItem(pos)
                 }
             }
 

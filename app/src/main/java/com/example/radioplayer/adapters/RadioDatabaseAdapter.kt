@@ -89,8 +89,6 @@ class RadioDatabaseAdapter @Inject constructor(
         } else
             utils.restoreState(holder.bind)
 
-        if(position == 0) animator.resetAnimator()
-
         animator.animateAppearance(holder.itemView)
 
     }

@@ -101,7 +101,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
             if(RadioService.playbackSpeedRec > 10){
                 RadioService.playbackSpeedRec -= 10
-                mainViewModel.updateRecPlaybackSpeed()
+                recordingsViewModel.updateRecPlaybackSpeed()
                 updatePlaybackSpeedDisplayValue()
             }
 
@@ -110,7 +110,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
         bind.fabSpeedPlus.setOnClickListener {
             if(RadioService.playbackSpeedRec < 400){
                 RadioService.playbackSpeedRec += 10
-                mainViewModel.updateRecPlaybackSpeed()
+                recordingsViewModel.updateRecPlaybackSpeed()
                 updatePlaybackSpeedDisplayValue()
             }
         }
@@ -138,7 +138,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
                 )
 
 
-                databaseViewModel.renameRecording(recording.id, newName)
+                recordingsViewModel.renameRecording(recording.id, newName)
 
 
             }.show()
@@ -274,7 +274,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 seekBar?.let {
-                    mainViewModel.seekTo(it.progress.toLong())
+                    recordingsViewModel.seekTo(it.progress.toLong())
                     RadioService.recordingPlaybackPosition.postValue(it.progress.toLong())
                     isSeekBarToUpdate = true
                 }
@@ -284,7 +284,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
     private fun observeRecordingDuration(){
 
-        mainViewModel.currentRecordingDuration.observe(viewLifecycleOwner){
+        recordingsViewModel.currentRecordingDuration.observe(viewLifecycleOwner){
             bind.seekBar.max = it.toInt()
         }
 
@@ -293,7 +293,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
 
     private fun observePlayerPosition(){
-        mainViewModel.currentPlayerPosition.observe(viewLifecycleOwner){
+        recordingsViewModel.currentPlayerPosition.observe(viewLifecycleOwner){
             if(isSeekBarToUpdate){
                 bind.seekBar.progress = it.toInt()
                 setTvRecordingPlayingTime(it)

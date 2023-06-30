@@ -189,9 +189,9 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     private fun setSearchButton(){
 
         if(!mainViewModel.isFullAutoSearch){
-            setDragListenerForLayout()
-            setDragListenerForButton()
-            getFabSearchPositionIfNeeded()
+//            setDragListenerForLayout()
+//            setDragListenerForButton()
+//            getFabSearchPositionIfNeeded()
             listenSearchButton()
         }
     }
@@ -451,47 +451,47 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
 
 
-    private fun getFabSearchPositionIfNeeded(){
-        bind.fabInitiateSearch.doOnLayout {
-            if (mainViewModel.isFabMoved || mainViewModel.isFabUpdated) {
-                bind.fabInitiateSearch.x = mainViewModel.fabX
-                bind.fabInitiateSearch.y = mainViewModel.fabY
-            }
-            bind.fabInitiateSearch.isVisible = true
-        }
-    }
+//    private fun getFabSearchPositionIfNeeded(){
+//        bind.fabInitiateSearch.doOnLayout {
+//            if (mainViewModel.isFabMoved || mainViewModel.isFabUpdated) {
+//                bind.fabInitiateSearch.x = mainViewModel.fabX
+//                bind.fabInitiateSearch.y = mainViewModel.fabY
+//            }
+//            bind.fabInitiateSearch.isVisible = true
+//        }
+//    }
 
-    private fun setDragListenerForLayout(){
-            var tempX = 0f
-            var tempY = 0f
+//    private fun setDragListenerForLayout(){
+//            var tempX = 0f
+//            var tempY = 0f
+//
+//        bind.root.setOnDragListener { v, event ->
+//            when(event.action){
+//                DragEvent.ACTION_DRAG_LOCATION -> {
+//                   tempX = event.x
+//                   tempY = event.y
+//                }
+//                DragEvent.ACTION_DRAG_ENDED ->{
+//
+//                    bind.fabInitiateSearch.x = tempX - bind.fabInitiateSearch.width/2
+//                    bind.fabInitiateSearch.y = tempY - bind.fabInitiateSearch.height/2
+//
+//                    mainViewModel.fabX = bind.fabInitiateSearch.x
+//                    mainViewModel.fabY = bind.fabInitiateSearch.y
+//                    mainViewModel.isFabUpdated = true
+//                }
+//            }
+//            true
+//        }
+//    }
 
-        bind.root.setOnDragListener { v, event ->
-            when(event.action){
-                DragEvent.ACTION_DRAG_LOCATION -> {
-                   tempX = event.x
-                   tempY = event.y
-                }
-                DragEvent.ACTION_DRAG_ENDED ->{
-
-                    bind.fabInitiateSearch.x = tempX - bind.fabInitiateSearch.width/2
-                    bind.fabInitiateSearch.y = tempY - bind.fabInitiateSearch.height/2
-
-                    mainViewModel.fabX = bind.fabInitiateSearch.x
-                    mainViewModel.fabY = bind.fabInitiateSearch.y
-                    mainViewModel.isFabUpdated = true
-                }
-            }
-            true
-        }
-    }
-
-    private fun setDragListenerForButton(){
-        bind.fabInitiateSearch.setOnLongClickListener { view ->
-            val shadow = View.DragShadowBuilder(bind.fabInitiateSearch)
-            view.startDragAndDrop(null, shadow, view, 0)
-            true
-        }
-    }
+//    private fun setDragListenerForButton(){
+//        bind.fabInitiateSearch.setOnLongClickListener { view ->
+//            val shadow = View.DragShadowBuilder(bind.fabInitiateSearch)
+//            view.startDragAndDrop(null, shadow, view, 0)
+//            true
+//        }
+//    }
 
 
     private fun setAdapterOnClickListener(){
@@ -750,6 +750,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     }
 
     private fun listenSearchButton(){
+
+        bind.fabInitiateSearch.visibility = View.VISIBLE
 
         bind.fabInitiateSearch.setOnClickListener {
 

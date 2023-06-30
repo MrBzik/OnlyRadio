@@ -14,7 +14,7 @@ class AdapterAnimator {
     fun animateAppearance(view : View){
 
         if(isToAnimate){
-            Log.d("CHECKTAGS", "delay is ${(count * 35).toLong() + DELAY}")
+//            Log.d("CHECKTAGS", "delay is ${(count * 35).toLong() + DELAY}")
             view.slideAnim(350, (count * 35).toLong() + DELAY, R.anim.fall_down)
             count ++
         } else {

@@ -109,7 +109,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
 
     private fun observePlayerPosition(){
-        mainViewModel.currentPlayerPosition.observe(viewLifecycleOwner){
+        recordingsViewModel.currentPlayerPosition.observe(viewLifecycleOwner){
 
             if(isSeekBarToUpdate){
 
@@ -141,7 +141,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
             if(!isItemChanged){
 
-                mainViewModel.currentPlayerPosition.value?.let { position ->
+                recordingsViewModel.currentPlayerPosition.value?.let { position ->
                     seekbar.progress = position.toInt()
                     setTvRecordingPlayingTime(position)
                 }
@@ -170,7 +170,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 seekBar?.let {
-                    mainViewModel.seekTo(it.progress.toLong())
+                    recordingsViewModel.seekTo(it.progress.toLong())
                     RadioService.recordingPlaybackPosition.postValue(it.progress.toLong())
                     isSeekBarToUpdate = true
                 }
@@ -209,7 +209,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
         recordingsAdapter.setOnClickListener { recording, position ->
             animator.cancel()
-            mainViewModel.playOrToggleRecording(
+            recordingsViewModel.playOrToggleRecording(
                 rec = recording,
                 itemIndex = position
             )
@@ -220,7 +220,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
     private fun subscribeToRecordings (){
 
-        databaseViewModel.allRecordingsLiveData.observe(viewLifecycleOwner){
+        recordingsViewModel.allRecordingsLiveData.observe(viewLifecycleOwner){
 
             bind.tvMessage.apply {
                 if(it.isEmpty()){
@@ -235,7 +235,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
             recordingsAdapter.listOfRecordings = it
 
-            databaseViewModel.checkRecordingsForCleanUp(it)
+            recordingsViewModel.checkRecordingsForCleanUp(it)
 
 
         }
@@ -254,7 +254,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
             recordingsAdapter.apply{
                 alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
-                titleSize = mainViewModel.stationsTitleSize
+                titleSize = settingsViewModel.stationsTitleSize
 
                 if(RadioService.currentMediaItems == SEARCH_FROM_RECORDINGS){
                     playingRecordingId = RadioService.currentPlayingRecording.value?.id ?: ""
@@ -332,13 +332,13 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
                 }
 
                 if(RadioService.currentMediaItems == SEARCH_FROM_RECORDINGS){
-                    mainViewModel.removeRecordingMediaItem(position)
+                    recordingsViewModel.removeRecordingMediaItem(position)
                 }
 
 
 
 
-                databaseViewModel.deleteRecording(recording.id)
+                recordingsViewModel.deleteRecording(recording.id)
 
 
                 Snackbar.make(
@@ -354,15 +354,15 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
                             if(event != DISMISS_EVENT_ACTION) {
 
 //                                val filePath = "${requireContext().filesDir}/${recording.id}"
-                                databaseViewModel.removeRecordingFile(recording.id)
+                                recordingsViewModel.removeRecordingFile(recording.id)
                             }
                         }
                     }
                     )
                     setAction("UNDO"){
-                        databaseViewModel.insertNewRecording(recording)
+                        recordingsViewModel.insertNewRecording(recording)
                         if(RadioService.currentMediaItems == SEARCH_FROM_RECORDINGS){
-                            mainViewModel.restoreRecordingMediaItem(position)
+                            recordingsViewModel.restoreRecordingMediaItem(position)
                         }
 
                     }

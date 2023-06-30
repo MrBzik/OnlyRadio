@@ -2,20 +2,16 @@ package com.example.radioplayer.ui.viewmodels
 
 import android.app.Application
 import android.content.Context
-import android.content.SharedPreferences
-import android.os.Bundle
 import android.util.Log
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
-import com.example.radioplayer.RadioApplication
 import com.example.radioplayer.adapters.datasources.RadioStationsDataSource
 import com.example.radioplayer.adapters.datasources.StationsPageLoader
 import com.example.radioplayer.adapters.models.CountryWithRegion
 import com.example.radioplayer.connectivityObserver.ConnectivityObserver
 import com.example.radioplayer.connectivityObserver.NetworkConnectivityObserver
 import com.example.radioplayer.data.local.entities.RadioStation
-import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.data.remote.entities.RadioStations
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.repositories.DatabaseRepository
@@ -26,34 +22,22 @@ import com.example.radioplayer.utils.Constants.COMMAND_ADD_MEDIA_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_BASS_LEVEL
 import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_REVERB_MODE
 import com.example.radioplayer.utils.Constants.COMMAND_CLEAR_MEDIA_ITEMS
-
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
-import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
-import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
-
 import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_RECORDING_MEDIA_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_MEDIA_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_RESTART_PLAYER
 import com.example.radioplayer.utils.Constants.COMMAND_RESTORE_RECORDING_MEDIA_ITEM
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_FAV_PLAYLIST
-import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_HISTORY
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH
 import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
-import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_REC_PLAYBACK_SPEED
-import com.example.radioplayer.utils.Constants.FAB_POSITION_X
-import com.example.radioplayer.utils.Constants.FAB_POSITION_Y
 import com.example.radioplayer.utils.Constants.IS_CHANGE_MEDIA_ITEMS
-import com.example.radioplayer.utils.Constants.IS_FAB_UPDATED
 import com.example.radioplayer.utils.Constants.IS_NAME_EXACT
 import com.example.radioplayer.utils.Constants.IS_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.IS_SAME_STATION
 import com.example.radioplayer.utils.Constants.IS_TAG_EXACT
-import com.example.radioplayer.utils.Constants.ITEM_ID
 import com.example.radioplayer.utils.Constants.ITEM_INDEX
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
 import com.example.radioplayer.utils.Constants.PLAY_WHEN_READY
-import com.example.radioplayer.utils.Constants.SEARCH_BTN_PREF
-
 import com.example.radioplayer.utils.Constants.SEARCH_FLAG
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.Constants.SEARCH_FULL_COUNTRY_NAME
@@ -62,7 +46,6 @@ import com.example.radioplayer.utils.Constants.SEARCH_PREF_FULL_AUTO
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_MAX_BIT
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_MIN_BIT
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
-import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME_AUTO
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_ORDER
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
 import com.example.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
@@ -74,15 +57,13 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     app : Application,
     private val radioServiceConnection: RadioServiceConnection,
-    val radioSource: RadioSource,
-    private val repository: DatabaseRepository
+    val radioSource: RadioSource
 ) : AndroidViewModel(app) {
 
 //       val isConnected = radioServiceConnection.isConnected
@@ -90,33 +71,25 @@ class MainViewModel @Inject constructor(
        val networkError = radioServiceConnection.networkError
        val playbackState = radioServiceConnection.playbackState
 
-       val textSizePref = app.getSharedPreferences(TEXT_SIZE_STATION_TITLE_PREF, Context.MODE_PRIVATE)
-
-       var stationsTitleSize = textSizePref.getFloat(TEXT_SIZE_STATION_TITLE_PREF, 20f)
 
 //       private var listOfStations = listOf<RadioStation>()
-       var isNewSearch = true
+
 
 //       val newPlayingItem : MutableLiveData<PlayingItem> = MutableLiveData()
 
 
-       var isInSettingsExtras = false
-
-
        var isInDetailsFragment = false
        var currentFragment = 0
+       val currentSongTitle = RadioService.currentSongTitle
+       var isInitialLaunchOfTheApp = true
+       val isPlayerBuffering = radioSource.isPlayerBuffering
+
+
 
 
        var noResultDetection : MutableLiveData<Boolean> = MutableLiveData()
+       var isNewSearch = true
 
-       val currentSongTitle = RadioService.currentSongTitle
-
-       var isInitialLaunchOfTheApp = true
-
-       var isSmoothTransitionNeeded = false
-
-
-       val isPlayerBuffering = radioSource.isPlayerBuffering
 
 
 //     fun disconnectMediaBrowser(){
@@ -337,20 +310,20 @@ class MainViewModel @Inject constructor(
            searchBy.postValue(true)
        }
 
-
-       var fabX = 0f
-       var fabY = 0f
-
-       var fabPref: SharedPreferences = app.getSharedPreferences(SEARCH_BTN_PREF, Context.MODE_PRIVATE)
-       var isFabMoved = fabPref.getBoolean(IS_FAB_UPDATED, false)
-
-       var isFabUpdated = false
-       init {
-            if(isFabMoved){
-                fabX = fabPref.getFloat(FAB_POSITION_X, 0f)
-                fabY = fabPref.getFloat(FAB_POSITION_Y, 0f)
-            }
-        }
+// REPOSITION OF SEARCH FAB
+//       var fabX = 0f
+//       var fabY = 0f
+//
+//       var fabPref: SharedPreferences = app.getSharedPreferences(SEARCH_BTN_PREF, Context.MODE_PRIVATE)
+//       var isFabMoved = fabPref.getBoolean(IS_FAB_UPDATED, false)
+//
+//       var isFabUpdated = false
+//       init {
+//            if(isFabMoved){
+//                fabX = fabPref.getFloat(FAB_POSITION_X, 0f)
+//                fabY = fabPref.getFloat(FAB_POSITION_Y, 0f)
+//            }
+//        }
 
 
 
@@ -525,85 +498,8 @@ class MainViewModel @Inject constructor(
             }
     }
 
-        fun changeReverbMode(){
-            radioServiceConnection.sendCommand(COMMAND_CHANGE_REVERB_MODE, null)
-        }
-
-        fun changeVirtualizerLevel(){
-            radioServiceConnection.sendCommand(COMMAND_CHANGE_BASS_LEVEL, null)
-        }
 
 
-        fun restartPlayer(){
-            radioServiceConnection.sendCommand(COMMAND_RESTART_PLAYER, null)
-        }
-
-
-        fun seekTo(position : Long){
-            radioServiceConnection.transportControls.seekTo(position)
-
-        }
-
-        fun removeRecordingMediaItem(index : Int){
-
-            radioServiceConnection.sendCommand(COMMAND_REMOVE_RECORDING_MEDIA_ITEM,
-                bundleOf(Pair(ITEM_INDEX, index)))
-        }
-
-        fun restoreRecordingMediaItem(index : Int){
-            radioServiceConnection.sendCommand(COMMAND_RESTORE_RECORDING_MEDIA_ITEM,
-                bundleOf(Pair(ITEM_INDEX, index)))
-        }
-
-
-        fun playOrToggleRecording(
-            rec : Recording,
-            playWhenReady : Boolean = true,
-            itemIndex : Int? = -1
-            ): Boolean {
-
-            val isToChangeMediaItems = RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS
-
-            val isPrepared = playbackState.value?.isPrepared ?: false
-
-            val id = rec.id
-
-            if(isPrepared && id == RadioService.currentPlayingRecording.value?.id
-                && RadioService.currentMediaItems == SEARCH_FROM_RECORDINGS
-            ) {
-                playbackState.value?.let { playbackState ->
-                    when {
-                        playbackState.isPlaying -> {
-
-                            radioServiceConnection.transportControls.pause()
-                            return false
-                        }
-
-                        playbackState.isPlayEnabled -> {
-
-                            radioServiceConnection.transportControls.play()
-                            return true
-                        }
-                        else -> false
-                    }
-                }
-
-            } else {
-
-                RadioService.currentMediaItems = SEARCH_FROM_RECORDINGS
-                RadioService.recordingPlaybackPosition.postValue(0)
-
-                radioServiceConnection.transportControls
-                    .playFromMediaId(id, bundleOf(
-                        Pair(SEARCH_FLAG, SEARCH_FROM_RECORDINGS),
-                        Pair(PLAY_WHEN_READY, playWhenReady),
-                        Pair(ITEM_INDEX, itemIndex),
-                        Pair(IS_CHANGE_MEDIA_ITEMS, isToChangeMediaItems)
-                    ))
-            }
-
-            return false
-        }
 
 
         fun playOrToggleStation(
@@ -682,62 +578,12 @@ class MainViewModel @Inject constructor(
 //        var isRadioTrueRecordingFalse = true
 
 
-        fun updateRadioPlaybackSpeed(){
-            radioServiceConnection.sendCommand(COMMAND_UPDATE_RADIO_PLAYBACK_SPEED, null)
-        }
-
-        fun updateRadioPlaybackPitch(){
-            radioServiceConnection.sendCommand(COMMAND_UPDATE_RADIO_PLAYBACK_PITCH, null)
-        }
 
 //        fun compareDatesWithPrefAndCLeanIfNeeded() {
 //            radioServiceConnection.sendCommand(COMMAND_COMPARE_DATES_PREF_AND_CLEAN, null)
 //         }
 
-        fun updateFavPlaylist(){
-            radioServiceConnection.sendCommand(COMMAND_UPDATE_FAV_PLAYLIST, null)
-        }
 
-        fun clearMediaItems(){
-            radioServiceConnection.sendCommand(COMMAND_CLEAR_MEDIA_ITEMS, null)
-        }
-
-
-        fun removeMediaItem(index : Int){
-            radioServiceConnection.sendCommand(COMMAND_REMOVE_MEDIA_ITEM,
-                bundleOf(Pair(ITEM_INDEX, index)))
-        }
-
-        fun restoreMediaItem(index : Int){
-            radioServiceConnection.sendCommand(COMMAND_ADD_MEDIA_ITEM,
-                bundleOf(Pair(ITEM_INDEX, index)))
-        }
-
-
-    // ExoRecord
-
-        val currentPlayerPosition = RadioService.recordingPlaybackPosition
-        val currentRecordingDuration = RadioService.recordingDuration
-
-        fun startRecording() {
-            radioServiceConnection.sendCommand(COMMAND_START_RECORDING, null)
-        }
-
-        fun stopRecording(){
-            radioServiceConnection.sendCommand(COMMAND_STOP_RECORDING, null)
-        }
-        val exoRecordFinishConverting = radioSource.exoRecordFinishConverting
-        val exoRecordState = radioSource.exoRecordState
-        val exoRecordTimer = radioSource.exoRecordTimer
-
-//        val isRecordingUpdated = radioSource.isRecordingUpdated
-
-
-        fun updateRecPlaybackSpeed(){
-            radioServiceConnection.sendCommand(COMMAND_UPDATE_REC_PLAYBACK_SPEED, null)
-        }
-
-        var isCutExpanded = false
 
 
 //        private fun calculateTags() = viewModelScope.launch{
