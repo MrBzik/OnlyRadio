@@ -12,6 +12,8 @@ import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
+import com.google.android.exoplayer2.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -224,6 +226,7 @@ public class DefaultItemAnimator extends SimpleItemAnimator {
     @SuppressLint("UnknownNullness") // b/240775049: Cannot annotate properly
     public boolean animateMove(final RecyclerView.ViewHolder holder, int fromX, int fromY,
                                int toX, int toY) {
+
         final View view = holder.itemView;
         fromX += (int) holder.itemView.getTranslationX();
         fromY += (int) holder.itemView.getTranslationY();
@@ -244,9 +247,11 @@ public class DefaultItemAnimator extends SimpleItemAnimator {
         return true;
     }
     void animateMoveImpl(final RecyclerView.ViewHolder holder, int fromX, int fromY, int toX, int toY) {
+
         final View view = holder.itemView;
         final int deltaX = toX - fromX;
         final int deltaY = toY - fromY;
+
         if (deltaX != 0) {
             view.animate().translationX(0);
         }
@@ -262,7 +267,9 @@ public class DefaultItemAnimator extends SimpleItemAnimator {
             @Override
             public void onAnimationStart(Animator animator) {
                 dispatchMoveStarting(holder);
+
             }
+
             @Override
             public void onAnimationCancel(Animator animator) {
                 if (deltaX != 0) {
@@ -281,6 +288,8 @@ public class DefaultItemAnimator extends SimpleItemAnimator {
             }
         }).start();
     }
+
+
     @Override
     @SuppressLint("UnknownNullness") // b/240775049: Cannot annotate properly
     public boolean animateChange(RecyclerView.ViewHolder oldHolder,

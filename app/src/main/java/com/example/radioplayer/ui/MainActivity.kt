@@ -44,6 +44,7 @@ import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.HistoryViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.ui.viewmodels.RecordingsViewModel
+import com.example.radioplayer.ui.viewmodels.SearchDialogsViewModel
 import com.example.radioplayer.ui.viewmodels.SettingsViewModel
 
 import com.example.radioplayer.utils.Constants.FRAG_FAV
@@ -80,6 +81,7 @@ class MainActivity : AppCompatActivity() {
     val historyViewModel : HistoryViewModel by viewModels()
     val recordingsViewModel : RecordingsViewModel by viewModels()
     val settingsViewModel : SettingsViewModel by viewModels()
+    val searchDialogsViewModel : SearchDialogsViewModel by viewModels()
 
     lateinit var bind : ActivityMainBinding
     lateinit var bindPlayer : StubPlayerActivityMainBinding
@@ -156,8 +158,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Log.d("CHECKTAGS", "on create")
-
         setTheme(R.style.Theme_RadioPlayer)
 
         bind = ActivityMainBinding.inflate(layoutInflater)
@@ -205,7 +205,6 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onStart() {
-        Log.d("CHECKTAGS", "on start")
         super.onStart()
         mainViewModel.connectMediaBrowser()
     }

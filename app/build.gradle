@@ -41,10 +41,10 @@ android {
         }
 
         debug {
-//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//            minifyEnabled true
-//            shrinkResources true
-            debuggable true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            shrinkResources true
+            debuggable false
         }
     }
 

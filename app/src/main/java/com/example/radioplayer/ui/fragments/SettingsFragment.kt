@@ -27,6 +27,9 @@ import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.BufferSettingsDialog
 import com.example.radioplayer.ui.dialogs.HistoryOptionsDialog
 import com.example.radioplayer.ui.dialogs.RecordingOptionsDialog
+import com.example.radioplayer.ui.stubs.GeneralDialogsCall
+import com.example.radioplayer.ui.stubs.SettingsExtras
+import com.example.radioplayer.ui.stubs.SettingsGeneral
 import com.example.radioplayer.ui.viewmodels.BluetoothViewModel
 import com.example.radioplayer.utils.Constants.ADD_RADIO_STATION_URL
 import com.example.radioplayer.utils.Constants.BUFFER_PREF
@@ -72,15 +75,58 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
     }
 
 
-    private lateinit var bindTvGeneral : StubTvTitleBinding
-    private lateinit var bindTvExtras : StubTvTitleBinding
+    private var bindTvGeneral : StubTvTitleBinding? = null
+    private var bindTvExtras : StubTvTitleBinding? = null
 
-    private lateinit var bindGeneral : StubSettingsGeneralBinding
-    private lateinit var bindExtras : StubSettingsExtrasBinding
+    private var bindGeneral : StubSettingsGeneralBinding? = null
+    private var bindExtras : StubSettingsExtrasBinding? = null
 
     private var isGeneralLogicSet = false
     private var isExtrasLogicSet = false
 
+    private val settingsExtras by lazy {
+        SettingsExtras().apply {
+            setFields(settingsViewModel)
+        }
+    }
+
+    private val settingsGeneral by lazy {
+        SettingsGeneral().apply {
+            setFields(
+                settingsViewModel, mainViewModel, generalDialogsCall
+            )
+        }
+    }
+
+    private val generalDialogsCall by lazy {
+        object : GeneralDialogsCall{
+            override fun recOptionsDialog(newValue: (Int) -> Unit) {
+                RecordingOptionsDialog(
+                    recordingQualityPref,
+                    requireContext(),
+                    newValue).show()
+            }
+
+            override fun recInitialValue(): Int {
+               return RecPref.qualityFloatToInt(
+                    recordingQualityPref.getFloat(RECORDING_QUALITY_PREF, REC_QUALITY_DEF)
+                )
+            }
+
+            override fun historyDialog() {
+                HistoryOptionsDialog(requireContext(), historyPref, historyViewModel).show()
+            }
+
+            override fun bufferDialog() {
+                BufferSettingsDialog(requireContext(), bufferPref){ isPlayerToRestart ->
+
+                    if(isPlayerToRestart){
+                        settingsViewModel.restartPlayer()
+                    }
+                }.show()
+            }
+        }
+    }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -110,60 +156,60 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         bind.stubTvExtras.setOnInflateListener{ _, bindView ->
             bindTvExtras = StubTvTitleBinding.bind(bindView)
-            (bindTvExtras.tvTitle as TextView).text = "Effects"
+            (bindTvExtras?.tvTitle as TextView).text = "Effects"
         }
 
         bind.stubTvGeneral.setOnInflateListener{ _, bindView ->
             bindTvGeneral = StubTvTitleBinding.bind(bindView)
-            (bindTvGeneral.tvTitle as TextView).text = "General"
+            (bindTvGeneral?.tvTitle as TextView).text = "General"
         }
 
 
         bind.stubSettingsGeneral.setOnInflateListener { _, bindView ->
             bindGeneral = StubSettingsGeneralBinding.bind(bindView)
+            bindGeneral?.let {
+                settingsGeneral.updateBinding(it)
+            }
         }
 
         bind.stubSettingsExtras.setOnInflateListener { _, bindView ->
             bindExtras = StubSettingsExtrasBinding.bind(bindView)
+            bindExtras?.let {
+                settingsExtras.updateBinding(it)
+            }
         }
     }
 
 
 
     private fun setExtrasLogic(){
-
-        setPlaybackSpeedButtons()
-
-        setLinkClickListener()
-
-        setReverbClickListeners()
-
-        setVirtualizerClickListeners()
+        settingsExtras.setExtrasLogic()
     }
 
     private fun setGeneralLogic(){
 
-        getInitialUiMode()
+        settingsGeneral.setGeneralLogic()
 
-        setReconnectButton()
 
-        setForegroundPrefButton()
+//        getInitialUiMode()
+//
+//        setReconnectButton()
+//
+//        setForegroundPrefButton()
 
         setSwitchNightModeListener()
 
-        setupRecSettingClickListener()
-
-        historySettingsClickListener()
-
-//        setSearchBtnResetListener()
-
-        setBufferSettingsClickListener()
-
-        setFullAutoSearch()
-
-        setStationTitleSize()
-
-        setAddStationClickListener()
+//        setupRecSettingClickListener()
+//
+//        historySettingsClickListener()
+//
+//        setBufferSettingsClickListener()
+//
+//        setFullAutoSearch()
+//
+//        setStationTitleSize()
+//
+//        setAddStationClickListener()
 
     }
 
@@ -171,14 +217,14 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
     private fun setTitleButtonsClickListeners(){
 
-        bindTvGeneral.tvTitle.setOnClickListener {
+        bindTvGeneral?.tvTitle?.setOnClickListener {
             if(settingsViewModel.isInSettingsExtras){
                 settingsViewModel.isInSettingsExtras = false
                 switchGeneralExtras(true)
             }
         }
 
-        bindTvExtras.tvTitle.setOnClickListener {
+        bindTvExtras?.tvTitle?.setOnClickListener {
             if(!settingsViewModel.isInSettingsExtras){
                 settingsViewModel.isInSettingsExtras = true
                 switchGeneralExtras(true)
@@ -194,7 +240,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         bind.stubSettingsExtras.visibility = View.VISIBLE
             if(isToAnimate){
-                bindExtras.root.slideAnim(350, 100, R.anim.fade_in_anim)
+                bindExtras?.root?.slideAnim(350, 100, R.anim.fade_in_anim)
             }
 
             if(isGeneralLogicSet)
@@ -209,7 +255,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
             bind.stubSettingsGeneral.visibility = View.VISIBLE
                 if(isToAnimate){
-                bindGeneral.root.slideAnim(350, 100, R.anim.fade_in_anim)
+                bindGeneral?.root?.slideAnim(350, 100, R.anim.fade_in_anim)
             }
 
                 if(isExtrasLogicSet)
@@ -227,44 +273,44 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
     private fun swapTitlesUi(isToAnimate: Boolean) = SwapTitlesUi.swap(
         conditionA = settingsViewModel.isInSettingsExtras,
-        textViewA = bindTvExtras.tvTitle as TextView,
-        textViewB = bindTvGeneral.tvTitle as TextView,
+        textViewA = bindTvExtras?.tvTitle as TextView,
+        textViewB = bindTvGeneral?.tvTitle as TextView,
         isToAnimate = isToAnimate,
         toolbar = bind.viewToolbar,
         fragment = FRAG_OPTIONS
     )
 
 
-    private fun setAddStationClickListener(){
+//    private fun setAddStationClickListener(){
+//
+//        bindGeneral.tvAddStationTitleBtn.setOnClickListener {
+//
+//            val intent = Intent(Intent.ACTION_VIEW,
+//                Uri.parse(ADD_RADIO_STATION_URL))
+//            startActivity(intent)
+//        }
+//    }
 
-        bindGeneral.tvAddStationTitleBtn.setOnClickListener {
 
-            val intent = Intent(Intent.ACTION_VIEW,
-                Uri.parse(ADD_RADIO_STATION_URL))
-            startActivity(intent)
-        }
-    }
-
-
-    private fun setStationTitleSize(){
-
-        bindGeneral.tvStationsTitleSize.apply {
-
-            textSize = settingsViewModel.stationsTitleSize
-
-            setOnClickListener {
-
-                val newSize = if(settingsViewModel.stationsTitleSize > 14){
-                    settingsViewModel.stationsTitleSize -2f
-                } else {
-                    20f
-                }
-
-                textSize = newSize
-                settingsViewModel.stationsTitleSize = newSize
-            }
-        }
-    }
+//    private fun setStationTitleSize(){
+//
+//        bindGeneral.tvStationsTitleSize.apply {
+//
+//            textSize = settingsViewModel.stationsTitleSize
+//
+//            setOnClickListener {
+//
+//                val newSize = if(settingsViewModel.stationsTitleSize > 14){
+//                    settingsViewModel.stationsTitleSize -2f
+//                } else {
+//                    20f
+//                }
+//
+//                textSize = newSize
+//                settingsViewModel.stationsTitleSize = newSize
+//            }
+//        }
+//    }
 
 
 //    private fun setAutoSearchByName(){
@@ -279,104 +325,48 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 //        }
 //    }
 
-    private fun setFullAutoSearch(){
-
-
-        bindGeneral.tvFullAutoSearchHint.text =
-            "(Default: start new searches manually by Swipe-up or with [icon] button)"
-
-        bindGeneral.tvFullAutoSearchHint.addImage(
-            atText = "[icon]",
-            imgSrc = R.drawable.ic_new_radio_search,
-            imgWidth = 30f.dpToP(requireContext()),
-            imgHeight = 30f.dpToP(requireContext())
-            )
-
-        bindGeneral.switchFullAutoSearchPref.apply {
-            isChecked = mainViewModel.isFullAutoSearch
-
-            setOnCheckedChangeListener { _, isChecked ->
-
-                mainViewModel.isFullAutoSearch = isChecked
-            }
-        }
-    }
-
-
-    private fun setVirtualizerClickListeners(){
-
-        bindExtras.switchWideRange.apply{
-            isChecked = RadioService.isVirtualizerEnabled
-            setOnCheckedChangeListener { _, isChecked ->
-
-                RadioService.isVirtualizerEnabled = isChecked
-                settingsViewModel.changeVirtualizerLevel()
-            }
-        }
-    }
+//    private fun setFullAutoSearch(){
+//
+//
+//        bindGeneral.tvFullAutoSearchHint.text =
+//            "(Default: start new searches manually by Swipe-up or with [icon] button)"
+//
+//        bindGeneral.tvFullAutoSearchHint.addImage(
+//            atText = "[icon]",
+//            imgSrc = R.drawable.ic_new_radio_search,
+//            imgWidth = 30f.dpToP(requireContext()),
+//            imgHeight = 30f.dpToP(requireContext())
+//            )
+//
+//        bindGeneral.switchFullAutoSearchPref.apply {
+//            isChecked = mainViewModel.isFullAutoSearch
+//
+//            setOnCheckedChangeListener { _, isChecked ->
+//
+//                mainViewModel.isFullAutoSearch = isChecked
+//            }
+//        }
+//    }
 
 
 
-    private fun setReverbClickListeners(){
-
-        setReverbName()
-
-        bindExtras.fabPrevReverb.setOnClickListener {
-
-            if(RadioService.reverbMode == 0){
-                RadioService.reverbMode = 6
-            } else {
-                RadioService.reverbMode -= 1
-            }
-            setReverbName()
-
-            settingsViewModel.changeReverbMode()
-        }
-
-        bindExtras.fabNextReverb.setOnClickListener {
-
-            if(RadioService.reverbMode == 6){
-                RadioService.reverbMode = 0
-            } else {
-                RadioService.reverbMode += 1
-            }
-            setReverbName()
-
-            settingsViewModel.changeReverbMode()
-
-        }
-    }
-
-    private fun setReverbName(){
-
-        bindExtras.tvReverbValue.text = when(RadioService.reverbMode){
-            0 -> "Reverb: none"
-            1 -> "Large hall"
-            2 -> "Medium hall"
-            3 -> "Large room"
-            4 -> "Medium room"
-            5 -> "Small room"
-            else -> "Plate"
-        }
-
-    }
 
 
-    private fun setBufferSettingsClickListener(){
 
 
-        bindGeneral.tvControlBufferValue.setOnClickListener {
-
-            BufferSettingsDialog(requireContext(), bufferPref){ isPlayerToResturt ->
-
-                if(isPlayerToResturt){
-                    settingsViewModel.restartPlayer()
-                }
-
-            }.show()
-
-        }
-    }
+//    private fun setBufferSettingsClickListener(){
+//
+//
+//        bindGeneral.tvControlBufferValue.setOnClickListener {
+//
+//            BufferSettingsDialog(requireContext(), bufferPref){ isPlayerToResturt ->
+//
+//                if(isPlayerToResturt){
+//                    settingsViewModel.restartPlayer()
+//                }
+//            }.show()
+//        }
+//    }
 
 
 
@@ -494,116 +484,42 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
     }
 
-    private fun setForegroundPrefButton(){
-
-        val foregroundPref : SharedPreferences by lazy{
-            requireContext().getSharedPreferences(FOREGROUND_PREF, Context.MODE_PRIVATE)
-        }
-
-        bindGeneral.switchForegroundPref.apply {
-            isChecked = RadioService.isToKillServiceOnAppClose
-            setOnCheckedChangeListener { _, isChecked ->
-                foregroundPref.edit().putBoolean(FOREGROUND_PREF, isChecked).apply()
-                RadioService.isToKillServiceOnAppClose = isChecked
-            }
-        }
-    }
-
-
-
-    private fun setReconnectButton(){
-
-        val reconnectPref = requireContext().getSharedPreferences(RECONNECT_PREF, Context.MODE_PRIVATE)
-
-        val initialMode = reconnectPref.getBoolean(RECONNECT_PREF, true)
-
-        bindGeneral.switchReconnect.apply {
-            isChecked = initialMode
-
-            setOnCheckedChangeListener { _, isChecked ->
-
-                reconnectPref.edit().putBoolean(RECONNECT_PREF, isChecked).apply()
-                RadioService.isToReconnect = isChecked
-            }
-        }
-    }
-
-    private fun setPlaybackSpeedButtons(){
-
-        updatePlaybackSpeedDisplayValue()
-        updatePlaybackPitchDisplayValue()
-        updateLinkIcon()
-
-        bindExtras.fabSpeedMinus.setOnClickListener {
-
-            if(RadioService.playbackSpeedRadio > 10){
-                RadioService.playbackSpeedRadio -= 10
-                settingsViewModel.updateRadioPlaybackSpeed()
-                updatePlaybackSpeedDisplayValue()
-            }
-
-        }
-
-        bindExtras.fabSpeedPlus.setOnClickListener {
-            if(RadioService.playbackSpeedRadio < 200){
-                RadioService.playbackSpeedRadio += 10
-                settingsViewModel.updateRadioPlaybackSpeed()
-                updatePlaybackSpeedDisplayValue()
-            }
-        }
-
-        bindExtras.fabPitchMinus.setOnClickListener {
-
-            if(RadioService.playbackPitchRadio > 10){
-                RadioService.playbackPitchRadio -= 10
-                settingsViewModel.updateRadioPlaybackPitch()
-                updatePlaybackPitchDisplayValue()
-            }
-        }
-
-        bindExtras.fabPitchPlus.setOnClickListener {
-            if(RadioService.playbackPitchRadio < 200){
-                RadioService.playbackPitchRadio += 10
-                settingsViewModel.updateRadioPlaybackPitch()
-                updatePlaybackPitchDisplayValue()
-            }
-        }
-    }
+//    private fun setForegroundPrefButton(){
+//
+//        val foregroundPref : SharedPreferences by lazy{
+//            requireContext().getSharedPreferences(FOREGROUND_PREF, Context.MODE_PRIVATE)
+//        }
+//
+//        bindGeneral.switchForegroundPref.apply {
+//            isChecked = RadioService.isToKillServiceOnAppClose
+//            setOnCheckedChangeListener { _, isChecked ->
+//                foregroundPref.edit().putBoolean(FOREGROUND_PREF, isChecked).apply()
+//                RadioService.isToKillServiceOnAppClose = isChecked
+//            }
+//        }
+//    }
 
 
-    private fun setLinkClickListener(){
-        bindExtras.ivLink.setOnClickListener {
-            RadioService.isSpeedPitchLinked = !RadioService.isSpeedPitchLinked
-            updateLinkIcon()
-        }
-    }
+
+//    private fun setReconnectButton(){
+//
+//        val reconnectPref = requireContext().getSharedPreferences(RECONNECT_PREF, Context.MODE_PRIVATE)
+//
+//        val initialMode = reconnectPref.getBoolean(RECONNECT_PREF, true)
+//
+//        bindGeneral.switchReconnect.apply {
+//            isChecked = initialMode
+//
+//            setOnCheckedChangeListener { _, isChecked ->
+//
+//                reconnectPref.edit().putBoolean(RECONNECT_PREF, isChecked).apply()
+//                RadioService.isToReconnect = isChecked
+//            }
+//        }
+//    }
 
 
-    private fun updateLinkIcon(){
 
-        bindExtras.ivLink.apply {
-            if(RadioService.isSpeedPitchLinked)
-                setImageResource(R.drawable.link)
-            else setImageResource(R.drawable.link_off)
-        }
-    }
-
-
-    private fun updatePlaybackSpeedDisplayValue(){
-
-        bindExtras.tvPlaybackSpeedValue.text = " ${RadioService.playbackSpeedRadio}%"
-        if(RadioService.isSpeedPitchLinked)
-            bindExtras.tvPlaybackPitchValue.text = " ${RadioService.playbackSpeedRadio}%"
-
-    }
-
-    private fun updatePlaybackPitchDisplayValue(){
-
-        bindExtras.tvPlaybackPitchValue.text = " ${RadioService.playbackPitchRadio}%"
-        if(RadioService.isSpeedPitchLinked)
-            bindExtras.tvPlaybackSpeedValue.text = " ${RadioService.playbackPitchRadio}%"
-
-    }
 
 //    private fun setSearchBtnResetListener(){
 //
@@ -631,45 +547,45 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
 
 
-    private fun historySettingsClickListener(){
-
-        bindGeneral.tvHistorySettingValue.setOnClickListener {
-
-            HistoryOptionsDialog(requireContext(), historyPref, historyViewModel).show()
-
-        }
-    }
-
-
+//    private fun historySettingsClickListener(){
+//
+//        bindGeneral.tvHistorySettingValue.setOnClickListener {
+//
+//            HistoryOptionsDialog(requireContext(), historyPref, historyViewModel).show()
+//
+//        }
+//    }
 
 
 
-    private fun setupRecSettingClickListener(){
-
-        val initialValue = RecPref.qualityFloatToInt(
-            recordingQualityPref.getFloat(RECORDING_QUALITY_PREF, REC_QUALITY_DEF)
-        )
-
-        bindGeneral.tvRecordingSettingsValue.text = RecPref.setTvRecQualityValue(initialValue)
 
 
-        bindGeneral.tvRecordingSettingsValue.setOnClickListener {
-
-            RecordingOptionsDialog(
-                recordingQualityPref,
-                requireContext(),
-                ) { newValue ->
-
-                bindGeneral.tvRecordingSettingsValue.text = RecPref.setTvRecQualityValue(newValue)
-
-            }.show()
-
-        }
-    }
+//    private fun setupRecSettingClickListener(){
+//
+//        val initialValue = RecPref.qualityFloatToInt(
+//            recordingQualityPref.getFloat(RECORDING_QUALITY_PREF, REC_QUALITY_DEF)
+//        )
+//
+//        bindGeneral.tvRecordingSettingsValue.text = RecPref.setTvRecQualityValue(initialValue)
+//
+//
+//        bindGeneral.tvRecordingSettingsValue.setOnClickListener {
+//
+//            RecordingOptionsDialog(
+//                recordingQualityPref,
+//                requireContext(),
+//                ) { newValue ->
+//
+//                bindGeneral.tvRecordingSettingsValue.text = RecPref.setTvRecQualityValue(newValue)
+//
+//            }.show()
+//
+//        }
+//    }
 
     private fun setSwitchNightModeListener(){
 
-        bindGeneral.switchNightMode.setOnClickListener {
+        bindGeneral?.switchNightMode?.setOnClickListener {
 
 
             settingsViewModel.isSmoothTransitionNeeded = true
@@ -684,7 +600,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
                 bind.root.postDelayed({
 
-                    if(bindGeneral.switchNightMode.isChecked){
+                    if(bindGeneral?.switchNightMode?.isChecked == true){
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
 
 
@@ -695,24 +611,21 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
                     }
 
                 }, 500)
-
         }
     }
 
-    private fun getInitialUiMode(){
-
-//       val mode = requireContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-
-        when(MainActivity.uiMode){
-            Configuration.UI_MODE_NIGHT_YES -> {
-                bindGeneral.switchNightMode.isChecked = true
-            }
-
-            Configuration.UI_MODE_NIGHT_NO -> {
-                bindGeneral.switchNightMode.isChecked = false
-            }
-        }
-    }
+//    private fun getInitialUiMode(){
+//
+//        when(MainActivity.uiMode){
+//            Configuration.UI_MODE_NIGHT_YES -> {
+//                bindGeneral.switchNightMode.isChecked = true
+//            }
+//
+//            Configuration.UI_MODE_NIGHT_NO -> {
+//                bindGeneral.switchNightMode.isChecked = false
+//            }
+//        }
+//    }
 
 
     override fun onDestroyView() {
@@ -720,6 +633,10 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         isGeneralLogicSet = false
         isExtrasLogicSet = false
         _bind = null
+        bindTvGeneral = null
+        bindTvExtras = null
+        bindExtras = null
+        bindGeneral = null
 
     }
 

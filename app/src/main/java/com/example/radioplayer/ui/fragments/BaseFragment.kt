@@ -17,6 +17,7 @@ import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.HistoryViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.ui.viewmodels.RecordingsViewModel
+import com.example.radioplayer.ui.viewmodels.SearchDialogsViewModel
 import com.example.radioplayer.ui.viewmodels.SettingsViewModel
 import com.example.radioplayer.utils.Constants
 
@@ -48,6 +49,10 @@ abstract class BaseFragment<VB: ViewBinding>(
 
     val settingsViewModel : SettingsViewModel by lazy {
         (activity as MainActivity).settingsViewModel
+    }
+
+    val searchDialogsViewModels : SearchDialogsViewModel by lazy {
+        (activity as MainActivity).searchDialogsViewModel
     }
 
 

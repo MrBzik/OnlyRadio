@@ -8,7 +8,6 @@ import androidx.lifecycle.*
 import androidx.paging.*
 import com.example.radioplayer.adapters.datasources.RadioStationsDataSource
 import com.example.radioplayer.adapters.datasources.StationsPageLoader
-import com.example.radioplayer.adapters.models.CountryWithRegion
 import com.example.radioplayer.connectivityObserver.ConnectivityObserver
 import com.example.radioplayer.connectivityObserver.NetworkConnectivityObserver
 import com.example.radioplayer.data.local.entities.RadioStation
@@ -16,20 +15,8 @@ import com.example.radioplayer.data.remote.entities.RadioStations
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.ui.dialogs.*
-import com.example.radioplayer.ui.fragments.RadioSearchFragment.Companion.listOfCountries
 import com.example.radioplayer.utils.Constants
-import com.example.radioplayer.utils.Constants.COMMAND_ADD_MEDIA_ITEM
-import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_BASS_LEVEL
-import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_REVERB_MODE
-import com.example.radioplayer.utils.Constants.COMMAND_CLEAR_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
-import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_RECORDING_MEDIA_ITEM
-import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_MEDIA_ITEM
-import com.example.radioplayer.utils.Constants.COMMAND_RESTART_PLAYER
-import com.example.radioplayer.utils.Constants.COMMAND_RESTORE_RECORDING_MEDIA_ITEM
-import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_FAV_PLAYLIST
-import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH
-import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.IS_CHANGE_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants.IS_NAME_EXACT
 import com.example.radioplayer.utils.Constants.IS_NEW_SEARCH
@@ -48,9 +35,6 @@ import com.example.radioplayer.utils.Constants.SEARCH_PREF_MIN_BIT
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_ORDER
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
-import com.example.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
-import com.example.radioplayer.utils.Language
-import com.example.radioplayer.utils.listOfLanguages
 import com.example.radioplayer.utils.toRadioStation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -101,32 +85,6 @@ class MainViewModel @Inject constructor(
         radioServiceConnection.connectBrowser()
     }
 
-//    init {
-//
-//        currentRadioStation.value?.let {
-//            viewModelScope.launch {
-//                val itemId = it.getString(METADATA_KEY_MEDIA_ID)
-//
-//                if(itemId != null){
-//
-//                    if(itemId.contains(".ogg")) {
-//                        val item = repository.getCurrentRecording(itemId)
-//                        newPlayingItem.postValue(PlayingItem.FromRecordings(item))
-//                        isRadioTrueRecordingFalse = false
-//                    } else {
-//                        val item = repository.getCurrentRadioStation(itemId)
-//                        newPlayingItem.postValue(PlayingItem.FromRadio(item))
-//                        isRadioTrueRecordingFalse = true
-//
-//                    }
-//
-//                }
-//
-//
-//            }
-//        }
-//
-//    }
 
 
     val connectivityObserver = NetworkConnectivityObserver(getApplication())
@@ -163,7 +121,6 @@ class MainViewModel @Inject constructor(
         setConnectivityObserver()
     }
 
-       var isCountryListToUpdate = true
 
 
        val searchPreferences = app.getSharedPreferences("SearchPref", Context.MODE_PRIVATE)
@@ -200,83 +157,6 @@ class MainViewModel @Inject constructor(
 
 
 
-    fun updateCountryList(handleResults : () -> Unit) = viewModelScope.launch {
-
-        if(isCountryListToUpdate){
-
-            try {
-                val countryList = radioSource.getAllCountries()
-                if(countryList.isSuccessful){
-                    countryList.body()?.let {
-                        it.forEach { country ->
-
-                            for(i in listOfCountries.indices){
-                                if(listOfCountries[i] is CountryWithRegion.Country){
-                                    if((listOfCountries[i] as CountryWithRegion.Country)
-                                            .countryCode == country.iso_3166_1){
-                                        (listOfCountries[i] as CountryWithRegion.Country).stationsCount =
-                                            country.stationcount
-                                        break
-                                    }
-                                }
-                            }
-                        }
-
-                        handleResults()
-
-                        isCountryListToUpdate = false
-                    }
-
-                }
-
-
-            } catch (e : Exception){ }
-
-        }
-    }
-
-    private var currentLanguage = ""
-
-    private var stationsCountForLanguage = 0
-
-    fun updateLanguageCount(resultHandler : (Int) -> Unit) = viewModelScope.launch {
-
-        val newLang = Locale.getDefault().language
-
-        if(currentLanguage != newLang){
-
-            var language : Language? = null
-
-            for(i in listOfLanguages.indices){
-                if(listOfLanguages[i].iso == newLang){
-                    language = listOfLanguages[i]
-                    break
-                }
-            }
-
-            resultHandler(language?.stationCount ?: 0)
-            stationsCountForLanguage
-
-             language?.let {
-
-                try {
-                    val response = radioSource.getLanguages(language.name)
-                      response.body()?.let { langs ->
-                        var count = 0
-                        langs.forEach {
-                            count += it.stationcount
-                        }
-                        resultHandler(count)
-                        stationsCountForLanguage = count
-                        currentLanguage = newLang
-                    }
-
-                } catch (e : Exception){}
-            }
-        } else {
-            resultHandler(stationsCountForLanguage)
-        }
-    }
 
 
     private val searchBy : MutableLiveData<Boolean> = MutableLiveData()
@@ -499,9 +379,6 @@ class MainViewModel @Inject constructor(
     }
 
 
-
-
-
         fun playOrToggleStation(
             station : RadioStation? = null,
             searchFlag : Int,
@@ -574,6 +451,11 @@ class MainViewModel @Inject constructor(
                 return true
             }
         }
+
+
+
+
+
 
 //        var isRadioTrueRecordingFalse = true
 

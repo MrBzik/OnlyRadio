@@ -35,6 +35,7 @@ import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.TextLoadAnim
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.*
+import com.example.radioplayer.ui.stubs.NoResultMessage
 import com.example.radioplayer.utils.*
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
@@ -67,81 +68,14 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private var isToInitiateNewSearch = false
 
-    private lateinit var bindNoResultMessage : StubNoResultMessageBinding
+    private var bindNoResultMessage : StubNoResultMessageBinding? = null
+
     private var isBindNoResultMessageInflated = false
 
-    private var isNoResultClickLogicSet = false
-
-    companion object {
-
-        var tagAdapterPosition : Parcelable? = null
-        var countriesAdapterPosition : Parcelable? = null
-
-
-        val tagsList : ArrayList<TagWithGenre> by lazy { ArrayList<TagWithGenre>().apply {
-
-                add(TagWithGenre.Genre(TAG_BY_PERIOD))
-                addAll(tagsListByPeriod)
-
-                add(TagWithGenre.Genre(TAG_BY_SPECIAL))
-                addAll(tagsListSpecial)
-
-                add(TagWithGenre.Genre(TAG_BY_GENRE))
-                addAll(tagsListByGenre)
-
-                add(TagWithGenre.Genre(TAG_BY_SUB_GENRE))
-                addAll(tagsListBySubGenre)
-
-                add(TagWithGenre.Genre(TAG_BY_CLASSIC))
-                addAll(tagsListClassics)
-
-                add(TagWithGenre.Genre(TAG_BY_MINDFUL))
-                addAll(tagsListMindful)
-
-                add(TagWithGenre.Genre(TAG_BY_EXPERIMENTAL))
-                addAll(tagsListExperimental)
-
-                add(TagWithGenre.Genre(TAG_BY_TALK))
-                addAll(tagsListByTalk)
-
-                add(TagWithGenre.Genre(TAG_BY_RELIGION))
-                addAll(tagsListReligion)
-
-                add(TagWithGenre.Genre(TAG_BY_ORIGIN))
-                addAll(tagsListByOrigin)
-
-                add(TagWithGenre.Genre(TAG_BY_OTHER))
-                addAll(tagsListOther)
-            }
-        }
-
-        val listOfCountries : ArrayList<CountryWithRegion> by lazy{
-            ArrayList<CountryWithRegion>().apply {
-
-                add(CountryWithRegion.Region(COUNTRY_REGION_AFRICA))
-                addAll(listOfAfrica)
-                 add(CountryWithRegion.Region(COUNTRY_REGION_ASIA))
-                addAll(listOfAsia)
-                 add(CountryWithRegion.Region(COUNTRY_REGION_CENTRAL_AMERICA))
-                addAll(listOfCentralAmerica)
-                 add(CountryWithRegion.Region(COUNTRY_REGION_NORTH_AMERICA))
-                addAll(listOfNorthAmerica)
-                 add(CountryWithRegion.Region(COUNTRY_REGION_SOUTH_AMERICA))
-                addAll(listOfSouthAmerica)
-                 add(CountryWithRegion.Region(COUNTRY_REGION_EAST_EUROPE))
-                addAll(listOfEastEurope)
-                 add(CountryWithRegion.Region(COUNTRY_REGION_WEST_EUROPE))
-                addAll(listOfWestEurope)
-                 add(CountryWithRegion.Region(COUNTRY_REGION_MIDDLE_EAST))
-                addAll(listOfMiddleEast)
-                 add(CountryWithRegion.Region(COUNTRY_REGION_OCEANIA))
-                addAll(listOfOceania)
-                 add(CountryWithRegion.Region(COUNTRY_REGION_THE_CARIBBEAN))
-                addAll(listOfTheCaribbean)
-
-            }
-        }
-    }
+    private var noResultMessage = NoResultMessage(
+        postInitiateNewSearch = {isToInitiateNewSearch = true},
+        initiateNewSearch = { initiateNewSearch() }
+    )
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -197,28 +131,31 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     }
 
 
-
     private fun setSearchParamsFabClickListener(){
 
         bind.fabSearchOrder.setOnClickListener {
-            SearchParamsDialog(requireContext(), mainViewModel){
-                if(mainViewModel.isFullAutoSearch){
-                    val check = mainViewModel.initiateNewSearch()
-                    clearAdapter(check)
-                }
+            SearchParamsDialog(
+                requireContext = requireContext(),
+                mainViewModel = mainViewModel,
+                searchDialogsViewModel = searchDialogsViewModels
+            ) {
+                initiateNewSearch()
             }.show()
         }
-
     }
 
 
+    private fun initiateNewSearch(){
+        if(mainViewModel.isFullAutoSearch){
+            val check = mainViewModel.initiateNewSearch()
+            clearAdapter(check)
+        }
+    }
 
     private fun setToolbar(){
-
         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
             bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_search_vector)
         }
-
         else {
             bind.viewToolbar.setBackgroundColor(Color.BLACK)
         }
@@ -226,131 +163,16 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
 
     private fun observeNoResultDetector(){
-
-        mainViewModel.noResultDetection.observe(viewLifecycleOwner){noResult ->
-
+        mainViewModel.noResultDetection.observe(viewLifecycleOwner){ noResult ->
             if(noResult){
-
                 if(!isBindNoResultMessageInflated){
                     isBindNoResultMessageInflated = true
                     bind.stubTvNoResultMessage.inflate()
                 }
 
-                bindNoResultMessage.apply {
-
-                    if(mainViewModel.lastSearchTag.isBlank()){
-                        llTag.visibility = View.GONE
-                    } else {
-                        llTag.visibility = View.VISIBLE
-                        val tagExact = if(mainViewModel.isTagExact) "(Exact)" else ""
-                        tvTag.text = "${mainViewModel.lastSearchTag} $tagExact"
-                    }
-
-                    if(mainViewModel.lastSearchName.isBlank()){
-                        llName.visibility = View.GONE
-                    } else {
-                        llName.visibility = View.VISIBLE
-                        val nameExact = if(mainViewModel.isNameExact) "(Exact)" else ""
-                        tvName.text = "${mainViewModel.lastSearchName} $nameExact"
-                    }
-
-                    if(mainViewModel.searchFullCountryName.isBlank()){
-                        llCountry.visibility = View.GONE
-                    } else {
-                        llCountry.visibility = View.VISIBLE
-                        tvCountry.text = mainViewModel.searchFullCountryName
-                    }
-
-                    if(mainViewModel.isSearchFilterLanguage){
-                        llLanguage.visibility = View.VISIBLE
-                        tvLanguage.text = Locale.getDefault().displayLanguage
-                    } else {
-                        llLanguage.visibility = View.GONE
-                    }
-
-                    if(mainViewModel.minBitrateOld == BITRATE_0){
-                        llBitrateMin.visibility = View.GONE
-                    } else {
-                        llBitrateMin.visibility = View.VISIBLE
-                        tvBitrateMin.text = "${mainViewModel.minBitrateOld} kbps"
-                    }
-
-                    if(mainViewModel.maxBitrateOld == BITRATE_MAX){
-                        llBitrateMax.visibility = View.GONE
-                    } else {
-                        llBitrateMax.visibility = View.VISIBLE
-                        tvBitrateMax.text = "${mainViewModel.maxBitrateOld} kbps"
-                    }
-                }
-
-                bindNoResultMessage.llRootLayout.visibility = View.VISIBLE
-
-                bindNoResultMessage.llRootLayout.slideAnim(350, 0, R.anim.fade_in_anim)
-
-                if(!isNoResultClickLogicSet) setNoResultClickLogic()
-
-            }
-//            else bind.stubTvNoResultMessage.visibility = View.GONE
-
-        }
-    }
-
-    private var isNoResultClick = false
-    private fun setNoResultClickLogic(){
-        isNoResultClickLogicSet = true
-
-        bindNoResultMessage.apply {
-
-            llTag.setOnClickListener {
-                if(mainViewModel.isFullAutoSearch) isToInitiateNewSearch = true
-
-                mainViewModel.searchParamTag.postValue("")
-                llTag.visibility = View.INVISIBLE
-            }
-
-            llName.setOnClickListener {
-                if(mainViewModel.isFullAutoSearch) isToInitiateNewSearch = true
-
-                isNoResultClick = true
-                mainViewModel.searchParamName.postValue("")
-                llName.visibility = View.INVISIBLE
-            }
-
-            llCountry.setOnClickListener {
-                if(mainViewModel.isFullAutoSearch) isToInitiateNewSearch = true
-
-                mainViewModel.searchParamCountry.postValue("")
-                mainViewModel.searchFullCountryName = ""
-                llCountry.visibility = View.INVISIBLE
-            }
-
-            llLanguage.setOnClickListener {
-                llLanguage.visibility = View.INVISIBLE
-                mainViewModel.isSearchFilterLanguage = false
-
-                if(mainViewModel.isFullAutoSearch){
-                    mainViewModel.initiateNewSearch()
-                    clearAdapter(true)
-                }
-            }
-
-
-            llBitrateMin.setOnClickListener {
-                llBitrateMin.visibility = View.INVISIBLE
-                mainViewModel.minBitrateNew = BITRATE_0
-                if(mainViewModel.isFullAutoSearch) {
-                    mainViewModel.initiateNewSearch()
-                    clearAdapter(true)
-                }
-            }
-
-            llBitrateMax.setOnClickListener {
-                llBitrateMax.visibility = View.INVISIBLE
-                mainViewModel.maxBitrateNew = BITRATE_MAX
-                if(mainViewModel.isFullAutoSearch) {
-                    mainViewModel.initiateNewSearch()
-                    clearAdapter(true)
-                }
+               bindNoResultMessage?.let {
+                   noResultMessage.generateMessage(it, mainViewModel)
+               }
             }
         }
     }
@@ -376,9 +198,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             else {
                 isToHandleNewStationObserver = true
             }
-
         }
-
     }
 }
 
@@ -419,10 +239,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                     }
                 }
             }
-
         }
-
-
     }
 
 
@@ -498,14 +315,10 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         pagingRadioAdapter.utils.setOnClickListener { station, index ->
 
-
            val isToChangeMediaItems = RadioService.currentMediaItems != SEARCH_FROM_API
-
 
             mainViewModel.playOrToggleStation(station, SEARCH_FROM_API,
                 itemIndex = index, isToChangeMediaItems = isToChangeMediaItems)
-
-
         }
     }
 
@@ -544,8 +357,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             } else {
                 pagingRadioAdapter.currentRadioStationId = ""
             }
-
-
         }
     }
 
@@ -593,8 +404,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                         isNewSearchForAnimations = false
                         isToShowLoadingMessage = false
 
-                        Log.d("CHECKTAGS", "is adapter load state listener")
-
                         bind.rvSearchStations.apply {
                             if(isInitialLaunch){
 
@@ -622,9 +431,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                         }
 
                     }
-
-
-
 
                 }
 
@@ -683,7 +489,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     private fun setSearchToolbar() {
 
         bind.tvTag.setOnClickListener {
-           TagPickerDialog(requireContext(), mainViewModel){
+           TagPickerDialog(requireContext(), mainViewModel, searchDialogsViewModels){
                if(mainViewModel.isFullAutoSearch)
                    isToInitiateNewSearch = true
            }.show()
@@ -694,10 +500,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         bind.tvName.setOnClickListener {
 
             NameAutoDialog(requireContext(), mainViewModel){
-                if(mainViewModel.isFullAutoSearch){
-                    val check = mainViewModel.initiateNewSearch()
-                    clearAdapter(check)
-                }
+                initiateNewSearch()
             }.show()
 
 
@@ -720,7 +523,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         bind.tvSelectedCountry.setOnClickListener {
 
-            CountryPickerDialog(requireContext(), mainViewModel){
+            CountryPickerDialog(requireContext(), mainViewModel, searchDialogsViewModels){
                 if(mainViewModel.isFullAutoSearch)
                     isToInitiateNewSearch = true
             }.show()
@@ -767,13 +570,12 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     private fun clearAdapter(check : Boolean){
         if(check){
 
-            if(isBindNoResultMessageInflated){
-                if(bindNoResultMessage.llRootLayout.isVisible){
-                    bindNoResultMessage.llRootLayout.visibility = View.GONE
-                    bindNoResultMessage.llRootLayout.slideAnim(150, 0, R.anim.fade_out_anim)
+            bindNoResultMessage?.apply {
+                if(llRootLayout.isVisible){
+                    llRootLayout.visibility = View.GONE
+                    llRootLayout.slideAnim(150, 0, R.anim.fade_out_anim)
                 }
             }
-
 
             isNewSearchForAnimations = true
             isToShowLoadingMessage = true
@@ -795,8 +597,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         mainViewModel.searchParamName.observe(viewLifecycleOwner){
 
-            if(isNoResultClick){
-                isNoResultClick = false
+            if(noResultMessage.isNoResultClick){
+                noResultMessage.isNoResultClick = false
                 handleNewParams()
             }
 
@@ -844,11 +646,12 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     override fun onDestroyView() {
         super.onDestroyView()
         pagingRadioAdapter.animator.resetAnimator()
-        isNoResultClickLogicSet = false
+        noResultMessage.isNoResultClickLogicSet = false
         isBindNoResultMessageInflated = false
         bind.rvSearchStations.adapter = null
         textLoadAnim = null
         _bind = null
+        bindNoResultMessage = null
         isInitialLaunch = true
         isToHandleNewStationObserver = false
         isNewSearchForAnimations = true

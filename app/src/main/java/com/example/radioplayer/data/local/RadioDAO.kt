@@ -239,7 +239,7 @@ interface  RadioDAO {
     suspend fun insertNewBookmarkedTitle(title : BookmarkedTitle)
 
     @Query("SELECT * FROM BookmarkedTitle ORDER BY timeStamp DESC")
-    fun bookmarkedTitlesLiveData() : LiveData<List<BookmarkedTitle>>
+    fun bookmarkedTitlesLiveData() : Flow<List<BookmarkedTitle>>
 
     @Query("SELECT COUNT(timeStamp) FROM BookmarkedTitle")
     suspend fun countBookmarkedTitles() : Int

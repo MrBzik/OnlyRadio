@@ -33,22 +33,19 @@ import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.combineTransform
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
 import java.sql.Date
 import java.util.Calendar
 import javax.inject.Inject
-
-const val SWITCH_STATIONS_ALL = 0
-const val SWITCH_STATIONS_ONE_DATE = 1
-const val SWITCH_TITLES_ALL = 2
-const val SWITCH_TITLES_ONE_DATE = 3
-const val SWITCH_BOOKMARKS = 4
 
 
 const val TAB_STATIONS = 0
@@ -71,7 +68,7 @@ class HistoryViewModel @Inject constructor(
 
     private suspend fun getStationsInAllDates(limit: Int, offset: Int): List<StationWithDateModel> {
 
-        Log.d("CHECKTAGS", "callings all DATES get fun")
+//        Log.d("CHECKTAGS", "callings all DATES get fun")
 
         val response = radioSource.getStationsInAllDates(limit, offset)
 
@@ -100,7 +97,7 @@ class HistoryViewModel @Inject constructor(
 
     private suspend fun getStationsInOneDate() : List<StationWithDateModel> {
 
-        Log.d("CHECKTAGS", "callings one date get fun")
+//        Log.d("CHECKTAGS", "callings one date get fun")
 
         val response = radioSource.getStationsInOneDate(selectedDate)
 
@@ -139,7 +136,7 @@ class HistoryViewModel @Inject constructor(
 
     private suspend fun getTitlesInAllDates(pageIndex : Int, pageSize : Int) : List<TitleWithDateModel>{
 
-        Log.d("CHECKTAGS", "callings all titles get fun")
+//        Log.d("CHECKTAGS", "callings all titles get fun")
 
         val response = repository.getTitlesPage(pageIndex * Constants.PAGE_SIZE, pageSize)
         val titlesWithDates: MutableList<TitleWithDateModel> = mutableListOf()
@@ -174,7 +171,7 @@ class HistoryViewModel @Inject constructor(
 
     private suspend fun getTitlesInOneDate(pageIndex : Int, pageSize : Int): List<TitleWithDateModel> {
 
-        Log.d("CHECKTAGS", "callings one title get fun")
+//        Log.d("CHECKTAGS", "callings one title get fun")
 
         val response = repository.getTitlesInOneDatePage(pageIndex * Constants.PAGE_SIZE, pageSize, selectedDate)
         val titlesWithDates: MutableList<TitleWithDateModel> = mutableListOf()
@@ -208,77 +205,36 @@ class HistoryViewModel @Inject constructor(
 
 
 
-//     val updateHistory : MutableLiveData<Boolean> = MutableLiveData()
-//
-//    @OptIn(ExperimentalCoroutinesApi::class)
-//    val historyFlow = updateHistory.asFlow()
-//        .flatMapLatest {
-//            if(it)
-//            stationsHistoryFlow()
-//            else stationsHistoryOneDateFlow()
-//        }.cachedIn(viewModelScope)
-
-
-
-//    var isHistoryInStationsTab = true
-
-//    var isHistoryTitlesInBookmark = false
-
-    var isInBookmarksLiveData : MutableLiveData<Boolean> = MutableLiveData(false)
-    var isHistoryInStationsTabLiveData : MutableLiveData<Boolean> = MutableLiveData(true)
-
-
     private val _currentTab = MutableStateFlow(TAB_STATIONS)
     val currentTab = _currentTab.asStateFlow()
 
-    private val _selectedDate = MutableStateFlow(0L)
+    private val selectedDateFlow = MutableStateFlow(0L)
 
-    private val isInBookmarksFlow = MutableStateFlow(false)
-    private val isHistoryInStationsTabFlow = MutableStateFlow(true)
+    private var isInBookmarksFlow = false
+    private var isHistoryInStationsTabFlow = true
 
-
-    fun setIsInBookmarks(value : Boolean) {
-        isInBookmarksFlow.value = value
+    fun setIsInBookmarks() {
+        isInBookmarksFlow = !isInBookmarksFlow
+        if(isInBookmarksFlow)
+            _currentTab.value = TAB_BOOKMARKS
+        else
+            _currentTab.value = TAB_TITLES
     }
     fun setIsInStations(value : Boolean) {
-        isHistoryInStationsTabFlow.value = value
+        isHistoryInStationsTabFlow = value
+        if(value){
+            _currentTab.value = TAB_STATIONS
+        } else if(!isInBookmarksFlow){
+            _currentTab.value = TAB_TITLES
+        } else {
+            _currentTab.value = TAB_BOOKMARKS
+        }
     }
 
     fun updateSelectedDate(date : Long){
         selectedDate = date
-        _selectedDate.value = date
+        selectedDateFlow.value = date
     }
-
-    private val historySwitch = MutableLiveData(SWITCH_STATIONS_ALL)
-
-    init {
-        isInBookmarksFlow.combine(isHistoryInStationsTabFlow){ isInBookmarks, isInStations ->
-            if(isInStations)
-                _currentTab.value = TAB_STATIONS
-            else if(!isInBookmarks)
-                _currentTab.value = TAB_TITLES
-            else
-                _currentTab.value = TAB_BOOKMARKS
-        }.launchIn(viewModelScope)
-
-        _currentTab.combine(_selectedDate){tab, date ->
-
-            val switchTo = if(tab == TAB_BOOKMARKS)
-                    SWITCH_BOOKMARKS
-                else if(tab == TAB_STATIONS){
-                    if(date == 0L) SWITCH_STATIONS_ALL
-                    else SWITCH_STATIONS_ONE_DATE
-                } else {
-                    if(date == 0L) SWITCH_TITLES_ALL
-                    else SWITCH_TITLES_ONE_DATE
-                }
-            getHistory(switchTo)
-
-        }.launchIn(viewModelScope)
-    }
-
-    var isInBookmarks = false
-    var isInStationsTab = true
 
 
     private val allHistoryLoader : HistoryDateLoader = { dateIndex ->
@@ -289,7 +245,6 @@ class HistoryViewModel @Inject constructor(
         getStationsInOneDate()
     }
 
-
     private val allTitlesLoader : TitlesPageLoader = { pageIndex, pageSize ->
         getTitlesInAllDates(pageIndex, pageSize)
     }
@@ -299,38 +254,22 @@ class HistoryViewModel @Inject constructor(
     }
 
 
+    private var historyFlow : Flow<PagingData<StationWithDateModel>>?  = null
+
+    private var titlesFlow : Flow<PagingData<TitleWithDateModel>>? = null
 
 
+    var observableHistoryPages : Flow<Any>? = null
 
-    private var historyFlow : LiveData<PagingData<StationWithDateModel>>?  = null
-//    private var oneDateHistoryFlow : LiveData<PagingData<StationWithDateModel>>?  = null
-
-    private var titlesFlow : LiveData<PagingData<TitleWithDateModel>>? = null
-//    private var oneDateTitlesFlow : LiveData<PagingData<TitleWithDateModel>>? = null
-
-
-//    val observableHistory = MediatorLiveData<PagingData<StationWithDateModel>>()
-//
-//    val observableTitles = MediatorLiveData<PagingData<TitleWithDateModel>>()
-//
-//    val oneHistoryDateCaller : MutableLiveData<Boolean> = MutableLiveData(false)
-//
-//    val oneTitleDateCaller : MutableLiveData<Boolean> = MutableLiveData(false)
-
-
-    var historySwitchValue = SWITCH_STATIONS_ALL
-
-
-    var observableHistoryPages : LiveData<out Any>? = null
-
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun initiateHistory(){
-        observableHistoryPages = Transformations.switchMap(historySwitch){
-            when (it) {
-                SWITCH_STATIONS_ALL -> {
-                    historyFlow
-                }
-                SWITCH_STATIONS_ONE_DATE -> {
-
+        observableHistoryPages = _currentTab.combine(selectedDateFlow){tab, date ->
+            tab
+        }.flatMapLatest {tab ->
+            if(tab == TAB_STATIONS){
+                if(selectedDate == 0L)
+                    historyFlow?: emptyFlow()
+                else
                     Pager(
                         config = PagingConfig(
                             pageSize = 10,
@@ -339,13 +278,13 @@ class HistoryViewModel @Inject constructor(
                         pagingSourceFactory = {
                             HistoryOneDateSource(oneDateHistoryLoader)
                         }
-                    ).liveData
+                    ).flow
 
-                }
-                SWITCH_TITLES_ALL -> {
-                    titlesFlow
-                }
-                SWITCH_TITLES_ONE_DATE -> {
+            } else if (tab == TAB_TITLES){
+                if(selectedDate == 0L)
+                    titlesFlow ?: emptyFlow()
+                else {
+                    isTitleOneDateHeaderSet = false
                     Pager(
                         config = PagingConfig(
                             pageSize = Constants.PAGE_SIZE,
@@ -354,14 +293,13 @@ class HistoryViewModel @Inject constructor(
                         ), pagingSourceFactory = {
                             TitlesDataSource(oneDateTitleLoader, Constants.PAGE_SIZE)
                         }
-                    ).liveData
+                    ).flow
                 }
-                SWITCH_BOOKMARKS -> bookmarkedTitlesLivedata
-                else -> null
             }
+            else
+                bookmarkedTitlesLivedata
         }
     }
-
 
 
     fun setHistoryLiveData(){
@@ -374,34 +312,7 @@ class HistoryViewModel @Inject constructor(
             pagingSourceFactory = {
                 HistoryDataSource(allHistoryLoader)
             }
-        ).liveData.cachedIn(viewModelScope)
-
-//        oneDateHistoryFlow = Transformations.switchMap(oneHistoryDateCaller){
-//
-//            Pager(
-//                config = PagingConfig(
-//                    pageSize = 10,
-//                    enablePlaceholders = false
-//                ),
-//                pagingSourceFactory = {
-//                    HistoryOneDateSource(oneDateHistoryLoader)
-//                }
-//            ).liveData.cachedIn(lifecycle)
-//
-//        }
-
-//        observableHistory.addSource(historyFlow!!) { history ->
-//            if(selectedDate == 0L){
-//                observableHistory.value = history
-//            }
-//        }
-//
-//        observableHistory.addSource(oneDateHistoryFlow!!) { history ->
-//            if(selectedDate > 0L){
-//                observableHistory.value = history
-//            }
-//        }
-
+        ).flow.cachedIn(viewModelScope)
     }
 
 
@@ -415,41 +326,8 @@ class HistoryViewModel @Inject constructor(
             ), pagingSourceFactory = {
                 TitlesDataSource(allTitlesLoader, Constants.PAGE_SIZE)
             }
-        ).liveData.cachedIn(viewModelScope)
-
-//        oneDateTitlesFlow = Transformations.switchMap(oneTitleDateCaller){
-//            Pager(
-//                config = PagingConfig(
-//                    pageSize = Constants.PAGE_SIZE,
-//                    initialLoadSize = Constants.PAGE_SIZE,
-//                    enablePlaceholders = false
-//                ), pagingSourceFactory = {
-//                    TitlesDataSource(oneDateTitleLoader, Constants.PAGE_SIZE)
-//                }
-//            ).liveData.cachedIn(lifecycle)
-//        }
-//
-//
-//        observableTitles.addSource(titlesFlow!!) { titles ->
-//            if(selectedDate == 0L){
-//                observableTitles.value = titles
-//            }
-//        }
-//
-//        observableTitles.addSource(oneDateTitlesFlow!!) { titles ->
-//            if(selectedDate > 0L){
-//                observableTitles.value = titles
-//            }
-//        }
+        ).flow.cachedIn(viewModelScope)
     }
-
-
-    fun getHistory(switchTo : Int){
-        historySwitchValue = switchTo
-
-        historySwitch.postValue(switchTo)
-    }
-
 
 
 
@@ -461,26 +339,8 @@ class HistoryViewModel @Inject constructor(
 
     fun cleanHistoryTab(){
 
-
-//        historyFlow?.let{
-//            observableHistory.removeSource(it)
-//        }
-//        oneDateHistoryFlow?.let {
-//            observableHistory.removeSource(it)
-//        }
-//
-//        titlesFlow?.let {
-//            observableTitles.removeSource(it)
-//        }
-//
-//        oneDateTitlesFlow?.let {
-//            observableTitles.removeSource(it)
-//        }
-
         historyFlow = null
-//        oneDateHistoryFlow = null
         titlesFlow = null
-//        oneDateTitlesFlow = null
 
         observableHistoryPages = null
         lastTitleDate = 0L
@@ -492,7 +352,7 @@ class HistoryViewModel @Inject constructor(
 
     // Bookmarked title
 
-    val bookmarkedTitlesLivedata = repository.bookmarkedTitlesLiveData()
+    private val bookmarkedTitlesLivedata = repository.bookmarkedTitlesLiveData()
 
     fun deleteBookmarkTitle (title: BookmarkedTitle) = viewModelScope.launch {
         repository.deleteBookmarkTitle(title)

@@ -162,52 +162,46 @@ class PlaylistsAdapter @Inject constructor(
                     handleHighlightOnPlaylistClick(playlistHolder)
                 }
             }
+        }
 
+        playlistHolder.itemView.setOnDragListener { view, event ->
 
-            playlistHolder.itemView.setOnDragListener { view, event ->
+            when(event.action){
 
-
-                if(isFooterNeeded && playlistHolder.absoluteAdapterPosition != 0){
-
+                DragEvent.ACTION_DRAG_STARTED ->{
+                    event.clipDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)
                 }
+                DragEvent.ACTION_DRAG_ENTERED ->{
 
-                when(event.action){
-
-                    DragEvent.ACTION_DRAG_STARTED ->{
-                        event.clipDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)
-                    }
-                    DragEvent.ACTION_DRAG_ENTERED ->{
-
-                        playlistHolder.bind.cardView.isPressed = true
-                        view.invalidate()
-                        true
-                    }
-                    DragEvent.ACTION_DRAG_LOCATION -> true
-                    DragEvent.ACTION_DRAG_EXITED -> {
-
-                        playlistHolder.bind.cardView.isPressed = false
-                        view.invalidate()
-                        true
-                    }
-                    DragEvent.ACTION_DROP ->{
-
-                        playlistHolder.bind.cardView.isPressed = false
-
-                        val item = event.clipData.getItemAt(0)
-                        val data = item.text
-
-                        handleDragAndDrop?.let {
-                            it(data.toString(), playlistHolder.bind.tvPlaylistName.text.toString())
-                        }
-
-                        view.invalidate()
-                        true
-                    } DragEvent.ACTION_DRAG_ENDED -> {
+                    playlistHolder.bind.cardView.isPressed = true
                     view.invalidate()
                     true
                 }
-                    else -> false
+                DragEvent.ACTION_DRAG_LOCATION -> true
+                DragEvent.ACTION_DRAG_EXITED -> {
+
+                    playlistHolder.bind.cardView.isPressed = false
+                    view.invalidate()
+                    true
                 }
+                DragEvent.ACTION_DROP ->{
+
+                    playlistHolder.bind.cardView.isPressed = false
+
+                    val item = event.clipData.getItemAt(0)
+                    val data = item.text
+
+                    handleDragAndDrop?.let {
+                        it(data.toString(), playlistHolder.bind.tvPlaylistName.text.toString())
+                    }
+
+                    view.invalidate()
+                    true
+                } DragEvent.ACTION_DRAG_ENDED -> {
+                view.invalidate()
+                true
+            }
+                else -> false
             }
         }
 
@@ -303,9 +297,11 @@ class PlaylistsAdapter @Inject constructor(
 
     }
 
-    var handleDragAndDrop : ((stationID: String, playlistName : String) -> Unit)? = null
+    private var handleDragAndDrop : ((stationID: String, playlistName : String) -> Unit)? = null
 
-
+    fun setDragAndDrop (dragAndDrop : (stationID: String, playlistName : String) -> Unit){
+        handleDragAndDrop = dragAndDrop
+    }
 
 
 }

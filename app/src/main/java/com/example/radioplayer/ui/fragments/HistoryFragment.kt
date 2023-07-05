@@ -41,15 +41,12 @@ import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.AdapterAnimator
 import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
+import com.example.radioplayer.ui.animations.DefaultItemAnimator
 import com.example.radioplayer.ui.animations.SwapTitlesUi
 import com.example.radioplayer.ui.animations.SwipeToDeleteCallback
 import com.example.radioplayer.ui.animations.objectSizeScaleAnimation
 import com.example.radioplayer.ui.animations.slideAnim
-import com.example.radioplayer.ui.viewmodels.SWITCH_BOOKMARKS
-import com.example.radioplayer.ui.viewmodels.SWITCH_STATIONS_ALL
-import com.example.radioplayer.ui.viewmodels.SWITCH_STATIONS_ONE_DATE
-import com.example.radioplayer.ui.viewmodels.SWITCH_TITLES_ALL
-import com.example.radioplayer.ui.viewmodels.SWITCH_TITLES_ONE_DATE
+
 import com.example.radioplayer.ui.viewmodels.TAB_BOOKMARKS
 import com.example.radioplayer.ui.viewmodels.TAB_STATIONS
 import com.example.radioplayer.ui.viewmodels.TAB_TITLES
@@ -78,7 +75,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     FragmentHistoryBinding::inflate
 ) {
 
-
     private lateinit var datesAdapter : HistoryDatesAdapter
 
     @Inject
@@ -102,6 +98,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private var rvState : Parcelable? = null
 
+    private var currentTab = TAB_STATIONS
 
     private val clipBoard : ClipboardManager? by lazy {
         ContextCompat.getSystemService(requireContext(), ClipboardManager::class.java)
@@ -110,9 +107,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     companion object{
 
-        var adapterAnimator = AdapterAnimator()
+       var adapterAnimator = AdapterAnimator()
 
-//       var isNewHistoryQuery = true
        var numberOfDates = 0
 
     }
@@ -120,22 +116,13 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        observeIsInBookmarks()
-
-        observeIsInStationsTab()
-
         setupRecyclerView()
 
         observePlaybackState()
 
         observeNewStation()
 
-        setupAdapterClickListener()
-
         observeListOfDates()
-
-//        setTvSelectDateClickListener()
-
 
         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
             setSpinnerOpenCloseListener()
@@ -152,30 +139,33 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         setFabPickDateClickListener()
 
+        collectCurrentTabChanges()
 
+    }
+
+
+    private fun collectCurrentTabChanges(){
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 historyViewModel.currentTab.collectLatest {
+                    currentTab = it
                     when(it){
                         TAB_STATIONS -> {
                             setStationsHistoryAdapter()
                             bind.fabBookmarkedTitles.isVisible = false
                             bind.fabDatePick.setImageResource(R.drawable.ic_history_pick_date)
-
                         }
                         TAB_TITLES -> {
-
+                            setTitlesHistoryAdapter()
                             bind.fabBookmarkedTitles.setImageResource(R.drawable.ic_bookmark_hollow)
                             bind.fabBookmarkedTitles.isVisible = true
                             bind.fabDatePick.setImageResource(R.drawable.ic_history_pick_date)
-                            setTitlesHistoryAdapter()
                         }
                         TAB_BOOKMARKS -> {
                             switchToBookmarkedTitles()
                             bind.fabBookmarkedTitles.setImageResource(R.drawable.ic_bookmark_selected)
                             bind.fabBookmarkedTitles.isVisible = true
                             bind.fabDatePick.setImageResource(R.drawable.ic_history_pick_date_inactive)
-
                         }
                     }
                 }
@@ -186,35 +176,31 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private fun setFabPickDateClickListener(){
         bind.fabDatePick.setOnClickListener {
-
-            if(!historyViewModel.isInStationsTab && historyViewModel.isInBookmarks){
-                /*DO NOTHING*/
-            } else {
+            if(currentTab != TAB_BOOKMARKS){
                 bind.spinnerDates.performClick()
             }
         }
     }
 
 
-    private fun observeIsInStationsTab(){
+//    private fun observeIsInStationsTab(){
+//
+//        historyViewModel.isHistoryInStationsTabLiveData.observe(viewLifecycleOwner){
 
-        historyViewModel.isHistoryInStationsTabLiveData.observe(viewLifecycleOwner){
-
-            historyViewModel.isInStationsTab = it
+//            historyViewModel.isInStationsTab = it
 
 //            bind.fabBookmarkedTitles.isVisible = !it
 
 //            switchButtonsVisibilityWithBookmarks()
 
-        }
+//        }
+//    }
 
-    }
 
-
-    private fun observeIsInBookmarks(){
-
-        historyViewModel.isInBookmarksLiveData.observe(viewLifecycleOwner){
-            historyViewModel.isInBookmarks = it
+//    private fun observeIsInBookmarks(){
+//
+//        historyViewModel.isInBookmarksLiveData.observe(viewLifecycleOwner){
+//            historyViewModel.isInBookmarks = it
 
 //            bind.fabBookmarkedTitles.apply {
 //                if(it)
@@ -225,22 +211,21 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
 //            switchButtonsVisibilityWithBookmarks()
 
-        }
+//        }
+//    }
 
-    }
 
-
-    private fun switchButtonsVisibilityWithBookmarks(){
-
-        if(!historyViewModel.isInStationsTab && historyViewModel.isInBookmarks){
-            bind.fabDatePick.setImageResource(R.drawable.ic_history_pick_date_inactive)
+//    private fun switchButtonsVisibilityWithBookmarks(){
+//
+//        if(!historyViewModel.isInStationsTab && historyViewModel.isInBookmarks){
+//            bind.fabDatePick.setImageResource(R.drawable.ic_history_pick_date_inactive)
 //            bind.spinnerDates.isVisible = false
 
-        } else {
-            bind.fabDatePick.setImageResource(R.drawable.ic_history_pick_date)
+//        } else {
+//            bind.fabDatePick.setImageResource(R.drawable.ic_history_pick_date)
 //            bind.spinnerDates.isVisible = true
-        }
-    }
+//        }
+//    }
 
 
     private fun setSpinnerOpenCloseListener(){
@@ -248,30 +233,19 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         bind.spinnerDates.setSpinnerEventsListener( object : SpinnerExt.OnSpinnerEventsListener{
             override fun onSpinnerOpened(spinner: Spinner?) {
 
-//                bind.tvShrinkArrow.
-//                    setCompoundDrawablesWithIntrinsicBounds(0, 0,
-//                        R.drawable.ic_playlists_arrow_shrink,0)
-
                 bind.separatorDefault?.visibility = View.INVISIBLE
                 bind.separatorDefault?.slideAnim(200, 100, R.anim.fade_out_anim)
 
             }
 
             override fun onSpinnerClosed(spinner: Spinner?) {
-//                bind.tvShrinkArrow.
-//                setCompoundDrawablesWithIntrinsicBounds(0, 0,
-//                    R.drawable.ic_playlists_arrow_expand,0)
 
                 bind.separatorDefault?.visibility = View.VISIBLE
-
                 bind.separatorDefault?.slideAnim(300, 0, R.anim.fade_in_anim)
 
             }
         })
     }
-
-
-
 
 
 
@@ -282,8 +256,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         datesAdapter.selectedColor = ContextCompat.getColor(requireContext(), R.color.color_non_interactive)
 
     }
-
-
 
 
     private fun observeListOfDates(){
@@ -362,9 +334,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 //        isInitialLoad = true
 //        adapterAnimator.resetAnimator()
 
-//        rvState?.let {
-//            bind.rvHistory.layoutManager?.onRestoreInstanceState(it)
-//        }
+
 
 //        historyViewModel.apply {
 
@@ -390,19 +360,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 //        }
 //    }
 
-//    private fun setSliderHeaderText(time : Long){
-//
-//            if(time == 0L) (bind.tvSliderHeader as TextView).text = "All dates"
-//
-//            else{
-//                calendar.time = Date(time)
-//
-//                val date = Utils.fromDateToStringShort(calendar)
-//
-//                (bind.tvSliderHeader as TextView).text = date
-//            }
-//
-//    }
+
 
 
     private fun observePlaybackState(){
@@ -432,7 +390,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
 
-            if(historyViewModel.isInStationsTab &&
+            if(historyViewModel.currentTab.value == TAB_STATIONS &&
                     RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
 
                 if(isToHandleNewStationObserver){
@@ -517,7 +475,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             rvState = LinearLayoutManager(requireContext()).onSaveInstanceState()
 
             edgeEffectFactory = BounceEdgeEffectFactory()
-//            itemAnimator = null
+            itemAnimator = DefaultItemAnimator()
 //            layoutAnimation = (activity as MainActivity).layoutAnimationController
 
 //            setRvLoadChildrenListener()
@@ -564,7 +522,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                     }
                 }
 
-
                 if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
                     RadioService.currentPlayingStation.value?.let {
                         val id =  it.stationuuid
@@ -573,9 +530,12 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 } else {
                     currentRadioStationID = ""
                 }
+
             }
 
             historyViewModel.setHistoryLiveData()
+
+            setupAdapterClickListener()
 
             isStationsAdapterSet = true
         }
@@ -670,31 +630,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     }
 
-    private fun setTitlesClickListener(){
-
-        bind.tvTitles.setOnClickListener {
-
-            if(historyViewModel.isInStationsTab){
-
-                historyViewModel.isInStationsTab = false
-                historyViewModel.isHistoryInStationsTabLiveData.postValue(false)
-                historyViewModel.setIsInStations(false)
-
-
-//                if(historyViewModel.isInBookmarks){
-//                    switchToBookmarkedTitles()
-//
-//                } else {
-//                    handleSwitchToNotMarkedTitles()
-//                }
-
-            }
-
-            switchTitlesStationsUi(true)
-
-        }
-    }
-
 
 
 
@@ -715,10 +650,11 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             setOnClickListener {
 
-                historyViewModel.isInBookmarks = !historyViewModel.isInBookmarks
+//                historyViewModel.isInBookmarks = !historyViewModel.isInBookmarks
+//
+//                historyViewModel.isInBookmarksLiveData.postValue(historyViewModel.isInBookmarks)
 
-                historyViewModel.isInBookmarksLiveData.postValue(historyViewModel.isInBookmarks)
-                historyViewModel.setIsInBookmarks(historyViewModel.isInBookmarks)
+                historyViewModel.setIsInBookmarks()
 
 //                adapterAnimator.resetAnimator()
 
@@ -775,19 +711,41 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
 
 
+    private fun setTitlesClickListener(){
+
+        bind.tvTitles.setOnClickListener {
+
+            if(currentTab == TAB_STATIONS){
+
+//                historyViewModel.isInStationsTab = false
+//                historyViewModel.isHistoryInStationsTabLiveData.postValue(false)
+                historyViewModel.setIsInStations(false)
+
+
+//                if(historyViewModel.isInBookmarks){
+//                    switchToBookmarkedTitles()
+//
+//                } else {
+//                    handleSwitchToNotMarkedTitles()
+//                }
+                switchTitlesStationsUi(true)
+            }
+        }
+    }
+
 
 
     private fun setStationsClickListener(){
 
         bind.tvStations.setOnClickListener {
 
-            if(!historyViewModel.isInStationsTab){
+            if(currentTab != TAB_STATIONS){
 
-                historyViewModel.isInStationsTab = true
-                historyViewModel.isHistoryInStationsTabLiveData.postValue(true)
+//                historyViewModel.isInStationsTab = true
+//                historyViewModel.isHistoryInStationsTabLiveData.postValue(true)
                 historyViewModel.setIsInStations(true)
 
-                setStationsHistoryAdapter()
+//                setStationsHistoryAdapter()
 
 //                if(databaseViewModel.selectedDate != 0L){
 //                    stationsHistoryAdapter?.submitData(lifecycle, PagingData.empty())
@@ -804,7 +762,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private fun switchTitlesStationsUi(isToAnimate: Boolean) =
         SwapTitlesUi.swap(
-            conditionA = historyViewModel.isInStationsTab,
+            conditionA = historyViewModel.currentTab.value == TAB_STATIONS,
             textViewA = bind.tvStations as TextView,
             textViewB = bind.tvTitles as TextView,
             isToAnimate = isToAnimate,
@@ -836,19 +794,29 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         historyViewModel.initiateHistory()
 
-        historyViewModel.observableHistoryPages?.observe(viewLifecycleOwner){
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED){
 
-            isInitialLoad = true
-            adapterAnimator.resetAnimator()
+                historyViewModel.observableHistoryPages?.collectLatest{
 
-            when(historyViewModel.historySwitchValue){
-                in SWITCH_STATIONS_ALL..SWITCH_STATIONS_ONE_DATE -> stationsHistoryAdapter
-                    ?.submitData(lifecycle, it as PagingData<StationWithDateModel>)
-                in SWITCH_TITLES_ALL..SWITCH_TITLES_ONE_DATE -> titlesHistoryAdapter
-                    ?.submitData(lifecycle, it as PagingData<TitleWithDateModel>)
-                SWITCH_BOOKMARKS -> bookmarkedTitlesAdapter.listOfTitles = it as List<BookmarkedTitle>
+                    isInitialLoad = true
+                    adapterAnimator.resetAnimator()
+
+                    when(historyViewModel.currentTab.value){
+                        TAB_STATIONS -> stationsHistoryAdapter
+                            ?.submitData(lifecycle, it as PagingData<StationWithDateModel>)
+                        TAB_TITLES -> titlesHistoryAdapter
+                            ?.submitData(lifecycle, it as PagingData<TitleWithDateModel>)
+                        TAB_BOOKMARKS -> bookmarkedTitlesAdapter.listOfTitles = it as List<BookmarkedTitle>
+                    }
+                }
+
+
+
             }
         }
+
+
     }
 
 

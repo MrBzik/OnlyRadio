@@ -114,8 +114,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         setMainAdapterClickListener()
 
-        setPlaylistAdapterClickListeners()
-
         setArrowToFavClickListener()
 
         setOnPlaylistsExpandClickListener()
@@ -338,7 +336,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             }
 
-            handleDragAndDrop = { stationID, playlistName ->
+            setDragAndDrop { stationID, playlistName ->
 
                 if(currentTab == SEARCH_FROM_FAVOURITES){
                     if(RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES){
@@ -671,6 +669,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         playlistAdapter.apply {
             strokeWidth = 2f.dpToP(requireContext())
             strokeColor = ContextCompat.getColor(requireContext(), R.color.recording_seekbar_progress)
+            setPlaylistAdapterClickListeners()
         }
 
         bind.rvPlaylists.apply {

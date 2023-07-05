@@ -20,14 +20,15 @@ import com.example.radioplayer.adapters.models.TagWithGenre
 import com.example.radioplayer.databinding.DialogPickTagBinding
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.fragments.RadioSearchFragment
-import com.example.radioplayer.ui.fragments.RadioSearchFragment.Companion.tagsList
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.ui.viewmodels.SearchDialogsViewModel
 import com.example.radioplayer.utils.*
 import com.example.radioplayer.utils.KeyboardObserver.observeKeyboardState
 
 class TagPickerDialog (
     private val requireContext : Context,
     private val mainViewModel: MainViewModel,
+    private val searchDialogsViewModel: SearchDialogsViewModel,
     private val handleNewParams : () -> Unit
 )
     : BaseDialog<DialogPickTagBinding>(
@@ -62,10 +63,10 @@ class TagPickerDialog (
 
             mainViewModel.isTagExact = isChecked
             tagAdapter.isExactMatch = isChecked
-            RadioSearchFragment.tagAdapterPosition = bind.recyclerView.layoutManager?.onSaveInstanceState()
+            searchDialogsViewModel.tagAdapterPosition = bind.recyclerView.layoutManager?.onSaveInstanceState()
             bind.recyclerView.adapter = null
             bind.recyclerView.adapter = tagAdapter
-            RadioSearchFragment.tagAdapterPosition?.let {
+            searchDialogsViewModel.tagAdapterPosition?.let {
                 bind.recyclerView.layoutManager?.onRestoreInstanceState(it)
             }
         }
@@ -97,7 +98,7 @@ class TagPickerDialog (
 
         tagAdapter = FilterTagsAdapter()
         tagAdapter.apply {
-            submitList(tagsList)
+            submitList(searchDialogsViewModel.tagsList)
             defaultTextColor = ContextCompat.getColor(requireContext, R.color.unselected_genre_color)
             selectedTextColor = ContextCompat.getColor(requireContext, R.color.selected_genre_color)
             openingDrawable = R.drawable.tags_expand
@@ -108,7 +109,7 @@ class TagPickerDialog (
         bind.recyclerView.apply {
             adapter = tagAdapter
             layoutManager = LinearLayoutManager(requireContext)
-            RadioSearchFragment.tagAdapterPosition?.let {
+            searchDialogsViewModel.tagAdapterPosition?.let {
                 layoutManager?.onRestoreInstanceState(it)
             }
         }
@@ -161,144 +162,56 @@ class TagPickerDialog (
         }
     }
 
+
     private fun addTagsSublist(genre : String, position: Int){
 
-        var itemCount = 0
+        val listToAdd = getList(genre)
 
-        when(genre){
-            TAG_BY_PERIOD -> {
-                tagsList.addAll(position+1, tagsListByPeriod)
-                itemCount = tagsListByPeriod.size
-            }
-            TAG_BY_GENRE -> {
-                tagsList.addAll(position+1, tagsListByGenre)
-                itemCount = tagsListByGenre.size
+        searchDialogsViewModel.tagsList.addAll(position+1, listToAdd)
 
-            }
-
-            TAG_BY_SUB_GENRE -> {
-                tagsList.addAll(position+1, tagsListBySubGenre)
-                itemCount = tagsListBySubGenre.size
-            }
-
-            TAG_BY_MINDFUL -> {
-                tagsList.addAll(position+1, tagsListMindful)
-                itemCount = tagsListMindful.size
-
-            }
-            TAG_BY_CLASSIC -> {
-                tagsList.addAll(position+1, tagsListClassics)
-                itemCount = tagsListClassics.size
-            }
-
-            TAG_BY_EXPERIMENTAL ->{
-                tagsList.addAll(position+1, tagsListExperimental)
-                itemCount = tagsListExperimental.size
-            }
-
-            TAG_BY_SPECIAL ->{
-                tagsList.addAll(position+1, tagsListSpecial)
-                itemCount = tagsListSpecial.size
-            }
-
-
-            TAG_BY_TALK -> {
-                tagsList.addAll(position+1, tagsListByTalk)
-                itemCount = tagsListByTalk.size
-
-            }
-            TAG_BY_RELIGION -> {
-                tagsList.addAll(position+1, tagsListReligion)
-                itemCount = tagsListReligion.size
-
-            }
-            TAG_BY_ORIGIN -> {
-                tagsList.addAll(position+1, tagsListByOrigin)
-                itemCount = tagsListByOrigin.size
-
-            }
-            TAG_BY_OTHER -> {
-                tagsList.addAll(position+1, tagsListOther)
-                itemCount = tagsListOther.size
-
-            }
-        }
-
-        (tagsList[position] as TagWithGenre.Genre).isOpened = true
-        tagAdapter.submitList(tagsList)
-        tagAdapter.notifyItemRangeInserted(position+1, itemCount)
+        (searchDialogsViewModel.tagsList[position] as TagWithGenre.Genre).isOpened = true
+        tagAdapter.submitList(searchDialogsViewModel.tagsList)
+        tagAdapter.notifyItemRangeInserted(position+1, listToAdd.size)
 
     }
 
     private fun removeTagsSubList(genre : String, position : Int)  {
 
-        var itemCount = 0
+        val listToRemove = getList(genre)
 
-        when(genre){
-            TAG_BY_PERIOD -> {
-                tagsList.removeAll(tagsListByPeriod)
-                itemCount = tagsListByPeriod.size
-            }
-            TAG_BY_GENRE -> {
-                tagsList.removeAll(tagsListByGenre)
-                itemCount = tagsListByGenre.size
+        searchDialogsViewModel.tagsList.removeAll(listToRemove)
 
-            }
+        (searchDialogsViewModel.tagsList[position] as TagWithGenre.Genre).isOpened = false
+        tagAdapter.submitList(searchDialogsViewModel.tagsList)
+        tagAdapter.notifyItemRangeRemoved(position+1, listToRemove.size)
 
-            TAG_BY_SUB_GENRE -> {
-                tagsList.removeAll(tagsListBySubGenre)
-                itemCount = tagsListBySubGenre.size
-
-            }
-
-            TAG_BY_MINDFUL -> {
-                tagsList.removeAll(tagsListMindful)
-                itemCount = tagsListMindful.size
-
-            }
-
-            TAG_BY_CLASSIC -> {
-                tagsList.removeAll( tagsListClassics)
-                itemCount = tagsListClassics.size
-            }
-
-            TAG_BY_EXPERIMENTAL ->{
-                tagsList.removeAll( tagsListExperimental)
-                itemCount = tagsListExperimental.size
-            }
-
-            TAG_BY_SPECIAL ->{
-                tagsList.removeAll( tagsListSpecial)
-                itemCount = tagsListSpecial.size
-            }
+    }
 
 
-            TAG_BY_TALK -> {
-                tagsList.removeAll(tagsListByTalk)
-                itemCount = tagsListByTalk.size
+    private fun getList(genre : String) : Set<TagWithGenre.Tag> {
+        return when(genre){
+            TAG_BY_PERIOD -> tagsListByPeriod
 
-            }
-            TAG_BY_RELIGION -> {
-                tagsList.removeAll(tagsListReligion)
-                itemCount = tagsListReligion.size
+            TAG_BY_GENRE -> tagsListByGenre
 
-            }
-            TAG_BY_ORIGIN -> {
-                tagsList.removeAll(tagsListByOrigin)
-                itemCount = tagsListByOrigin.size
+            TAG_BY_SUB_GENRE -> tagsListBySubGenre
 
-            }
-            TAG_BY_OTHER -> {
-                tagsList.removeAll(tagsListOther)
-                itemCount = tagsListOther.size
+            TAG_BY_MINDFUL -> tagsListMindful
 
-            }
+            TAG_BY_CLASSIC -> tagsListClassics
+
+            TAG_BY_EXPERIMENTAL -> tagsListExperimental
+
+            TAG_BY_SPECIAL -> tagsListSpecial
+
+            TAG_BY_TALK -> tagsListByTalk
+
+            TAG_BY_RELIGION -> tagsListReligion
+
+            TAG_BY_ORIGIN -> tagsListByOrigin
+
+            else -> tagsListOther
         }
-
-        (tagsList[position] as TagWithGenre.Genre).isOpened = false
-        tagAdapter.submitList(tagsList)
-        tagAdapter.notifyItemRangeRemoved(position+1, itemCount)
-
     }
 
 
@@ -327,7 +240,7 @@ class TagPickerDialog (
     override fun onStop() {
         super.onStop()
 
-        RadioSearchFragment.tagAdapterPosition = bind.recyclerView.layoutManager?.onSaveInstanceState()
+        searchDialogsViewModel.tagAdapterPosition = bind.recyclerView.layoutManager?.onSaveInstanceState()
 
         bind.recyclerView.adapter = null
         _bind = null

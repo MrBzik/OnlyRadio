@@ -19,6 +19,7 @@ import com.example.radioplayer.databinding.DialogSearchParamsBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.viewmodels.MainViewModel
+import com.example.radioplayer.ui.viewmodels.SearchDialogsViewModel
 import com.google.android.material.slider.RangeSlider
 import java.util.*
 
@@ -60,6 +61,7 @@ val bitrateCalclList = arrayListOf(7000, 60, 230, 20, 1300, 2600, 3300, 500, 200
 class SearchParamsDialog (
     private val requireContext : Context,
     private val mainViewModel: MainViewModel,
+    private val searchDialogsViewModel : SearchDialogsViewModel,
     private val handleNewParams : () -> Unit
         ) : BaseDialog<DialogSearchParamsBinding>(
     requireContext, DialogSearchParamsBinding::inflate
@@ -102,7 +104,7 @@ class SearchParamsDialog (
 
     private fun updateStationsCountForLanguage(){
 
-        mainViewModel.updateLanguageCount {
+        searchDialogsViewModel.updateLanguageCount {
             bind.tvStationsLangCount.text = "$it st."
         }
 
