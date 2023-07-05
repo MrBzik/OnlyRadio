@@ -81,7 +81,7 @@ class RadioPlayerEventListener (
         }
 
         if(radioService.radioSource.exoRecordState.value == true){
-            radioService.stopRecording()
+            radioService.exoRecordImp.stopRecording()
         }
     }
 
@@ -155,7 +155,7 @@ class RadioPlayerEventListener (
             }
 
             if(radioService.radioSource.exoRecordState.value == true){
-                radioService.stopRecording()
+                radioService.exoRecordImp.stopRecording()
             }
         }
     }

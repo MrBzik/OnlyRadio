@@ -118,17 +118,7 @@ import javax.inject.Inject
 
 private const val SERVICE_TAG = "service tag"
 
-private const val RECORDING_HANDLER = "keeps info about last started recording"
-private const val IS_RECORDING_HANDLED = "is recording handled"
-private const val RECORDING_FILE_NAME = "file and path of the recording"
-private const val RECORDING_NAME = "name of recording"
-private const val RECORDING_TIMESTAMP = "rec. time stamp"
-private const val RECORDING_ICON_URL = "rec. url path"
-private const val RECORDING_SAMPLE_RATE = "rec. sample rate"
-private const val RECORDING_CHANNELS_COUNT = "rec. channels count"
-
 private const val PLAY_DURATION_MILLS_CHECK = 604800000
-
 
 private const val DURATION_UPDATE_PREF = "duration update recovery shared pref"
 private const val LAST_PLAYED_STATION_ID = "last played station Id"
@@ -160,6 +150,10 @@ class RadioService : MediaBrowserServiceCompat() {
     @Inject
     lateinit var exoRecord: ExoRecord
 
+    val exoRecordImp by lazy {
+        ExoRecordImpl(this)
+    }
+
     @Inject
     lateinit var databaseRepository: DatabaseRepository
 
@@ -185,6 +179,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
     var isForegroundService = false
 
+    var isPlaybackStatePlaying = false
 
     private var isPlayerInitialized = false
 
@@ -194,9 +189,6 @@ class RadioService : MediaBrowserServiceCompat() {
 //    private lateinit var visualizer: Visualizer
 
 
-    private val recordingCheck : SharedPreferences by lazy {
-        this@RadioService.getSharedPreferences(RECORDING_HANDLER, Context.MODE_PRIVATE)
-    }
 
 
 
@@ -345,8 +337,8 @@ class RadioService : MediaBrowserServiceCompat() {
             glide, {
                 upsertNewBookmark()
             }, {
-                stopRecording()
-            }
+                exoRecordImp.stopRecording()
+                 }
             )
 
 
@@ -391,21 +383,16 @@ class RadioService : MediaBrowserServiceCompat() {
 //                    }
 //                }
 
-
                 COMMAND_START_RECORDING -> {
 
                     if(isPlaybackStatePlaying){
-                        if(isExoRecordListenerToSet){
-                            setExoRecordListener()
-//                            createRecordingNotificationChannel()
-                        }
-                        startRecording()
-                    }
 
+                        exoRecordImp.onCommandStartRecording()
+                    }
                 }
 
                 COMMAND_STOP_RECORDING -> {
-                    stopRecording()
+                    exoRecordImp.stopRecording()
                 }
 
 
@@ -714,7 +701,7 @@ class RadioService : MediaBrowserServiceCompat() {
 //        radioNotificationManager.showNotification(exoPlayer)
 
 
-        checkRecordingAndRecoverIfNeeded()
+        exoRecordImp.checkRecordingAndRecoverIfNeeded()
 
         isToReconnect = this@RadioService
             .getSharedPreferences(RECONNECT_PREF, Context.MODE_PRIVATE).getBoolean(
@@ -983,47 +970,6 @@ class RadioService : MediaBrowserServiceCompat() {
     }
 
 
-
-
-
-    class MyMediaSourceFactory(context: Context, datasourceFactory: DataSource.Factory, checkIntervals: Int) : MediaSource.Factory {
-        private val defaultMediaSourceFactory: DefaultMediaSourceFactory
-        private val progressiveFactory : MediaSource.Factory
-
-        init {
-            defaultMediaSourceFactory = DefaultMediaSourceFactory(context)
-            progressiveFactory = ProgressiveMediaSource.Factory(datasourceFactory)
-                .setContinueLoadingCheckIntervalBytes(1024 * checkIntervals)
-        }
-
-
-        override fun setDrmSessionManagerProvider(drmSessionManagerProvider: DrmSessionManagerProvider): MediaSource.Factory {
-            defaultMediaSourceFactory.setDrmSessionManagerProvider(drmSessionManagerProvider)
-            progressiveFactory.setDrmSessionManagerProvider(drmSessionManagerProvider)
-            return this;
-        }
-
-        override fun setLoadErrorHandlingPolicy(loadErrorHandlingPolicy: LoadErrorHandlingPolicy): MediaSource.Factory {
-            defaultMediaSourceFactory.setLoadErrorHandlingPolicy(loadErrorHandlingPolicy)
-            progressiveFactory.setLoadErrorHandlingPolicy(loadErrorHandlingPolicy)
-            return this
-        }
-
-        override fun getSupportedTypes(): IntArray {
-            return defaultMediaSourceFactory.supportedTypes
-        }
-
-        override fun createMediaSource(mediaItem: MediaItem): MediaSource {
-            if (mediaItem.localConfiguration?.uri?.path?.contains("m3u8") == true) {
-                return defaultMediaSourceFactory.createMediaSource(mediaItem);
-
-            }
-            return progressiveFactory.createMediaSource(mediaItem)
-        }
-    }
-
-
-
     private fun recreateExoPlayer(){
 
         val isToPlay = exoPlayer.playWhenReady
@@ -1041,50 +987,6 @@ class RadioService : MediaBrowserServiceCompat() {
             )
     }
 
-
-
-    private fun getRecordingDuration(id : String) : Long {
-        var duration = 0L
-
-        try {
-
-            val filePath = this@RadioService.filesDir.absolutePath + "/" + id
-            val extractor = MediaExtractor()
-            extractor.setDataSource(filePath)
-            val format = extractor.getTrackFormat(0)
-            val dur = format.getLong(MediaFormat.KEY_DURATION)
-            duration = dur
-
-        } catch (e : Exception){
-            Log.d("CHECKTAGS", e.stackTraceToString())
-        }
-
-        return duration
-    }
-
-
-    private fun checkRecordingAndRecoverIfNeeded(){
-
-        val check = recordingCheck.getBoolean(IS_RECORDING_HANDLED, true)
-
-        if(!check){
-
-            serviceScope.launch(Dispatchers.IO){
-                val recId = recordingCheck.getString(RECORDING_FILE_NAME, "")
-                recId?.let { id ->
-                    val duration = getRecordingDuration(id)
-
-                    convertRecording(
-                        id,
-                        recordingCheck.getInt(RECORDING_SAMPLE_RATE, 44100),
-                        recordingCheck.getInt(RECORDING_CHANNELS_COUNT, 2),
-                        recordingCheck.getLong(RECORDING_TIMESTAMP, System.currentTimeMillis()),
-                        duration / 1000
-                    )
-                }
-            }
-        }
-    }
 
 
 
@@ -1123,7 +1025,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
     private var isRecordingDurationListenerRunning = false
-    var isPlaybackStatePlaying = false
+
 
 
 
@@ -1149,37 +1051,9 @@ class RadioService : MediaBrowserServiceCompat() {
 //
 //        visualizer.enabled = true
 
-
-
-        serviceScope.launch {
-
-
-
-
-
-            while (true){
-
-//                val peaks = visualizer.getMeasurementPeakRms(android.media.audiofx.Visualizer.MeasurementPeakRms())
+  //      val peaks = visualizer.getMeasurementPeakRms(android.media.audiofx.Visualizer.MeasurementPeakRms())
 //
-//            Log.d("CHECKTAGS", "peaks are : $peaks")
 
-                val format = exoPlayer.audioFormat
-//
-//                val sampleRate = format?.sampleRate
-
-
-
-//                Log.d("CHECKTAGS", "sampleRate: $sampleRate, channels: $channels")
-
-//
-//                Log.d("CHECKTAGS", "buffer? : ${exoPlayer.totalBufferedDuration}")
-
-
-                delay(2000)
-
-            }
-
-        }
 
 
 //        val rate = Visualizer.getMaxCaptureRate()
@@ -1242,14 +1116,6 @@ class RadioService : MediaBrowserServiceCompat() {
 
                     val pos = mediaSession.controller.playbackState.currentPlaybackPosition
 
-//                    if(exoPlayer.duration in 0..pos) {
-//
-//                       exoPlayer.seekTo(currentPlayingItemPosition, 0)
-//                        exoPlayer.pause()
-//                       recordingPlaybackPosition.postValue(0)
-//
-//                        break
-//                    }
 
                     recordingPlaybackPosition.postValue(pos)
 
@@ -1273,191 +1139,11 @@ class RadioService : MediaBrowserServiceCompat() {
 
                 }
                 isRecordingDurationListenerRunning = false
-//                      isToSkip = true
+
             }
         }
     }
 
-
-
-    private val exoRecordListener = object : ExoRecord.ExoRecordListener{
-
-        lateinit var timer : Timer
-        var duration = 0L
-
-
-        override fun onStartRecording(recordFileName: String) {
-
-//            val notification = RecordingNotification(this@RadioService) {
-//                currentRadioStation?.name ?: ""
-//            }
-
-//            notification.showNotification()
-
-            radioSource.exoRecordState.postValue(true)
-            radioSource.exoRecordFinishConverting.postValue(false)
-
-            timer = Timer()
-            timer.scheduleAtFixedRate(object : TimerTask() {
-                val startTime = System.currentTimeMillis()
-                override fun run() {
-                    duration = (System.currentTimeMillis() - startTime)
-
-                    val time = Utils.timerFormat(duration)
-
-                    radioNotificationManager.recordingDuration = time
-                    radioNotificationManager.updateNotification()
-
-                    radioSource.exoRecordTimer.postValue(time)
-                }
-            }, 0L, 1000L)
-
-           recordingCheck.edit().apply{
-               putBoolean(IS_RECORDING_HANDLED, false)
-               putString(RECORDING_FILE_NAME, recordFileName)
-               putString(RECORDING_NAME, currentRadioStation?.name ?: "")
-               putString(RECORDING_ICON_URL, currentRadioStation?.favicon ?: "")
-               putInt(RECORDING_SAMPLE_RATE, recSampleRate)
-               putInt(RECORDING_CHANNELS_COUNT, recChannelsCount)
-               putLong(RECORDING_TIMESTAMP, System.currentTimeMillis())
-           }.apply()
-
-
-            radioNotificationManager.updateForStartRecording()
-
-
-        }
-
-        override fun onStopRecording(record: IExoRecord.Record) {
-
-//            NotificationManagerCompat.from(this@RadioService).cancel(RECORDING_NOTIFICATION_ID)
-
-
-            radioNotificationManager.updateForStopRecording()
-
-            timer.cancel()
-            isConverterWorking = true
-            radioSource.exoRecordState.postValue(false)
-
-            convertRecording(record.filePath, recSampleRate, recChannelsCount, System.currentTimeMillis(), duration)
-
-        }
-    }
-
-
-
-    private fun convertRecording(
-        filePath: String, sampleRate : Int, channelsCount : Int,
-        timeStamp : Long, duration : Long
-        )
-            = CoroutineScope(Dispatchers.IO).launch {
-
-        val recQualityPref = this@RadioService.application.getSharedPreferences(RECORDING_QUALITY_PREF, Context.MODE_PRIVATE)
-        val setting = recQualityPref.getFloat(RECORDING_QUALITY_PREF, REC_QUALITY_DEF)
-
-        Log.d("CHECKTAGS", "setting is : $setting")
-
-        ExoRecordOgg.convertFile(
-            this@RadioService.application,
-            filePath,
-            sampleRate,
-            channelsCount,
-            setting
-        ){ progress ->
-
-            if(progress == 100.0f){
-
-                Log.d("CHECKTAGS", "progress is 100")
-
-
-                try {
-                    insertNewRecording(
-                        filePath,
-                        timeStamp,
-                        duration
-                    )
-                    deleteFile(filePath)
-                    isConverterWorking = false
-                    radioSource.exoRecordFinishConverting.postValue(true)
-                    recordingCheck.edit().putBoolean(IS_RECORDING_HANDLED, true).apply()
-                } catch (e: java.lang.Exception){
-                    Log.d("CHECKTAGS", e.stackTraceToString())
-                }
-                this.cancel()
-            }
-        }
-    }
-
-
-    private suspend fun insertNewRecording(
-        recId : String, timeStamp : Long, duration : Long
-    ) {
-
-        Log.d("CHECKTAGS", "inserting new recording")
-
-        val id = recId.replace(".wav", ".ogg")
-        val iconUri = recordingCheck.getString(RECORDING_ICON_URL, "") ?: ""
-        val name = "Rec. ${ recordingCheck.getString(RECORDING_NAME, "") ?: ""}"
-
-        var dur = duration
-
-        if(duration == 0L){
-            dur = getRecordingDuration(id)
-        }
-
-
-        radioSource.insertRecording(
-            Recording(
-                id, iconUri, timeStamp, name, dur
-            )
-        )
-    }
-
-
-    private var isExoRecordListenerToSet = true
-
-    private var isConverterWorking = false
-
-    private fun setExoRecordListener(){
-        exoRecord.addExoRecordListener("MainListener", exoRecordListener)
-        isExoRecordListenerToSet = false
-    }
-
-
-    private fun startRecording () = serviceScope.launch {
-        if(!isConverterWorking){
-
-            val format = exoPlayer.audioFormat
-            val sampleRate = format?.sampleRate ?: 0
-            val channels = format?.channelCount ?: 0
-
-
-//            Log.d("CHECKTAGS", "$sampleRate, $channels")
-
-
-            recSampleRate = if(sampleRate == 22050 && format?.sampleMimeType == "audio/mp4a-latm" ||
-                sampleRate == 24000 && format?.sampleMimeType == "audio/mp4a-latm"
-                    ) {
-                recChannelsCount = 2
-                sampleRate*2
-            } else {
-                recChannelsCount = channels
-                sampleRate
-            }
-
-            Log.d("CHECKTAGS", "rec in : $recChannelsCount, $recSampleRate")
-
-            exoRecord.exoRecordProcessor.configure(AudioProcessor.AudioFormat(sampleRate, channels,  C.ENCODING_PCM_16BIT))
-
-            exoRecord.startRecording()
-        }
-    }
-
-    fun stopRecording () = serviceScope.launch {
-       if(!isConverterWorking){
-           exoRecord.stopRecording()
-       }
-    }
 
     fun invalidateNotification(){
         mediaSessionConnector.invalidateMediaSessionQueue()
@@ -1465,8 +1151,6 @@ class RadioService : MediaBrowserServiceCompat() {
         radioNotificationManager.resetBookmarkIcon()
         radioNotificationManager.updateNotification()
     }
-
-
 
 
    private inner class RadioQueueNavigator : TimelineQueueNavigator(mediaSession){
@@ -1674,8 +1358,6 @@ class RadioService : MediaBrowserServiceCompat() {
             }
             index - shift
         }
-
-
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {

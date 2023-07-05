@@ -148,7 +148,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
 //        setBluetoothDialog()
 
-
     }
 
 
@@ -190,26 +189,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         settingsGeneral.setGeneralLogic()
 
-
-//        getInitialUiMode()
-//
-//        setReconnectButton()
-//
-//        setForegroundPrefButton()
-
         setSwitchNightModeListener()
-
-//        setupRecSettingClickListener()
-//
-//        historySettingsClickListener()
-//
-//        setBufferSettingsClickListener()
-//
-//        setFullAutoSearch()
-//
-//        setStationTitleSize()
-//
-//        setAddStationClickListener()
 
     }
 
@@ -281,93 +261,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
     )
 
 
-//    private fun setAddStationClickListener(){
-//
-//        bindGeneral.tvAddStationTitleBtn.setOnClickListener {
-//
-//            val intent = Intent(Intent.ACTION_VIEW,
-//                Uri.parse(ADD_RADIO_STATION_URL))
-//            startActivity(intent)
-//        }
-//    }
-
-
-//    private fun setStationTitleSize(){
-//
-//        bindGeneral.tvStationsTitleSize.apply {
-//
-//            textSize = settingsViewModel.stationsTitleSize
-//
-//            setOnClickListener {
-//
-//                val newSize = if(settingsViewModel.stationsTitleSize > 14){
-//                    settingsViewModel.stationsTitleSize -2f
-//                } else {
-//                    20f
-//                }
-//
-//                textSize = newSize
-//                settingsViewModel.stationsTitleSize = newSize
-//            }
-//        }
-//    }
-
-
-//    private fun setAutoSearchByName(){
-//
-//        bindGeneral.switchNameAutoSearchPref.apply {
-//            isChecked = mainViewModel.isNameAutoSearch
-//
-//            setOnCheckedChangeListener { _, isChecked ->
-//
-//                mainViewModel.isNameAutoSearch = isChecked
-//            }
-//        }
-//    }
-
-//    private fun setFullAutoSearch(){
-//
-//
-//        bindGeneral.tvFullAutoSearchHint.text =
-//            "(Default: start new searches manually by Swipe-up or with [icon] button)"
-//
-//        bindGeneral.tvFullAutoSearchHint.addImage(
-//            atText = "[icon]",
-//            imgSrc = R.drawable.ic_new_radio_search,
-//            imgWidth = 30f.dpToP(requireContext()),
-//            imgHeight = 30f.dpToP(requireContext())
-//            )
-//
-//        bindGeneral.switchFullAutoSearchPref.apply {
-//            isChecked = mainViewModel.isFullAutoSearch
-//
-//            setOnCheckedChangeListener { _, isChecked ->
-//
-//                mainViewModel.isFullAutoSearch = isChecked
-//            }
-//        }
-//    }
-
-
-
-
-
-
-
-//    private fun setBufferSettingsClickListener(){
-//
-//
-//        bindGeneral.tvControlBufferValue.setOnClickListener {
-//
-//            BufferSettingsDialog(requireContext(), bufferPref){ isPlayerToResturt ->
-//
-//                if(isPlayerToResturt){
-//                    settingsViewModel.restartPlayer()
-//                }
-//            }.show()
-//        }
-//    }
-
 
 
 //    private fun openAudioSettings(){
@@ -383,24 +276,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 //    }
 
 
-//
-//    private fun changePlayerBtn(){
-//
-//        bind.switchChangePlayer.setOnCheckedChangeListener { buttonView, isChecked ->
-//
-//            if(isChecked){
-//
-//                mainViewModel.changeToGoodPlayer()
-//
-//            }
-//
-//            else{
-//                mainViewModel.changeToBadPlayer()
-//            }
-//
-//        }
-//
-//    }
+
 
 //    private fun setBluetoothDialog(){
 //
@@ -437,10 +313,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
 
 //                BluetoothDialog(requireContext(), bluetoothViewModel).show()
-//
-//
-//
-//
 //        }
 //
 //    }
@@ -484,104 +356,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
     }
 
-//    private fun setForegroundPrefButton(){
-//
-//        val foregroundPref : SharedPreferences by lazy{
-//            requireContext().getSharedPreferences(FOREGROUND_PREF, Context.MODE_PRIVATE)
-//        }
-//
-//        bindGeneral.switchForegroundPref.apply {
-//            isChecked = RadioService.isToKillServiceOnAppClose
-//            setOnCheckedChangeListener { _, isChecked ->
-//                foregroundPref.edit().putBoolean(FOREGROUND_PREF, isChecked).apply()
-//                RadioService.isToKillServiceOnAppClose = isChecked
-//            }
-//        }
-//    }
-
-
-
-//    private fun setReconnectButton(){
-//
-//        val reconnectPref = requireContext().getSharedPreferences(RECONNECT_PREF, Context.MODE_PRIVATE)
-//
-//        val initialMode = reconnectPref.getBoolean(RECONNECT_PREF, true)
-//
-//        bindGeneral.switchReconnect.apply {
-//            isChecked = initialMode
-//
-//            setOnCheckedChangeListener { _, isChecked ->
-//
-//                reconnectPref.edit().putBoolean(RECONNECT_PREF, isChecked).apply()
-//                RadioService.isToReconnect = isChecked
-//            }
-//        }
-//    }
-
-
-
-
-//    private fun setSearchBtnResetListener(){
-//
-//        mainViewModel.apply {
-//            if(isFabUpdated || isFabMoved){
-//                bindGeneral.tvSearchBtnReset
-//                    .setTextColor(ContextCompat.getColor(requireContext(), R.color.apply_option_text))
-//            }
-//
-//        }
-//
-//        bindGeneral.tvSearchBtnReset.setOnClickListener {
-//
-//            mainViewModel.apply {
-//                isFabMoved = false
-//                isFabUpdated = false
-//                fabPref.edit().putBoolean(IS_FAB_UPDATED, false).apply()
-//            }
-//
-//            bindGeneral.tvSearchBtnReset
-//                .setTextColor(ContextCompat.getColor(requireContext(), R.color.selected_station_paused))
-//
-//        }
-//    }
-
-
-
-//    private fun historySettingsClickListener(){
-//
-//        bindGeneral.tvHistorySettingValue.setOnClickListener {
-//
-//            HistoryOptionsDialog(requireContext(), historyPref, historyViewModel).show()
-//
-//        }
-//    }
-
-
-
-
-
-//    private fun setupRecSettingClickListener(){
-//
-//        val initialValue = RecPref.qualityFloatToInt(
-//            recordingQualityPref.getFloat(RECORDING_QUALITY_PREF, REC_QUALITY_DEF)
-//        )
-//
-//        bindGeneral.tvRecordingSettingsValue.text = RecPref.setTvRecQualityValue(initialValue)
-//
-//
-//        bindGeneral.tvRecordingSettingsValue.setOnClickListener {
-//
-//            RecordingOptionsDialog(
-//                recordingQualityPref,
-//                requireContext(),
-//                ) { newValue ->
-//
-//                bindGeneral.tvRecordingSettingsValue.text = RecPref.setTvRecQualityValue(newValue)
-//
-//            }.show()
-//
-//        }
-//    }
 
     private fun setSwitchNightModeListener(){
 
@@ -613,19 +387,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
                 }, 500)
         }
     }
-
-//    private fun getInitialUiMode(){
-//
-//        when(MainActivity.uiMode){
-//            Configuration.UI_MODE_NIGHT_YES -> {
-//                bindGeneral.switchNightMode.isChecked = true
-//            }
-//
-//            Configuration.UI_MODE_NIGHT_NO -> {
-//                bindGeneral.switchNightMode.isChecked = false
-//            }
-//        }
-//    }
 
 
     override fun onDestroyView() {
