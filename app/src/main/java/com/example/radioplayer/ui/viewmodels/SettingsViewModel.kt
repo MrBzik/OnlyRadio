@@ -3,7 +3,6 @@ package com.example.radioplayer.ui.viewmodels
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import com.example.radioplayer.exoPlayer.RadioServiceConnection
 import com.example.radioplayer.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +26,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun changeVirtualizerLevel(){
-        radioServiceConnection.sendCommand(Constants.COMMAND_CHANGE_BASS_LEVEL, null)
+        radioServiceConnection.sendCommand(Constants.COMMAND_TOGGLE_REVERB, null)
     }
 
 

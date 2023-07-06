@@ -56,7 +56,7 @@ class RadioPlayerEventListener (
                             RadioService.currentSongTitle.postValue(withoutWalm)
 
                             if(radioService.exoPlayer.playWhenReady){
-                                radioService.insertNewTitle(withoutWalm)
+                                radioService.dbOperators.insertNewTitle(withoutWalm)
                             }
 
                             RadioService.currentlyPlayingSong = withoutWalm
@@ -76,7 +76,7 @@ class RadioPlayerEventListener (
         if(playWhenReady){
             if(RadioService.currentlyPlayingSong != radioService.lastInsertedSong &&
                RadioService.currentlyPlayingSong != TITLE_UNKNOWN){
-                radioService.insertNewTitle(RadioService.currentlyPlayingSong)
+                radioService.dbOperators.insertNewTitle(RadioService.currentlyPlayingSong)
             }
         }
 
@@ -112,7 +112,7 @@ class RadioPlayerEventListener (
                     SEARCH_FROM_API -> {
 
                         station = radioService.radioSource.stationsFromApi[index].toRadioStation()
-                        radioService.insertRadioStation(station)
+                        radioService.dbOperators.insertRadioStation(station)
 
                     }
 
@@ -150,8 +150,8 @@ class RadioPlayerEventListener (
 
                 radioService.currentRadioStation = it
                 RadioService.currentPlayingStation.postValue(it)
-                radioService.updateStationLastClicked(it.stationuuid)
-                radioService.checkDateAndUpdateHistory(it.stationuuid)
+                radioService.dbOperators.updateStationLastClicked(it.stationuuid)
+                radioService.dbOperators.checkDateAndUpdateHistory(it.stationuuid)
             }
 
             if(radioService.radioSource.exoRecordState.value == true){
@@ -174,7 +174,7 @@ class RadioPlayerEventListener (
 
             radioService.isPlaybackStatePlaying = false
 
-            radioService.updateStationPlayedDuration()
+            radioService.dbOperators.updateStationPlayedDuration()
 
             radioService.stopForeground(STOP_FOREGROUND_DETACH)
 
@@ -187,7 +187,7 @@ class RadioPlayerEventListener (
             radioService.isPlaybackStatePlaying = true
             radioService.listenToRecordDuration()
 
-            radioService.updateStationPlayedDuration()
+            radioService.dbOperators.updateStationPlayedDuration()
 
             if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
                 radioService.fadeInPlayer()

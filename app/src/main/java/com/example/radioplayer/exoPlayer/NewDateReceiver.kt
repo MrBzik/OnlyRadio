@@ -12,4 +12,8 @@ class NewDateReceiver(private val newDateHandler : () -> Unit) : BroadcastReceiv
             newDateHandler()
         }
     }
+
+
+
+
 }

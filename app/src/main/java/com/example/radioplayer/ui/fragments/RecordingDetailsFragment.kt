@@ -20,8 +20,6 @@ import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.databinding.FragmentRecordingDetailsBinding
 import com.example.radioplayer.exoPlayer.RadioService
-import com.example.radioplayer.exoPlayer.audiocalc.AudioCalculator
-import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.dialogs.RenameRecordingDialog
 import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Utils

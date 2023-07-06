@@ -208,7 +208,7 @@ object Constants {
 
     const val COMMAND_CHANGE_REVERB_MODE = "change reverb mode"
 
-    const val COMMAND_CHANGE_BASS_LEVEL = "change bass boost level"
+    const val COMMAND_TOGGLE_REVERB = "change bass boost level"
 
 
 }
