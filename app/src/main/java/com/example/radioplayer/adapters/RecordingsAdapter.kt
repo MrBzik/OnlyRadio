@@ -23,6 +23,7 @@ import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.databinding.ItemRecordingWithSeekbarBinding
 import com.example.radioplayer.exoPlayer.RadioService
+import com.example.radioplayer.extensions.loadImage
 import com.example.radioplayer.ui.animations.fadeOut
 import com.example.radioplayer.ui.fragments.RecordingsFragment
 import com.example.radioplayer.utils.RandomColors
@@ -38,7 +39,6 @@ class RecordingsAdapter @Inject constructor(
 ) : RecyclerView.Adapter<RecordingsAdapter.RecordingItemHolder>() {
 
     private val randColors = RandomColors()
-    private val glideLoader = GlideLoader()
 
     class RecordingItemHolder (val bind : ItemRecordingWithSeekbarBinding) : RecyclerView.ViewHolder(bind.root)
 
@@ -118,9 +118,7 @@ class RecordingsAdapter @Inject constructor(
 
             } else {
 
-
-                glideLoader.loadImage(
-                    glide = glide,
+                glide.loadImage(
                     uri = recording.iconUri,
                     tvPlaceholder = tvPlaceholder,
                     ivItemImage = ivItemImage,

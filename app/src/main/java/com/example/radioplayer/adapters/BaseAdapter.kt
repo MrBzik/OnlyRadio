@@ -15,6 +15,7 @@ import com.bumptech.glide.request.target.Target
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.ItemRadioWithTextBinding
+import com.example.radioplayer.extensions.loadImage
 import com.example.radioplayer.ui.animations.fadeOut
 import com.example.radioplayer.utils.RandomColors
 
@@ -123,8 +124,7 @@ class BaseAdapter(
 
             } else {
 
-                glideLoader.loadImage(
-                    glide = glide,
+                glide.loadImage(
                     uri = station.favicon,
                     tvPlaceholder = tvPlaceholder,
                     ivItemImage = ivItemImage,

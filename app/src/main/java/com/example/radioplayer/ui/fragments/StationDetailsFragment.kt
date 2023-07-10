@@ -124,9 +124,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
 
 
-
-
-
     private fun getCurrentPlaylistItems(){
 
 
@@ -539,86 +536,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         }
     }
 
-    private val randColors = RandomColors()
-
-//    private fun setTvPlaceHolderLetter(name : String,){
-//
-//        val color = randColors.getColor()
-//
-//            var char = 'X'
-//
-//            for(l in name.indices){
-//                if(name[l].isLetter()){
-//                    char = name[l]
-//                    break
-//                }
-//            }
-//
-//            bind.tvPlaceholder.apply {
-//                text = char.toString().uppercase()
-//                setTextColor(color)
-//                alpha = 0.6f
-//        }
-//    }
-
-
-//    private fun updateUiForRadioStation(station : RadioStation){
-//
-//            homepageUrl = station.homepage
-//
-//            bind.tvName.text = station.name
-//
-//            if(station.favicon.isNullOrBlank()){
-//
-//                bind.ivIcon.visibility = View.INVISIBLE
-//                setTvPlaceHolderLetter(station.name?: "")
-//
-//            } else {
-//
-//                glide
-//                    .load(station.favicon)
-//                    .listener(object : RequestListener<Drawable>{
-//                        override fun onLoadFailed(
-//                            e: GlideException?,
-//                            model: Any?,
-//                            target: Target<Drawable>?,
-//                            isFirstResource: Boolean
-//                        ): Boolean {
-//
-//                            bind.ivIcon.visibility = View.INVISIBLE
-//                            setTvPlaceHolderLetter(station.name ?: "")
-//                            return true
-//                        }
-//
-//                        override fun onResourceReady(
-//                            resource: Drawable?,
-//                            model: Any?,
-//                            target: Target<Drawable>?,
-//                            dataSource: DataSource?,
-//                            isFirstResource: Boolean
-//                        ): Boolean {
-//                            return false
-//                        }
-//                    })
-//                    .transition(DrawableTransitionOptions.withCrossFade())
-//                    .into(bind.ivIcon)
-//
-//            }
-//
-//
-//
-//            if(!station.language.isNullOrBlank()){
-//                bind.tvLanguage.isVisible = true
-//                val languages = station.language.replace(",", ", ")
-//                bind.tvLanguage.text = "Languages : $languages"
-//            }
-//            if(!station.tags.isNullOrBlank()){
-//                bind.tvTags.isVisible = true
-//                val tags = station.tags.replace(",", ", ")
-//                bind.tvTags.text = "Tags : $tags"
-//            }
-//
-//    }
 
 
     private fun updateListOfPlaylists(){
@@ -629,17 +546,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         }
     }
 
-
-//    private fun setHomePageClickListener(){
-//
-//        bind.tvHomePage.setOnClickListener {
-//
-//            if(!homepageUrl.isNullOrBlank()) {
-//                val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(homepageUrl))
-//                startActivity(webIntent)
-//            }
-//        }
-//    }
 
 
     private fun addToPlaylistLogic(){

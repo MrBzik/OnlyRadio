@@ -35,6 +35,7 @@ import com.example.radioplayer.databinding.ItemRadioWithTextBinding
 import com.example.radioplayer.databinding.ItemTitleBinding
 import com.example.radioplayer.databinding.RadioItemBinding
 import com.example.radioplayer.exoPlayer.RadioService
+import com.example.radioplayer.extensions.loadImage
 import com.example.radioplayer.ui.animations.fadeOut
 import com.example.radioplayer.ui.fragments.HistoryFragment
 import com.example.radioplayer.utils.RandomColors
@@ -54,7 +55,6 @@ class TitleAdapter @Inject constructor(
 ) : PagingDataAdapter<TitleWithDateModel, RecyclerView.ViewHolder>(TitlesComparator) {
 
     private val randColors = RandomColors()
-    private val glideLoader = GlideLoader()
 
     class TitleViewHolder (val bind: ItemTitleBinding)
         : RecyclerView.ViewHolder(bind.root)
@@ -178,8 +178,7 @@ class TitleAdapter @Inject constructor(
 
                 } else {
 
-                    glideLoader.loadImage(
-                        glide = glide,
+                    glide.loadImage(
                         uri = title.stationIconUri,
                         tvPlaceholder = tvPlaceholder,
                         ivItemImage = ivItemImage,

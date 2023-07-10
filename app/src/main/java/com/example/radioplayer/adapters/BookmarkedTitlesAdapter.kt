@@ -26,6 +26,7 @@ import com.example.radioplayer.databinding.ItemBookmarkedTitleBinding
 import com.example.radioplayer.databinding.ItemRadioWithTextBinding
 import com.example.radioplayer.databinding.ItemTitleBinding
 import com.example.radioplayer.exoPlayer.RadioService
+import com.example.radioplayer.extensions.loadImage
 import com.example.radioplayer.ui.animations.fadeOut
 import com.example.radioplayer.ui.fragments.HistoryFragment
 import com.example.radioplayer.utils.RandomColors
@@ -37,7 +38,6 @@ class BookmarkedTitlesAdapter @Inject constructor(
 ) : RecyclerView.Adapter<BookmarkedTitlesAdapter.TitleViewHolder>() {
 
     private val randColors = RandomColors()
-    private val glideLoader = GlideLoader()
 
     class TitleViewHolder (val bind : ItemBookmarkedTitleBinding) : RecyclerView.ViewHolder(bind.root)
 
@@ -96,8 +96,7 @@ class BookmarkedTitlesAdapter @Inject constructor(
 
             } else {
 
-                glideLoader.loadImage(
-                    glide = glide,
+                glide.loadImage(
                     uri = title.stationIconUri,
                     tvPlaceholder = tvPlaceholder,
                     ivItemImage = ivItemImage,
