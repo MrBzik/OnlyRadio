@@ -38,6 +38,7 @@ class RecordingsAdapter @Inject constructor(
 ) : RecyclerView.Adapter<RecordingsAdapter.RecordingItemHolder>() {
 
     private val randColors = RandomColors()
+    private val glideLoader = GlideLoader()
 
     class RecordingItemHolder (val bind : ItemRecordingWithSeekbarBinding) : RecyclerView.ViewHolder(bind.root)
 
@@ -117,46 +118,17 @@ class RecordingsAdapter @Inject constructor(
 
             } else {
 
-                glide
-                    .load(recording.iconUri)
-                    .listener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
 
-                            return true
-                        }
-
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-
-                            if(dataSource?.name == "REMOTE"){
-
-                                tvPlaceholder.fadeOut(300, alpha, position){ pos ->
-                                    if(pos != holder.bindingAdapterPosition) {
-                                        tvPlaceholder.alpha = alpha
-                                    }
-                                }
-
-                            }
-                            else {
-
-                                tvPlaceholder.alpha = 0f
-                            }
-                            ivItemImage.visibility = View.VISIBLE
-                            return false
-                        }
-                    })
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(ivItemImage)
+                glideLoader.loadImage(
+                    glide = glide,
+                    uri = recording.iconUri,
+                    tvPlaceholder = tvPlaceholder,
+                    ivItemImage = ivItemImage,
+                    alpha = alpha,
+                    position = position
+                ){
+                    holder.bindingAdapterPosition
+                }
             }
 
 

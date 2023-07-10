@@ -62,10 +62,8 @@ class PagingRadioAdapter @Inject constructor(
 
         holder.bind.apply {
 
-            utils.handleBinding(this, station, position){pos ->
-                if(pos != holder.bindingAdapterPosition) {
-                    tvPlaceholder.alpha = utils.alpha
-                }
+            utils.handleBinding(this, station, position){
+                holder.bindingAdapterPosition
             }
         }
 

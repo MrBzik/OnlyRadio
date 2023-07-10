@@ -12,6 +12,11 @@ import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.exoPlayer.isPrepared
 import com.example.radioplayer.repositories.DatabaseRepository
+import com.example.radioplayer.utils.Commands.COMMAND_REMOVE_RECORDING_MEDIA_ITEM
+import com.example.radioplayer.utils.Commands.COMMAND_RESTORE_RECORDING_MEDIA_ITEM
+import com.example.radioplayer.utils.Commands.COMMAND_START_RECORDING
+import com.example.radioplayer.utils.Commands.COMMAND_STOP_RECORDING
+import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_REC_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -162,11 +167,11 @@ class RecordingsViewModel @Inject constructor(
     val currentRecordingDuration = RadioService.recordingDuration
 
     fun startRecording() {
-        radioServiceConnection.sendCommand(Constants.COMMAND_START_RECORDING, null)
+        radioServiceConnection.sendCommand(COMMAND_START_RECORDING, null)
     }
 
     fun stopRecording(){
-        radioServiceConnection.sendCommand(Constants.COMMAND_STOP_RECORDING, null)
+        radioServiceConnection.sendCommand(COMMAND_STOP_RECORDING, null)
     }
     val exoRecordFinishConverting = radioSource.exoRecordFinishConverting
     val exoRecordState = radioSource.exoRecordState
@@ -175,7 +180,7 @@ class RecordingsViewModel @Inject constructor(
 //        val isRecordingUpdated = radioSource.isRecordingUpdated
 
     fun updateRecPlaybackSpeed(){
-        radioServiceConnection.sendCommand(Constants.COMMAND_UPDATE_REC_PLAYBACK_SPEED, null)
+        radioServiceConnection.sendCommand(COMMAND_UPDATE_REC_PLAYBACK_SPEED, null)
     }
 
 
@@ -188,13 +193,13 @@ class RecordingsViewModel @Inject constructor(
     fun removeRecordingMediaItem(index : Int){
 
         radioServiceConnection.sendCommand(
-            Constants.COMMAND_REMOVE_RECORDING_MEDIA_ITEM,
+            COMMAND_REMOVE_RECORDING_MEDIA_ITEM,
             bundleOf(Pair(Constants.ITEM_INDEX, index)))
     }
 
     fun restoreRecordingMediaItem(index : Int){
         radioServiceConnection.sendCommand(
-            Constants.COMMAND_RESTORE_RECORDING_MEDIA_ITEM,
+            COMMAND_RESTORE_RECORDING_MEDIA_ITEM,
             bundleOf(Pair(Constants.ITEM_INDEX, index)))
     }
 

@@ -15,11 +15,15 @@ import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.exoPlayer.RadioServiceConnection
 import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.repositories.DatabaseRepository
+import com.example.radioplayer.utils.Commands
+import com.example.radioplayer.utils.Commands.COMMAND_ADD_MEDIA_ITEM
+import com.example.radioplayer.utils.Commands.COMMAND_CLEAR_MEDIA_ITEMS
+import com.example.radioplayer.utils.Commands.COMMAND_ON_DROP_STATION_IN_PLAYLIST
+import com.example.radioplayer.utils.Commands.COMMAND_REMOVE_MEDIA_ITEM
+import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_FAV_PLAYLIST
+import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_HISTORY_MEDIA_ITEMS
+import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants
-import com.example.radioplayer.utils.Constants.COMMAND_CLEAR_MEDIA_ITEMS
-import com.example.radioplayer.utils.Constants.COMMAND_ON_DROP_STATION_IN_PLAYLIST
-import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_HISTORY_MEDIA_ITEMS
-import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants.IS_TO_CLEAR_HISTORY_ITEMS
 import com.example.radioplayer.utils.Constants.LAZY_LIST_NAME
 import com.example.radioplayer.utils.Constants.PAGE_SIZE
@@ -368,7 +372,7 @@ class DatabaseViewModel @Inject constructor(
     // COMMANDS
 
     fun updateFavPlaylist(){
-        radioServiceConnection.sendCommand(Constants.COMMAND_UPDATE_FAV_PLAYLIST, null)
+        radioServiceConnection.sendCommand(COMMAND_UPDATE_FAV_PLAYLIST, null)
     }
 
     fun clearMediaItems(){
@@ -378,13 +382,13 @@ class DatabaseViewModel @Inject constructor(
 
     fun removeMediaItem(index : Int){
         radioServiceConnection.sendCommand(
-            Constants.COMMAND_REMOVE_MEDIA_ITEM,
+            COMMAND_REMOVE_MEDIA_ITEM,
             bundleOf(Pair(Constants.ITEM_INDEX, index)))
     }
 
     fun restoreMediaItem(index : Int){
         radioServiceConnection.sendCommand(
-            Constants.COMMAND_ADD_MEDIA_ITEM,
+            COMMAND_ADD_MEDIA_ITEM,
             bundleOf(Pair(Constants.ITEM_INDEX, index)))
     }
 

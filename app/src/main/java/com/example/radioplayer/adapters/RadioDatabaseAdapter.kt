@@ -75,10 +75,8 @@ class RadioDatabaseAdapter @Inject constructor(
         val station = listOfStations[position]
 
         holder.bind.apply {
-           utils.handleBinding(holder.bind, station, position){pos ->
-               if(pos != holder.bindingAdapterPosition) {
-                   tvPlaceholder.alpha = utils.alpha
-               }
+           utils.handleBinding(holder.bind, station, position){
+               holder.bindingAdapterPosition
            }
         }
 

@@ -29,6 +29,8 @@ import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.exoPlayer.RadioServiceConnection
 import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.repositories.DatabaseRepository
+import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_HISTORY_MEDIA_ITEMS
+import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -74,7 +76,7 @@ class HistoryViewModel @Inject constructor(
 
         if(RadioService.currentMediaItems == Constants.SEARCH_FROM_HISTORY){
             radioServiceConnection.sendCommand(
-                Constants.COMMAND_UPDATE_HISTORY_MEDIA_ITEMS,
+                COMMAND_UPDATE_HISTORY_MEDIA_ITEMS,
                 bundleOf(Pair(Constants.IS_TO_CLEAR_HISTORY_ITEMS, offset == 0))
             )
         }
@@ -120,7 +122,7 @@ class HistoryViewModel @Inject constructor(
             RadioService.currentMediaItems == Constants.SEARCH_FROM_HISTORY_ONE_DATE
         ){
             RadioSource.updateHistoryOneDateStations()
-            radioServiceConnection.sendCommand(Constants.COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS, null)
+            radioServiceConnection.sendCommand(COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS, null)
         }
 
         return stationsWithDate

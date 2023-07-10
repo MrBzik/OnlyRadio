@@ -4,6 +4,11 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import com.example.radioplayer.exoPlayer.RadioServiceConnection
+import com.example.radioplayer.utils.Commands.COMMAND_CHANGE_REVERB_MODE
+import com.example.radioplayer.utils.Commands.COMMAND_RESTART_PLAYER
+import com.example.radioplayer.utils.Commands.COMMAND_TOGGLE_REVERB
+import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH
+import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -22,25 +27,24 @@ class SettingsViewModel @Inject constructor(
 
 
     fun changeReverbMode(){
-        radioServiceConnection.sendCommand(Constants.COMMAND_CHANGE_REVERB_MODE, null)
+        radioServiceConnection.sendCommand(COMMAND_CHANGE_REVERB_MODE, null)
     }
 
     fun changeVirtualizerLevel(){
-        radioServiceConnection.sendCommand(Constants.COMMAND_TOGGLE_REVERB, null)
+        radioServiceConnection.sendCommand(COMMAND_TOGGLE_REVERB, null)
     }
 
 
     fun restartPlayer(){
-        radioServiceConnection.sendCommand(Constants.COMMAND_RESTART_PLAYER, null)
+        radioServiceConnection.sendCommand(COMMAND_RESTART_PLAYER, null)
     }
 
     fun updateRadioPlaybackSpeed(){
-        radioServiceConnection.sendCommand(Constants.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED, null)
+        radioServiceConnection.sendCommand(COMMAND_UPDATE_RADIO_PLAYBACK_SPEED, null)
     }
 
     fun updateRadioPlaybackPitch(){
-        radioServiceConnection.sendCommand(Constants.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH, null)
+        radioServiceConnection.sendCommand(COMMAND_UPDATE_RADIO_PLAYBACK_PITCH, null)
     }
-
 
 }

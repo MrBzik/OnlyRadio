@@ -2,6 +2,8 @@ package com.example.radioplayer.adapters
 
 import android.graphics.drawable.Drawable
 import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
@@ -21,7 +23,7 @@ import com.example.radioplayer.utils.RandomColors
 class BaseAdapter(
     private val glide : RequestManager) {
 
-
+    private val glideLoader = GlideLoader()
     private val randColors = RandomColors()
 
     var currentPlaybackState = false
@@ -74,7 +76,7 @@ class BaseAdapter(
         bind: ItemRadioWithTextBinding,
         station: RadioStation,
         position : Int,
-        checkPosition : (Int) -> Unit
+        checkPosition : () -> Int
     ){
 
         bind.apply {
@@ -121,45 +123,16 @@ class BaseAdapter(
 
             } else {
 
-                glide
-                    .load(station.favicon)
-                    .listener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-
-                            return true
-                        }
-
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-
-                            if(dataSource?.name == "REMOTE"){
-
-                                tvPlaceholder.fadeOut(300, alpha, position){ pos ->
-                                   checkPosition(pos)
-                                }
-
-                            }
-                            else {
-
-                                tvPlaceholder.alpha = 0f
-                            }
-                            ivItemImage.visibility = View.VISIBLE
-                            return false
-                        }
-                    })
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .apply(RequestOptions().override(65, 65))
-                    .into(ivItemImage)
+                glideLoader.loadImage(
+                    glide = glide,
+                    uri = station.favicon,
+                    tvPlaceholder = tvPlaceholder,
+                    ivItemImage = ivItemImage,
+                    alpha = alpha,
+                    position = position
+                ){
+                    checkPosition()
+                }
             }
         }
     }
@@ -170,8 +143,60 @@ class BaseAdapter(
         onItemClickListener = listener
     }
 
-
-
-
 }
+
+class GlideLoader(){
+    fun loadImage(
+        glide: RequestManager,
+        uri: String,
+        tvPlaceholder: TextView,
+        ivItemImage: ImageView,
+        alpha : Float,
+        position: Int,
+        updatedHolderPos : () -> Int
+    ){
+        glide
+            .load(uri)
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+
+                    return true
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+
+                    if(dataSource?.name == "REMOTE"){
+
+                        tvPlaceholder.fadeOut(300, alpha, position){ pos ->
+                            if(pos != updatedHolderPos()) {
+                                tvPlaceholder.alpha = alpha
+                            }
+                        }
+                    }
+                    else {
+
+                        tvPlaceholder.alpha = 0f
+                    }
+                    ivItemImage.visibility = View.VISIBLE
+                    return false
+                }
+            })
+            .transition(DrawableTransitionOptions.withCrossFade())
+//                    .apply(RequestOptions().override(65, 65))
+            .into(ivItemImage)
+    }
+}
+
+
 

@@ -66,46 +66,8 @@ class RadioPlaybackPreparer (
             isSameStation = it.getBoolean(IS_SAME_STATION, false)
         }
 
-//        if(flag == SEARCH_FROM_HISTORY){
-//            if(historyId.isNotBlank()){
-//                index = radioSource.stationsFromHistory.indexOfFirst {
-//                    it.stationuuid == historyId
-//                }
-//            }
-//        }
 
-
-//        radioSource.whenReady {
-//            val itemToPlay =
-//                    when(flag){
-//                        SEARCH_FROM_API -> radioSource.stationsFromApiMetadata.find {
-//                            it.description.mediaId == mediaId
-//                        }
-//                         SEARCH_FROM_FAVOURITES -> radioSource.stationsFavouredMetadata.find {
-//                             it.description.mediaId == mediaId
-//                         }
-//                          SEARCH_FROM_HISTORY -> radioSource.stationsFromHistoryMetadata.find{
-//                              it.description.mediaId == mediaId
-//                          }
-//                          SEARCH_FROM_HISTORY_ONE_DATE -> radioSource.stationsFromHistoryOneDateMetadata.find{
-//                              it.description.mediaId == mediaId
-//                          }
-//
-//                           SEARCH_FROM_RECORDINGS -> {
-//
-//                               radioSource.recordings.find {
-//                                   it.description.mediaId == mediaId
-//                               }
-//                           }
-//                         else -> radioSource.stationsFromPlaylistMetadata.find {
-//                             it.description.mediaId == mediaId
-//                         }
-//                    }
-
-            playerPrepared(
-//                itemToPlay,
-                flag, isToPlay, index, isToChangeMediaItems, isSameStation)
-//        }
+            playerPrepared(flag, isToPlay, index, isToChangeMediaItems, isSameStation)
 
     }
 

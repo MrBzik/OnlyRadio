@@ -54,6 +54,7 @@ class TitleAdapter @Inject constructor(
 ) : PagingDataAdapter<TitleWithDateModel, RecyclerView.ViewHolder>(TitlesComparator) {
 
     private val randColors = RandomColors()
+    private val glideLoader = GlideLoader()
 
     class TitleViewHolder (val bind: ItemTitleBinding)
         : RecyclerView.ViewHolder(bind.root)
@@ -177,47 +178,16 @@ class TitleAdapter @Inject constructor(
 
                 } else {
 
-                    glide
-                        .load(title.stationIconUri)
-                        .listener(object : RequestListener<Drawable> {
-                            override fun onLoadFailed(
-                                e: GlideException?,
-                                model: Any?,
-                                target: Target<Drawable>?,
-                                isFirstResource: Boolean
-                            ): Boolean {
-
-                                return true
-                            }
-
-                            override fun onResourceReady(
-                                resource: Drawable?,
-                                model: Any?,
-                                target: Target<Drawable>?,
-                                dataSource: DataSource?,
-                                isFirstResource: Boolean
-                            ): Boolean {
-
-                                if(dataSource?.name == "REMOTE"){
-
-                                    tvPlaceholder.fadeOut(300, alpha, position){ pos ->
-                                        if(pos != holder.bindingAdapterPosition) {
-                                            tvPlaceholder.alpha = alpha
-                                        }
-                                    }
-
-                                }
-                                else {
-
-                                    tvPlaceholder.alpha = 0f
-                                }
-                                ivItemImage.visibility = View.VISIBLE
-                                return false
-                            }
-                        })
-                        .transition(DrawableTransitionOptions.withCrossFade())
-                        .apply(RequestOptions().override(50, 50))
-                        .into(ivItemImage)
+                    glideLoader.loadImage(
+                        glide = glide,
+                        uri = title.stationIconUri,
+                        tvPlaceholder = tvPlaceholder,
+                        ivItemImage = ivItemImage,
+                        alpha = alpha,
+                        position = position
+                    ){
+                        holder.bindingAdapterPosition
+                    }
                 }
             }
         }

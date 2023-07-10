@@ -11,6 +11,7 @@ import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.sql.Date
@@ -140,6 +141,7 @@ class DBOperators (private val service: RadioService) {
         recoverAndUpdateLastPlayDuration()
 
         compareDatesWithPrefAndCLeanIfNeeded()
+
     }
 
 
@@ -184,23 +186,32 @@ class DBOperators (private val service: RadioService) {
             val numberOfDatesToDelete = numberOfDatesInDB - historyDatesPref
             val deleteList = databaseRepository.getDatesToDelete(numberOfDatesToDelete)
 
-            deleteList.forEach {
+             CoroutineScope(Dispatchers.IO).launch {
 
-                databaseRepository.deleteAllCrossRefWithDate(it.date)
-                databaseRepository.deleteDate(it)
-                databaseRepository.deleteTitlesWithDate(it.time)
-            }
+                deleteList.forEach {
+
+                    launch {
+                        databaseRepository.deleteAllCrossRefWithDate(it.date)
+                        databaseRepository.deleteDate(it)
+                        databaseRepository.deleteTitlesWithDate(it.time)
+                    }
+                }
+            }.join()
 
             val stations = databaseRepository.gatherStationsForCleaning()
 
-            stations.forEach {
+            CoroutineScope(Dispatchers.IO).launch {
 
-//                val checkIfInPlaylists = databaseRepository.checkIfInPlaylists(it.stationuuid)
-                val checkIfInHistory = databaseRepository.checkIfRadioStationInHistory(it.stationuuid)
+                stations.forEach {
 
-                if(!checkIfInHistory){
+                    launch {
+                        val checkIfInHistory = databaseRepository.checkIfRadioStationInHistory(it.stationuuid)
 
-                    databaseRepository.deleteRadioStation(it)
+                        if(!checkIfInHistory){
+
+                            databaseRepository.deleteRadioStation(it)
+                        }
+                    }
                 }
             }
         }
@@ -259,12 +270,14 @@ class DBOperators (private val service: RadioService) {
                 stationName = stationName,
                 stationIconUri = stationUri,
                 isBookmarked = isTitleBookmarked ?: false
-            )
+                )
             )
 
             service.lastInsertedSong = title
 
         }
     }
+
+
 
 }

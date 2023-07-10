@@ -20,6 +20,7 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.transition.Fade
 import androidx.transition.Slide
 import com.bumptech.glide.RequestManager
@@ -36,6 +37,7 @@ import com.example.radioplayer.databinding.StubPlayerActivityMainBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
+import com.example.radioplayer.extensions.navigate
 import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
 import com.example.radioplayer.ui.animations.LoadingAnim
 import com.example.radioplayer.ui.animations.slideAnim
@@ -385,8 +387,8 @@ class MainActivity : AppCompatActivity() {
         bindPlayer.root.slideAnim(500, 0, R.anim.fade_in_anim)
 
 
-                bindPlayer.tvStationTitle.isSingleLine = true
-                bindPlayer.tvStationTitle.isSelected = true
+        bindPlayer.tvStationTitle.isSingleLine = true
+        bindPlayer.tvStationTitle.isSelected = true
 
 
         clickListenerToHandleNavigationWithDetailsFragment()
@@ -513,90 +515,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        getFragment(item?.itemId ?: menuItem).apply {
+            exitTransition = null
+            supportFragmentManager.navigate(this)
 
-        when(item?.itemId ?: menuItem) {
-            R.id.mi_radioSearchFragment -> {
-
-                radioSearchFragment.exitTransition = null
-
-                mainViewModel.currentFragment = FRAG_SEARCH
-
-                supportFragmentManager.beginTransaction().apply {
-                    setCustomAnimations(R.anim.blank_anim, android.R.anim.fade_out)
-                    replace(R.id.flFragment, radioSearchFragment)
-                    addToBackStack(null)
-                    commit()
-                }
-
-
-            }
-            R.id.mi_favStationsFragment -> {
-
-                favStationsFragment.exitTransition = null
-
-                mainViewModel.currentFragment = FRAG_FAV
-
-                supportFragmentManager.beginTransaction().apply {
-                    setCustomAnimations(R.anim.blank_anim, android.R.anim.fade_out)
-                    replace(R.id.flFragment, favStationsFragment)
-                    addToBackStack(null)
-                    commit()
-                }
-
-
-
-            }
-            R.id.mi_historyFragment -> {
-
-                historyFragment.exitTransition = null
-
-                mainViewModel.currentFragment = FRAG_HISTORY
-
-                supportFragmentManager.beginTransaction().apply {
-                    setCustomAnimations(R.anim.blank_anim, android.R.anim.fade_out)
-                    replace(R.id.flFragment, historyFragment)
-                    addToBackStack(null)
-                    commit()
-                }
-
-
-
-            }
-
-            R.id.mi_recordingsFragment -> {
-
-                recordingsFragment.exitTransition = null
-
-                mainViewModel.currentFragment = FRAG_REC
-
-                supportFragmentManager.beginTransaction().apply {
-                    setCustomAnimations(R.anim.blank_anim, android.R.anim.fade_out)
-                    replace(R.id.flFragment, recordingsFragment)
-                    addToBackStack(null)
-                    commit()
-                }
-
-
-            }
-
-            R.id.mi_settingsFragment -> {
-                settingsFragment.exitTransition = null
-
-                mainViewModel.currentFragment = FRAG_OPTIONS
-
-                supportFragmentManager.beginTransaction().apply {
-                    setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                    replace(R.id.flFragment, settingsFragment)
-                    addToBackStack(null)
-                    commit()
-                }
-
-//                val drawable = bindPlayer.root.background as GradientDrawable
-//                drawable.mutate()
-//                drawable.setStroke(4,color)
-
-            }
         }
+
 
         if(isStubPlayerBindInflated){
             bindPlayer.tvExpandHideText.setText(R.string.Expand)
@@ -610,33 +534,42 @@ class MainActivity : AppCompatActivity() {
 
     private fun putFadeOutForDetailsFragment(){
 
-        when(bind.bottomNavigationView.selectedItemId) {
-            R.id.mi_radioSearchFragment -> {
+        getFragment(bind.bottomNavigationView.selectedItemId).exitTransition = Fade()
 
-                radioSearchFragment.exitTransition = Fade()
+    }
+
+    private fun getFragment(id : Int) : Fragment {
+
+       return when(id) {
+
+            R.id.mi_radioSearchFragment -> {
+                mainViewModel.currentFragment = FRAG_SEARCH
+                radioSearchFragment
 
             }
             R.id.mi_favStationsFragment -> {
-
-                favStationsFragment.exitTransition = Fade()
+                mainViewModel.currentFragment = FRAG_FAV
+                favStationsFragment
 
             }
             R.id.mi_historyFragment -> {
-
-                historyFragment.exitTransition = Fade()
+                mainViewModel.currentFragment = FRAG_HISTORY
+                historyFragment
 
             }
             R.id.mi_recordingsFragment -> {
-
-                recordingsFragment.exitTransition = Fade()
+                mainViewModel.currentFragment = FRAG_REC
+                recordingsFragment
             }
 
-            R.id.mi_settingsFragment -> {
-
-                settingsFragment.exitTransition = Fade()
+            else -> {
+                mainViewModel.currentFragment = FRAG_OPTIONS
+                settingsFragment
             }
         }
+
     }
+
 
     private val randColors = RandomColors()
 
@@ -799,7 +732,6 @@ class MainActivity : AppCompatActivity() {
                             setTextColor(ContextCompat.getColor(this@MainActivity, R.color.regular_text_color))
 
                         }
-
                     }
                 }
             }

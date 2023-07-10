@@ -46,50 +46,7 @@ object Constants {
 
     const val NETWORK_ERROR = "network error"
 
-
-    const val COMMAND_NEW_SEARCH = "new search"
-
-    const val COMMAND_UPDATE_HISTORY = "command update history"
-
-    const val COMMAND_START_RECORDING = "start exoRecord recording"
-    const val COMMAND_STOP_RECORDING = "stop exoRecord recording"
-
-    const val COMMAND_REMOVE_RECORDING_MEDIA_ITEM = "remove playing item from exoplayer"
-    const val COMMAND_RESTORE_RECORDING_MEDIA_ITEM = "command restore rec media item"
-
-    const val COMMAND_UPDATE_REC_PLAYBACK_SPEED = "update recordings playback speed"
-    const val COMMAND_UPDATE_RADIO_PLAYBACK_SPEED = "update radio playback speed"
-    const val COMMAND_UPDATE_RADIO_PLAYBACK_PITCH= "update radio playback pitch"
-
-    const val COMMAND_RESTART_PLAYER = "command to recreate player"
-
-    const val COMMAND_COMPARE_DATES_PREF_AND_CLEAN = "command check date and update history"
-
-    const val COMMAND_UPDATE_FAV_PLAYLIST = "command update fav playlist"
-
-    const val COMMAND_UPDATE_HISTORY_MEDIA_ITEMS = "command update history mediaitems"
     const val IS_TO_CLEAR_HISTORY_ITEMS = "is to clear mediaItems"
-
-    const val COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS = "command update history one date media items"
-
-
-    const val COMMAND_CLEAR_MEDIA_ITEMS = "command clear media items"
-
-//    const val COMMAND_CHANGE_MEDIA_ITEMS = "command change media items"
-
-    const val COMMAND_REMOVE_MEDIA_ITEM = "command remove media item"
-    const val COMMAND_ADD_MEDIA_ITEM = "command add media item"
-
-    const val COMMAND_ON_DROP_STATION_IN_PLAYLIST = "command on drop station in playlist"
-
-
-
-    const val COMMAND_PAUSE_PLAYER = "command pause player"
-    const val COMMAND_START_PLAYER = "command start player"
-
-    const val COMMAND_STOP_SERVICE = "command to stop service"
-
-
 
     const val PAGE_SIZE = 10
 
@@ -98,6 +55,8 @@ object Constants {
     const val SEARCH_FLAG = "search flag"
 
     const val IS_NEW_SEARCH = "is new search"
+
+    // MEDIA ITEMS
 
     const val NO_ITEMS = -2
     const val NO_PLAYLIST = -1
@@ -206,9 +165,28 @@ object Constants {
 
     // Audio effects
 
-    const val COMMAND_CHANGE_REVERB_MODE = "change reverb mode"
-
-    const val COMMAND_TOGGLE_REVERB = "change bass boost level"
 
 
 }
+
+ object Commands {
+
+     const val COMMAND_NEW_SEARCH = "new search"
+     const val COMMAND_START_RECORDING = "start exoRecord recording"
+     const val COMMAND_STOP_RECORDING = "stop exoRecord recording"
+     const val COMMAND_REMOVE_RECORDING_MEDIA_ITEM = "remove playing item from exoplayer"
+     const val COMMAND_RESTORE_RECORDING_MEDIA_ITEM = "command restore rec media item"
+     const val COMMAND_UPDATE_REC_PLAYBACK_SPEED = "update recordings playback speed"
+     const val COMMAND_UPDATE_RADIO_PLAYBACK_SPEED = "update radio playback speed"
+     const val COMMAND_UPDATE_RADIO_PLAYBACK_PITCH= "update radio playback pitch"
+     const val COMMAND_RESTART_PLAYER = "command to recreate player"
+     const val COMMAND_UPDATE_FAV_PLAYLIST = "command update fav playlist"
+     const val COMMAND_UPDATE_HISTORY_MEDIA_ITEMS = "command update history mediaitems"
+     const val COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS = "command update history one date media items"
+     const val COMMAND_CLEAR_MEDIA_ITEMS = "command clear media items"
+     const val COMMAND_REMOVE_MEDIA_ITEM = "command remove media item"
+     const val COMMAND_ADD_MEDIA_ITEM = "command add media item"
+     const val COMMAND_ON_DROP_STATION_IN_PLAYLIST = "command on drop station in playlist"
+     const val COMMAND_CHANGE_REVERB_MODE = "change reverb mode"
+     const val COMMAND_TOGGLE_REVERB = "change bass boost level"
+ }

@@ -150,10 +150,8 @@ class PagingHistoryAdapter @Inject constructor(
 
                 val station = item.radioStation
 
-                utils.handleBinding(this, station, position){pos ->
-                    if(pos != holder.bindingAdapterPosition) {
-                        tvPlaceholder.alpha = utils.alpha
-                    }
+                utils.handleBinding(this, station, position){
+                    holder.bindingAdapterPosition
                 }
 
 

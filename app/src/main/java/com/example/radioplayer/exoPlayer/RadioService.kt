@@ -30,33 +30,26 @@ import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.BUFFER_FOR_PLAYBACK
 import com.example.radioplayer.utils.Constants.BUFFER_PREF
 import com.example.radioplayer.utils.Constants.BUFFER_SIZE_IN_MILLS
-import com.example.radioplayer.utils.Constants.COMMAND_ADD_MEDIA_ITEM
-import com.example.radioplayer.utils.Constants.COMMAND_TOGGLE_REVERB
-import com.example.radioplayer.utils.Constants.COMMAND_CHANGE_REVERB_MODE
-import com.example.radioplayer.utils.Constants.COMMAND_CLEAR_MEDIA_ITEMS
-
 import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
-import com.example.radioplayer.utils.Constants.COMMAND_NEW_SEARCH
-import com.example.radioplayer.utils.Constants.COMMAND_ON_DROP_STATION_IN_PLAYLIST
-import com.example.radioplayer.utils.Constants.COMMAND_START_RECORDING
-import com.example.radioplayer.utils.Constants.COMMAND_STOP_RECORDING
-
-import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_RECORDING_MEDIA_ITEM
-import com.example.radioplayer.utils.Constants.COMMAND_REMOVE_MEDIA_ITEM
-import com.example.radioplayer.utils.Constants.COMMAND_RESTART_PLAYER
-import com.example.radioplayer.utils.Constants.COMMAND_RESTORE_RECORDING_MEDIA_ITEM
-import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_FAV_PLAYLIST
-import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_HISTORY_MEDIA_ITEMS
-import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS
-import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH
-import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
-import com.example.radioplayer.utils.Constants.COMMAND_UPDATE_REC_PLAYBACK_SPEED
+import com.example.radioplayer.utils.Commands.COMMAND_ADD_MEDIA_ITEM
+import com.example.radioplayer.utils.Commands.COMMAND_TOGGLE_REVERB
+import com.example.radioplayer.utils.Commands.COMMAND_CHANGE_REVERB_MODE
+import com.example.radioplayer.utils.Commands.COMMAND_CLEAR_MEDIA_ITEMS
+import com.example.radioplayer.utils.Commands.COMMAND_NEW_SEARCH
+import com.example.radioplayer.utils.Commands.COMMAND_ON_DROP_STATION_IN_PLAYLIST
+import com.example.radioplayer.utils.Commands.COMMAND_START_RECORDING
+import com.example.radioplayer.utils.Commands.COMMAND_STOP_RECORDING
+import com.example.radioplayer.utils.Commands.COMMAND_REMOVE_RECORDING_MEDIA_ITEM
+import com.example.radioplayer.utils.Commands.COMMAND_REMOVE_MEDIA_ITEM
+import com.example.radioplayer.utils.Commands.COMMAND_RESTART_PLAYER
+import com.example.radioplayer.utils.Commands.COMMAND_RESTORE_RECORDING_MEDIA_ITEM
+import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_FAV_PLAYLIST
+import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_HISTORY_MEDIA_ITEMS
+import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS
+import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH
+import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
+import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_REC_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants.FOREGROUND_PREF
-import com.example.radioplayer.utils.Constants.HISTORY_BOOKMARK_PREF_DEFAULT
-import com.example.radioplayer.utils.Constants.HISTORY_DATES_PREF_DEFAULT
-import com.example.radioplayer.utils.Constants.HISTORY_PREF
-import com.example.radioplayer.utils.Constants.HISTORY_PREF_BOOKMARK
-import com.example.radioplayer.utils.Constants.HISTORY_PREF_DATES
 import com.example.radioplayer.utils.Constants.IS_ADAPTIVE_LOADER_TO_USE
 import com.example.radioplayer.utils.Constants.IS_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.IS_TO_CLEAR_HISTORY_ITEMS
@@ -64,8 +57,6 @@ import com.example.radioplayer.utils.Constants.ITEM_INDEX
 import com.example.radioplayer.utils.Constants.NO_ITEMS
 import com.example.radioplayer.utils.Constants.NO_PLAYLIST
 import com.example.radioplayer.utils.Constants.RECONNECT_PREF
-
-
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
@@ -194,7 +185,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
         var currentlyPlayingSong = TITLE_UNKNOWN
 //        var currentStation : MediaMetadataCompat? = null
-        var currentMediaItems = -1
+        var currentMediaItems = NO_ITEMS
 
         var isInStationDetails = false
 
@@ -627,6 +618,7 @@ class RadioService : MediaBrowserServiceCompat() {
             }
         )
     }
+
 
 
 
