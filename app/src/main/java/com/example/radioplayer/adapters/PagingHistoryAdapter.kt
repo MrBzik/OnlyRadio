@@ -32,7 +32,9 @@ import com.example.radioplayer.databinding.ItemDateSeparatorEnclosingBinding
 import com.example.radioplayer.databinding.ItemRadioWithTextBinding
 import com.example.radioplayer.databinding.RadioItemBinding
 import com.example.radioplayer.exoPlayer.RadioService
+import com.example.radioplayer.ui.animations.AdapterFadeAnim.adapterItemFadeIn
 import com.example.radioplayer.ui.animations.fadeOut
+import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.fragments.HistoryFragment
 import com.example.radioplayer.utils.RandomColors
 import javax.inject.Inject
@@ -172,8 +174,8 @@ class PagingHistoryAdapter @Inject constructor(
             }
         }
 
+        adapterItemFadeIn(holder.itemView)
 
-        HistoryFragment.adapterAnimator.animateAppearance(holder.itemView)
     }
 
 //    var separatorDefault = 0

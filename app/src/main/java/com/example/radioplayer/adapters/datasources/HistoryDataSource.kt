@@ -17,36 +17,35 @@ class HistoryDataSource(
 
         val dateIndex = params.key ?: 0
 
-//        var pagesLoaded = 1
+        var pagesLoaded = 1
 
         return try {
 
             val stations = loader(dateIndex).toMutableList()
 
-//            if(HistoryFragment.isNewHistoryQuery){
-//                while(stations.size < 9 && HistoryFragment.numberOfDates > pagesLoaded){
-//
-//                    val moreStations = loader(dateIndex+pagesLoaded)
-//
-//                    stations.addAll(moreStations)
-//
-//                    pagesLoaded += 1
-//
-//                 }
-//
-//
-//                HistoryFragment.isNewHistoryQuery = false
-//            }
+            if(HistoryFragment.isNewHistoryQuery){
+                while(stations.size < 9 && HistoryFragment.numberOfDates > pagesLoaded){
 
-            val nextKey = dateIndex + 1
+                    val moreStations = loader(dateIndex+pagesLoaded)
+
+                    stations.addAll(moreStations)
+
+                    pagesLoaded += 1
+
+                }
+
+
+                HistoryFragment.isNewHistoryQuery = false
+            }
+
+            val nextKey = dateIndex +pagesLoaded
 
             LoadResult.Page(
                 data = stations,
                 prevKey = if (dateIndex == 0) null else dateIndex - 1,
                 nextKey = if(nextKey < HistoryFragment.numberOfDates) nextKey
-                            else null
+                else null
             )
-
         } catch (e: Exception) {
             Log.d("CHECKTAGS", e.stackTraceToString())
             LoadResult.Error(e)

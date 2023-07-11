@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 22,
-    "identityHash": "44447c46a817640314a2d066cfe1f52b",
+    "version": 24,
+    "identityHash": "1f7c63b20e924271c74a5c6f527b6f55",
     "entities": [
       {
         "tableName": "RadioStation",
@@ -228,7 +228,17 @@
           ],
           "autoGenerate": false
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_StationDateCrossRef_date",
+            "unique": false,
+            "columnNames": [
+              "date"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_StationDateCrossRef_date` ON `${TABLE_NAME}` (`date`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -375,7 +385,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '44447c46a817640314a2d066cfe1f52b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1f7c63b20e924271c74a5c6f527b6f55')"
     ]
   }
 }

@@ -37,6 +37,7 @@ import com.example.radioplayer.databinding.StubPlayerActivityMainBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
+import com.example.radioplayer.extensions.loadImage
 import com.example.radioplayer.extensions.navigate
 import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
 import com.example.radioplayer.ui.animations.LoadingAnim
@@ -79,11 +80,9 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
 
     val mainViewModel: MainViewModel by viewModels()
-    val databaseViewModel : DatabaseViewModel by viewModels()
-    val historyViewModel : HistoryViewModel by viewModels()
-    val recordingsViewModel : RecordingsViewModel by viewModels()
     val settingsViewModel : SettingsViewModel by viewModels()
-    val searchDialogsViewModel : SearchDialogsViewModel by viewModels()
+    val recordingsViewModel : RecordingsViewModel by viewModels()
+
 
     lateinit var bind : ActivityMainBinding
     lateinit var bindPlayer : StubPlayerActivityMainBinding
@@ -122,7 +121,6 @@ class MainActivity : AppCompatActivity() {
         var uiMode = 0
         var flHeight = 0
     }
-
 
 
     private val radioSearchFragment : RadioSearchFragment by lazy { RadioSearchFragment() }
@@ -227,9 +225,6 @@ class MainActivity : AppCompatActivity() {
                     startAnim(bind.separatorSecond!!)
                     startAnim(bind.separatorLowest!!)
                 }
-
-
-
         }
 
         if(uiMode != Configuration.UI_MODE_NIGHT_YES){
@@ -632,43 +627,20 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
             if(newImage.isBlank()){
                 bindPlayer.ivCurrentStationImage.visibility = View.GONE
                 setTvPlaceHolderLetter(newName, isRecording)
 
             } else {
 
-
                 bindPlayer.ivCurrentStationImage.visibility = View.VISIBLE
-                glide
-                    .load(newImage)
-                    .listener(object : RequestListener<Drawable>{
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-
-                            bindPlayer.ivCurrentStationImage.visibility = View.GONE
-                            setTvPlaceHolderLetter(newName, isRecording)
-                            return true
-                        }
-
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            bindPlayer.tvPlaceholder.alpha = 0f
-                            return false
-                        }
-                    })
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(bindPlayer.ivCurrentStationImage)
+                glide.loadImage(
+                    uri = newImage,
+                    tvPlaceholder = bindPlayer.tvPlaceholder,
+                    ivItemImage = bindPlayer.ivCurrentStationImage,
+                ){
+                    setTvPlaceHolderLetter(newName, isRecording)
+                }
             }
         }
 

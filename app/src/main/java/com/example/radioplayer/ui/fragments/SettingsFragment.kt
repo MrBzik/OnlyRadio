@@ -8,6 +8,7 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
@@ -400,5 +401,11 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         bindGeneral = null
 
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("CHECKTAGS", "calling setting's on destroy")
+    }
+
 
 }

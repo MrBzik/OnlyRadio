@@ -24,7 +24,7 @@ import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
         Title::class,
         BookmarkedTitle::class
                ],
-        version = 22,
+        version = 24,
          autoMigrations = [
         AutoMigration(from = 9, to = 10, spec = RadioDB.Migration9To10::class),
         AutoMigration(from = 11, to = 12, spec = RadioDB.Migration11To12::class),
@@ -35,7 +35,8 @@ import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
          AutoMigration(from = 18, to = 19, spec = RadioDB.Migration18To19::class),
          AutoMigration(from = 19, to = 20, spec = RadioDB.Migration19To20::class),
          AutoMigration(from = 20, to = 21, spec = RadioDB.Migration20To21::class),
-         AutoMigration(from = 21, to = 22, spec = RadioDB.Migration21To22::class)
+         AutoMigration(from = 21, to = 22, spec = RadioDB.Migration21To22::class),
+
     ]
 )
 
@@ -73,6 +74,7 @@ abstract class RadioDB : RoomDatabase() {
     class Migration20To21 : AutoMigrationSpec
 
     class Migration21To22 : AutoMigrationSpec
+
 
     companion object{
 
@@ -113,6 +115,23 @@ abstract class RadioDB : RoomDatabase() {
                 )
             }
         }
+
+        val migration22To23 = object : Migration(22, 23){
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "CREATE INDEX index_StationPlaylistCrossRef_playlistName ON StationPlaylistCrossRef (playlistName)"
+                )
+            }
+        }
+
+        val migration23To24 = object : Migration(23, 24){
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "CREATE INDEX index_StationDateCrossRef_date ON StationDateCrossRef (date)"
+                )
+            }
+        }
+
     }
 
 

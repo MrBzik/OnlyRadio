@@ -2,13 +2,13 @@ package com.example.radioplayer.ui.fragments
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.viewbinding.ViewBinding
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.BaseAdapter
@@ -32,15 +32,12 @@ abstract class BaseFragment<VB: ViewBinding>(
      val bind : VB
      get() = _bind!!
 
-    val databaseViewModel : DatabaseViewModel by lazy {
-        (activity as MainActivity).databaseViewModel
-    }
+    val favViewModel : DatabaseViewModel by viewModels()
+    val historyViewModel : HistoryViewModel by viewModels()
+    val searchDialogsViewModels : SearchDialogsViewModel by viewModels()
+
     val mainViewModel: MainViewModel by lazy {
         (activity as MainActivity).mainViewModel
-    }
-
-    val historyViewModel : HistoryViewModel by lazy {
-        (activity as MainActivity).historyViewModel
     }
 
     val recordingsViewModel : RecordingsViewModel by lazy {
@@ -49,10 +46,6 @@ abstract class BaseFragment<VB: ViewBinding>(
 
     val settingsViewModel : SettingsViewModel by lazy {
         (activity as MainActivity).settingsViewModel
-    }
-
-    val searchDialogsViewModels : SearchDialogsViewModel by lazy {
-        (activity as MainActivity).searchDialogsViewModel
     }
 
 
@@ -116,5 +109,4 @@ abstract class BaseFragment<VB: ViewBinding>(
 
         }
     }
-
 }

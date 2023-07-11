@@ -4,7 +4,6 @@ import android.app.SearchManager
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -31,10 +30,6 @@ import com.example.radioplayer.ui.animations.reduceDragSensitivity
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.AddStationToPlaylistDialog
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
-import com.example.radioplayer.utils.Constants.FRAG_FAV
-import com.example.radioplayer.utils.Constants.FRAG_HISTORY
-import com.example.radioplayer.utils.Constants.FRAG_REC
-import com.example.radioplayer.utils.Constants.FRAG_SEARCH
 import com.example.radioplayer.utils.Constants.NO_PLAYLIST
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
@@ -43,7 +38,6 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_LAZY_LIST
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.example.radioplayer.utils.Constants.TITLE_UNKNOWN
-import com.example.radioplayer.utils.RandomColors
 import com.example.radioplayer.utils.Utils
 import com.example.radioplayer.utils.addAction
 import com.example.radioplayer.utils.toRadioStation
@@ -143,7 +137,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
                 listName = "From favoured"
 
-                if(databaseViewModel.isStationFavoured.value == false){
+                if(favViewModel.isStationFavoured.value == false){
                     RadioService.currentPlayingStation.value?.let {
                         listOf(it)
                     } ?: emptyList()
@@ -334,7 +328,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             currentRadioStation = station
 
 
-            databaseViewModel.getRadioStationPlayDuration(station.stationuuid){dur ->
+            favViewModel.getRadioStationPlayDuration(station.stationuuid){ dur ->
                 bind.tvDuration.text = "${dur/ 1000}s"
             }
 
@@ -511,7 +505,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     private fun observeIfNewStationFavoured(){
 
-        databaseViewModel.isStationFavoured.observe(viewLifecycleOwner){
+        favViewModel.isStationFavoured.observe(viewLifecycleOwner){
 
             paintButtonAddToFav(it)
 
@@ -522,7 +516,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
 
     private fun checkIfStationFavoured(station: RadioStation){
-        databaseViewModel.checkIfStationIsFavoured(station.stationuuid)
+        favViewModel.checkIfStationIsFavoured(station.stationuuid)
     }
 
 
@@ -540,7 +534,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     private fun updateListOfPlaylists(){
 
-        databaseViewModel.listOfAllPlaylists.observe(viewLifecycleOwner){
+        favViewModel.listOfAllPlaylists.observe(viewLifecycleOwner){
 
             listOfPlaylists = it
         }
@@ -551,7 +545,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     private fun addToPlaylistLogic(){
 
         AddStationToPlaylistDialog(
-            requireContext(), listOfPlaylists, databaseViewModel, pixabayViewModel, glide,
+            requireContext(), listOfPlaylists, favViewModel, pixabayViewModel, glide,
             "Add station to an existing playlist or a new one"
         ) { playlistName ->
             insertStationInPlaylist(playlistName)
@@ -583,18 +577,18 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             if(isFavoured) {
 
                 currentRadioStation?.let {
-                    databaseViewModel.updateIsFavouredState(0, it.stationuuid)
+                    favViewModel.updateIsFavouredState(0, it.stationuuid)
                     Snackbar.make(requireActivity().findViewById(R.id.rootLayout),
                         "Station removed from favs", Snackbar.LENGTH_SHORT).show()
-                    databaseViewModel.isStationFavoured.postValue(false)
+                    favViewModel.isStationFavoured.postValue(false)
                 }
 
             } else {
                 currentRadioStation?.let {
-                    databaseViewModel.updateIsFavouredState(System.currentTimeMillis(), it.stationuuid)
+                    favViewModel.updateIsFavouredState(System.currentTimeMillis(), it.stationuuid)
                     Snackbar.make(requireActivity().findViewById(R.id.rootLayout),
                         "Station saved to favs", Snackbar.LENGTH_SHORT).show()
-                    databaseViewModel.isStationFavoured.postValue(true)
+                    favViewModel.isStationFavoured.postValue(true)
                 }
             }
         }
@@ -606,7 +600,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         currentRadioStation?.let { station ->
 
-            databaseViewModel.checkAndInsertStationPlaylistCrossRef(
+            favViewModel.checkAndInsertStationPlaylistCrossRef(
                 station.stationuuid, playlistName
             ) {
 
@@ -623,7 +617,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     private fun callFavPlaylistUpdateIfNeeded(){
         if(RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES)
-            databaseViewModel.updateFavPlaylist()
+            favViewModel.updateFavPlaylist()
     }
 
 
@@ -643,9 +637,15 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         isPagerTransAnimSet = false
         if(RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES && !isFavoured){
             RadioService.currentMediaItems = NO_PLAYLIST
-            databaseViewModel.clearMediaItems()
+            favViewModel.clearMediaItems()
         }
 
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("CHECKTAGS", "calling station detail's on destroy")
     }
 
 

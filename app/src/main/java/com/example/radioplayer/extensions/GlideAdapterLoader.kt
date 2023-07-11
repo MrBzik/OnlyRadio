@@ -60,3 +60,38 @@ fun RequestManager.loadImage(
 //                    .apply(RequestOptions().override(65, 65))
         .into(ivItemImage)
 }
+
+fun RequestManager.loadImage(
+    uri: String,
+    tvPlaceholder: TextView,
+    ivItemImage: ImageView,
+    setTvPlaceHolderLetter : () -> Unit
+){
+    load(uri)
+        .listener(object : RequestListener<Drawable>{
+            override fun onLoadFailed(
+                e: GlideException?,
+                model: Any?,
+                target: Target<Drawable>?,
+                isFirstResource: Boolean
+            ): Boolean {
+
+                ivItemImage.visibility = View.GONE
+                setTvPlaceHolderLetter()
+                return true
+            }
+
+            override fun onResourceReady(
+                resource: Drawable?,
+                model: Any?,
+                target: Target<Drawable>?,
+                dataSource: DataSource?,
+                isFirstResource: Boolean
+            ): Boolean {
+                tvPlaceholder.alpha = 0f
+                return false
+            }
+        })
+        .transition(DrawableTransitionOptions.withCrossFade())
+        .into(ivItemImage)
+}

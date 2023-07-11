@@ -25,6 +25,7 @@ import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.ItemRadioWithTextBinding
 import com.example.radioplayer.databinding.ItemViewPagerStationBinding
 import com.example.radioplayer.exoPlayer.RadioService
+import com.example.radioplayer.extensions.loadImage
 import com.example.radioplayer.ui.animations.fadeOut
 import com.example.radioplayer.utils.RandomColors
 import javax.inject.Inject
@@ -61,34 +62,13 @@ class ViewPagerStationsAdapter constructor(
             } else {
                 ivIcon.visibility = View.VISIBLE
 
-                glide
-                    .load(station.favicon)
-                    .listener(object : RequestListener<Drawable>{
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-
-                            ivIcon.visibility = View.INVISIBLE
-                            setTvPlaceHolderLetter(station.name ?: "", this@apply)
-                            return true
-                        }
-
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            tvPlaceholder.alpha = 0f
-                            return false
-                        }
-                    })
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(ivIcon)
+                glide.loadImage(
+                    uri = station.favicon,
+                    tvPlaceholder = tvPlaceholder,
+                    ivItemImage = ivIcon
+                ){
+                    setTvPlaceHolderLetter(station.name ?: "", this@apply)
+                }
             }
 
 

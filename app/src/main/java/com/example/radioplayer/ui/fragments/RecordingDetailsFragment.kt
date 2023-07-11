@@ -326,6 +326,10 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
     }
 
 
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("CHECKTAGS", "calling rec details's on destroy")
+    }
 
 
 }

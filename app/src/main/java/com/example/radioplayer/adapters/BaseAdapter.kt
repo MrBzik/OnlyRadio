@@ -24,7 +24,6 @@ import com.example.radioplayer.utils.RandomColors
 class BaseAdapter(
     private val glide : RequestManager) {
 
-    private val glideLoader = GlideLoader()
     private val randColors = RandomColors()
 
     var currentPlaybackState = false
@@ -143,59 +142,6 @@ class BaseAdapter(
         onItemClickListener = listener
     }
 
-}
-
-class GlideLoader(){
-    fun loadImage(
-        glide: RequestManager,
-        uri: String,
-        tvPlaceholder: TextView,
-        ivItemImage: ImageView,
-        alpha : Float,
-        position: Int,
-        updatedHolderPos : () -> Int
-    ){
-        glide
-            .load(uri)
-            .listener(object : RequestListener<Drawable> {
-                override fun onLoadFailed(
-                    e: GlideException?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    isFirstResource: Boolean
-                ): Boolean {
-
-                    return true
-                }
-
-                override fun onResourceReady(
-                    resource: Drawable?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    dataSource: DataSource?,
-                    isFirstResource: Boolean
-                ): Boolean {
-
-                    if(dataSource?.name == "REMOTE"){
-
-                        tvPlaceholder.fadeOut(300, alpha, position){ pos ->
-                            if(pos != updatedHolderPos()) {
-                                tvPlaceholder.alpha = alpha
-                            }
-                        }
-                    }
-                    else {
-
-                        tvPlaceholder.alpha = 0f
-                    }
-                    ivItemImage.visibility = View.VISIBLE
-                    return false
-                }
-            })
-            .transition(DrawableTransitionOptions.withCrossFade())
-//                    .apply(RequestOptions().override(65, 65))
-            .into(ivItemImage)
-    }
 }
 
 

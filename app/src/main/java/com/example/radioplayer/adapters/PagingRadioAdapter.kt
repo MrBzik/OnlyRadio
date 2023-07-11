@@ -9,15 +9,10 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
-import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.ItemRadioWithTextBinding
 import com.example.radioplayer.ui.animations.AdapterAnimator
+import com.example.radioplayer.ui.animations.AdapterFadeAnim.adapterItemFadeIn
 import com.example.radioplayer.ui.animations.fadeOut
 import com.example.radioplayer.utils.RandomColors
 import javax.inject.Inject
@@ -28,8 +23,6 @@ class PagingRadioAdapter @Inject constructor(
 ) : PagingDataAdapter<RadioStation, PagingRadioAdapter.RadioItemHolder>(StationsComparator) {
 
     val utils = BaseAdapter(glide)
-
-    val animator = AdapterAnimator()
 
     class RadioItemHolder (val bind : ItemRadioWithTextBinding) : RecyclerView.ViewHolder(bind.root)
 
@@ -74,7 +67,7 @@ class PagingRadioAdapter @Inject constructor(
 
         } else utils.restoreState(holder.bind)
 
-        animator.animateAppearance(holder.itemView)
+        adapterItemFadeIn(holder.itemView)
 
     }
 

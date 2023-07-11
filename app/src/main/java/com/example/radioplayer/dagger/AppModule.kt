@@ -50,7 +50,8 @@ object AppModule {
         @ApplicationContext app : Context
     ) : RadioDB = Room.databaseBuilder(
         app, RadioDB::class.java, DATABASE_NAME)
-        .addMigrations(RadioDB.migration10To11, RadioDB.migration15To16, RadioDB.migration17To18)
+        .addMigrations(RadioDB.migration10To11, RadioDB.migration15To16, RadioDB.migration17To18,
+        RadioDB.migration22To23, RadioDB.migration23To24)
         .build()
 
     @Provides

@@ -27,6 +27,7 @@ import com.example.radioplayer.databinding.ItemRadioWithTextBinding
 import com.example.radioplayer.databinding.ItemTitleBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.extensions.loadImage
+import com.example.radioplayer.ui.animations.AdapterFadeAnim.adapterItemFadeIn
 import com.example.radioplayer.ui.animations.fadeOut
 import com.example.radioplayer.ui.fragments.HistoryFragment
 import com.example.radioplayer.utils.RandomColors
@@ -108,7 +109,7 @@ class BookmarkedTitlesAdapter @Inject constructor(
             }
         }
 
-        HistoryFragment.adapterAnimator.animateAppearance(holder.itemView)
+            adapterItemFadeIn(holder.itemView)
 
     }
 

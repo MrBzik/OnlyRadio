@@ -2,12 +2,10 @@ package com.example.radioplayer.ui.fragments
 
 
 import android.content.res.Configuration
-import android.graphics.Canvas
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -36,7 +34,6 @@ import com.example.radioplayer.ui.dialogs.CreatePlaylistDialog
 import com.example.radioplayer.ui.dialogs.EditPlaylistDialog
 import com.example.radioplayer.ui.dialogs.RemovePlaylistDialog
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
-import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.LAZY_LIST_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_LAZY_LIST
@@ -47,7 +44,6 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -121,8 +117,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         observePlaylistsVisibilityState()
 
         editPlaylistClickListener()
-
-
 
     }
 
@@ -217,7 +211,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                     requireContext(), listOfPlaylists,
                     currentPlaylistName,
                     currentPlaylistPosition,
-                    databaseViewModel, pixabayViewModel, glide
+                    favViewModel, pixabayViewModel, glide
                 ) {
                     isDeletePlaylistCalled = it
                 }
@@ -230,9 +224,9 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
                         RemovePlaylistDialog(requireContext(), currentPlaylistName){
 
-                            databaseViewModel.deletePlaylistAndContent(currentPlaylistName)
+                            favViewModel.deletePlaylistAndContent(currentPlaylistName)
 
-                            databaseViewModel.getAllFavouredStations()
+                            favViewModel.getAllFavouredStations()
 
                         }.show()
                     }
@@ -241,10 +235,10 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
                 AddStationToPlaylistDialog(
                     requireContext(), listOfPlaylists,
-                     databaseViewModel, pixabayViewModel, glide,
+                     favViewModel, pixabayViewModel, glide,
                     "Export stations from Lazy list to an existing playlist or a new one",
                 ) { playlistName ->
-                    databaseViewModel.exportStationFromLazyList(playlistName)
+                    favViewModel.exportStationFromLazyList(playlistName)
                 }.show()
 
             }
@@ -299,13 +293,13 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             playlistAdapter.unselectPlaylist()
 
-            databaseViewModel.getAllFavouredStations()
+            favViewModel.getAllFavouredStations()
 
-//            bind.rvFavStations.apply {
-//                post {
-//                    scheduleLayoutAnimation()
-//                }
-//            }
+            bind.rvFavStations.apply {
+                post {
+                    scheduleLayoutAnimation()
+                }
+            }
         }
     }
 
@@ -317,21 +311,30 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             setAddPlaylistClickListener {
                 CreatePlaylistDialog(
-                    requireContext(), listOfPlaylists, databaseViewModel, pixabayViewModel, glide, null
+                    requireContext(), listOfPlaylists, favViewModel, pixabayViewModel, glide, null
                 ).show()
             }
 
 
             setLazyListClickListener {
 
-                databaseViewModel.getLazyPlaylist()
+                bind.rvFavStations.post {
+
+                    bind.rvFavStations.scheduleLayoutAnimation()
+                }
+                favViewModel.getLazyPlaylist()
 
             }
 
 
             setPlaylistClickListener { playlist, position ->
 
-                databaseViewModel.subscribeToStationsInPlaylist(playlist.playlistName)
+                bind.rvFavStations.post {
+
+                    bind.rvFavStations.scheduleLayoutAnimation()
+                }
+
+                favViewModel.subscribeToStationsInPlaylist(playlist.playlistName)
                 currentPlaylistPosition = position
 
             }
@@ -341,9 +344,9 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 if(currentTab == SEARCH_FROM_FAVOURITES){
                     if(RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES){
 
-                        databaseViewModel.removeMediaItem(dragAndDropItemPos)
+                        favViewModel.removeMediaItem(dragAndDropItemPos)
                     }
-                    databaseViewModel.updateIsFavouredState(0, stationID)
+                    favViewModel.updateIsFavouredState(0, stationID)
 
                 }
                 else if(currentTab == SEARCH_FROM_PLAYLIST) {
@@ -352,9 +355,9 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
                         if(currentPlaylistName == RadioService.currentPlaylistName &&
                             RadioService.currentMediaItems == SEARCH_FROM_PLAYLIST){
-                            databaseViewModel.removeMediaItem(dragAndDropItemPos)
+                            favViewModel.removeMediaItem(dragAndDropItemPos)
                         }
-                        databaseViewModel.deleteStationPlaylistCrossRef(
+                        favViewModel.deleteStationPlaylistCrossRef(
                             stationID, currentPlaylistName)
 
                     }
@@ -363,7 +366,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                     // LAZY PLAYLIST
                 else {
                     if(RadioService.currentMediaItems == SEARCH_FROM_LAZY_LIST){
-                        databaseViewModel.removeMediaItem(dragAndDropItemPos)
+                        favViewModel.removeMediaItem(dragAndDropItemPos)
                     }
 
                     RadioSource.removeItemFromLazyList(dragAndDropItemPos)
@@ -381,7 +384,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         observeListOfPlaylists()
 
-        databaseViewModel.currentPlaylistName.observe(viewLifecycleOwner){
+        favViewModel.currentPlaylistName.observe(viewLifecycleOwner){
 
             bind.tvPlaylistName.text = it
             currentPlaylistName = it
@@ -404,16 +407,15 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             repeatOnLifecycle(Lifecycle.State.STARTED){
 
-                databaseViewModel.favFragStationsFlow.collectLatest {
+                favViewModel.favFragStationsFlow.collectLatest {
 
-                    mainAdapter.animator.resetAnimator()
                     mainAdapter.listOfStations = it
 
                     withContext(Dispatchers.Main){
                         bind.tvPlaylistMessage.apply {
                             if(it.isEmpty()){
                                 text = requireContext().resources.getString(
-                                    when(databaseViewModel.favFragStationsSwitch.value){
+                                    when(favViewModel.favFragStationsSwitch.value){
                                         SEARCH_FROM_FAVOURITES -> R.string.fav_frag_hint
                                         SEARCH_FROM_PLAYLIST -> R.string.playlist__hint
                                         else -> R.string.lazy_list_hint
@@ -482,7 +484,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     private fun observeFavOrPlaylistState(){
 
-        databaseViewModel.favFragStationsSwitch.observe(viewLifecycleOwner) {
+        favViewModel.favFragStationsSwitch.observe(viewLifecycleOwner) {
             updateUiOnTabChange(it)
 
             currentTab = it
@@ -577,7 +579,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     private fun observeListOfPlaylists (){
 
-        databaseViewModel.listOfAllPlaylists.observe(viewLifecycleOwner){ originalList ->
+        favViewModel.listOfAllPlaylists.observe(viewLifecycleOwner){ originalList ->
 
             val listWithHeader = mutableListOf(Playlist(LAZY_LIST_NAME, ""))
 
@@ -639,8 +641,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 mainAdapter.currentRadioStationId = ""
             }
 
-
-//            layoutAnimation = (activity as MainActivity).layoutAnimationController
+            layoutAnimation = (activity as MainActivity).layoutAnimationController
 
                 post {
 
@@ -650,16 +651,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                         scrollToPosition(index)
                     }
 
-//                    scheduleLayoutAnimation()
+                    scheduleLayoutAnimation()
                 }
-
-            addOnScrollListener(object : RecyclerView.OnScrollListener(){
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-                    if(newState == SCROLL_STATE_DRAGGING)
-                        mainAdapter.animator.cancelAnimator()
-                }
-            })
 
         }
     }
@@ -704,20 +697,20 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     private fun handleSwipeOnFavStation(stationID : String, favouredAt : Long, pos : Int){
 
         if(RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES){
-            databaseViewModel.removeMediaItem(pos)
+            favViewModel.removeMediaItem(pos)
         }
 
-        databaseViewModel.updateIsFavouredState(0, stationID).also{
+        favViewModel.updateIsFavouredState(0, stationID).also{
             Snackbar.make(
                 requireActivity().findViewById(R.id.rootLayout),
                 "Station removed from favs", Snackbar.LENGTH_LONG
             ).apply {
 
                 setAction("UNDO"){
-                    databaseViewModel.updateIsFavouredState(favouredAt, stationID)
+                    favViewModel.updateIsFavouredState(favouredAt, stationID)
 
                     if(RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES){
-                        databaseViewModel.restoreMediaItem(pos)
+                        favViewModel.restoreMediaItem(pos)
                     }
                 }
             }.show()
@@ -729,13 +722,13 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         if(RadioService.currentMediaItems == SEARCH_FROM_PLAYLIST
             && currentPlaylistName == RadioService.currentPlaylistName){
-            databaseViewModel.removeMediaItem(pos)
+            favViewModel.removeMediaItem(pos)
         }
 
         val playlistName = currentPlaylistName
         lifecycleScope.launch {
-            val timeOfInsertion = databaseViewModel.getTimeOfStationPlaylistInsertion(stationID, playlistName)
-            databaseViewModel.deleteStationPlaylistCrossRef(stationID, playlistName)
+            val timeOfInsertion = favViewModel.getTimeOfStationPlaylistInsertion(stationID, playlistName)
+            favViewModel.deleteStationPlaylistCrossRef(stationID, playlistName)
             withContext(Dispatchers.Main){
                 Snackbar.make(
                     requireActivity().findViewById(R.id.rootLayout),
@@ -745,9 +738,9 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
                         if(RadioService.currentMediaItems == SEARCH_FROM_PLAYLIST
                             && currentPlaylistName == RadioService.currentPlaylistName){
-                            databaseViewModel.restoreMediaItem(pos)
+                            favViewModel.restoreMediaItem(pos)
                         }
-                        databaseViewModel.insertStationPlaylistCrossRef(
+                        favViewModel.insertStationPlaylistCrossRef(
                             StationPlaylistCrossRef(
                                 stationID, playlistName, timeOfInsertion
                             )
@@ -761,11 +754,11 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     private fun handleSwipeOnLazyList(stationID : String, pos : Int){
 
         if(RadioService.currentMediaItems == SEARCH_FROM_LAZY_LIST){
-            databaseViewModel.removeMediaItem(pos)
+            favViewModel.removeMediaItem(pos)
         }
 
         RadioSource.removeItemFromLazyList(pos)
-        databaseViewModel.getLazyPlaylist()
+        favViewModel.getLazyPlaylist()
 //        mainAdapter.listOfStations = RadioSource.lazyListStations
 //        mainAdapter.notifyItemRemoved(pos)
 
@@ -778,13 +771,13 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
                 RadioSource.restoreItemFromLazyList(pos)
                 if(currentTab == SEARCH_FROM_LAZY_LIST){
-                    databaseViewModel.getLazyPlaylist()
+                    favViewModel.getLazyPlaylist()
 //                    mainAdapter.listOfStations = RadioSource.lazyListStations
 //                    mainAdapter.notifyItemInserted(pos)
                 }
 
                 if(RadioService.currentMediaItems == SEARCH_FROM_LAZY_LIST){
-                    databaseViewModel.restoreMediaItem(pos)
+                    favViewModel.restoreMediaItem(pos)
                 }
             }
 
@@ -792,7 +785,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                     super.onDismissed(transientBottomBar, event)
                     if(event != DISMISS_EVENT_ACTION) {
-                        databaseViewModel.clearRadioStationPlayedDuration(stationID)
+                        favViewModel.clearRadioStationPlayedDuration(stationID)
                     }
                 }
             }
@@ -805,7 +798,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     private fun insertStationInPlaylist(stationID: String, playlistName : String){
 
-            databaseViewModel.checkAndInsertStationPlaylistCrossRef(
+            favViewModel.checkAndInsertStationPlaylistCrossRef(
                 stationID, playlistName
             ) {
 
@@ -817,7 +810,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
                 if(!it && RadioService.currentPlaylistName == currentPlaylistName &&
                         RadioService.currentMediaItems == SEARCH_FROM_PLAYLIST){
-                    databaseViewModel.addMediaItemOnDropToPlaylist()
+                    favViewModel.addMediaItemOnDropToPlaylist()
                 }
 
 
@@ -827,11 +820,17 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mainAdapter.animator.resetAnimator()
+
         bind.rvFavStations.adapter = null
         bind.rvPlaylists.adapter = null
         _bind = null
         isToHandleNewStationObserver = false
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("CHECKTAGS", "calling fav's on destroy")
+    }
+
 
 }
