@@ -66,6 +66,18 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent" />
 
+<!--  <FrameLayout-->
+<!--      android:id="@+id/flPlayerFragment"-->
+<!--      android:layout_width="match_parent"-->
+<!--      android:visibility="gone"-->
+<!--      android:layout_height="@dimen/player_view_height"-->
+<!--      android:layout_marginHorizontal="@dimen/stub_player_margin_horizontal"-->
+<!--      android:layout_marginBottom="@dimen/player_view_bottom_margin"-->
+<!--      app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"-->
+<!--      app:layout_constraintEnd_toEndOf="parent"-->
+<!--      app:layout_constraintStart_toStartOf="parent"-->
+<!--      />-->
+
 
   <View
       android:id="@+id/separatorLowest"

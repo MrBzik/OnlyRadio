@@ -479,7 +479,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             stationsHistoryAdapter?.apply {
 
-                setAdapterValues(utils)
+                utils.initialiseValues(requireContext(), settingsViewModel.stationsTitleSize)
 
                 addOnPagesUpdatedListener {
                     handleRvAnim()

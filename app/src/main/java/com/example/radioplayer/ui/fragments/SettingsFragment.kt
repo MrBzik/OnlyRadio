@@ -22,6 +22,8 @@ import com.example.radioplayer.databinding.StubTvTitleBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
+import com.example.radioplayer.ui.animations.FADE_IN_DURATION
+import com.example.radioplayer.ui.animations.FADE_OUT_DURATION
 import com.example.radioplayer.ui.animations.SwapTitlesUi
 import com.example.radioplayer.ui.animations.objectSizeScaleAnimation
 import com.example.radioplayer.ui.animations.slideAnim
@@ -115,7 +117,9 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
             }
 
             override fun historyDialog() {
-                HistoryOptionsDialog(requireContext(), historyPref, historyViewModel).show()
+                HistoryOptionsDialog(requireContext(), historyPref){
+                    historyViewModel.checkAndCleanBookmarkTitles()
+                }.show()
             }
 
             override fun bufferDialog() {
@@ -348,7 +352,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         if(settingsViewModel.isSmoothTransitionNeeded){
 
-            bind.root.slideAnim(700, 0, R.anim.fade_in_anim)
+            bind.root.slideAnim(FADE_IN_DURATION, 0, R.anim.fade_in_anim)
 
             (activity as MainActivity).smoothDayNightFadeIn()
 
@@ -367,7 +371,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
 //           bind.root.slideAnim(500, 0, R.anim.fade_out_anim)
 
-            val fadeAnim = AlphaFadeOutAnim(1f, 500)
+            val fadeAnim = AlphaFadeOutAnim(1f, FADE_OUT_DURATION)
             fadeAnim.startAnim(bind.root)
 
 
@@ -378,14 +382,11 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
                     if(bindGeneral?.switchNightMode?.isChecked == true){
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
 
-
                     } else{
-
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
                     }
 
-                }, 500)
+                }, FADE_OUT_DURATION)
         }
     }
 

@@ -13,7 +13,6 @@ import com.example.radioplayer.connectivityObserver.NetworkConnectivityObserver
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.remote.entities.RadioStations
 import com.example.radioplayer.exoPlayer.*
-import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.ui.dialogs.*
 import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Commands.COMMAND_NEW_SEARCH
@@ -55,6 +54,8 @@ class MainViewModel @Inject constructor(
        val networkError = radioServiceConnection.networkError
        val playbackState = radioServiceConnection.playbackState
 
+        var isPlayerFragInitialized = false
+
 
 //       private var listOfStations = listOf<RadioStation>()
 
@@ -62,7 +63,19 @@ class MainViewModel @Inject constructor(
 //       val newPlayingItem : MutableLiveData<PlayingItem> = MutableLiveData()
 
 
-       var isInDetailsFragment = false
+       private val _isInDetailsFragment = MutableLiveData(false)
+       val isInDetailsFragment : LiveData<Boolean> = _isInDetailsFragment
+       fun updateIsInDetails(value : Boolean){
+           _isInDetailsFragment.postValue(value)
+       }
+
+       private val _isToPlayLoadAnim = MutableLiveData(false)
+       val isToPlayLoadAnim : LiveData<Boolean> = _isToPlayLoadAnim
+
+       fun updateIsToPlayLoadAnim(value: Boolean){
+           _isToPlayLoadAnim.postValue(value)
+       }
+
        var currentFragment = 0
        val currentSongTitle = RadioService.currentSongTitle
        var isInitialLaunchOfTheApp = true
@@ -121,12 +134,7 @@ class MainViewModel @Inject constructor(
         setConnectivityObserver()
     }
 
-
        val searchPreferences = app.getSharedPreferences("SearchPref", Context.MODE_PRIVATE)
-
-       val searchParamTag : MutableLiveData<String> = MutableLiveData()
-       val searchParamName : MutableLiveData<String> = MutableLiveData()
-       val searchParamCountry : MutableLiveData<String> = MutableLiveData()
 
        var isFullAutoSearch = searchPreferences.getBoolean(SEARCH_PREF_FULL_AUTO, true)
 
@@ -134,6 +142,11 @@ class MainViewModel @Inject constructor(
        var lastSearchName = searchPreferences.getString(SEARCH_PREF_NAME, "")?: ""
        var lastSearchTag = searchPreferences.getString(SEARCH_PREF_TAG, "")?: ""
        var searchFullCountryName = searchPreferences.getString(SEARCH_FULL_COUNTRY_NAME, "")?: ""
+
+       val searchParamTag : MutableLiveData<String> = MutableLiveData(lastSearchTag)
+       val searchParamName : MutableLiveData<String> = MutableLiveData(lastSearchName)
+       val searchParamCountry : MutableLiveData<String> = MutableLiveData(lastSearchCountry)
+
 
        var isTagExact = searchPreferences.getBoolean(IS_TAG_EXACT, false)
        var isNameExact = searchPreferences.getBoolean(IS_NAME_EXACT, false)
@@ -153,6 +166,23 @@ class MainViewModel @Inject constructor(
        var wasSearchFilterLanguage = isSearchFilterLanguage
 
 
+
+    fun saveSearchPrefs(){
+        searchPreferences.edit().apply {
+            putString(SEARCH_PREF_TAG, searchParamTag.value)
+            putString(SEARCH_PREF_NAME, searchParamName.value)
+            putString(SEARCH_PREF_COUNTRY, searchParamCountry.value)
+            putString(SEARCH_FULL_COUNTRY_NAME, searchFullCountryName)
+            putString(SEARCH_PREF_ORDER, newSearchOrder)
+            putBoolean(IS_NAME_EXACT, isNameExact)
+            putBoolean(IS_TAG_EXACT, isTagExact)
+            putInt(SEARCH_PREF_MIN_BIT, minBitrateNew)
+            putInt(SEARCH_PREF_MAX_BIT, maxBitrateNew)
+            putBoolean(Constants.IS_SEARCH_FILTER_LANGUAGE, isSearchFilterLanguage)
+            putBoolean(SEARCH_PREF_FULL_AUTO, isFullAutoSearch)
+
+        }.apply()
+    }
 
 
 
@@ -176,9 +206,6 @@ class MainViewModel @Inject constructor(
 
 
        init {
-           searchParamTag.postValue(lastSearchTag)
-           searchParamName.postValue(lastSearchName)
-           searchParamCountry.postValue(lastSearchCountry)
            searchBy.postValue(true)
        }
 
@@ -216,6 +243,8 @@ class MainViewModel @Inject constructor(
             limit : Int, offset : Int) : List<RadioStation> {
 
             searchLoadingState.postValue(true)
+
+           delay(2000)
 
            Log.d("CHECKTAGS", "is new search? $isNewSearch")
 
@@ -332,7 +361,6 @@ class MainViewModel @Inject constructor(
 
 
     fun initiateNewSearch() : Boolean {
-
 
         if(
             lastSearchName == searchParamName.value &&

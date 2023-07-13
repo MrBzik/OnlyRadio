@@ -1,9 +1,11 @@
 package com.example.radioplayer.adapters
 
+import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
@@ -40,6 +42,15 @@ class BaseAdapter(
     private val pausedBG = R.drawable.item_radio_bg_paused
 
 
+    fun initialiseValues(context : Context, fontSize : Float){
+        defaultTextColor = ContextCompat.getColor(context, R.color.default_text_color)
+        selectedTextColor = ContextCompat.getColor(context, R.color.selected_text_color)
+
+        defaultSecondaryTextColor = ContextCompat.getColor(context, R.color.default_secondary_text_color)
+        selectedSecondaryTextColor = ContextCompat.getColor(context, R.color.selected_secondary_text_color)
+        alpha = context.resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
+        titleSize = fontSize
+    }
 
      fun restoreState(bind: ItemRadioWithTextBinding){
         bind.apply {

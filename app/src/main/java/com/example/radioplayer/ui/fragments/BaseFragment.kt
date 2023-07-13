@@ -12,7 +12,11 @@ import androidx.fragment.app.viewModels
 import androidx.viewbinding.ViewBinding
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.BaseAdapter
+import com.example.radioplayer.databinding.FragmentPlayerBinding
+import com.example.radioplayer.databinding.FragmentSettingsBinding
 import com.example.radioplayer.ui.MainActivity
+import com.example.radioplayer.ui.delegates.SystemBars
+import com.example.radioplayer.ui.delegates.SystemBarsImp
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.HistoryViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
@@ -24,17 +28,20 @@ import com.example.radioplayer.utils.Constants
 abstract class BaseFragment<VB: ViewBinding>(
         private val bindingInflater : (inflater : LayoutInflater) -> VB
 )
-    : Fragment() {
-
+    : Fragment(), SystemBars by SystemBarsImp() {
 
      var _bind : VB? = null
 
      val bind : VB
      get() = _bind!!
 
-    val favViewModel : DatabaseViewModel by viewModels()
-    val historyViewModel : HistoryViewModel by viewModels()
-    val searchDialogsViewModels : SearchDialogsViewModel by viewModels()
+    val favViewModel : DatabaseViewModel by lazy {
+        (activity as MainActivity).favViewModel
+    }
+
+    val historyViewModel : HistoryViewModel by lazy {
+        (activity as MainActivity).historyViewModel
+    }
 
     val mainViewModel: MainViewModel by lazy {
         (activity as MainActivity).mainViewModel
@@ -48,6 +55,7 @@ abstract class BaseFragment<VB: ViewBinding>(
         (activity as MainActivity).settingsViewModel
     }
 
+    val searchDialogsViewModels : SearchDialogsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,49 +72,9 @@ abstract class BaseFragment<VB: ViewBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColor()
-    }
 
-    fun setAdapterValues(utils : BaseAdapter){
-
-        utils.apply {
-
-            defaultTextColor = ContextCompat.getColor(requireContext(), R.color.default_text_color)
-            selectedTextColor = ContextCompat.getColor(requireContext(), R.color.selected_text_color)
-
-            defaultSecondaryTextColor = ContextCompat.getColor(requireContext(), R.color.default_secondary_text_color)
-            selectedSecondaryTextColor = ContextCompat.getColor(requireContext(), R.color.selected_secondary_text_color)
-            alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
-            titleSize = settingsViewModel.stationsTitleSize
-
-        }
-    }
-
-    private fun setSystemBarsColor(){
-
-        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
-
-            var isToHandle = true
-
-            val color = when(mainViewModel.currentFragment){
-
-                Constants.FRAG_SEARCH -> ContextCompat.getColor(requireContext(), R.color.nav_bar_search_fragment)
-                Constants.FRAG_FAV -> ContextCompat.getColor(requireContext(), R.color.nav_bar_fav_fragment)
-                Constants.FRAG_HISTORY -> ContextCompat.getColor(requireContext(), R.color.nav_bar_history_frag)
-                Constants.FRAG_REC -> ContextCompat.getColor(requireContext(), R.color.nav_bar_rec_frag)
-                else -> {
-                    isToHandle = false
-                    0
-                }
-            }
-
-            if(isToHandle){
-                (activity as MainActivity).apply {
-                    window.navigationBarColor = color
-                    window.statusBarColor = color
-                }
-            }
-
+        if(bind !is FragmentSettingsBinding){
+            setSystemBarsColor(requireContext(), mainViewModel.currentFragment)
         }
     }
 }

@@ -322,20 +322,17 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
 //                        mainViewModel.stopPlay()
 
-                        (activity as MainActivity).bindPlayer.root.apply {
-                            visibility = View.GONE
-                            slideAnim(300, 0, R.anim.fade_out_anim)
+                        (activity as MainActivity).bindPlayer?.root?.let { playerView ->
+                            playerView.visibility = View.GONE
+                            playerView.slideAnim(300, 0, R.anim.fade_out_anim)
 
                         }
-
                     }
                 }
 
                 if(RadioService.currentMediaItems == SEARCH_FROM_RECORDINGS){
                     recordingsViewModel.removeRecordingMediaItem(position)
                 }
-
-
 
 
                 recordingsViewModel.deleteRecording(recording.id)

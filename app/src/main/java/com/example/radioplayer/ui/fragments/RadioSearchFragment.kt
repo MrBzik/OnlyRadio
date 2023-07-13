@@ -3,54 +3,43 @@ package com.example.radioplayer.ui.fragments
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Parcelable
 import android.util.Log
-import android.view.DragEvent
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.content.ContextCompat
-import androidx.core.view.doOnLayout
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.paging.LoadState
-import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingRadioAdapter
-import com.example.radioplayer.adapters.models.CountryWithRegion
-import com.example.radioplayer.adapters.models.TagWithGenre
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.FragmentRadioSearchBinding
 import com.example.radioplayer.databinding.StubNoResultMessageBinding
-import com.example.radioplayer.databinding.StubTvTitleBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.TextLoadAnim
 import com.example.radioplayer.ui.animations.slideAnim
+import com.example.radioplayer.ui.delegates.SystemBars
+import com.example.radioplayer.ui.delegates.SystemBarsImp
 import com.example.radioplayer.ui.dialogs.*
 import com.example.radioplayer.ui.stubs.NoResultMessage
-import com.example.radioplayer.utils.*
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 
 @AndroidEntryPoint
 class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     FragmentRadioSearchBinding::inflate
-) {
+), SystemBars by SystemBarsImp() {
 
 
     private var isNewSearchForAnimations = true
@@ -331,8 +320,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
 
-            setAdapterValues(pagingRadioAdapter.utils)
-
+            pagingRadioAdapter.utils.initialiseValues(requireContext(), settingsViewModel.stationsTitleSize)
 
 
 //            itemAnimator = null
@@ -355,25 +343,29 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         mainViewModel.searchLoadingState.observe(viewLifecycleOwner){
 
 
-            if(it){
+            if(it) {
 
-                if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
-                    (activity as MainActivity).startSeparatorsLoadAnim()
-                } else {
+                mainViewModel.updateIsToPlayLoadAnim(true)
 
-                    if(mainViewModel.isNewSearch)
-                        (activity as MainActivity).bind.progressBarBottom?.hide()
-                    else
-                        (activity as MainActivity).bind.progressBarBottom?.show()
-                }
+//                if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
+//                    mainViewModel.updateIsToPlaySeparatorAnim(true)
+//                } else {
+//
+//                    if(mainViewModel.isNewSearch)
+//                        (activity as MainActivity).bind.progressBarBottom?.hide()
+//                    else
+//                        (activity as MainActivity).bind.progressBarBottom?.show()
+//                }
 
 
             } else if(!it){
-                if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
-                    (activity as MainActivity).endSeparatorsLoadAnim()
-                } else {
-                    (activity as MainActivity).bind.progressBarBottom?.hide()
-                }
+                mainViewModel.updateIsToPlayLoadAnim(false)
+
+//                if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
+//                    mainViewModel.updateIsToPlaySeparatorAnim(false)
+//                } else {
+//                    (activity as MainActivity).bind.progressBarBottom?.hide()
+//                }
 
                 textLoadAnim?.endLoadingAnim()
 
@@ -640,9 +632,10 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         isInitialLaunch = true
         isToHandleNewStationObserver = false
         isNewSearchForAnimations = true
-        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
-            (activity as MainActivity).bind.progressBarBottom?.hide()
-        }
+
+//        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
+//            (activity as MainActivity).bind.progressBarBottom?.hide()
+//        }
     }
 
 

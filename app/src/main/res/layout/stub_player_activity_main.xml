@@ -85,7 +85,7 @@
         android:id="@+id/ivTogglePlayCurrentStation"
         android:layout_width="60dp"
         android:layout_height="65dp"
-        android:layout_marginEnd="@dimen/player_view_bottom_margin"
+
         android:src="@drawable/ic_play_pause"
         android:layout_gravity="end"
         android:background="?android:attr/selectableItemBackground"

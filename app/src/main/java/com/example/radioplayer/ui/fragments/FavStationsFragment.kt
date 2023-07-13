@@ -29,6 +29,8 @@ import com.example.radioplayer.databinding.FragmentFavStationsBinding
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.*
+import com.example.radioplayer.ui.delegates.SystemBars
+import com.example.radioplayer.ui.delegates.SystemBarsImp
 import com.example.radioplayer.ui.dialogs.AddStationToPlaylistDialog
 import com.example.radioplayer.ui.dialogs.CreatePlaylistDialog
 import com.example.radioplayer.ui.dialogs.EditPlaylistDialog
@@ -54,7 +56,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     FragmentFavStationsBinding::inflate
-) {
+), SystemBars by SystemBarsImp() {
 
 
     private var currentPlaylistName : String = ""
@@ -117,6 +119,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         observePlaylistsVisibilityState()
 
         editPlaylistClickListener()
+
+
 
     }
 
@@ -629,7 +633,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             setHasFixedSize(true)
             ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this)
 
-            setAdapterValues(mainAdapter.utils)
+            mainAdapter.utils.initialiseValues(requireContext(), settingsViewModel.stationsTitleSize)
 
 
             if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){

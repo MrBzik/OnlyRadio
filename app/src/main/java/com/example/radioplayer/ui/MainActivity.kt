@@ -1,78 +1,35 @@
 package com.example.radioplayer.ui
 
-import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import android.graphics.Color
-import android.graphics.drawable.Drawable
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.Gravity
-import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
-import android.widget.TextView
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
-import androidx.transition.Fade
-import androidx.transition.Slide
 import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.databinding.ActivityMainBinding
 import com.example.radioplayer.databinding.StubPlayerActivityMainBinding
 import com.example.radioplayer.exoPlayer.RadioService
-import com.example.radioplayer.exoPlayer.isPlayEnabled
-import com.example.radioplayer.exoPlayer.isPlaying
-import com.example.radioplayer.extensions.loadImage
-import com.example.radioplayer.extensions.navigate
-import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
+import com.example.radioplayer.ui.animations.DayNightAnim
 import com.example.radioplayer.ui.animations.LoadingAnim
-import com.example.radioplayer.ui.animations.slideAnim
+import com.example.radioplayer.ui.delegates.NavigationImpl
 import com.example.radioplayer.ui.fragments.*
+import com.example.radioplayer.ui.stubs.MainPlayerView
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.HistoryViewModel
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.ui.viewmodels.RecordingsViewModel
-import com.example.radioplayer.ui.viewmodels.SearchDialogsViewModel
 import com.example.radioplayer.ui.viewmodels.SettingsViewModel
-
-import com.example.radioplayer.utils.Constants.FRAG_FAV
-import com.example.radioplayer.utils.Constants.FRAG_HISTORY
-import com.example.radioplayer.utils.Constants.FRAG_OPTIONS
-import com.example.radioplayer.utils.Constants.FRAG_REC
-import com.example.radioplayer.utils.Constants.FRAG_SEARCH
-
-import com.example.radioplayer.utils.Constants.IS_NAME_EXACT
-import com.example.radioplayer.utils.Constants.IS_SEARCH_FILTER_LANGUAGE
-import com.example.radioplayer.utils.Constants.IS_TAG_EXACT
-import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
-import com.example.radioplayer.utils.Constants.SEARCH_FULL_COUNTRY_NAME
-import com.example.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
-import com.example.radioplayer.utils.Constants.SEARCH_PREF_FULL_AUTO
-import com.example.radioplayer.utils.Constants.SEARCH_PREF_MAX_BIT
-import com.example.radioplayer.utils.Constants.SEARCH_PREF_MIN_BIT
-import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
-import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME_AUTO
-import com.example.radioplayer.utils.Constants.SEARCH_PREF_ORDER
-import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
 import com.example.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
-import com.example.radioplayer.utils.Constants.TITLE_UNKNOWN
-import com.example.radioplayer.utils.RandomColors
-
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -82,23 +39,15 @@ class MainActivity : AppCompatActivity() {
     val mainViewModel: MainViewModel by viewModels()
     val settingsViewModel : SettingsViewModel by viewModels()
     val recordingsViewModel : RecordingsViewModel by viewModels()
-
+    val historyViewModel : HistoryViewModel by viewModels()
+    val favViewModel : DatabaseViewModel by viewModels()
 
     lateinit var bind : ActivityMainBinding
-    lateinit var bindPlayer : StubPlayerActivityMainBinding
-     var isStubPlayerBindInflated = false
+    var bindPlayer : StubPlayerActivityMainBinding? = null
 
     private val separatorAnimation : LoadingAnim by lazy { LoadingAnim(this,
         bind.viewSeparatorStart!!, bind.viewSeparatorEnd!!,
         bind.separatorLowest!!, bind.separatorSecond!!) }
-
-    fun startSeparatorsLoadAnim(){
-        separatorAnimation.startLoadingAnim()
-    }
-
-    fun endSeparatorsLoadAnim(){
-        separatorAnimation.endLoadingAnim()
-    }
 
 
     private val animationIn : Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.fall_down) }
@@ -109,7 +58,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val navigation : NavigationImpl by lazy {
+        NavigationImpl(supportFragmentManager, mainViewModel)
+    }
 
+    private val playerUtils : MainPlayerView by lazy {
+        MainPlayerView(bindPlayer!!, glide)
+    }
+
+    private val dayNightAnim : DayNightAnim by lazy {
+        DayNightAnim()
+    }
 
     @Inject
     lateinit var glide : RequestManager
@@ -123,34 +82,13 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private val radioSearchFragment : RadioSearchFragment by lazy { RadioSearchFragment() }
-    private val favStationsFragment : FavStationsFragment by lazy { FavStationsFragment() }
-    private val historyFragment : HistoryFragment by lazy { HistoryFragment() }
-    private val recordingsFragment : RecordingsFragment by lazy { RecordingsFragment() }
-    private val settingsFragment : SettingsFragment by lazy { SettingsFragment() }
-
-
-    private val stationDetailsFragment : StationDetailsFragment by lazy { StationDetailsFragment().apply {
-        enterTransition = Slide(Gravity.BOTTOM)
-        exitTransition = Slide(Gravity.BOTTOM)
-        }
-    }
-
-    private val recordingDetailsFragment : RecordingDetailsFragment by lazy { RecordingDetailsFragment().apply {
-        enterTransition = Slide(Gravity.BOTTOM)
-        exitTransition = Slide(Gravity.BOTTOM)
-         }
-    }
-
 
     override fun onBackPressed() {
 
-        if(!isStubPlayerBindInflated) {
+        if(mainViewModel.isInDetailsFragment.value == false) {
             this.moveTaskToBack(true)
-        } else if ((bindPlayer.tvExpandHideText as TextView).text  == resources.getString(R.string.Expand)) {
-            this.moveTaskToBack(true)
-        } else {
-            handleNavigationToFragments(null)
+        }  else {
+            navigation.handleNavigationToFragments(bind.bottomNavigationView.selectedItemId)
         }
     }
 
@@ -167,12 +105,13 @@ class MainActivity : AppCompatActivity() {
                 bindPlayer = StubPlayerActivityMainBinding.bind(view)
         }
 
-
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.toolbar)
+//        window.navigationBarColor = ContextCompat.getColor(this, R.color.toolbar)
 
         uiMode = this.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
 
-        setupInitialNavigation()
+        observeIsToPlayLoadingAnim()
+
+        navigation.initialNavigation()
 
         observeNewStation()
 
@@ -182,27 +121,36 @@ class MainActivity : AppCompatActivity() {
 
         refreshSeparators()
 
-
             bind.root.doOnLayout {
                 flHeight = bind.viewHeight.height
             }
-
-
-
     }
 
-    private fun setInitialDetailsText(){
+    private fun observeIsInDetails(){
 
-        if(isStubPlayerBindInflated){
-            if(mainViewModel.isInDetailsFragment){
-                bindPlayer.tvExpandHideText.setText(R.string.Hide)
+        mainViewModel.isInDetailsFragment.observe(this){
+            if(it){
+                bindPlayer?.tvExpandHideText?.setText(R.string.Hide)
             } else {
-                bindPlayer.tvExpandHideText.setText(R.string.Expand)
+                bindPlayer?.tvExpandHideText?.setText(R.string.Expand)
             }
         }
-
     }
 
+    private fun observeIsToPlayLoadingAnim(){
+
+        mainViewModel.isToPlayLoadAnim.observe(this){
+
+            if(uiMode == Configuration.UI_MODE_NIGHT_YES){
+                if(it) separatorAnimation.startLoadingAnim()
+                else separatorAnimation.endLoadingAnim()
+            } else {
+                if(!it || mainViewModel.isNewSearch)
+                    bind.progressBarBottom?.hide()
+                else bind.progressBarBottom?.show()
+            }
+        }
+    }
 
     override fun onStart() {
         super.onStart()
@@ -212,122 +160,33 @@ class MainActivity : AppCompatActivity() {
 
     fun smoothDayNightFadeOut(){
 
-        AlphaFadeOutAnim(1f, 500).apply {
+        dayNightAnim.smoothDayNightFadeOut(bind, bindPlayer)
 
-            if(isStubPlayerBindInflated)
-                startAnim(bindPlayer.root)
-
-                startAnim(bind.bottomNavigationView)
-
-                bind.viewSeparatorStart?.let{
-                    startAnim(bind.viewSeparatorStart!!)
-                    startAnim(bind.viewSeparatorEnd!!)
-                    startAnim(bind.separatorSecond!!)
-                    startAnim(bind.separatorLowest!!)
-                }
-        }
-
-        if(uiMode != Configuration.UI_MODE_NIGHT_YES){
-
-            val colorAnimator = ValueAnimator.ofArgb(Color.WHITE, Color.BLACK)
-            colorAnimator.addUpdateListener {
-                bind.root.setBackgroundColor(it.animatedValue as Int)
-            }
-            colorAnimator.duration = 500
-            colorAnimator.start()
-
-
-            val colorFrom = ContextCompat.getColor(this, R.color.nav_bar_settings_frag)
-
-            val barsColorAnimator = ValueAnimator.ofArgb(colorFrom, Color.BLACK)
-            barsColorAnimator.addUpdateListener { value ->
-                window.navigationBarColor = value.animatedValue as Int
-                window.statusBarColor = value.animatedValue as Int
-            }
-            barsColorAnimator.duration = 500
-            barsColorAnimator.start()
-
-
-
-        }
     }
 
     fun smoothDayNightFadeIn(){
-        if(isStubPlayerBindInflated)
-            bindPlayer.root.slideAnim(700, 0, R.anim.fade_in_anim)
 
-        bind.bottomNavigationView.slideAnim(700, 0, R.anim.fade_in_anim)
-        bind.viewSeparatorStart?.slideAnim(700, 0, R.anim.fade_in_anim)
-        bind.viewSeparatorEnd?.slideAnim(700, 0, R.anim.fade_in_anim)
-        bind.separatorSecond?.slideAnim(700, 0, R.anim.fade_in_anim)
-        bind.separatorLowest?.slideAnim(700, 0, R.anim.fade_in_anim)
+        dayNightAnim.smoothDayNightFadeIn(bind, bindPlayer)
 
-        if(uiMode != Configuration.UI_MODE_NIGHT_YES){
-
-
-            val colorAnimator = ValueAnimator.ofArgb(Color.BLACK, Color.WHITE)
-            colorAnimator.addUpdateListener {
-                bind.rootLayout.setBackgroundColor(it.animatedValue as Int)
-            }
-            colorAnimator.duration = 700
-            colorAnimator.start()
-
-            val colorTo = ContextCompat.getColor(this, R.color.nav_bar_settings_frag)
-
-            val barsColorAnimator = ValueAnimator.ofArgb(Color.BLACK, colorTo)
-            barsColorAnimator.addUpdateListener { value ->
-                window.navigationBarColor = value.animatedValue as Int
-                window.statusBarColor = value.animatedValue as Int
-            }
-            barsColorAnimator.duration = 700
-            barsColorAnimator.start()
-
-
-
-        }
     }
-
-
 
     private fun refreshSeparators(){
         if(!mainViewModel.isInitialLaunchOfTheApp && uiMode == Configuration.UI_MODE_NIGHT_YES){
             separatorAnimation.refresh()
-        }
-
-    }
-
-
-
-
-    private fun setupInitialNavigation(){
-
-        if(mainViewModel.isInitialLaunchOfTheApp){
-
-            supportFragmentManager.beginTransaction().apply {
-                replace(R.id.flFragment, radioSearchFragment)
-                addToBackStack(null)
-                commit()
-            }
         }
     }
 
 
     private fun handleStubPlayer(){
 
-        if(!isStubPlayerBindInflated) {
+        bindPlayer?.let {
+            if(it.root.visibility == View.GONE)
+                playerUtils.slideInPlayer()
+        } ?: kotlin.run {
             inflatePlayerStubAndCallRelatedMethods()
-        } else if(bindPlayer.root.visibility == View.GONE){
-
-            bindPlayer.root.visibility = View.VISIBLE
-            bindPlayer.root.slideAnim(500, 0, R.anim.fade_in_anim)
-            bindPlayer.tvStationTitle.isSingleLine = true
-            bindPlayer.tvStationTitle.isSelected = true
         }
 
-
-        updateImage()
-
-        setInitialDetailsText()
+        playerUtils.updateImage()
 
     }
 
@@ -350,84 +209,39 @@ class MainActivity : AppCompatActivity() {
             handleStubPlayer()
 
         }
-
-
-
-//        mainViewModel.newPlayingItem.observe(this){ playingItem ->
-
-//            currentPlayingItem = playingItem
-
-//            if(!isStubPlayerBindInflated) {
-//                inflatePlayerStubAndCallRelatedMethods()
-//            } else if(bindPlayer.root.visibility == View.GONE){
-//
-//                bindPlayer.root.visibility = View.VISIBLE
-//                bindPlayer.root.slideAnim(500, 0, R.anim.fade_in_anim)
-//                bindPlayer.tvStationTitle.isSingleLine = true
-//                bindPlayer.tvStationTitle.isSelected = true
-//            }
-//
-//
-//            updateImage()
-//
-//        }
     }
 
     private fun inflatePlayerStubAndCallRelatedMethods (){
 
-
-        isStubPlayerBindInflated = true
         bind.stubPlayer.visibility = View.VISIBLE
 
-        bindPlayer.root.slideAnim(500, 0, R.anim.fade_in_anim)
-
-
-        bindPlayer.tvStationTitle.isSingleLine = true
-        bindPlayer.tvStationTitle.isSelected = true
-
+        playerUtils.slideInPlayer()
 
         clickListenerToHandleNavigationWithDetailsFragment()
 
         onClickListenerForTogglePlay()
+
         observePlaybackStateToChangeIcons()
 
         observeCurrentSongTitle()
 
         observePlayerBufferingState()
 
+        observeIsInDetails()
+
     }
 
     private fun observePlayerBufferingState(){
         mainViewModel.isPlayerBuffering.observe(this){
-            bindPlayer.progressBuffer.isVisible = it
+            bindPlayer?.progressBuffer?.isVisible = it
         }
     }
-
 
     private fun observeCurrentSongTitle (){
 
         mainViewModel.currentSongTitle.observe(this){ title ->
 
-            handleTitleText(title)
-        }
-    }
-
-
-    private fun handleTitleText(title : String){
-
-        if(title.equals("NULL", ignoreCase = true) || title.isBlank()){
-            bindPlayer.tvStationTitle.apply {
-                text = TITLE_UNKNOWN
-                setTextColor(ContextCompat.getColor(this@MainActivity,R.color.regular_text_color))
-            }
-        } else {
-
-            bindPlayer.tvStationTitle.apply {
-
-                text = title
-                setTextColor(ContextCompat.getColor(this@MainActivity,R.color.selected_text_color))
-
-            }
+            playerUtils.handleTitleText(title)
         }
     }
 
@@ -435,219 +249,36 @@ class MainActivity : AppCompatActivity() {
     private fun setOnBottomNavClickListener(){
 
         bind.bottomNavigationView.setOnItemSelectedListener {
-           handleNavigationToFragments(it)
-
+            navigation.handleNavigationToFragments(it.itemId)
         }
     }
 
     private fun setOnBottomNavItemReselect(){
         bind.bottomNavigationView.setOnItemReselectedListener {
-
-            if(isStubPlayerBindInflated){
-                if(mainViewModel.isInDetailsFragment){
-                    handleNavigationToFragments(it)
-                }
+            if(mainViewModel.isInDetailsFragment.value == true){
+                navigation.handleNavigationToFragments(it.itemId)
             }
         }
     }
-
-
 
 
     @SuppressLint("ClickableViewAccessibility")
     private fun clickListenerToHandleNavigationWithDetailsFragment(){
 
-        bindPlayer.tvStationTitle.setOnTouchListener { v, event ->
+        bindPlayer?.tvStationTitle?.setOnTouchListener { _, event ->
 
             if (event.action == MotionEvent.ACTION_DOWN){
-
-                if(!mainViewModel.isInDetailsFragment) {
-                    mainViewModel.isInDetailsFragment = true
-
-                    putFadeOutForDetailsFragment()
-
-
-                    if(uiMode == Configuration.UI_MODE_NIGHT_YES){
-                        endSeparatorsLoadAnim()
-                    }
-
-
-                    supportFragmentManager.beginTransaction().apply {
-
-                        if(!RadioService.isFromRecording){
-                            replace(R.id.flFragment, stationDetailsFragment)
-                        } else {
-                            replace(R.id.flFragment, recordingDetailsFragment)
-                        }
-                        addToBackStack(null)
-                        commit()
-                    }
-
-                    bindPlayer.tvExpandHideText.setText(R.string.Hide)
-
-                }
-
-                else {
-
-                    handleNavigationToFragments(null)
-
-                }
+                navigation.handleNavigationWithDetailsFragment(bind.bottomNavigationView.selectedItemId)
             }
-
             true
         }
     }
 
-    private fun handleNavigationToFragments(item : MenuItem?) : Boolean {
-
-        val menuItem = bind.bottomNavigationView.selectedItemId
-
-
-
-        if((item?.itemId ?: menuItem) != R.id.mi_radioSearchFragment){
-            if(uiMode == Configuration.UI_MODE_NIGHT_YES){
-                endSeparatorsLoadAnim()
-            }
-        }
-
-        getFragment(item?.itemId ?: menuItem).apply {
-            exitTransition = null
-            supportFragmentManager.navigate(this)
-
-        }
-
-
-        if(isStubPlayerBindInflated){
-            bindPlayer.tvExpandHideText.setText(R.string.Expand)
-            mainViewModel.isInDetailsFragment = false
-
-        }
-
-        return true
-    }
-
-
-    private fun putFadeOutForDetailsFragment(){
-
-        getFragment(bind.bottomNavigationView.selectedItemId).exitTransition = Fade()
-
-    }
-
-    private fun getFragment(id : Int) : Fragment {
-
-       return when(id) {
-
-            R.id.mi_radioSearchFragment -> {
-                mainViewModel.currentFragment = FRAG_SEARCH
-                radioSearchFragment
-
-            }
-            R.id.mi_favStationsFragment -> {
-                mainViewModel.currentFragment = FRAG_FAV
-                favStationsFragment
-
-            }
-            R.id.mi_historyFragment -> {
-                mainViewModel.currentFragment = FRAG_HISTORY
-                historyFragment
-
-            }
-            R.id.mi_recordingsFragment -> {
-                mainViewModel.currentFragment = FRAG_REC
-                recordingsFragment
-            }
-
-            else -> {
-                mainViewModel.currentFragment = FRAG_OPTIONS
-                settingsFragment
-            }
-        }
-
-    }
-
-
-    private val randColors = RandomColors()
-
-    private fun setTvPlaceHolderLetter(name : String, isRecording : Boolean){
-
-        val color = randColors.getColor()
-
-        if(isRecording){
-
-            bindPlayer.tvPlaceholder.apply {
-                text = "Rec."
-                setTextColor(color)
-                alpha = 0.6f
-                textSize = 28f
-            }
-        } else {
-
-            var char = 'X'
-
-            for(l in name.indices){
-                if(name[l].isLetter()){
-                    char = name[l]
-                    break
-                }
-            }
-
-            bindPlayer.tvPlaceholder.apply {
-                text = char.toString().uppercase()
-                setTextColor(color)
-                alpha = 0.6f
-                textSize = 40f
-            }
-        }
-    }
-
-    private fun updateImage(){
-
-        var newName = ""
-        var isRecording = false
-        var newImage = ""
-
-        if (RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS) {
-
-                currentPlayingStation?.apply {
-                    newName = name ?: "X"
-                    newImage = favicon ?: ""
-                    val bits = if(bitrate == 0) "0? kbps" else "$bitrate kbps"
-                    bindPlayer.tvBitrate.text = bits
-            }
-
-        } else  {
-
-            currentPlayingRecording?.apply {
-                isRecording = true
-                bindPlayer.tvStationTitle.text = name
-                bindPlayer.tvBitrate.text = ""
-                newName = name
-                newImage = iconUri
-
-            }
-        }
-
-            if(newImage.isBlank()){
-                bindPlayer.ivCurrentStationImage.visibility = View.GONE
-                setTvPlaceHolderLetter(newName, isRecording)
-
-            } else {
-
-                bindPlayer.ivCurrentStationImage.visibility = View.VISIBLE
-                glide.loadImage(
-                    uri = newImage,
-                    tvPlaceholder = bindPlayer.tvPlaceholder,
-                    ivItemImage = bindPlayer.ivCurrentStationImage,
-                ){
-                    setTvPlaceHolderLetter(newName, isRecording)
-                }
-            }
-        }
 
 
     private fun onClickListenerForTogglePlay(){
 
-        bindPlayer.ivTogglePlayCurrentStation.setOnClickListener { _ ->
+        bindPlayer?.ivTogglePlayCurrentStation?.setOnClickListener { _ ->
 
             if(RadioService.isFromRecording){
 
@@ -660,24 +291,7 @@ class MainActivity : AppCompatActivity() {
                     isToChangeMediaItems = false,
                     searchFlag = RadioService.currentMediaItems
                 ) }
-
-
             }
-
-
-//            currentPlayingItem?.let {
-//
-//                when(it){
-//                    is PlayingItem.FromRadio -> {
-//                     mainViewModel.playOrToggleStation(it.radioStation)
-//
-//                    }
-//                    is PlayingItem.FromRecordings -> {
-//
-//                        mainViewModel.playOrToggleStation(rec = it.recording)
-//                    }
-//                }
-//            }
         }
     }
 
@@ -686,31 +300,10 @@ class MainActivity : AppCompatActivity() {
 
         mainViewModel.playbackState.observe(this){
 
-            it?.let {
-                    when{
-                    it.isPlaying -> {
-                        bindPlayer.ivTogglePlayCurrentStation
-                            .setImageResource(R.drawable.ic_pause_play)
-                        bindPlayer.tvStationTitle.apply {
-                            setTextColor(ContextCompat.getColor(this@MainActivity,R.color.selected_text_color))
+            playerUtils.handleIcons(it)
 
-                        }
-                    }
-                    it.isPlayEnabled -> {
-                        bindPlayer.ivTogglePlayCurrentStation
-                            .setImageResource(R.drawable.ic_play_pause)
-                        bindPlayer.tvStationTitle.apply {
-
-                            setTextColor(ContextCompat.getColor(this@MainActivity, R.color.regular_text_color))
-
-                        }
-                    }
-                }
-            }
         }
     }
-
-
 
 
 
@@ -718,32 +311,10 @@ class MainActivity : AppCompatActivity() {
         super.onStop()
         this.cacheDir.deleteRecursively()
 
-        mainViewModel.searchPreferences.edit().apply {
-            putString(SEARCH_PREF_TAG, mainViewModel.searchParamTag.value)
-            putString(SEARCH_PREF_NAME, mainViewModel.searchParamName.value)
-            putString(SEARCH_PREF_COUNTRY, mainViewModel.searchParamCountry.value)
-            putString(SEARCH_FULL_COUNTRY_NAME, mainViewModel.searchFullCountryName)
-            putString(SEARCH_PREF_ORDER, mainViewModel.newSearchOrder)
-            putBoolean(IS_NAME_EXACT, mainViewModel.isNameExact)
-            putBoolean(IS_TAG_EXACT, mainViewModel.isTagExact)
-            putInt(SEARCH_PREF_MIN_BIT, mainViewModel.minBitrateNew)
-            putInt(SEARCH_PREF_MAX_BIT, mainViewModel.maxBitrateNew)
-            putBoolean(IS_SEARCH_FILTER_LANGUAGE, mainViewModel.isSearchFilterLanguage)
-//            putBoolean(SEARCH_PREF_NAME_AUTO, mainViewModel.isNameAutoSearch)
-            putBoolean(SEARCH_PREF_FULL_AUTO, mainViewModel.isFullAutoSearch)
-
-        }.apply()
+        mainViewModel.saveSearchPrefs()
 
         settingsViewModel.textSizePref.edit()
             .putFloat(TEXT_SIZE_STATION_TITLE_PREF, settingsViewModel.stationsTitleSize).apply()
-
-//        if(mainViewModel.isFabUpdated){
-//            mainViewModel.fabPref.edit().apply {
-//                putFloat(FAB_POSITION_X, mainViewModel.fabX)
-//                putFloat(FAB_POSITION_Y, mainViewModel.fabY)
-//                putBoolean(IS_FAB_UPDATED, true)
-//            }.apply()
-//        }
 
     }
 

@@ -23,7 +23,7 @@ import com.google.android.material.slider.RangeSlider
 class HistoryOptionsDialog (
     requireContext : Context,
     private val historyPref : SharedPreferences,
-    private val historyViewModel: HistoryViewModel
+    private val cleanupCheck : () -> Unit
         ) : BaseDialog<DialogHistoryOptionsBinding> (
             requireContext,
     DialogHistoryOptionsBinding::inflate
@@ -165,7 +165,7 @@ class HistoryOptionsDialog (
                RadioService.historyPrefBookmark = newBookmarkNumber
 
                if(newBookmarkNumber < initialBookmarkNumber){
-                   historyViewModel.checkAndCleanBookmarkTitles()
+                   cleanupCheck()
                }
 
             }
