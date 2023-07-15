@@ -3,6 +3,7 @@ package com.example.radioplayer.ui
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.Animation
@@ -12,6 +13,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
@@ -31,6 +33,8 @@ import com.example.radioplayer.ui.viewmodels.RecordingsViewModel
 import com.example.radioplayer.ui.viewmodels.SettingsViewModel
 import com.example.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -111,6 +115,8 @@ class MainActivity : AppCompatActivity() {
 
         observeIsToPlayLoadingAnim()
 
+        refreshSeparators()
+
         navigation.initialNavigation()
 
         observeNewStation()
@@ -118,8 +124,6 @@ class MainActivity : AppCompatActivity() {
         setOnBottomNavClickListener()
 
         setOnBottomNavItemReselect()
-
-        refreshSeparators()
 
             bind.root.doOnLayout {
                 flHeight = bind.viewHeight.height
@@ -213,7 +217,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun inflatePlayerStubAndCallRelatedMethods (){
 
-        bind.stubPlayer.visibility = View.VISIBLE
+        bind.stubPlayer.inflate()
 
         playerUtils.slideInPlayer()
 

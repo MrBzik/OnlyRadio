@@ -120,7 +120,20 @@ class DBOperators (private val service: RadioService) {
     var isLastDateUpToDate = true
 
 
+//    private suspend fun testClickOnHistory(){
+//        val lastDate = databaseRepository.getLastDate()
+//        lastDate?.let {
+//            databaseRepository.deleteDate(it)
+//            databaseRepository.deleteAllCrossRefWithDate(it.date)
+//            databaseRepository.deleteTitlesWithDate(it.time)
+//        }
+//    }
+
+
      fun getLastDateAndCheck() = serviceScope.launch(Dispatchers.IO) {
+
+//         testClickOnHistory()
+
 
         val date = databaseRepository.getLastDate()
         date?.let {

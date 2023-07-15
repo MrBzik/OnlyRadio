@@ -55,6 +55,7 @@ class NavigationImpl (
 
     override fun initialNavigation() {
         if(mainViewModel.isInitialLaunchOfTheApp){
+            mainViewModel.isInitialLaunchOfTheApp = false
             supportFragmentManager.beginTransaction().apply {
                 replace(R.id.flFragment, radioSearchFragment)
                 addToBackStack(null)

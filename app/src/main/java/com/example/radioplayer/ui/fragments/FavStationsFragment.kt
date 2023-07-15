@@ -56,7 +56,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     FragmentFavStationsBinding::inflate
-), SystemBars by SystemBarsImp() {
+) {
 
 
     private var currentPlaylistName : String = ""
@@ -119,8 +119,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         observePlaylistsVisibilityState()
 
         editPlaylistClickListener()
-
-
 
     }
 
@@ -436,54 +434,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 }
             }
         }
-
-
-//        databaseViewModel.observableListOfStations.observe(viewLifecycleOwner){
-
-
-//            bind.tvPlaylistMessage.apply {
-//                if(it.isEmpty()){
-//                    visibility = View.VISIBLE
-//                    slideAnim(400, 0, R.anim.fade_in_anim)
-//                }
-//                else {
-//                    visibility = View.INVISIBLE
-//                }
-//            }
-
-//            mainAdapter.listOfStations = it
-
-//        }
     }
-
-//    private fun observeUnfilteredPlaylist(){
-//        databaseViewModel.stationsInPlaylist.observe(viewLifecycleOwner){ playlist ->
-//            playlist?.radioStations?.let { stations ->
-//                sortStationsInPlaylist(stations)
-//               }
-//            }
-//        }
-
-
-//    private fun sortStationsInPlaylist(stations : List<RadioStation>){
-//
-//        lifecycleScope.launch {
-//
-//            val result: MutableList<RadioStation> = mutableListOf()
-//
-//            val stationIndexMap = stations.withIndex().associate { it.value.stationuuid to it.index }
-//
-//            val order = databaseViewModel.getPlaylistOrder(currentPlaylistName)
-//
-//            order.forEach { crossref ->
-//                val index = stationIndexMap[crossref.stationuuid]
-//                if (index != null) {
-//                    result.add(stations[index])
-//                }
-//            }
-//            databaseViewModel.playlist.postValue(result)
-//        }
-//    }
 
 
     private fun observeFavOrPlaylistState(){
@@ -684,15 +635,19 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.layoutPosition
+                val position = viewHolder.absoluteAdapterPosition
                 val stationID = mainAdapter.listOfStations[position].stationuuid
-                val favouredAt =  mainAdapter.listOfStations[position].favouredAt
-                if(currentTab == SEARCH_FROM_FAVOURITES){
-                    handleSwipeOnFavStation(stationID, favouredAt, viewHolder.absoluteAdapterPosition)
-                } else if(currentTab == SEARCH_FROM_PLAYLIST){
-                    handleSwipeOnPlaylistStation(stationID, viewHolder.absoluteAdapterPosition)
-                } else {
-                    handleSwipeOnLazyList(stationID, viewHolder.absoluteAdapterPosition)
+                when (currentTab) {
+                    SEARCH_FROM_FAVOURITES -> {
+                        val favouredAt =  mainAdapter.listOfStations[position].favouredAt
+                        handleSwipeOnFavStation(stationID, favouredAt, position)
+                    }
+                    SEARCH_FROM_PLAYLIST -> {
+                        handleSwipeOnPlaylistStation(stationID, position)
+                    }
+                    else -> {
+                        handleSwipeOnLazyList(stationID, position)
+                    }
                 }
             }
         }
@@ -816,8 +771,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                         RadioService.currentMediaItems == SEARCH_FROM_PLAYLIST){
                     favViewModel.addMediaItemOnDropToPlaylist()
                 }
-
-
             }
 
     }

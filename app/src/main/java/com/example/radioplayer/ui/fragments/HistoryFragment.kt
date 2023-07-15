@@ -176,10 +176,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         stationsHistoryAdapter?.addLoadStateListener {
 
-            if (it.refresh is LoadState.Loading ||
-                it.append is LoadState.Loading) { }
-            else {
-                    handleRvAnim()
+            if (it.refresh !is LoadState.Loading && it.append !is LoadState.Loading) {
+                handleRvAnim()
             }
         }
     }
@@ -188,9 +186,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         titlesHistoryAdapter?.addLoadStateListener {
 
-            if (it.refresh is LoadState.Loading ||
-                it.append is LoadState.Loading) { }
-            else {
+            if (it.refresh !is LoadState.Loading && it.append !is LoadState.Loading) {
                 handleRvAnim()
             }
         }
@@ -274,27 +270,37 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             val dates = it.toMutableList()
             dates.add(0, allHistory)
 
-            setupDatesSpinner(dates)
+            if(!isSpinnerSet){
+                isSpinnerSet = true
 
-            var pos = dates.indexOfFirst { historyDate ->
-                historyDate.time == historyViewModel.selectedDate
+                setupDatesSpinner(dates)
+                val pos = dates.indexOfFirst { historyDate ->
+                    historyDate.time == historyViewModel.selectedDate
+                }
+
+                datesAdapter.selectedItemPosition = pos
+
+                bind.spinnerDates.setSelection(pos)
+
+                setDatesSpinnerSelectListener()
+
+                subscribeToHistory()
+
+            } else {
+
+                datesAdapter.apply {
+                    datesList = dates
+                    if(historyViewModel.selectedDate > 0L)
+                    selectedItemPosition += 1
+                }
             }
-
-
-            datesAdapter.selectedItemPosition = pos
-
-//            setSliderHeaderText(databaseViewModel.selectedDate)
-
-            bind.spinnerDates.setSelection(pos)
-
-            setDatesSpinnerSelectListener()
-
-            subscribeToHistory()
-
-            Log.d("CHECKTAGS", "check if with adding new date this code is running twice")
-
         }
     }
+
+
+    private var isSpinnerSet = false
+
+
 
 
     private fun setDatesSpinnerSelectListener(){
@@ -444,30 +450,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             itemAnimator = null
             layoutAnimation = (activity as MainActivity).layoutAnimationController
 
-//            setRvLoadChildrenListener()
-
-//            addOnScrollListener(object : RecyclerView.OnScrollListener(){
-//                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-//                    super.onScrollStateChanged(recyclerView, newState)
-//                    if(newState == RecyclerView.SCROLL_STATE_DRAGGING)
-//                        adapterAnimator.cancelAnimator()
-//                }
-//            })
-
-//            if(historyViewModel.isInStationsTab){
-//                setStationsHistoryAdapter()
-//            } else {
-//
-//                if(historyViewModel.isInBookmarks){
-//                    switchToBookmarkedTitles()
-//                    bind.fabBookmarkedTitles.setImageResource(R.drawable.ic_bookmark_selected)
-//                } else {
-//                    setTitlesHistoryAdapter()
-//                }
-//            }
+            setRvLoadChildrenListener()
         }
-
-        setRvLoadChildrenListener()
     }
 
 
@@ -531,7 +515,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                     Toast.makeText(requireContext(), "Title bookmarked", Toast.LENGTH_SHORT).show()
 
                     historyViewModel.upsertBookmarkedTitle(title)
-
                 }
 
                 addOnPagesUpdatedListener {
@@ -629,17 +612,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                     handleTitleClick(title.title)
                 }
             }
-
-//            historyViewModel.bookmarkedTitlesLivedata.observe(viewLifecycleOwner){
-//
-//                bookmarkedTitlesAdapter.listOfTitles = it
-//
-//            }
         }
-
-//        else {
-//            bind.rvHistory.scheduleLayoutAnimation()
-//        }
     }
 
 
@@ -650,18 +623,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             if(currentTab == TAB_STATIONS){
 
-//                historyViewModel.isInStationsTab = false
-//                historyViewModel.isHistoryInStationsTabLiveData.postValue(false)
                 isInitialLoad = true
                 historyViewModel.setIsInStations(false)
 
-
-//                if(historyViewModel.isInBookmarks){
-//                    switchToBookmarkedTitles()
-//
-//                } else {
-//                    handleSwitchToNotMarkedTitles()
-//                }
                 switchTitlesStationsUi(true)
             }
         }
@@ -675,20 +639,11 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             if(currentTab != TAB_STATIONS){
 
-//                historyViewModel.isInStationsTab = true
-//                historyViewModel.isHistoryInStationsTabLiveData.postValue(true)
                 isInitialLoad = true
                 historyViewModel.setIsInStations(true)
 
-//                setStationsHistoryAdapter()
-
-//                if(databaseViewModel.selectedDate != 0L){
-//                    stationsHistoryAdapter?.submitData(lifecycle, PagingData.empty())
-//                }
-
                 switchTitlesStationsUi(true)
 
-//                loadHistory()
             }
         }
     }
@@ -725,6 +680,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             }
         }
     }
+
 
 
     private fun setupAdapterClickListener(){
@@ -766,7 +722,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
 
-                val position = viewHolder.layoutPosition
+                val position = viewHolder.absoluteAdapterPosition
 
                 val bookmark = bookmarkedTitlesAdapter.listOfTitles[position]
 
@@ -809,7 +765,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         _bind = null
         isToHandleNewStationObserver = false
         isBookmarkedTitlesObserverSet = false
-//        adapterAnimator.resetAnimator()
+        isSpinnerSet = false
     }
 
     override fun onDestroy() {

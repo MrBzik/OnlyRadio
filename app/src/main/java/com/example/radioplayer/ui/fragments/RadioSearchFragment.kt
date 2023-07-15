@@ -24,8 +24,6 @@ import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.TextLoadAnim
 import com.example.radioplayer.ui.animations.slideAnim
-import com.example.radioplayer.ui.delegates.SystemBars
-import com.example.radioplayer.ui.delegates.SystemBarsImp
 import com.example.radioplayer.ui.dialogs.*
 import com.example.radioplayer.ui.stubs.NoResultMessage
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
@@ -39,7 +37,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     FragmentRadioSearchBinding::inflate
-), SystemBars by SystemBarsImp() {
+) {
 
 
     private var isNewSearchForAnimations = true
@@ -50,8 +48,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     lateinit var pagingRadioAdapter : PagingRadioAdapter
 
     private var textLoadAnim : TextLoadAnim? = null
-
-    private var isToShowLoadingMessage = false
 
     private var isToHandleNewStationObserver = false
 
@@ -104,10 +100,24 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         observeSearchState()
 
-        textLoadAnim = TextLoadAnim(requireContext(), bind.tvLoading)
+        observeIsToShowLoadingMessage()
+//
+//        textLoadAnim = TextLoadAnim(requireContext(), bind.tvLoading)
 
     }
 
+    private fun observeIsToShowLoadingMessage(){
+
+        textLoadAnim = TextLoadAnim(requireContext(), bind.tvLoading)
+
+        mainViewModel.isToShowLoadingMessage.observe(viewLifecycleOwner){
+            if(it){
+                textLoadAnim?.startLoadingAnim()
+            } else {
+                textLoadAnim?.endLoadingAnim()
+            }
+        }
+    }
 
     private fun setSearchButton(){
 
@@ -342,34 +352,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         mainViewModel.searchLoadingState.observe(viewLifecycleOwner){
 
+            mainViewModel.updateIsToPlayLoadAnim(it)
 
-            if(it) {
-
-                mainViewModel.updateIsToPlayLoadAnim(true)
-
-//                if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
-//                    mainViewModel.updateIsToPlaySeparatorAnim(true)
-//                } else {
-//
-//                    if(mainViewModel.isNewSearch)
-//                        (activity as MainActivity).bind.progressBarBottom?.hide()
-//                    else
-//                        (activity as MainActivity).bind.progressBarBottom?.show()
-//                }
-
-
-            } else if(!it){
-                mainViewModel.updateIsToPlayLoadAnim(false)
-
-//                if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
-//                    mainViewModel.updateIsToPlaySeparatorAnim(false)
-//                } else {
-//                    (activity as MainActivity).bind.progressBarBottom?.hide()
-//                }
-
-                textLoadAnim?.endLoadingAnim()
-
-            }
         }
     }
 
@@ -383,7 +367,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                     if(isNewSearchForAnimations){
 
                         isNewSearchForAnimations = false
-                        isToShowLoadingMessage = false
 
                         bind.rvSearchStations.apply {
                             if(isInitialLaunch){
@@ -429,39 +412,12 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 mainViewModel.stationsFlow.collectLatest {
 
-
-//                if(!isInitialLaunch){
-//                    launchRecyclerOutAnim()
-//                }
-
-                    if(isToShowLoadingMessage || mainViewModel.isInitialLaunchOfTheApp){
-                        mainViewModel.isInitialLaunchOfTheApp = false
-
-                        textLoadAnim?.startLoadingAnim()
-
-//                    if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES)
-//                        showLoadingResultsMessage()
-//                    else {
-//                        bind.tvResultMessage.visibility = View.INVISIBLE
-//                    }
-                    }
-
                     pagingRadioAdapter.submitData(it)
 
                 }
             }
         }
     }
-
-
-
-//    private fun showLoadingResultsMessage(){
-//        bind.tvResultMessage.apply {
-//            visibility = View.VISIBLE
-//            text = "Waiting for response from servers..."
-//            slideAnim(100, 0, R.anim.fade_in_anim)
-//        }
-//    }
 
 
     private fun setSearchToolbar() {
@@ -474,29 +430,11 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         }
 
 
-
         bind.tvName.setOnClickListener {
 
             NameAutoDialog(requireContext(), mainViewModel){
                 initiateNewSearch()
             }.show()
-
-
-
-//            if(mainViewModel.isNameAutoSearch){
-//                NameAutoDialog(requireContext(), mainViewModel){
-//
-//                    val check = mainViewModel.initiateNewSearch()
-//                    clearAdapter(check)
-//
-//                }.show()
-//            } else {
-//                NameDialog(requireContext(), mainViewModel){
-//                    if(mainViewModel.isFullAutoSearch)
-//                        isToInitiateNewSearch = true
-//                }.show()
-//            }
-
         }
 
         bind.tvSelectedCountry.setOnClickListener {
@@ -556,9 +494,9 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             }
 
             isNewSearchForAnimations = true
-            isToShowLoadingMessage = true
+
             pagingRadioAdapter.previousItemHolder = null
-//            pagingRadioAdapter.submitData(lifecycle, PagingData.empty())
+
         }
     }
 
@@ -633,9 +571,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         isToHandleNewStationObserver = false
         isNewSearchForAnimations = true
 
-//        if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
-//            (activity as MainActivity).bind.progressBarBottom?.hide()
-//        }
     }
 
 

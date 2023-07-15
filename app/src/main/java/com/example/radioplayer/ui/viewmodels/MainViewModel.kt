@@ -63,18 +63,21 @@ class MainViewModel @Inject constructor(
 //       val newPlayingItem : MutableLiveData<PlayingItem> = MutableLiveData()
 
 
+
        private val _isInDetailsFragment = MutableLiveData(false)
        val isInDetailsFragment : LiveData<Boolean> = _isInDetailsFragment
        fun updateIsInDetails(value : Boolean){
-           _isInDetailsFragment.postValue(value)
+           _isInDetailsFragment.value = value
        }
 
        private val _isToPlayLoadAnim = MutableLiveData(false)
        val isToPlayLoadAnim : LiveData<Boolean> = _isToPlayLoadAnim
 
        fun updateIsToPlayLoadAnim(value: Boolean){
-           _isToPlayLoadAnim.postValue(value)
+           _isToPlayLoadAnim.value = value
        }
+
+       val isToShowLoadingMessage = MutableLiveData(true)
 
        var currentFragment = 0
        val currentSongTitle = RadioService.currentSongTitle
@@ -244,6 +247,8 @@ class MainViewModel @Inject constructor(
 
             searchLoadingState.postValue(true)
 
+           if(isNewSearch) isToShowLoadingMessage.value = true
+
            delay(2000)
 
            Log.d("CHECKTAGS", "is new search? $isNewSearch")
@@ -332,6 +337,8 @@ class MainViewModel @Inject constructor(
                isNewSearch = false
 
                searchLoadingState.postValue(false)
+               if(isToShowLoadingMessage.value == true)
+                   isToShowLoadingMessage.value = false
            }
 
            searchJob.join()

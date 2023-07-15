@@ -164,14 +164,6 @@ class MainPlayerView(private val bind : StubPlayerActivityMainBinding,
             }
         }
     }
-
-
-
-//    override fun onDestroyView() {
-//        super.onDestroyView()
-//        _bind = null
-//    }
-
 }
 
 

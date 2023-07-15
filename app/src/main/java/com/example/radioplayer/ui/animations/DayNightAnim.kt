@@ -28,7 +28,6 @@ class DayNightAnim() {
                 startAnim(it.root)
             }
 
-
             startAnim(bind.bottomNavigationView)
 
             bind.viewSeparatorStart?.let{
