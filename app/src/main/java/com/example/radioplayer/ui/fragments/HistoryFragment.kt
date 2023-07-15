@@ -88,9 +88,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     @Inject
     lateinit var bookmarkedTitlesAdapter : BookmarkedTitlesAdapter
 
-    private var isStationsAdapterSet = false
-    private var isTitlesAdapterSet = false
-
     private var isToHandleNewStationObserver = false
 
     private var isBookmarkedTitlesObserverSet = false
@@ -106,7 +103,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     companion object{
 
-//       var adapterAnimator = AdapterAnimator()
        var isNewHistoryQuery = true
        var numberOfDates = 0
 
@@ -194,7 +190,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
 
     private fun setRvLoadChildrenListener(){
-
         bind.rvHistory.addOnChildAttachStateChangeListener(
             object : RecyclerView.OnChildAttachStateChangeListener{
                 override fun onChildViewAttachedToWindow(view: View) {
@@ -210,7 +205,14 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private fun handleRvAnim(){
         if(isInitialLoad){
+
             isInitialLoad = false
+
+            if(currentTab == TAB_STATIONS)
+                attachStationsAdapter()
+            else if(currentTab == TAB_TITLES)
+                attachTitlesAdapter()
+
             bind.rvHistory.apply {
                 scrollToPosition(0)
                 startLayoutAnimation()
@@ -320,6 +322,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                     datesAdapter.selectedItemPosition = position
 
                     isInitialLoad = true
+
                     historyViewModel.updateSelectedDate(item.time)
 
                 }
@@ -451,13 +454,14 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             layoutAnimation = (activity as MainActivity).layoutAnimationController
 
             setRvLoadChildrenListener()
+
         }
     }
 
 
     private fun setStationsHistoryAdapter(){
 
-        if(!isStationsAdapterSet){
+        if(stationsHistoryAdapter == null){
 
             stationsHistoryAdapter = PagingHistoryAdapter(glide)
 
@@ -485,23 +489,20 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             setupAdapterClickListener()
 
-            isStationsAdapterSet = true
-
         }
-
+    }
+    private fun attachStationsAdapter(){
         bind.rvHistory.apply {
             if(adapter !is PagingHistoryAdapter)
-            adapter = stationsHistoryAdapter
+                adapter = stationsHistoryAdapter
             setHasFixedSize(true)
+            itemTouchHelper.attachToRecyclerView(null)
         }
-
-
-        itemTouchHelper.attachToRecyclerView(null)
     }
 
     private fun setTitlesHistoryAdapter(){
 
-        if(!isTitlesAdapterSet){
+        if(titlesHistoryAdapter == null){
             titlesHistoryAdapter = TitleAdapter(glide)
             titlesHistoryAdapter?.apply {
                 alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
@@ -525,16 +526,16 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             }
             historyViewModel.setTitlesLiveData()
-            isTitlesAdapterSet = true
         }
+    }
 
+    private fun attachTitlesAdapter(){
         bind.rvHistory.apply {
             if(adapter !is TitleAdapter)
-            adapter = titlesHistoryAdapter
+                adapter = titlesHistoryAdapter
             setHasFixedSize(false)
+            itemTouchHelper.attachToRecyclerView(null)
         }
-
-        itemTouchHelper.attachToRecyclerView(null)
     }
 
 
@@ -580,6 +581,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             setOnClickListener {
 
                 isInitialLoad = true
+
                 historyViewModel.setIsInBookmarks()
 
             }
@@ -624,6 +626,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             if(currentTab == TAB_STATIONS){
 
                 isInitialLoad = true
+
                 historyViewModel.setIsInStations(false)
 
                 switchTitlesStationsUi(true)
@@ -640,6 +643,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             if(currentTab != TAB_STATIONS){
 
                 isInitialLoad = true
+
                 historyViewModel.setIsInStations(true)
 
                 switchTitlesStationsUi(true)
@@ -757,8 +761,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         historyViewModel.cleanHistoryTab()
         isNewHistoryQuery = true
         isInitialLoad = true
-        isStationsAdapterSet = false
-        isTitlesAdapterSet = false
         bind.rvHistory.adapter = null
         stationsHistoryAdapter = null
         titlesHistoryAdapter = null

@@ -170,6 +170,7 @@ class HistoryViewModel @Inject constructor(
 
 
     var isTitleOneDateHeaderSet = false
+    var isTitleOneDateFooterSet = false
 
     private suspend fun getTitlesInOneDate(pageIndex : Int, pageSize : Int): List<TitleWithDateModel> {
 
@@ -194,12 +195,15 @@ class HistoryViewModel @Inject constructor(
         }
 
         if(response.size < Constants.PAGE_SIZE){
-            titlesWithDates.add(
-                TitleWithDateModel.TitleDateSeparatorEnclosing(
-                    Utils.fromDateToString(
-                        calendar
-                    )
-                ))
+            if(!isTitleOneDateFooterSet){
+                isTitleOneDateFooterSet = true
+                titlesWithDates.add(
+                    TitleWithDateModel.TitleDateSeparatorEnclosing(
+                        Utils.fromDateToString(
+                            calendar
+                        )
+                    ))
+            }
         }
 
         return titlesWithDates
@@ -287,6 +291,7 @@ class HistoryViewModel @Inject constructor(
                     titlesFlow ?: emptyFlow()
                 else {
                     isTitleOneDateHeaderSet = false
+                    isTitleOneDateFooterSet = false
                     Pager(
                         config = PagingConfig(
                             pageSize = Constants.PAGE_SIZE,
@@ -348,7 +353,7 @@ class HistoryViewModel @Inject constructor(
         lastTitleDate = 0L
         isTitleHeaderSet = false
         isTitleOneDateHeaderSet = false
-
+        isTitleOneDateFooterSet = false
     }
 
 
