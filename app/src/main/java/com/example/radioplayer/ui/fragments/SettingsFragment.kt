@@ -27,6 +27,8 @@ import com.example.radioplayer.ui.animations.FADE_OUT_DURATION
 import com.example.radioplayer.ui.animations.SwapTitlesUi
 import com.example.radioplayer.ui.animations.objectSizeScaleAnimation
 import com.example.radioplayer.ui.animations.slideAnim
+import com.example.radioplayer.ui.animations.smoothDayNightFadeIn
+import com.example.radioplayer.ui.animations.smoothDayNightFadeOut
 import com.example.radioplayer.ui.dialogs.BufferSettingsDialog
 import com.example.radioplayer.ui.dialogs.HistoryOptionsDialog
 import com.example.radioplayer.ui.dialogs.RecordingOptionsDialog

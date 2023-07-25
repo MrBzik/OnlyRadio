@@ -1,6 +1,8 @@
 package com.example.radioplayer.ui.stubs
 
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
@@ -66,6 +68,7 @@ class SettingsGeneral () {
         setStationTitleSize()
 
         setAddStationClickListener()
+
     }
 
 

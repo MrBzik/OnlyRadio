@@ -12,6 +12,9 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.radioplayer.ui.animations.fadeOut
 
+const val TRANSITION_DURATION = 500
+const val FADE_OUT_DURATION = 500L
+
 fun RequestManager.loadImage(
     uri: String,
     tvPlaceholder: TextView,
@@ -42,7 +45,7 @@ fun RequestManager.loadImage(
 
                 if(dataSource?.name == "REMOTE"){
 
-                    tvPlaceholder.fadeOut(300, alpha, position){ pos ->
+                    tvPlaceholder.fadeOut(FADE_OUT_DURATION, alpha, position){ pos ->
                         if(pos != updatedHolderPos()) {
                             tvPlaceholder.alpha = alpha
                         }
@@ -56,7 +59,7 @@ fun RequestManager.loadImage(
                 return false
             }
         })
-        .transition(DrawableTransitionOptions.withCrossFade())
+        .transition(DrawableTransitionOptions.withCrossFade(TRANSITION_DURATION))
 //                    .apply(RequestOptions().override(65, 65))
         .into(ivItemImage)
 }
@@ -92,6 +95,6 @@ fun RequestManager.loadImage(
                 return false
             }
         })
-        .transition(DrawableTransitionOptions.withCrossFade())
+        .transition(DrawableTransitionOptions.withCrossFade(TRANSITION_DURATION))
         .into(ivItemImage)
 }

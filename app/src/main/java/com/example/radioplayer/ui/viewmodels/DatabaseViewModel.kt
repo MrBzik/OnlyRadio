@@ -64,9 +64,10 @@ class DatabaseViewModel @Inject constructor(
 
     fun getRadioStationPlayDuration(stationID: String, handleResult: (Long) -> Unit) =
         viewModelScope.launch {
-        val result = repository.getRadioStationPlayDuration(stationID)
-        handleResult(result)
-    }
+            repository.getRadioStationPlayDuration(stationID)?.also {result ->
+                handleResult(result)
+            }
+        }
 
 
 
@@ -221,8 +222,6 @@ class DatabaseViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val favFragStationsFlow = favFragStationsSwitch.asFlow().flatMapLatest {
-        Log.d("CHECKTAGS", "switch is activated?")
-
         when (it) {
             SEARCH_FROM_FAVOURITES -> {
                 Log.d("CHECKTAGS", "getting all fav stations flow already?")

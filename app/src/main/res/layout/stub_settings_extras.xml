@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="10dp"
-        android:text="(Beware stream edge when speeding up)*"
+        android:text="(Keep in mind stream edge when speeding up)*"
         android:textAppearance="@style/hintText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvPlaybackSpeedRecHint" />

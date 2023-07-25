@@ -5,6 +5,8 @@ import com.example.radioplayer.databinding.StubSettingsExtrasBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.viewmodels.SettingsViewModel
 
+const val SPEED_PITCH_STEP = 5
+
 class SettingsExtras() {
 
 
@@ -39,7 +41,7 @@ class SettingsExtras() {
         bindExtras.fabSpeedMinus.setOnClickListener {
 
             if(RadioService.playbackSpeedRadio > 10){
-                RadioService.playbackSpeedRadio -= 10
+                RadioService.playbackSpeedRadio -= SPEED_PITCH_STEP
                 settingsViewModel.updateRadioPlaybackSpeed()
                 updatePlaybackSpeedDisplayValue()
             }
@@ -48,7 +50,7 @@ class SettingsExtras() {
 
         bindExtras.fabSpeedPlus.setOnClickListener {
             if(RadioService.playbackSpeedRadio < 200){
-                RadioService.playbackSpeedRadio += 10
+                RadioService.playbackSpeedRadio += SPEED_PITCH_STEP
                 settingsViewModel.updateRadioPlaybackSpeed()
                 updatePlaybackSpeedDisplayValue()
             }
@@ -57,7 +59,7 @@ class SettingsExtras() {
         bindExtras.fabPitchMinus.setOnClickListener {
 
             if(RadioService.playbackPitchRadio > 10){
-                RadioService.playbackPitchRadio -= 10
+                RadioService.playbackPitchRadio -= SPEED_PITCH_STEP
                 settingsViewModel.updateRadioPlaybackPitch()
                 updatePlaybackPitchDisplayValue()
             }
@@ -65,7 +67,7 @@ class SettingsExtras() {
 
         bindExtras.fabPitchPlus.setOnClickListener {
             if(RadioService.playbackPitchRadio < 200){
-                RadioService.playbackPitchRadio += 10
+                RadioService.playbackPitchRadio += SPEED_PITCH_STEP
                 settingsViewModel.updateRadioPlaybackPitch()
                 updatePlaybackPitchDisplayValue()
             }

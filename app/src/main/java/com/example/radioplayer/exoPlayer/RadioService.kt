@@ -14,6 +14,7 @@ import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
+import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -77,6 +78,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.brookmg.exorecord.lib.ExoRecord
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
+import java.lang.Exception
 import java.sql.Date
 import java.util.*
 import javax.inject.Inject
@@ -669,21 +671,25 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private fun changeReverbMode() {
 
-        setPreset(environmentalReverb, reverbMode)
+        try {
+            setPreset(environmentalReverb, reverbMode)
 
-
-        if(reverbMode == 0){
-            environmentalReverb.enabled = false
-        } else {
-            if(!environmentalReverb.enabled){
-                environmentalReverb.enabled = true
+            if(reverbMode == 0){
+                environmentalReverb.enabled = false
+            } else {
+                if(!environmentalReverb.enabled){
+                    environmentalReverb.enabled = true
+                }
             }
-        }
 
 //        if(!wasReverbSet){
             exoPlayer.setAuxEffectInfo(AuxEffectInfo(environmentalReverb.id, 1f))
 //            wasReverbSet = true
 //        }
+        } catch (e : Exception){
+            reverbMode = 0
+            Toast.makeText(this, "Oops... Try rebooting device for the effect to work", Toast.LENGTH_LONG).show()
+        }
     }
 
     private var wasBassBoostSet = false

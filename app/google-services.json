@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "790726641813",
+    "project_id": "radioplayer-780ac",
+    "storage_bucket": "radioplayer-780ac.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:790726641813:android:90272a0afbcd83a4c2739c",
+        "android_client_info": {
+          "package_name": "com.example.radioplayer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "790726641813-691ncv14nngpj8a8p1a5o58fpf3btjer.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCo9wYXm-P9efWBvYjSNGtudsV-h5NzxWA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "790726641813-691ncv14nngpj8a8p1a5o58fpf3btjer.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

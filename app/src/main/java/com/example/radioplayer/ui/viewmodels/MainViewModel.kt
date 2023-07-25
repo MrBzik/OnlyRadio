@@ -249,8 +249,6 @@ class MainViewModel @Inject constructor(
 
            if(isNewSearch) isToShowLoadingMessage.value = true
 
-           delay(2000)
-
            Log.d("CHECKTAGS", "is new search? $isNewSearch")
 
                val calcOffset = limit * offset

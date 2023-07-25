@@ -208,6 +208,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             isInitialLoad = false
 
+            // attaching only now to negate old adapter's items
             if(currentTab == TAB_STATIONS)
                 attachStationsAdapter()
             else if(currentTab == TAB_TITLES)
@@ -219,7 +220,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             }
         }
     }
-
 
     private fun setFabPickDateClickListener(){
         bind.fabDatePick.setOnClickListener {
@@ -286,6 +286,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 setDatesSpinnerSelectListener()
 
+                // subscribing now due to datasource needs number of dates
                 subscribeToHistory()
 
             } else {
@@ -598,9 +599,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             setHasFixedSize(false)
         }
 
-
         itemTouchHelper.attachToRecyclerView(bind.rvHistory)
-
 
         if(!isBookmarkedTitlesObserverSet){
 

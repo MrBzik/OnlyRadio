@@ -37,7 +37,7 @@ interface  RadioDAO {
     suspend fun clearRadioStationPlayedDuration(stationID: String)
 
     @Query("SELECT playDuration FROM RadioStation WHERE stationuuid =:stationID LIMIT 1")
-    suspend fun getRadioStationPlayDuration(stationID: String) : Long
+    suspend fun getRadioStationPlayDuration(stationID: String) : Long?
 
     // For favoured stations
 

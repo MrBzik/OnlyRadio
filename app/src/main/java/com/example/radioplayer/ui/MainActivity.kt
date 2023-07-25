@@ -21,7 +21,6 @@ import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.databinding.ActivityMainBinding
 import com.example.radioplayer.databinding.StubPlayerActivityMainBinding
 import com.example.radioplayer.exoPlayer.RadioService
-import com.example.radioplayer.ui.animations.DayNightAnim
 import com.example.radioplayer.ui.animations.LoadingAnim
 import com.example.radioplayer.ui.delegates.NavigationImpl
 import com.example.radioplayer.ui.fragments.*
@@ -33,8 +32,6 @@ import com.example.radioplayer.ui.viewmodels.RecordingsViewModel
 import com.example.radioplayer.ui.viewmodels.SettingsViewModel
 import com.example.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -68,10 +65,6 @@ class MainActivity : AppCompatActivity() {
 
     private val playerUtils : MainPlayerView by lazy {
         MainPlayerView(bindPlayer!!, glide)
-    }
-
-    private val dayNightAnim : DayNightAnim by lazy {
-        DayNightAnim()
     }
 
     @Inject
@@ -128,6 +121,7 @@ class MainActivity : AppCompatActivity() {
             bind.root.doOnLayout {
                 flHeight = bind.viewHeight.height
             }
+
     }
 
     private fun observeIsInDetails(){
@@ -161,18 +155,6 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.connectMediaBrowser()
     }
 
-
-    fun smoothDayNightFadeOut(){
-
-        dayNightAnim.smoothDayNightFadeOut(bind, bindPlayer)
-
-    }
-
-    fun smoothDayNightFadeIn(){
-
-        dayNightAnim.smoothDayNightFadeIn(bind, bindPlayer)
-
-    }
 
     private fun refreshSeparators(){
         if(!mainViewModel.isInitialLaunchOfTheApp && uiMode == Configuration.UI_MODE_NIGHT_YES){
@@ -322,12 +304,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-
-//    override fun onDestroy() {
-//        mainViewModel.disconnectMediaBrowser()
-//        Log.d("CHECKTAGS", "activity on destroy")
-//        super.onDestroy()
-//    }
 
 }
 
