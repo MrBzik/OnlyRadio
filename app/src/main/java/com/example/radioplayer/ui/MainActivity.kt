@@ -13,9 +13,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
+import com.example.radioplayer.adapters.models.TagWithGenre
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.databinding.ActivityMainBinding
@@ -31,6 +31,9 @@ import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.ui.viewmodels.RecordingsViewModel
 import com.example.radioplayer.ui.viewmodels.SettingsViewModel
 import com.example.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
+import com.example.radioplayer.utils.TAG_BY_CLASSIC
+import com.example.radioplayer.utils.TAG_BY_MINDFUL
+import com.example.radioplayer.utils.listOfCentralAmerica
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -121,8 +124,12 @@ class MainActivity : AppCompatActivity() {
             bind.root.doOnLayout {
                 flHeight = bind.viewHeight.height
             }
-
     }
+
+
+
+
+
 
     private fun observeIsInDetails(){
 

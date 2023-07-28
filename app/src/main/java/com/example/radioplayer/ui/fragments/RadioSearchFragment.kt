@@ -101,6 +101,9 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         observeSearchState()
 
         observeIsToShowLoadingMessage()
+
+        searchDialogsViewModels.checkTagsLastUpdate()
+
 //
 //        textLoadAnim = TextLoadAnim(requireContext(), bind.tvLoading)
 

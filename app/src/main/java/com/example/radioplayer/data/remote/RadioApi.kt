@@ -122,7 +122,7 @@ interface RadioApi {
 
 
         @POST("/json/tags")
-        suspend fun getAllTags() : Response<RadioTags>
+        suspend fun getAllTags() : Response<RadioTags>?
 
 
         @POST()

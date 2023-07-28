@@ -165,7 +165,7 @@ class FilterTagsAdapter(): ListAdapter<TagWithGenre, RecyclerView.ViewHolder>(DI
         if (!filtered)
             originalList = list ?: listOf()
 
-        super.submitList(list)
+        super.submitList(list?.toMutableList())
     }
 
 

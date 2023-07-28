@@ -6,6 +6,7 @@ plugins {
     id "androidx.navigation.safeargs.kotlin"
     id("com.google.firebase.crashlytics")
     id 'com.google.gms.google-services'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.7.20'
 }
 
 def localPropertiesFile = rootProject.file("local.properties")
@@ -46,7 +47,7 @@ android {
 //            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 //            minifyEnabled true
 //            shrinkResources true
-            debuggable false
+            debuggable true
         }
     }
 
@@ -132,6 +133,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics-ktx:21.2.0")
 
 
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 
 //     Memory leaks
 //    debugImplementation "com.squareup.leakcanary:leakcanary-android:2.10"

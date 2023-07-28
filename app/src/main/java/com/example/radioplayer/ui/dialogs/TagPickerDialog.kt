@@ -1,29 +1,47 @@
 package com.example.radioplayer.ui.dialogs
 
-import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.util.TypedValue
-import android.view.*
-import androidx.appcompat.app.AppCompatDialog
+import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.core.view.updateLayoutParams
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.FilterTagsAdapter
 import com.example.radioplayer.adapters.models.TagWithGenre
 import com.example.radioplayer.databinding.DialogPickTagBinding
-import com.example.radioplayer.ui.animations.slideAnim
-import com.example.radioplayer.ui.fragments.RadioSearchFragment
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.ui.viewmodels.SearchDialogsViewModel
-import com.example.radioplayer.utils.*
 import com.example.radioplayer.utils.KeyboardObserver.observeKeyboardState
+import com.example.radioplayer.utils.TAG_BY_CLASSIC
+import com.example.radioplayer.utils.TAG_BY_EXPERIMENTAL
+import com.example.radioplayer.utils.TAG_BY_GENRE
+import com.example.radioplayer.utils.TAG_BY_MINDFUL
+import com.example.radioplayer.utils.TAG_BY_ORIGIN
+import com.example.radioplayer.utils.TAG_BY_PERIOD
+import com.example.radioplayer.utils.TAG_BY_RELIGION
+import com.example.radioplayer.utils.TAG_BY_SPECIAL
+import com.example.radioplayer.utils.TAG_BY_SUB_GENRE
+import com.example.radioplayer.utils.TAG_BY_TALK
+import com.example.radioplayer.utils.tagsListByGenre
+import com.example.radioplayer.utils.tagsListByOrigin
+import com.example.radioplayer.utils.tagsListByPeriod
+import com.example.radioplayer.utils.tagsListBySubGenre
+import com.example.radioplayer.utils.tagsListByTalk
+import com.example.radioplayer.utils.tagsListClassics
+import com.example.radioplayer.utils.tagsListExperimental
+import com.example.radioplayer.utils.tagsListMindful
+import com.example.radioplayer.utils.tagsListOther
+import com.example.radioplayer.utils.tagsListReligion
+import com.example.radioplayer.utils.tagsListSpecial
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class TagPickerDialog (
     private val requireContext : Context,
@@ -50,8 +68,25 @@ class TagPickerDialog (
         setSwitchExactMatch()
 
         adjustDialogHeight(bind.clTagPickDialog)
+
+        observeTagsFlow()
+
     }
 
+
+    private fun observeTagsFlow(){
+
+        lifecycleScope.launch {
+
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+
+                searchDialogsViewModel.tagsListFlow.collectLatest {
+
+                    tagAdapter.submitList(it)
+                }
+            }
+        }
+    }
 
     private fun setSwitchExactMatch(){
 
@@ -98,7 +133,9 @@ class TagPickerDialog (
 
         tagAdapter = FilterTagsAdapter()
         tagAdapter.apply {
-            submitList(searchDialogsViewModel.tagsList)
+
+
+//            submitList(searchDialogsViewModel.tagsList)
             defaultTextColor = ContextCompat.getColor(requireContext, R.color.unselected_genre_color)
             selectedTextColor = ContextCompat.getColor(requireContext, R.color.selected_genre_color)
             openingDrawable = R.drawable.tags_expand
@@ -140,14 +177,16 @@ class TagPickerDialog (
 
             if(tag is TagWithGenre.Genre){
 
-                if(tag.isOpened) {
+                searchDialogsViewModel.updateTagsFlow(tag, position)
 
-                    removeTagsSubList(tag.genre, position)
-
-                } else {
-
-                    addTagsSublist(tag.genre, position)
-                }
+//                if(tag.isOpened) {
+//
+//                    removeTagsSubList(tag.genre, position)
+//
+//                } else {
+//
+//                    addTagsSublist(tag.genre, position)
+//                }
 
 
             } else if(tag is TagWithGenre.Tag) {
@@ -163,32 +202,34 @@ class TagPickerDialog (
     }
 
 
-    private fun addTagsSublist(genre : String, position: Int){
 
-        val listToAdd = getList(genre)
+//    private fun addTagsSublist(genre : String, position: Int){
+//
+//        val listToAdd = getList(genre)
+//
+//        searchDialogsViewModel.tagsList.addAll(position+1, listToAdd)
+//
+//        (searchDialogsViewModel.tagsList[position] as TagWithGenre.Genre).isOpened = true
+//
+//        tagAdapter.submitList(searchDialogsViewModel.tagsList)
+//
+//
+//    }
+//
+//
+//    private fun removeTagsSubList(genre : String, position : Int)  {
+//
+//        val listToRemove = getList(genre)
+//
+//        searchDialogsViewModel.tagsList.removeAll(listToRemove)
+//        (searchDialogsViewModel.tagsList[position] as TagWithGenre.Genre).isOpened = false
+//        tagAdapter.submitList(searchDialogsViewModel.tagsList)
+//
+//
+//    }
 
-        searchDialogsViewModel.tagsList.addAll(position+1, listToAdd)
 
-        (searchDialogsViewModel.tagsList[position] as TagWithGenre.Genre).isOpened = true
-        tagAdapter.submitList(searchDialogsViewModel.tagsList)
-        tagAdapter.notifyItemRangeInserted(position+1, listToAdd.size)
-
-    }
-
-    private fun removeTagsSubList(genre : String, position : Int)  {
-
-        val listToRemove = getList(genre)
-
-        searchDialogsViewModel.tagsList.removeAll(listToRemove)
-
-        (searchDialogsViewModel.tagsList[position] as TagWithGenre.Genre).isOpened = false
-        tagAdapter.submitList(searchDialogsViewModel.tagsList)
-        tagAdapter.notifyItemRangeRemoved(position+1, listToRemove.size)
-
-    }
-
-
-    private fun getList(genre : String) : Set<TagWithGenre.Tag> {
+    private fun getList(genre : String) : Set<TagWithGenre> {
         return when(genre){
             TAG_BY_PERIOD -> tagsListByPeriod
 
