@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/player_view_height"
     android:paddingBottom="2dp"
@@ -80,11 +81,11 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:indeterminateTint="@color/color_non_interactive"
-        app:layout_constraintStart_toEndOf="@+id/tvBitrate"
-        app:layout_constraintEnd_toStartOf="@+id/tvExpandHideText"
-        app:layout_constraintTop_toTopOf="@+id/tvExpandHideText"
         app:layout_constraintBottom_toBottomOf="@id/tvExpandHideText"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvExpandHideText" />
 
 
     <TextView
@@ -97,8 +98,6 @@
         android:textAppearance="@style/mainTextButtons"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
-
 
 
     <ImageView

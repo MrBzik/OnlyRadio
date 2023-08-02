@@ -62,12 +62,12 @@ class DatabaseViewModel @Inject constructor(
 //    }
 
 
-    fun getRadioStationPlayDuration(stationID: String, handleResult: (Long) -> Unit) =
-        viewModelScope.launch {
-            repository.getRadioStationPlayDuration(stationID)?.also {result ->
-                handleResult(result)
-            }
-        }
+//    fun getRadioStationPlayDuration(stationID: String, handleResult: (Long) -> Unit) =
+//        viewModelScope.launch {
+//            repository.getRadioStationPlayDuration(stationID)?.also {result ->
+//                handleResult(result)
+//            }
+//        }
 
 
 

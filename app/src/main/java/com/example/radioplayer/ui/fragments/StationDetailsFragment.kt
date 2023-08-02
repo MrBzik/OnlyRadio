@@ -232,8 +232,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             super.onPageScrollStateChanged(state)
             when(state){
 
-
-
                 SCROLL_STATE_DRAGGING -> {
 
                     bind.ivSwipeLeft.apply {
@@ -328,9 +326,9 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             currentRadioStation = station
 
 
-            favViewModel.getRadioStationPlayDuration(station.stationuuid){ dur ->
-                bind.tvDuration.text = "${dur/ 1000}s"
-            }
+//            favViewModel.getRadioStationPlayDuration(station.stationuuid){ dur ->
+//                bind.tvDuration.text = "${dur/ 1000}s"
+//            }
 
 
 

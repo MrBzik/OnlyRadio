@@ -5,11 +5,10 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
-import android.view.MotionEvent
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Spinner
@@ -40,32 +39,23 @@ import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
-import com.example.radioplayer.ui.animations.DefaultItemAnimator
 import com.example.radioplayer.ui.animations.SwapTitlesUi
 import com.example.radioplayer.ui.animations.SwipeToDeleteCallback
-import com.example.radioplayer.ui.animations.objectSizeScaleAnimation
 import com.example.radioplayer.ui.animations.slideAnim
 
 import com.example.radioplayer.ui.viewmodels.TAB_BOOKMARKS
 import com.example.radioplayer.ui.viewmodels.TAB_STATIONS
 import com.example.radioplayer.ui.viewmodels.TAB_TITLES
-import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Constants.FRAG_HISTORY
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.SpinnerExt
-import com.example.radioplayer.utils.TextViewOutlined
-import com.example.radioplayer.utils.Utils
-import com.example.radioplayer.utils.Utils.fromDateToString
 import com.example.radioplayer.utils.addAction
-import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.sql.Date
 import java.util.*
 import javax.inject.Inject
 
@@ -568,7 +558,13 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 intent.setPackage("com.google.android.youtube")
                 intent.putExtra("query", title)
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
+                try{
+                    startActivity(intent)
+                }catch (e : Exception){
+                    val webIntent = Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://www.youtube.com/results?search_query=$title"))
+                    startActivity(webIntent)
+                }
             }
         }.show()
     }

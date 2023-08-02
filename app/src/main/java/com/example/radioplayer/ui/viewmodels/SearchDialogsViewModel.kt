@@ -67,6 +67,7 @@ import kotlinx.serialization.json.Json
 
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
 import java.io.ObjectOutputStream
 import java.util.ArrayList
 import java.util.Calendar
@@ -81,6 +82,7 @@ import kotlin.system.measureTimeMillis
 
 const val TAGS_FILE_NAME = "allTagsFile.txt"
 const val TAGS_UPDATE_PREF = "tags update pref"
+const val TAGS_EXCLUDED_FILE_NAME = "excluded_tags.txt"
 
 @HiltViewModel
 class SearchDialogsViewModel @Inject constructor(
@@ -141,6 +143,8 @@ class SearchDialogsViewModel @Inject constructor(
 
     fun updateCountryList(handleResults : () -> Unit) = viewModelScope.launch {
 
+
+
         if(isCountryListToUpdate){
 
             try {
@@ -200,42 +204,99 @@ class SearchDialogsViewModel @Inject constructor(
             null
         }
 
-         response?.body()?.let {
+         val time = measureTimeMillis {
+             response?.body()?.let {tagsResponse ->
 
-             val list = listOf(
-                 tagsListByPeriod.toList(), tagsListSpecial.toList(), tagsListByGenre.toList(),
-                 tagsListBySubGenre.toList(), tagsListClassics.toList(), tagsListMindful.toList(),
-                 tagsListExperimental.toList(), tagsListByTalk.toList(), tagsListReligion.toList(),
-                 tagsListByOrigin.toList(), tagsListOther.toList()
-             )
+                 val excludedTagsSet = try {
+                     val inputStream: InputStream = app.assets.open("excluded_tags/excluded_tags.txt")
+                     val inputString = inputStream.bufferedReader().use{it.readText()}
+                     Json.decodeFromString<HashSet<String>>(inputString)
+                 } catch (e : Exception){
+                     HashSet()
+                 }
 
-             it.forEach {tagItem ->
+                 val list = listOf(
+                     tagsListByPeriod.toList(), tagsListSpecial.toList(), tagsListByGenre.toList(),
+                     tagsListBySubGenre.toList(), tagsListClassics.toList(), tagsListMindful.toList(),
+                     tagsListExperimental.toList(), tagsListByTalk.toList(), tagsListReligion.toList(),
+                     tagsListByOrigin.toList(), tagsListOther.toList()
+                 )
 
-                 list.forEachIndexed { listIndex, sublist ->
 
-                     sublist.forEachIndexed { index, tagWithGenre ->
+                 tagsResponse.forEach {tagItem ->
 
-                         if(tagItem.name.contains(tagWithGenre.tag)){
-                             list[listIndex][index].stationCount += tagItem.stationcount
-                             if(tagWithGenre.tag == tagItem.name){
-                                 list[listIndex][index].stationCountExact = tagItem.stationcount
+                     if(!excludedTagsSet.contains(tagItem.name)){
+
+                         list.forEachIndexed { listIndex, sublist ->
+
+                             sublist.forEachIndexed { index, tagWithGenre ->
+
+                                 if(tagItem.name.contains(tagWithGenre.tag)){
+                                     list[listIndex][index].stationCount += tagItem.stationcount
+                                     if(tagWithGenre.tag == tagItem.name){
+                                         list[listIndex][index].stationCountExact = tagItem.stationcount
+                                     }
+                                 }
                              }
                          }
                      }
                  }
-             }
 
 
-             val file = File(app.filesDir.absolutePath + File.separator + TAGS_FILE_NAME)
+                 val file = File(app.filesDir.absolutePath + File.separator + TAGS_FILE_NAME)
 
-             val json = Json.encodeToString(list)
+                 val json = Json.encodeToString(list)
 
-             file.writeText(json)
+                 file.writeText(json)
 
-             tagsPref.edit().putLong(TAGS_UPDATE_PREF, System.currentTimeMillis()).apply()
+                 tagsPref.edit().putLong(TAGS_UPDATE_PREF, System.currentTimeMillis()).apply()
 
-         } ?: run { isToCheckTags = true }
+             } ?: run { isToCheckTags = true }
+
+         }
+
+         Log.d("CHECKTAGS", "took time : $time")
+
      }
+
+
+
+//    fun generateExcludedTags() = viewModelScope.launch{
+//        val response = radioSource.getAllTags()
+//
+//        val excludedSet = HashSet<String>()
+//        val listOfTags = initiateTagsList()
+//        Log.d("CHECKTAGS", "response is : ${response?.body()?.size}, and included tags - ${listOfTags.size}")
+//
+//        response?.body()?.forEach { tagItem ->
+//
+//            var included = false
+//
+//            listOfTags.forEach {tagWithGenre ->
+//
+//                if(tagWithGenre is TagWithGenre.Tag){
+//
+//                    if(tagItem.name.contains(tagWithGenre.tag)){
+//                        included = true
+//                    }
+//                }
+//            }
+//
+//            if(!included)
+//                excludedSet.add(tagItem.name)
+//
+//        }
+//
+//        Log.d("CHECKTAGS", "set in the end : ${excludedSet.size}")
+//
+//        val file = File(app.filesDir.absolutePath + File.separator + TAGS_EXCLUDED_FILE_NAME)
+//
+//        val json = Json.encodeToString(excludedSet)
+//
+//        file.writeText(json)
+//
+//    }
+
 
 
     val tagsListFlow by lazy {
@@ -285,6 +346,11 @@ class SearchDialogsViewModel @Inject constructor(
     private fun initiateTagsList() : ArrayList<TagWithGenre>{
 
         val file = File(app.filesDir.absolutePath + File.separator + TAGS_FILE_NAME)
+
+
+//        val inputStream: InputStream = app.assets.open("allTagsFile.txt")
+//        val inputString = inputStream.bufferedReader().use{it.readText()}
+
         val isExists = file.exists()
 
         return ArrayList<TagWithGenre>().apply {

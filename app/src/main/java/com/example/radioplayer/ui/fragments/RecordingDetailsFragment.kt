@@ -181,6 +181,18 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
             lifecycleScope.launch(Dispatchers.IO){
                 val filePath = requireContext().filesDir.path + "/" + it.id
                 val file = File(filePath)
+
+
+//                val extractor = MediaExtractor()
+//                extractor.setDataSource(filePath)
+//                val format = extractor.getTrackFormat(0)
+//
+//                val bitrate = format.getInteger(MediaFormat.KEY_BIT_RATE)
+//
+//
+//                Log.d("CHECKTAGS", "bitrate : $bitrate")
+
+
                 val length = Formatter.formatFileSize(requireContext(), file.length())
                 withContext(Dispatchers.Main){
                     bind.tvOccupiedSpace.text = length
