@@ -127,7 +127,6 @@ class MainActivity : AppCompatActivity() {
             bind.root.doOnLayout {
                 flHeight = bind.viewHeight.height
             }
-
     }
 
 

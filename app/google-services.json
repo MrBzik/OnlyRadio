@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "790726641813",
-    "project_id": "radioplayer-780ac",
-    "storage_bucket": "radioplayer-780ac.appspot.com"
+    "project_number": "368990494251",
+    "project_id": "onlyradio-97101",
+    "storage_bucket": "onlyradio-97101.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:790726641813:android:7b09865cd46d6741c2739c",
+        "mobilesdk_app_id": "1:368990494251:android:309a5ba00464909f0c946e",
         "android_client_info": {
           "package_name": "com.onlyradio.radioplayer"
         }
       },
       "oauth_client": [
         {
-          "client_id": "790726641813-691ncv14nngpj8a8p1a5o58fpf3btjer.apps.googleusercontent.com",
+          "client_id": "368990494251-enhvvgmhviffrgqlq1oggl4ps1vvuhoq.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCo9wYXm-P9efWBvYjSNGtudsV-h5NzxWA"
+          "current_key": "AIzaSyA_SSP_lLUuCump-fVzK09sGU1GBeVqi8k"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "790726641813-691ncv14nngpj8a8p1a5o58fpf3btjer.apps.googleusercontent.com",
+              "client_id": "368990494251-enhvvgmhviffrgqlq1oggl4ps1vvuhoq.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
