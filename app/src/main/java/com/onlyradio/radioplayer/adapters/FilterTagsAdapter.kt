@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.onlyradio.radioplayer.adapters.models.TagWithGenre
+import com.onlyradio.radioplayer.adapters.models.serializable.TagWithGenre
 import com.onlyradio.radioplayer.databinding.ItemGenreBinding
 import com.onlyradio.radioplayer.databinding.ItemTagBinding
 

@@ -21,3 +21,4 @@
 #-renamesourcefileattribute SourceFile
 
 -keepclassmembers class com.onlyradio.radioplayer.data** {*;}
+-keepclassmembers class com.onlyradio.radioplayer.adapters.models.serializable** {*;}

@@ -6,7 +6,7 @@ import android.os.Parcelable
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.onlyradio.radioplayer.adapters.models.CountryWithRegion
-import com.onlyradio.radioplayer.adapters.models.TagWithGenre
+import com.onlyradio.radioplayer.adapters.models.serializable.TagWithGenre
 import com.onlyradio.radioplayer.exoPlayer.RadioSource
 import com.onlyradio.radioplayer.utils.COUNTRY_REGION_AFRICA
 import com.onlyradio.radioplayer.utils.COUNTRY_REGION_ASIA

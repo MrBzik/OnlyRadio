@@ -1,7 +1,6 @@
-package com.onlyradio.radioplayer.adapters.models
+package com.onlyradio.radioplayer.adapters.models.serializable
 
 import kotlinx.serialization.Serializable
-
 
 
 

@@ -1,6 +1,6 @@
 package com.onlyradio.radioplayer.utils
 
-import com.onlyradio.radioplayer.adapters.models.TagWithGenre
+import com.onlyradio.radioplayer.adapters.models.serializable.TagWithGenre
 
 const val TAG_BY_PERIOD = "- BY PERIOD -"
 const val TAG_BY_GENRE = "-POPULAR GENRES-"

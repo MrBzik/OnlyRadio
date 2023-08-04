@@ -13,7 +13,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.adapters.FilterTagsAdapter
-import com.onlyradio.radioplayer.adapters.models.TagWithGenre
+import com.onlyradio.radioplayer.adapters.models.serializable.TagWithGenre
 import com.onlyradio.radioplayer.databinding.DialogPickTagBinding
 import com.onlyradio.radioplayer.ui.viewmodels.MainViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.SearchDialogsViewModel
