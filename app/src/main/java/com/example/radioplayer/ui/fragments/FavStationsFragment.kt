@@ -3,7 +3,6 @@ package com.example.radioplayer.ui.fragments
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -17,7 +16,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PlaylistsAdapter
@@ -26,11 +24,14 @@ import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.databinding.FragmentFavStationsBinding
-import com.example.radioplayer.exoPlayer.*
+import com.example.radioplayer.exoPlayer.RadioService
+import com.example.radioplayer.exoPlayer.RadioSource
+import com.example.radioplayer.exoPlayer.isPlayEnabled
+import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
-import com.example.radioplayer.ui.animations.*
-import com.example.radioplayer.ui.delegates.SystemBars
-import com.example.radioplayer.ui.delegates.SystemBarsImp
+import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
+import com.example.radioplayer.ui.animations.SwipeToDeleteCallback
+import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.dialogs.AddStationToPlaylistDialog
 import com.example.radioplayer.ui.dialogs.CreatePlaylistDialog
 import com.example.radioplayer.ui.dialogs.EditPlaylistDialog
@@ -50,7 +51,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-
 
 
 @AndroidEntryPoint
@@ -784,10 +784,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         isToHandleNewStationObserver = false
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d("CHECKTAGS", "calling fav's on destroy")
-    }
 
 
 }

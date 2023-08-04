@@ -5,9 +5,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.WindowManager.LayoutParams
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatDialog
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
@@ -19,12 +17,13 @@ import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PagingPixabayAdapter
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.databinding.DialogEditPlaylistBinding
-
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
 import com.example.radioplayer.utils.KeyboardObserver
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 
 @ExperimentalCoroutinesApi

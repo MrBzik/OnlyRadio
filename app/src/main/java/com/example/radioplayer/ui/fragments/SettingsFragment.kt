@@ -2,13 +2,10 @@ package com.example.radioplayer.ui.fragments
 
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
@@ -19,13 +16,11 @@ import com.example.radioplayer.databinding.FragmentSettingsBinding
 import com.example.radioplayer.databinding.StubSettingsExtrasBinding
 import com.example.radioplayer.databinding.StubSettingsGeneralBinding
 import com.example.radioplayer.databinding.StubTvTitleBinding
-import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.AlphaFadeOutAnim
 import com.example.radioplayer.ui.animations.FADE_IN_DURATION
 import com.example.radioplayer.ui.animations.FADE_OUT_DURATION
 import com.example.radioplayer.ui.animations.SwapTitlesUi
-import com.example.radioplayer.ui.animations.objectSizeScaleAnimation
 import com.example.radioplayer.ui.animations.slideAnim
 import com.example.radioplayer.ui.animations.smoothDayNightFadeIn
 import com.example.radioplayer.ui.animations.smoothDayNightFadeOut
@@ -36,21 +31,13 @@ import com.example.radioplayer.ui.stubs.GeneralDialogsCall
 import com.example.radioplayer.ui.stubs.SettingsExtras
 import com.example.radioplayer.ui.stubs.SettingsGeneral
 import com.example.radioplayer.ui.viewmodels.BluetoothViewModel
-import com.example.radioplayer.utils.Constants.ADD_RADIO_STATION_URL
 import com.example.radioplayer.utils.Constants.BUFFER_PREF
 import com.example.radioplayer.utils.Constants.DARK_MODE_PREF
-import com.example.radioplayer.utils.Constants.FOREGROUND_PREF
 import com.example.radioplayer.utils.Constants.FRAG_OPTIONS
 import com.example.radioplayer.utils.Constants.HISTORY_PREF
-
-import com.example.radioplayer.utils.Constants.RECONNECT_PREF
 import com.example.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
 import com.example.radioplayer.utils.Constants.REC_QUALITY_DEF
 import com.example.radioplayer.utils.RecPref
-import com.example.radioplayer.utils.TextViewOutlined
-import com.example.radioplayer.utils.addImage
-import com.example.radioplayer.utils.dpToP
-import org.w3c.dom.Text
 
 
 class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
@@ -105,11 +92,13 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
     private val generalDialogsCall by lazy {
         object : GeneralDialogsCall{
-            override fun recOptionsDialog(newValue: (Int) -> Unit) {
+            override fun recOptionsDialog(
+//                newValue: (Int) -> Unit
+            ) {
                 RecordingOptionsDialog(
                     recordingQualityPref,
                     requireContext(),
-                    newValue).show()
+                ).show()
             }
 
             override fun recInitialValue(): Int {
@@ -405,10 +394,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d("CHECKTAGS", "calling setting's on destroy")
-    }
 
 
 }

@@ -3,17 +3,14 @@ package com.example.radioplayer.ui.dialogs
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.example.radioplayer.R
 import com.example.radioplayer.databinding.DialogBufferSettingsBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.utils.Constants.BUFFER_FOR_PLAYBACK
-import com.example.radioplayer.utils.Constants.BUFFER_SIZE_IN_BYTES
 import com.example.radioplayer.utils.Constants.BUFFER_SIZE_IN_MILLS
 import com.example.radioplayer.utils.Constants.IS_ADAPTIVE_LOADER_TO_USE
-import com.example.radioplayer.utils.Constants.IS_TO_SET_BUFFER_IN_BYTES
 import com.google.android.material.slider.RangeSlider
 
 class BufferSettingsDialog (

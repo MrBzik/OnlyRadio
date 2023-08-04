@@ -8,7 +8,6 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Spinner
@@ -26,7 +25,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
-import com.example.radioplayer.adapters.*
+import com.example.radioplayer.adapters.BookmarkedTitlesAdapter
+import com.example.radioplayer.adapters.HistoryDatesAdapter
+import com.example.radioplayer.adapters.PagingHistoryAdapter
+import com.example.radioplayer.adapters.TitleAdapter
 import com.example.radioplayer.adapters.models.StationWithDateModel
 import com.example.radioplayer.adapters.models.TitleWithDateModel
 import com.example.radioplayer.data.local.entities.BookmarkedTitle
@@ -42,7 +44,6 @@ import com.example.radioplayer.ui.animations.BounceEdgeEffectFactory
 import com.example.radioplayer.ui.animations.SwapTitlesUi
 import com.example.radioplayer.ui.animations.SwipeToDeleteCallback
 import com.example.radioplayer.ui.animations.slideAnim
-
 import com.example.radioplayer.ui.viewmodels.TAB_BOOKMARKS
 import com.example.radioplayer.ui.viewmodels.TAB_STATIONS
 import com.example.radioplayer.ui.viewmodels.TAB_TITLES
@@ -54,9 +55,10 @@ import com.example.radioplayer.utils.SpinnerExt
 import com.example.radioplayer.utils.addAction
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.util.*
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -354,7 +356,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
 
-            Log.d("CHECKTAGS", "collecting currentplayingstation again?")
+//            Log.d("CHECKTAGS", "collecting currentplayingstation again?")
 
             if(historyViewModel.currentTab.value == TAB_STATIONS &&
                     RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
@@ -667,13 +669,31 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             repeatOnLifecycle(Lifecycle.State.STARTED){
 
                 historyViewModel.observableHistoryPages?.collectLatest{
-
                     when(historyViewModel.currentTab.value){
-                        TAB_STATIONS -> stationsHistoryAdapter
-                            ?.submitData(lifecycle, it as PagingData<StationWithDateModel>)
-                        TAB_TITLES -> titlesHistoryAdapter
-                            ?.submitData(lifecycle, it as PagingData<TitleWithDateModel>)
-                        TAB_BOOKMARKS -> bookmarkedTitlesAdapter.listOfTitles = it as List<BookmarkedTitle>
+                        TAB_STATIONS -> {
+                            stationsHistoryAdapter
+                                ?.submitData(lifecycle, it as PagingData<StationWithDateModel>)
+                            bind.tvHistoryMessage.visibility = View.INVISIBLE
+                        }
+                        TAB_TITLES -> {
+                            titlesHistoryAdapter
+                                ?.submitData(lifecycle, it as PagingData<TitleWithDateModel>)
+                            bind.tvHistoryMessage.visibility = View.INVISIBLE
+                        }
+                        TAB_BOOKMARKS -> {
+                            bookmarkedTitlesAdapter.listOfTitles = it as List<BookmarkedTitle>
+                            withContext(Dispatchers.Main){
+                                bind.tvHistoryMessage.apply {
+                                    if(it.isEmpty()){
+                                        text = requireContext().resources.getString(R.string.bookmarks_message)
+                                        visibility = View.VISIBLE
+                                        slideAnim(400, 0, R.anim.fade_in_anim)
+                                    } else {
+                                        visibility = View.INVISIBLE
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -751,7 +771,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.d("CHECKTAGS", "history on view destroy")
 
         historyViewModel.cleanHistoryTab()
         isNewHistoryQuery = true
@@ -763,11 +782,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         isToHandleNewStationObserver = false
         isBookmarkedTitlesObserverSet = false
         isSpinnerSet = false
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d("CHECKTAGS", "calling history's on destroy")
     }
 
 

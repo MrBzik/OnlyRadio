@@ -1,10 +1,8 @@
 package com.example.radioplayer.adapters.datasources
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.radioplayer.adapters.models.TitleWithDateModel
-
 
 
 typealias TitlesPageLoader = suspend (pageIndex : Int, pageSize : Int) -> List<TitleWithDateModel>

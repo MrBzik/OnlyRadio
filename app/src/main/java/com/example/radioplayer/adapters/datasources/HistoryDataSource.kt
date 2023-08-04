@@ -1,6 +1,5 @@
 package com.example.radioplayer.adapters.datasources
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.radioplayer.adapters.models.StationWithDateModel
@@ -47,7 +46,7 @@ class HistoryDataSource(
                 else null
             )
         } catch (e: Exception) {
-            Log.d("CHECKTAGS", e.stackTraceToString())
+//            Log.d("CHECKTAGS", e.stackTraceToString())
             LoadResult.Error(e)
 
         }

@@ -3,7 +3,6 @@ package com.example.radioplayer.exoPlayer.callbacks
 import android.app.Notification
 import android.app.Service
 import android.content.Intent
-import android.util.Log
 import androidx.core.content.ContextCompat
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.utils.Constants.NOTIFICATION_ID
@@ -19,7 +18,7 @@ class RadioPlayerNotificationListener (
 
         radioService.apply {
 
-            Log.d("CHECKTAGS", "radio notification")
+//            Log.d("CHECKTAGS", "radio notification")
 
             stopForeground(Service.STOP_FOREGROUND_REMOVE)
 

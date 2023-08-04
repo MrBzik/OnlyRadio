@@ -8,11 +8,9 @@ import android.widget.BaseAdapter
 import android.widget.TextView
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.HistoryDate
-import com.example.radioplayer.utils.Constants.SHORT_DATE_FORMAT
 import com.example.radioplayer.utils.Utils
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 
 
 class HistoryDatesAdapter(

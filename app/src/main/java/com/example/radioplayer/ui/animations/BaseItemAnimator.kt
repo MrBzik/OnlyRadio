@@ -7,7 +7,6 @@ import android.view.animation.Interpolator
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.example.radioplayer.ui.animations.ViewHelper.clear
-import java.util.ArrayList
 import kotlin.math.abs
 
 /*

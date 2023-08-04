@@ -1,13 +1,10 @@
 package com.example.radioplayer.ui.animations
 
 import android.animation.ValueAnimator
-import android.app.Activity
 import android.content.res.Configuration
 import android.graphics.Color
 import androidx.core.content.ContextCompat
 import com.example.radioplayer.R
-import com.example.radioplayer.databinding.ActivityMainBinding
-import com.example.radioplayer.databinding.StubPlayerActivityMainBinding
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.MainActivity.Companion.uiMode
 

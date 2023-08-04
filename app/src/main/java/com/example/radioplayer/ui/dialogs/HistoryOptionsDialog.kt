@@ -4,20 +4,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
-
-import androidx.core.view.isVisible
-
 import com.example.radioplayer.databinding.DialogHistoryOptionsBinding
 import com.example.radioplayer.exoPlayer.RadioService
-
-import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
-import com.example.radioplayer.ui.viewmodels.HistoryViewModel
-import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.utils.Constants
-
 import com.example.radioplayer.utils.Constants.HISTORY_PREF_BOOKMARK
 import com.example.radioplayer.utils.Constants.HISTORY_PREF_DATES
-
 import com.google.android.material.slider.RangeSlider
 
 class HistoryOptionsDialog (

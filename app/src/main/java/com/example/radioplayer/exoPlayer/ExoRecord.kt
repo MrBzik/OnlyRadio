@@ -4,9 +4,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.media.MediaExtractor
 import android.media.MediaFormat
-import android.util.Log
 import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.utils.Constants
+import com.example.radioplayer.utils.Constants.TITLE_UNKNOWN
 import com.example.radioplayer.utils.Utils
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.audio.AudioProcessor
@@ -75,19 +75,33 @@ class ExoRecordImpl (private val service: RadioService) {
                 override fun run() {
                     duration = (System.currentTimeMillis() - startTime)
 
-                    val time = Utils.timerFormat(duration)
+                    if(duration > RadioService.autoStopRec) {
+                        if(RadioService.autoStopRec != 180 * 60000)
+                        stopRecording()
+                    } else {
 
-                    service.radioNotificationManager.recordingDuration = time
-                    service.radioNotificationManager.updateNotification()
+                        val time = Utils.timerFormat(duration)
 
-                    service.radioSource.exoRecordTimer.postValue(time)
+                        service.radioNotificationManager.recordingDuration = time
+                        service.radioNotificationManager.updateNotification()
+
+                        service.radioSource.exoRecordTimer.postValue(time)
+                    }
                 }
             }, 0L, 1000L)
 
             recordingCheck.edit().apply{
+
+
+                val recordingName = if(RadioService.isToUseTitleForRecNaming
+                    && RadioService.currentlyPlayingSong != TITLE_UNKNOWN
+                ) {
+                    RadioService.currentlyPlayingSong
+                } else service.currentRadioStation?.name ?: ""
+
                 putBoolean(IS_RECORDING_HANDLED, false)
                 putString(RECORDING_FILE_NAME, recordFileName)
-                putString(RECORDING_NAME, service.currentRadioStation?.name ?: "")
+                putString(RECORDING_NAME, recordingName)
                 putString(RECORDING_ICON_URL, service.currentRadioStation?.favicon ?: "")
                 putInt(RECORDING_SAMPLE_RATE, recSampleRate)
                 putInt(RECORDING_CHANNELS_COUNT, recChannelsCount)
@@ -129,7 +143,7 @@ class ExoRecordImpl (private val service: RadioService) {
             Constants.REC_QUALITY_DEF
         )
 
-        Log.d("CHECKTAGS", "setting is : $setting")
+//        Log.d("CHECKTAGS", "setting is : $setting")
 
         ExoRecordOgg.convertFile(
             service.application,
@@ -141,7 +155,7 @@ class ExoRecordImpl (private val service: RadioService) {
 
             if(progress == 100.0f){
 
-                Log.d("CHECKTAGS", "progress is 100")
+//                Log.d("CHECKTAGS", "progress is 100")
 
 
                 try {
@@ -155,7 +169,7 @@ class ExoRecordImpl (private val service: RadioService) {
                     service.radioSource.exoRecordFinishConverting.postValue(true)
                     recordingCheck.edit().putBoolean(IS_RECORDING_HANDLED, true).apply()
                 } catch (e: java.lang.Exception){
-                    Log.d("CHECKTAGS", e.stackTraceToString())
+//                    Log.d("CHECKTAGS", e.stackTraceToString())
                 }
                 this.cancel()
             }
@@ -166,7 +180,7 @@ class ExoRecordImpl (private val service: RadioService) {
         recId : String, timeStamp : Long, duration : Long
     ) {
 
-        Log.d("CHECKTAGS", "inserting new recording")
+//        Log.d("CHECKTAGS", "inserting new recording")
 
         val id = recId.replace(".wav", ".ogg")
         val iconUri = recordingCheck.getString(RECORDING_ICON_URL, "") ?: ""
@@ -218,7 +232,7 @@ class ExoRecordImpl (private val service: RadioService) {
                 sampleRate
             }
 
-            Log.d("CHECKTAGS", "rec in : $recChannelsCount, $recSampleRate")
+//            Log.d("CHECKTAGS", "rec in : $recChannelsCount, $recSampleRate")
 
             exoRecord.exoRecordProcessor.configure(AudioProcessor.AudioFormat(sampleRate, channels,  C.ENCODING_PCM_16BIT))
 
@@ -269,7 +283,7 @@ class ExoRecordImpl (private val service: RadioService) {
             duration = dur
 
         } catch (e : Exception){
-            Log.d("CHECKTAGS", e.stackTraceToString())
+//            Log.d("CHECKTAGS", e.stackTraceToString())
         }
 
         return duration

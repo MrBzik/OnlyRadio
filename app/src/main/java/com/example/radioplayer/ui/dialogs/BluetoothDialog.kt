@@ -146,7 +146,7 @@ class BluetoothDialog (
                                 .getMethod("connect", BluetoothDevice::class.java)
                                 .invoke(a2dp, device)
                         } catch (e : Exception) {
-                            Log.d("CHECKTAGS", e.stackTraceToString())
+//                            Log.d("CHECKTAGS", e.stackTraceToString())
                         }
 
                     }

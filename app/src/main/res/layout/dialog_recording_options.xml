@@ -16,7 +16,7 @@
         android:layout_marginStart="8dp"
         android:gravity="center_vertical"
         android:layout_marginTop="@dimen/dialog_top_margin"
-        android:text="Recording quality"
+        android:text="Recording options"
         android:textAppearance="@style/dialogTitleText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -36,18 +36,27 @@
         app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
 
 
-
+    <TextView
+        android:id="@+id/tvRecQualityTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="Q: "
+        android:textAppearance="@style/dialogItemText"
+        android:textColor="@color/default_secondary_text_color"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvMainHint" />
 
     <TextView
         android:id="@+id/tvRecQualityValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:text="Normal"
         android:textAppearance="@style/dialogItemText"
         android:textColor="@color/selected_genre_color"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvRecQualityTitle"
         app:layout_constraintTop_toBottomOf="@id/tvMainHint" />
 
 
@@ -73,17 +82,65 @@
         app:layout_constraintTop_toBottomOf="@+id/tvRecQualityValue" />
 
 
+
     <TextView
-        android:id="@+id/tvSpaceHint"
+        android:id="@+id/tvRecAutoStopTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="Stop rec. after: "
+        android:textAppearance="@style/dialogItemText"
+        android:textColor="@color/default_secondary_text_color"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rangeSliderRecQuality" />
+
+    <TextView
+        android:id="@+id/tvRecAutoStopValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="10m"
+        android:textAppearance="@style/dialogItemText"
+        android:textColor="@color/selected_genre_color"
+        app:layout_constraintStart_toEndOf="@+id/tvRecAutoStopTitle"
+        app:layout_constraintTop_toBottomOf="@id/rangeSliderRecQuality" />
+
+    <com.google.android.material.slider.RangeSlider
+        android:id="@+id/rangeSliderAutoStop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:fontFamily="@font/aldrich"
-        android:text="Some radio stations (usually podcasts) steam in mono or odd sample rates. Space occupied will be smaller for those"
-        android:textColor="@color/default_secondary_text_color"
-        android:textSize="13sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rangeSliderRecQuality" />
+        app:layout_constraintTop_toBottomOf="@+id/tvRecAutoStopValue" />
+
+
+    <TextView
+        android:id="@+id/tvNaming"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="8dp"
+        android:text="Use song title for rec. name if available"
+        android:textAppearance="@style/dialogItemText"
+        android:textColor="@color/default_secondary_text_color"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/switchNaming"
+        app:layout_constraintTop_toBottomOf="@id/rangeSliderAutoStop" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchNaming"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvNaming"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvNaming"
+        app:thumbTint="@color/switch_thumb_color"
+        app:trackTint="@color/switch_track_color" />
+
 
 
     <TextView
@@ -94,7 +151,7 @@
         android:gravity="center_vertical"
         android:text="@string/dialog_back_button"
         android:textAppearance="@style/dialogTextButtons"
-        app:layout_constraintTop_toBottomOf="@+id/tvSpaceHint"
+        app:layout_constraintTop_toBottomOf="@+id/tvNaming"
         app:layout_constraintStart_toStartOf="parent" />
 
 
@@ -106,7 +163,7 @@
         android:gravity="center_vertical"
         android:text="@string/dialog_accept_button"
         android:textAppearance="@style/dialogTextButtons"
-        app:layout_constraintTop_toBottomOf="@+id/tvSpaceHint"
+        app:layout_constraintTop_toBottomOf="@+id/tvNaming"
         app:layout_constraintEnd_toEndOf="parent" />
 
 

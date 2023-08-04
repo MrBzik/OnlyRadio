@@ -1,9 +1,9 @@
 package com.example.radioplayer.bluetooth
 
+import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.bluetooth.BluetoothDevice
 import android.os.Build
 
 class ConnectingDeviceReceiver(

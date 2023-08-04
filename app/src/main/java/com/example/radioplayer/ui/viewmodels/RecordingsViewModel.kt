@@ -3,6 +3,7 @@ package com.example.radioplayer.ui.viewmodels
 import android.app.Application
 import androidx.core.os.bundleOf
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.exoPlayer.RadioService
@@ -20,6 +21,7 @@ import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_REC_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -54,6 +56,14 @@ class RecordingsViewModel @Inject constructor(
 
 
     var isRecordingsCheckNeeded = true
+
+    val durationWithPosition = RadioService.recordingDuration
+        .asFlow()
+        .combine(RadioService.recordingPlaybackPosition.asFlow()){ dur, pos ->
+            dur - pos
+        }
+
+
 
     fun checkRecordingsForCleanUp(recList : List<Recording>){
 

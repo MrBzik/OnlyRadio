@@ -4,31 +4,23 @@ package com.example.radioplayer.ui.fragments
 //import com.arthenica.ffmpegkit.FFmpegKit
 
 
-import android.content.res.Configuration
-import android.media.MediaExtractor
-import android.media.MediaFormat
 import android.os.Bundle
 import android.text.format.Formatter
-import android.util.Log
 import android.view.View
 import android.widget.SeekBar
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.databinding.FragmentRecordingDetailsBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.dialogs.RenameRecordingDialog
-import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.util.*
 import javax.inject.Inject
 
 
@@ -46,7 +38,7 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
 //    private var isRecordingToUpdate = false
 
-    private val calendar = Calendar.getInstance()
+//    private val calendar = Calendar.getInstance()
 
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -200,9 +192,11 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
 
             }
 
-            calendar.time = Date(it.timeStamp)
 
-           bind.tvDate.text = Utils.fromDateToStringShortWithTime(calendar)
+//
+//            calendar.time = Date(it.timeStamp)
+
+           bind.tvDate.text = Utils.convertLongToDate(it.timeStamp)
 
 //            getDecibels()
 
@@ -337,11 +331,6 @@ class RecordingDetailsFragment : BaseFragment<FragmentRecordingDetailsBinding>(
         _bind = null
     }
 
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d("CHECKTAGS", "calling rec details's on destroy")
-    }
 
 
 }

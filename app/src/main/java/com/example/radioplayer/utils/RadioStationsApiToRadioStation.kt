@@ -1,7 +1,13 @@
 package com.example.radioplayer.utils
 
 import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.MediaMetadataCompat.*
+import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI
+import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI
+import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE
+import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE
+import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
+import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_URI
+import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.remote.entities.RadioStationsItem
 

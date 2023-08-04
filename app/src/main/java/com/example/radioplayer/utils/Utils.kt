@@ -6,7 +6,8 @@ import android.util.TypedValue
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.ListPopupWindow
 import java.text.DateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 import java.util.concurrent.TimeUnit
 
 
@@ -119,41 +120,43 @@ object Utils {
 
 
 
-    fun fromDateToStringShortWithTime(calendar: Calendar) : String{
+//    fun fromDateToStringShortWithTime(calendar: Calendar) : String{
+//
+//        val result = StringBuilder()
+//        val day = calendar.get(Calendar.DAY_OF_MONTH)
+//        val month = calendar.get(Calendar.MONTH)
+//
+//        result.append("$day of ")
+//        result.append(
+//            when(month){
+//                0 -> "Jan"
+//                1 -> "Feb"
+//                2 -> "Mar"
+//                3 -> "Apr"
+//                4 -> "May"
+//                5 -> "Jun"
+//                6 -> "Jul"
+//                7 -> "Aug"
+//                8 -> "Sep"
+//                9 -> "Oct"
+//                10 -> "Nov"
+//                else -> "Dec"
+//            }
+//        )
+//
+//        val time = convertLongToDate(calendar.time.time)
 
-        val result = StringBuilder()
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-        val month = calendar.get(Calendar.MONTH)
+//
+//        val hour = calendar.get(Calendar.HOUR)
+//        val minutes = calendar.get(Calendar.MINUTE)
+//        val seconds = calendar.get(Calendar.SECOND)
 
-        result.append("$day of ")
-        result.append(
-            when(month){
-                0 -> "Jan"
-                1 -> "Feb"
-                2 -> "Mar"
-                3 -> "Apr"
-                4 -> "May"
-                5 -> "Jun"
-                6 -> "Jul"
-                7 -> "Aug"
-                8 -> "Sep"
-                9 -> "Oct"
-                10 -> "Nov"
-                else -> "Dec"
-            }
-        )
-
-
-        val hour = calendar.get(Calendar.HOUR)
-        val minutes = calendar.get(Calendar.MINUTE)
-        val seconds = calendar.get(Calendar.SECOND)
-
-        result.append(", $hour:$minutes:$seconds")
-
-
-        return result.toString()
-
-    }
+//        result.append(", $time")
+//
+//
+//        return result.toString()
+//
+//    }
 
 
      fun convertLongToDate(time : Long) : String {
@@ -189,19 +192,24 @@ object Utils {
 
     }
 
-
     fun timerFormatCut(mills : Long) : String {
 
         var milliseconds = mills
         var mode = 1
 
         val hours = TimeUnit.MILLISECONDS.toHours(milliseconds)
-        if(hours != 0L) mode = 3
-        milliseconds -= TimeUnit.HOURS.toMillis(hours)
+        if(hours != 0L) {
+            mode = 3
+            milliseconds -= TimeUnit.HOURS.toMillis(hours)
+        }
+
 
         val minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds)
-        if(minutes != 0L && mode == 1) mode = 2
-        milliseconds -= TimeUnit.MINUTES.toMillis(minutes)
+        if(minutes != 0L && mode == 1) {
+            mode = 2
+            milliseconds -= TimeUnit.MINUTES.toMillis(minutes)
+        }
+
 
         val seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds)
         milliseconds -= TimeUnit.SECONDS.toMillis(seconds)

@@ -17,5 +17,7 @@
     <string name="fav_frag_hint">Add new stations in Details. Drag and drop to move stations into playlists. Swipe away to delete</string>
     <string name="playlist__hint">Add new stations in Details. Drag and drop to move stations between playlists. Also use "Export" option of Lazy list</string>
     <string name="lazy_list_hint">Stations most listened recently can be found here, excluding already favoured ones or added to playlists</string>
+    <string name="bookmarks_message">Bookmark titles from Details, notification or history-titles tab itself. Swipe to delete. Click on any title to see more options</string>
+    <string name="setSetting">Show</string>
 
 </resources>

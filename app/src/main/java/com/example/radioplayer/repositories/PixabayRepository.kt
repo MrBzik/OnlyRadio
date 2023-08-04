@@ -2,7 +2,6 @@ package com.example.radioplayer.repositories
 
 import com.example.radioplayer.data.remote.PixabayApi
 import com.example.radioplayer.data.remote.pixabay.PixabayResponse
-import com.example.radioplayer.utils.Resource
 import retrofit2.Response
 import javax.inject.Inject
 

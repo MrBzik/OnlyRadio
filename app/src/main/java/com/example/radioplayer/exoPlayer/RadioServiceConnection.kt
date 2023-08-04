@@ -10,7 +10,6 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.radioplayer.utils.Constants.NETWORK_ERROR
@@ -87,7 +86,7 @@ class RadioServiceConnection (
            ) : MediaBrowserCompat.ConnectionCallback() {
 
        override fun onConnected() {
-           Log.d("CHECKTAGS", "on connected")
+//           Log.d("CHECKTAGS", "on connected")
            mediaController = MediaControllerCompat(context, mediaBrowser.sessionToken).apply {
                registerCallback(mediaControllerCallback)
            }

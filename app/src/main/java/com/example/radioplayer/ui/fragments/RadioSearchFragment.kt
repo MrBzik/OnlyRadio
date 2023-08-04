@@ -3,7 +3,6 @@ package com.example.radioplayer.ui.fragments
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
@@ -24,7 +23,10 @@ import com.example.radioplayer.exoPlayer.isPlaying
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.animations.TextLoadAnim
 import com.example.radioplayer.ui.animations.slideAnim
-import com.example.radioplayer.ui.dialogs.*
+import com.example.radioplayer.ui.dialogs.CountryPickerDialog
+import com.example.radioplayer.ui.dialogs.NameAutoDialog
+import com.example.radioplayer.ui.dialogs.SearchParamsDialog
+import com.example.radioplayer.ui.dialogs.TagPickerDialog
 import com.example.radioplayer.ui.stubs.NoResultMessage
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
@@ -576,11 +578,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     }
 
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d("CHECKTAGS", "calling search's on destroy")
-    }
 
 }
 

@@ -3,10 +3,7 @@ package com.example.radioplayer.ui.viewmodels
 import android.app.Application
 import android.content.Context
 import android.os.Parcelable
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.radioplayer.adapters.models.CountryWithRegion
 import com.example.radioplayer.adapters.models.TagWithGenre
@@ -57,28 +54,17 @@ import com.example.radioplayer.utils.tagsListReligion
 import com.example.radioplayer.utils.tagsListSpecial
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-
 import java.io.File
-import java.io.FileOutputStream
 import java.io.InputStream
-import java.io.ObjectOutputStream
-import java.util.ArrayList
-import java.util.Calendar
-import java.util.Date
-
 import java.util.Locale
-import java.util.TreeMap
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlin.collections.LinkedHashMap
-import kotlin.system.measureTimeMillis
 
 const val TAGS_FILE_NAME = "allTagsFile.txt"
 const val TAGS_UPDATE_PREF = "tags update pref"
@@ -203,59 +189,55 @@ class SearchDialogsViewModel @Inject constructor(
         } catch (e: Exception){
             null
         }
+         response?.body()?.let {tagsResponse ->
 
-         val time = measureTimeMillis {
-             response?.body()?.let {tagsResponse ->
+             val excludedTagsSet = try {
+                 val inputStream: InputStream = app.assets.open("excluded_tags/excluded_tags.txt")
+                 val inputString = inputStream.bufferedReader().use{it.readText()}
+                 Json.decodeFromString<HashSet<String>>(inputString)
+             } catch (e : Exception){
+                 HashSet()
+             }
 
-                 val excludedTagsSet = try {
-                     val inputStream: InputStream = app.assets.open("excluded_tags/excluded_tags.txt")
-                     val inputString = inputStream.bufferedReader().use{it.readText()}
-                     Json.decodeFromString<HashSet<String>>(inputString)
-                 } catch (e : Exception){
-                     HashSet()
-                 }
-
-                 val list = listOf(
-                     tagsListByPeriod.toList(), tagsListSpecial.toList(), tagsListByGenre.toList(),
-                     tagsListBySubGenre.toList(), tagsListClassics.toList(), tagsListMindful.toList(),
-                     tagsListExperimental.toList(), tagsListByTalk.toList(), tagsListReligion.toList(),
-                     tagsListByOrigin.toList(), tagsListOther.toList()
-                 )
+             val list = listOf(
+                 tagsListByPeriod.toList(), tagsListSpecial.toList(), tagsListByGenre.toList(),
+                 tagsListBySubGenre.toList(), tagsListClassics.toList(), tagsListMindful.toList(),
+                 tagsListExperimental.toList(), tagsListByTalk.toList(), tagsListReligion.toList(),
+                 tagsListByOrigin.toList(), tagsListOther.toList()
+             )
 
 
-                 tagsResponse.forEach {tagItem ->
+             tagsResponse.forEach {tagItem ->
 
-                     if(!excludedTagsSet.contains(tagItem.name)){
+                 if(!excludedTagsSet.contains(tagItem.name)){
 
-                         list.forEachIndexed { listIndex, sublist ->
+                     list.forEachIndexed { listIndex, sublist ->
 
-                             sublist.forEachIndexed { index, tagWithGenre ->
+                         sublist.forEachIndexed { index, tagWithGenre ->
 
-                                 if(tagItem.name.contains(tagWithGenre.tag)){
-                                     list[listIndex][index].stationCount += tagItem.stationcount
-                                     if(tagWithGenre.tag == tagItem.name){
-                                         list[listIndex][index].stationCountExact = tagItem.stationcount
-                                     }
+                             if(tagItem.name.contains(tagWithGenre.tag)){
+                                 list[listIndex][index].stationCount += tagItem.stationcount
+                                 if(tagWithGenre.tag == tagItem.name){
+                                     list[listIndex][index].stationCountExact = tagItem.stationcount
                                  }
                              }
                          }
                      }
                  }
+             }
 
 
-                 val file = File(app.filesDir.absolutePath + File.separator + TAGS_FILE_NAME)
+             val file = File(app.filesDir.absolutePath + File.separator + TAGS_FILE_NAME)
 
-                 val json = Json.encodeToString(list)
+             val json = Json.encodeToString(list)
 
-                 file.writeText(json)
+             file.writeText(json)
 
-                 tagsPref.edit().putLong(TAGS_UPDATE_PREF, System.currentTimeMillis()).apply()
+             tagsPref.edit().putLong(TAGS_UPDATE_PREF, System.currentTimeMillis()).apply()
 
-             } ?: run { isToCheckTags = true }
+         } ?: run { isToCheckTags = true }
 
-         }
-
-         Log.d("CHECKTAGS", "took time : $time")
+//         Log.d("CHECKTAGS", "took time : $time")
 
      }
 

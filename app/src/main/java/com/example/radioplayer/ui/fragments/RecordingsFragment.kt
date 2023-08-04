@@ -4,13 +4,11 @@ import android.animation.ValueAnimator
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,8 +27,6 @@ import com.example.radioplayer.utils.Utils
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -385,10 +381,6 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
         isToHandleNewRecording = false
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d("CHECKTAGS", "calling rec's on destroy")
-    }
 
 
 }

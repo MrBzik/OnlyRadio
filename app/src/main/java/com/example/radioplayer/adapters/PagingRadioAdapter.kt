@@ -1,9 +1,7 @@
 package com.example.radioplayer.adapters
 
 import android.annotation.SuppressLint
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -11,10 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.ItemRadioWithTextBinding
-import com.example.radioplayer.ui.animations.AdapterAnimator
 import com.example.radioplayer.ui.animations.AdapterFadeAnim.adapterItemFadeIn
-import com.example.radioplayer.ui.animations.fadeOut
-import com.example.radioplayer.utils.RandomColors
 import javax.inject.Inject
 
 class PagingRadioAdapter @Inject constructor(
@@ -55,7 +50,11 @@ class PagingRadioAdapter @Inject constructor(
 
         holder.bind.apply {
 
-            utils.handleBinding(this, station, position){
+            utils.handleBinding(
+                bind = this,
+                station = station,
+                position = position)
+               {
                 holder.bindingAdapterPosition
             }
         }
@@ -129,3 +128,31 @@ class PagingRadioAdapter @Inject constructor(
     }
 
 }
+
+
+
+//saveImage = {drawable ->
+//
+//    try {
+//        val bitmap = (drawable as BitmapDrawable).bitmap
+//
+//        val path = holder.itemView.context.filesDir.absolutePath + File.separator
+//
+//        val file = File(path)
+//
+//        val imageFile = File(file, System.currentTimeMillis().toString() + ".png")
+//
+//        CoroutineScope(Dispatchers.IO).launch {
+//            val out = FileOutputStream(imageFile)
+//
+//            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+//
+//            out.close()
+//        }
+//    } catch (e : Exception){
+//
+//    }
+//
+//
+//}
+//)

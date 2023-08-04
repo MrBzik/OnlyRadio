@@ -2,16 +2,12 @@ package com.example.radioplayer.utils
 
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
-import android.util.Log
 import android.util.TypedValue
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat
-import com.example.radioplayer.R
 
 
 class TextOutline(context : Context, attrs : AttributeSet?) : AppCompatTextView(context, attrs) {
@@ -29,7 +25,7 @@ class TextOutline(context : Context, attrs : AttributeSet?) : AppCompatTextView(
 
     override fun onDraw(canvas: Canvas) {
 
-        Log.d("CHECKTAGS", "onDraw")
+//        Log.d("CHECKTAGS", "onDraw")
 
             isDrawing = true
             setTextColor(_strokeColor)
@@ -42,7 +38,7 @@ class TextOutline(context : Context, attrs : AttributeSet?) : AppCompatTextView(
     }
 
     override fun invalidate() {
-        Log.d("CHECKTAGS", "invalidate")
+//        Log.d("CHECKTAGS", "invalidate")
         if (isDrawing) return
         super.invalidate()
     }

@@ -13,51 +13,52 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
-import android.util.Log
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.media.MediaBrowserServiceCompat
 import com.bumptech.glide.RequestManager
-import com.example.radioplayer.data.local.entities.*
-import com.example.radioplayer.data.local.relations.StationDateCrossRef
+import com.example.radioplayer.data.local.entities.RadioStation
+import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlaybackPreparer
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
 import com.example.radioplayer.exoPlayer.callbacks.RadioPlayerNotificationListener
 import com.example.radioplayer.repositories.DatabaseRepository
 import com.example.radioplayer.ui.fragments.FavStationsFragment
-import com.example.radioplayer.utils.Constants
-import com.example.radioplayer.utils.Constants.BUFFER_FOR_PLAYBACK
-import com.example.radioplayer.utils.Constants.BUFFER_PREF
-import com.example.radioplayer.utils.Constants.BUFFER_SIZE_IN_MILLS
-import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Commands.COMMAND_ADD_MEDIA_ITEM
-import com.example.radioplayer.utils.Commands.COMMAND_TOGGLE_REVERB
 import com.example.radioplayer.utils.Commands.COMMAND_CHANGE_REVERB_MODE
 import com.example.radioplayer.utils.Commands.COMMAND_CLEAR_MEDIA_ITEMS
 import com.example.radioplayer.utils.Commands.COMMAND_NEW_SEARCH
 import com.example.radioplayer.utils.Commands.COMMAND_ON_DROP_STATION_IN_PLAYLIST
-import com.example.radioplayer.utils.Commands.COMMAND_START_RECORDING
-import com.example.radioplayer.utils.Commands.COMMAND_STOP_RECORDING
-import com.example.radioplayer.utils.Commands.COMMAND_REMOVE_RECORDING_MEDIA_ITEM
 import com.example.radioplayer.utils.Commands.COMMAND_REMOVE_MEDIA_ITEM
+import com.example.radioplayer.utils.Commands.COMMAND_REMOVE_RECORDING_MEDIA_ITEM
 import com.example.radioplayer.utils.Commands.COMMAND_RESTART_PLAYER
 import com.example.radioplayer.utils.Commands.COMMAND_RESTORE_RECORDING_MEDIA_ITEM
+import com.example.radioplayer.utils.Commands.COMMAND_START_RECORDING
+import com.example.radioplayer.utils.Commands.COMMAND_STOP_RECORDING
+import com.example.radioplayer.utils.Commands.COMMAND_TOGGLE_REVERB
 import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_FAV_PLAYLIST
 import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_HISTORY_MEDIA_ITEMS
 import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS
 import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH
 import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
 import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_REC_PLAYBACK_SPEED
+import com.example.radioplayer.utils.Constants.BUFFER_FOR_PLAYBACK
+import com.example.radioplayer.utils.Constants.BUFFER_PREF
+import com.example.radioplayer.utils.Constants.BUFFER_SIZE_IN_MILLS
 import com.example.radioplayer.utils.Constants.FOREGROUND_PREF
 import com.example.radioplayer.utils.Constants.IS_ADAPTIVE_LOADER_TO_USE
 import com.example.radioplayer.utils.Constants.IS_NEW_SEARCH
 import com.example.radioplayer.utils.Constants.IS_TO_CLEAR_HISTORY_ITEMS
 import com.example.radioplayer.utils.Constants.ITEM_INDEX
+import com.example.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.example.radioplayer.utils.Constants.NO_ITEMS
 import com.example.radioplayer.utils.Constants.NO_PLAYLIST
 import com.example.radioplayer.utils.Constants.RECONNECT_PREF
+import com.example.radioplayer.utils.Constants.RECORDING_AUTO_STOP_PREF
+import com.example.radioplayer.utils.Constants.RECORDING_NAMING_PREF
+import com.example.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
@@ -68,21 +69,31 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.Constants.TITLE_UNKNOWN
 import com.example.radioplayer.utils.Utils
 import com.example.radioplayer.utils.setPreset
-import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.DefaultLoadControl.*
-import com.google.android.exoplayer2.audio.*
+import com.google.android.exoplayer2.DefaultLoadControl
+import com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS
+import com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_MAX_BUFFER_MS
+import com.google.android.exoplayer2.DefaultRenderersFactory
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackParameters
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.audio.AudioAttributes
+import com.google.android.exoplayer2.audio.AuxEffectInfo
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
 import dagger.hilt.android.AndroidEntryPoint
 import dev.brookmg.exorecord.lib.ExoRecord
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import java.lang.Exception
+import kotlinx.coroutines.launch
 import java.sql.Date
-import java.util.*
+import java.util.Calendar
 import javax.inject.Inject
-
 
 
 private const val SERVICE_TAG = "service tag"
@@ -205,8 +216,10 @@ class RadioService : MediaBrowserServiceCompat() {
         var currentDateString = ""
 
         val currentSongTitle = MutableLiveData<String>()
+
         val recordingPlaybackPosition = MutableLiveData<Long>()
         val recordingDuration = MutableLiveData<Long>()
+        val recordingDurationRemains = MutableLiveData<Long>()
 
         var playbackSpeedRec = 100
         var playbackSpeedRadio = 100
@@ -226,6 +239,9 @@ class RadioService : MediaBrowserServiceCompat() {
         var reverbMode = 0
 
         var isVirtualizerEnabled = false
+
+        var autoStopRec = 0
+        var isToUseTitleForRecNaming = false
     }
 
     private fun searchRadioStations(isNewSearch : Boolean) {
@@ -296,6 +312,15 @@ class RadioService : MediaBrowserServiceCompat() {
             FOREGROUND_PREF, Context.MODE_PRIVATE).getBoolean(FOREGROUND_PREF, false)
 
         dbOperators.initialHistoryPref()
+
+
+        this@RadioService.getSharedPreferences(
+            RECORDING_QUALITY_PREF, Context.MODE_PRIVATE).apply {
+
+            autoStopRec = getInt(RECORDING_AUTO_STOP_PREF, 180) * 60000
+            isToUseTitleForRecNaming = getBoolean(RECORDING_NAMING_PREF, false)
+
+        }
     }
 
     private fun collectFavStations(){
@@ -781,11 +806,11 @@ class RadioService : MediaBrowserServiceCompat() {
 
     fun listenToRecordDuration ()  {
 
-        val format = exoPlayer.audioFormat
-        val sampleRate = format?.sampleRate ?: 0
-        val channels = format?.channelCount ?: 0
-
-        Log.d("CHECKTAGS", "sampleRate is $sampleRate, channels : $channels")
+//        val format = exoPlayer.audioFormat
+//        val sampleRate = format?.sampleRate ?: 0
+//        val channels = format?.channelCount ?: 0
+//
+//        Log.d("CHECKTAGS", "sampleRate is $sampleRate, channels : $channels")
 
 
         if(reverbMode != 0)
@@ -806,16 +831,17 @@ class RadioService : MediaBrowserServiceCompat() {
 
                     val pos = mediaSession.controller.playbackState.currentPlaybackPosition
 
-
                     recordingPlaybackPosition.postValue(pos)
 
                     if(exoPlayer.duration > 0){
                         recordingDuration.postValue(exoPlayer.duration)
 
+                        recordingDurationRemains.postValue(exoPlayer.duration - pos)
+
                         val delay = exoPlayer.duration - pos
 
-                        if(delay > 500){
-                            delay(400)
+                        if(delay > 600){
+                            delay(500)
                         } else {
                             delay(delay)
                             exoPlayer.seekTo(0)
@@ -824,7 +850,7 @@ class RadioService : MediaBrowserServiceCompat() {
                             break
                         }
                     } else {
-                        delay(400)
+                        delay(500)
                     }
 
                 }
@@ -1067,7 +1093,7 @@ class RadioService : MediaBrowserServiceCompat() {
         mediaSessionConnector.setPlaybackPreparer(null)
 
 //        if(canOnDestroyBeCalled){
-            Log.d("CHECKTAGS", "on destroy")
+//            Log.d("CHECKTAGS", "on destroy")
             mediaSession.run {
                 isActive = false
                 release()

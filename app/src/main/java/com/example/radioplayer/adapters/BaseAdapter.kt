@@ -3,24 +3,13 @@ package com.example.radioplayer.adapters
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.databinding.ItemRadioWithTextBinding
 import com.example.radioplayer.extensions.loadImage
-import com.example.radioplayer.ui.animations.fadeOut
 import com.example.radioplayer.utils.RandomColors
-
 
 
 class BaseAdapter(
@@ -87,6 +76,7 @@ class BaseAdapter(
         bind: ItemRadioWithTextBinding,
         station: RadioStation,
         position : Int,
+        saveImage : (Drawable) -> Unit = {},
         checkPosition : () -> Int
     ){
 
@@ -139,7 +129,8 @@ class BaseAdapter(
                     tvPlaceholder = tvPlaceholder,
                     ivItemImage = ivItemImage,
                     alpha = alpha,
-                    position = position
+                    position = position,
+                    saveImage = saveImage
                 ){
                     checkPosition()
                 }

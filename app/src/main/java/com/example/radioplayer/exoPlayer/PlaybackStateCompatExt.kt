@@ -2,9 +2,6 @@ package com.example.radioplayer.exoPlayer
 
 import android.os.SystemClock
 import android.support.v4.media.session.PlaybackStateCompat
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
 
 inline val PlaybackStateCompat.isPrepared
     get() = state == PlaybackStateCompat.STATE_BUFFERING ||

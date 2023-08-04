@@ -1,20 +1,12 @@
 package com.example.radioplayer.ui.viewmodels
 
-import android.util.Log
 import androidx.core.os.bundleOf
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.liveData
 import com.example.radioplayer.adapters.datasources.HistoryDataSource
 import com.example.radioplayer.adapters.datasources.HistoryDateLoader
 import com.example.radioplayer.adapters.datasources.HistoryOneDateLoader
@@ -34,16 +26,13 @@ import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_HISTORY_ONE_DATE_ME
 import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
 import java.sql.Date
 import java.util.Calendar

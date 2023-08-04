@@ -1,6 +1,5 @@
 package com.example.radioplayer.ui.animations
 
-import android.util.Log
 import android.view.View
 import com.example.radioplayer.R
 

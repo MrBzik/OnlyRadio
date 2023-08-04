@@ -1,26 +1,40 @@
 package com.example.radioplayer.ui.dialogs
 
+
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-
 import android.view.View
 import androidx.core.content.ContextCompat
-
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.FilterCountriesAdapter
 import com.example.radioplayer.adapters.models.CountryWithRegion
-
-
 import com.example.radioplayer.databinding.DialogPickCountryBinding
-
-
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.ui.viewmodels.SearchDialogsViewModel
-import com.example.radioplayer.utils.*
-import kotlin.system.measureTimeMillis
+import com.example.radioplayer.utils.COUNTRY_REGION_AFRICA
+import com.example.radioplayer.utils.COUNTRY_REGION_ASIA
+import com.example.radioplayer.utils.COUNTRY_REGION_CENTRAL_AMERICA
+import com.example.radioplayer.utils.COUNTRY_REGION_EAST_EUROPE
+import com.example.radioplayer.utils.COUNTRY_REGION_MIDDLE_EAST
+import com.example.radioplayer.utils.COUNTRY_REGION_NORTH_AMERICA
+import com.example.radioplayer.utils.COUNTRY_REGION_OCEANIA
+import com.example.radioplayer.utils.COUNTRY_REGION_SOUTH_AMERICA
+import com.example.radioplayer.utils.COUNTRY_REGION_THE_CARIBBEAN
+import com.example.radioplayer.utils.COUNTRY_REGION_WEST_EUROPE
+import com.example.radioplayer.utils.KeyboardObserver
+import com.example.radioplayer.utils.listOfAfrica
+import com.example.radioplayer.utils.listOfAsia
+import com.example.radioplayer.utils.listOfCentralAmerica
+import com.example.radioplayer.utils.listOfEastEurope
+import com.example.radioplayer.utils.listOfMiddleEast
+import com.example.radioplayer.utils.listOfNorthAmerica
+import com.example.radioplayer.utils.listOfOceania
+import com.example.radioplayer.utils.listOfSouthAmerica
+import com.example.radioplayer.utils.listOfTheCaribbean
+import com.example.radioplayer.utils.listOfWestEurope
 
 
 class CountryPickerDialog(

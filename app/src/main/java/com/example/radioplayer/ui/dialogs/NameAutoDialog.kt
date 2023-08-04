@@ -6,17 +6,9 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.WindowManager
-import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.lifecycleScope
 import com.example.radioplayer.databinding.DialogPickNameAutoBinding
 import com.example.radioplayer.ui.viewmodels.MainViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import java.util.Timer
-import java.util.TimerTask
 
 class NameAutoDialog (
     requireContext : Context,

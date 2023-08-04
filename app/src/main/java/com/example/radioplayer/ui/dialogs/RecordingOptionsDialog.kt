@@ -3,20 +3,10 @@ package com.example.radioplayer.ui.dialogs
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-
-import android.view.Gravity
-import android.view.View
-import android.view.WindowManager
-import android.widget.ArrayAdapter
-
-import androidx.appcompat.app.AppCompatDialog
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.radioplayer.R
-import com.example.radioplayer.adapters.SelectingOptionAdapter
 import com.example.radioplayer.databinding.DialogRecordingOptionsBinding
-
-import com.example.radioplayer.databinding.DialogRecordingSettingsBinding
-
+import com.example.radioplayer.exoPlayer.RadioService
+import com.example.radioplayer.utils.Constants.RECORDING_AUTO_STOP_PREF
+import com.example.radioplayer.utils.Constants.RECORDING_NAMING_PREF
 import com.example.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
 import com.example.radioplayer.utils.Constants.REC_QUALITY_DEF
 import com.example.radioplayer.utils.Constants.REC_QUALITY_HIGH
@@ -31,19 +21,22 @@ import com.google.android.material.slider.RangeSlider
 class RecordingOptionsDialog (
     private val recordingQualityPref : SharedPreferences,
     private val requireContext : Context,
-    private val updateTvValue : (Int) -> Unit
+//    private val updateTvValue : (Int) -> Unit
     )
     : BaseDialog<DialogRecordingOptionsBinding>
     (requireContext, DialogRecordingOptionsBinding::inflate) {
 
-    private var newOption : Int? = null
+    private var newQualityOption : Int? = null
+    private var newAutoStopOption : Int? = null
+    private var newNamingPref : Boolean? = null
 
     private var initialRecQuality = RecPref.qualityFloatToInt(
         recordingQualityPref.getFloat(RECORDING_QUALITY_PREF, REC_QUALITY_DEF)
     )
 
+    private var initialRecAutoStopMins = recordingQualityPref.getInt(RECORDING_AUTO_STOP_PREF, 180)
 
-
+    private var initialNamingPref = recordingQualityPref.getBoolean(RECORDING_NAMING_PREF, false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,17 +44,21 @@ class RecordingOptionsDialog (
 
         setRangeRecQuality()
 
+        setRangeAutoStop()
+
+        setNamingSwitchListener()
+
         bind.tvBack.setOnClickListener {
             dismiss()
         }
 
         bind.tvAccept.setOnClickListener {
 
-            newOption?.let { option ->
+            newQualityOption?.let { option ->
 
                 if(option != initialRecQuality){
 
-                updateTvValue(option)
+//                updateTvValue(option)
 
                 recordingQualityPref.edit().putFloat(RECORDING_QUALITY_PREF,
                     qualityIntToFloat(option)
@@ -69,10 +66,30 @@ class RecordingOptionsDialog (
 
                 }
             }
+
+            newAutoStopOption?.let { option ->
+
+                if(option != initialRecAutoStopMins){
+
+                    recordingQualityPref.edit().putInt(RECORDING_AUTO_STOP_PREF,
+                    option).apply()
+
+                    RadioService.autoStopRec = option
+                }
+            }
+
+
+            newNamingPref?.let { option ->
+
+                if(option != initialNamingPref){
+                    recordingQualityPref.edit().putBoolean(
+                        RECORDING_NAMING_PREF, option).apply()
+                    RadioService.isToUseTitleForRecNaming = option
+                }
+            }
+
             dismiss()
         }
-
-
 
     }
 
@@ -102,9 +119,9 @@ class RecordingOptionsDialog (
                 }
 
                 override fun onStopTrackingTouch(slider: RangeSlider) {
-                    newOption = slider.values.first().toInt()
+                    newQualityOption = slider.values.first().toInt()
 
-                    newOption?.let { value ->
+                    newQualityOption?.let { value ->
                         bind.tvRecQualityValue.text = RecPref.setTvRecQualityValue(value)
                         bind.tvQualityEstimate.text = setTvEstimateText(value)
                     }
@@ -138,8 +155,64 @@ class RecordingOptionsDialog (
             5 -> REC_QUALITY_ULTRA
             else -> REC_QUALITY_MAX
         }
+    }
 
 
+    private fun setRangeAutoStop(){
+        bind.rangeSliderAutoStop.apply {
+            valueFrom = 5f
+            valueTo = 180f
+            stepSize = 5f
+
+            bind.tvRecAutoStopValue.text = minsToString(initialRecAutoStopMins)
+
+            values = listOf(initialRecAutoStopMins.toFloat())
+
+            setLabelFormatter { value ->
+                minsToString(value.toInt())
+            }
+
+
+            addOnSliderTouchListener(object : RangeSlider.OnSliderTouchListener{
+                override fun onStartTrackingTouch(slider: RangeSlider) {
+
+                }
+
+                override fun onStopTrackingTouch(slider: RangeSlider) {
+                    newAutoStopOption = slider.values.first().toInt()
+
+                    newAutoStopOption?.let { value ->
+                        bind.tvRecAutoStopValue.text = minsToString(value)
+                    }
+                }
+            })
+        }
+    }
+
+
+    private fun minsToString(mins : Int) : String{
+
+        if(mins == 180)
+            return "unset"
+
+        val hours = mins / 60
+
+        val minsRemain = mins -( hours * 60)
+
+        return if (hours > 0){
+            "$hours h $minsRemain m"
+        } else {
+            "$minsRemain m"
+        }
+    }
+
+    private fun setNamingSwitchListener(){
+
+        bind.switchNaming.isChecked = initialNamingPref
+
+        bind.switchNaming.setOnCheckedChangeListener { buttonView, isChecked ->
+            newNamingPref = isChecked
+        }
     }
 
 

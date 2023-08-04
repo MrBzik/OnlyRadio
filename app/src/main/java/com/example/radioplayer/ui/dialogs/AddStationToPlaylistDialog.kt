@@ -1,30 +1,13 @@
 package com.example.radioplayer.ui.dialogs
 
 import android.content.Context
-import android.content.res.Configuration
-import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.RectShape
-import android.os.Build
 import android.os.Bundle
-import android.util.TypedValue
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
-import androidx.appcompat.app.AppCompatDialog
-import androidx.core.content.ContextCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.RequestManager
-import com.example.radioplayer.R
 import com.example.radioplayer.adapters.PlaylistsAdapter
 import com.example.radioplayer.data.local.entities.Playlist
 import com.example.radioplayer.databinding.DialogAddStationToPlaylistBinding
-import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.example.radioplayer.ui.viewmodels.PixabayViewModel
 

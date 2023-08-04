@@ -1,13 +1,10 @@
 package com.example.radioplayer.bluetooth
 
-import android.Manifest
-import android.bluetooth.BluetoothDevice
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.content.Context
-import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

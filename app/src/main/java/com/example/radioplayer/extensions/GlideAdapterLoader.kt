@@ -9,6 +9,7 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.example.radioplayer.ui.animations.fadeOut
 
@@ -21,9 +22,11 @@ fun RequestManager.loadImage(
     ivItemImage: ImageView,
     alpha : Float,
     position: Int,
-    updatedHolderPos : () -> Int
+    saveImage : (Drawable) -> Unit = {},
+    updatedHolderPos : () -> Int,
 ){
     load(uri)
+        .apply(RequestOptions().override(90, 90))
         .listener(object : RequestListener<Drawable> {
             override fun onLoadFailed(
                 e: GlideException?,
@@ -45,6 +48,8 @@ fun RequestManager.loadImage(
 
                 if(dataSource?.name == "REMOTE"){
 
+                    resource?.let { saveImage(it) }
+
                     tvPlaceholder.fadeOut(FADE_OUT_DURATION, alpha, position){ pos ->
                         if(pos != updatedHolderPos()) {
                             tvPlaceholder.alpha = alpha
@@ -59,12 +64,13 @@ fun RequestManager.loadImage(
                 return false
             }
         })
+
         .transition(DrawableTransitionOptions.withCrossFade(TRANSITION_DURATION))
-//                    .apply(RequestOptions().override(65, 65))
+
         .into(ivItemImage)
 }
 
-fun RequestManager.loadImage(
+fun RequestManager.loadSingleImage(
     uri: String,
     tvPlaceholder: TextView,
     ivItemImage: ImageView,

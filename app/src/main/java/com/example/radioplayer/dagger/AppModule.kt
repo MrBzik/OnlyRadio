@@ -1,6 +1,5 @@
 package com.example.radioplayer.dagger
 
-import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
@@ -9,7 +8,6 @@ import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
-import com.example.radioplayer.R
 import com.example.radioplayer.bluetooth.AndroidBluetoothController
 import com.example.radioplayer.bluetooth.BluetoothController
 import com.example.radioplayer.data.local.RadioDAO
@@ -26,7 +24,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.android.scopes.ServiceScoped
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.radioplayer.adapters.models.TagWithGenre
 import com.example.radioplayer.databinding.ItemGenreBinding
 import com.example.radioplayer.databinding.ItemTagBinding
-import com.example.radioplayer.databinding.ItemTextBinding
 
 
 const val VIEW_TYPE_TAG = 0

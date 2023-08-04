@@ -7,12 +7,11 @@ import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
+
 import androidx.annotation.NonNull;
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
-
-import com.google.android.exoplayer2.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;

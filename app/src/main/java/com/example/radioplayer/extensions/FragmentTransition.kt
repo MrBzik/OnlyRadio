@@ -2,7 +2,6 @@ package com.example.radioplayer.extensions
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import com.example.radioplayer.R
 import com.example.radioplayer.ui.fragments.SettingsFragment
 

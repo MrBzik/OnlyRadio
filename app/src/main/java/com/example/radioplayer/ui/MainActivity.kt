@@ -3,7 +3,6 @@ package com.example.radioplayer.ui
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.Animation
@@ -13,9 +12,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
-import com.example.radioplayer.adapters.models.TagWithGenre
 import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.databinding.ActivityMainBinding
@@ -31,10 +32,9 @@ import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.ui.viewmodels.RecordingsViewModel
 import com.example.radioplayer.ui.viewmodels.SettingsViewModel
 import com.example.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
-import com.example.radioplayer.utils.TAG_BY_CLASSIC
-import com.example.radioplayer.utils.TAG_BY_MINDFUL
-import com.example.radioplayer.utils.listOfCentralAmerica
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -117,6 +117,8 @@ class MainActivity : AppCompatActivity() {
 
         observeNewStation()
 
+        observeRecordingDuration()
+
         setOnBottomNavClickListener()
 
         setOnBottomNavItemReselect()
@@ -128,6 +130,18 @@ class MainActivity : AppCompatActivity() {
 
 
 
+    private fun observeRecordingDuration(){
+
+        lifecycleScope.launch {
+
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+
+                recordingsViewModel.durationWithPosition.collectLatest {
+                    playerUtils.updateRecordingDuration(it)
+                }
+            }
+        }
+    }
 
 
 

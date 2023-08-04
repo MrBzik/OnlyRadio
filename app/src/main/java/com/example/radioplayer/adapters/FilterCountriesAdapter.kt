@@ -12,10 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.example.radioplayer.adapters.models.CountryWithRegion
-import com.example.radioplayer.adapters.models.TagWithGenre
 import com.example.radioplayer.databinding.ItemCountryBinding
 import com.example.radioplayer.databinding.ItemGenreBinding
-import com.example.radioplayer.databinding.ItemTextBinding
 
 const val VIEW_TYPE_COUNTRY = 0
 const val VIEW_TYPE_REGION = 1

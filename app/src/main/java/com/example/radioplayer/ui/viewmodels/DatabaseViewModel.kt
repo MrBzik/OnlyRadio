@@ -1,46 +1,31 @@
 package com.example.radioplayer.ui.viewmodels
 
-import android.app.Application
-import android.util.Log
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.example.radioplayer.adapters.datasources.*
-import com.example.radioplayer.adapters.models.StationWithDateModel
-import com.example.radioplayer.adapters.models.TitleWithDateModel
-
 import com.example.radioplayer.data.local.entities.*
 import com.example.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.exoPlayer.RadioServiceConnection
 import com.example.radioplayer.exoPlayer.RadioSource
 import com.example.radioplayer.repositories.DatabaseRepository
-import com.example.radioplayer.utils.Commands
 import com.example.radioplayer.utils.Commands.COMMAND_ADD_MEDIA_ITEM
 import com.example.radioplayer.utils.Commands.COMMAND_CLEAR_MEDIA_ITEMS
 import com.example.radioplayer.utils.Commands.COMMAND_ON_DROP_STATION_IN_PLAYLIST
 import com.example.radioplayer.utils.Commands.COMMAND_REMOVE_MEDIA_ITEM
 import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_FAV_PLAYLIST
-import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_HISTORY_MEDIA_ITEMS
-import com.example.radioplayer.utils.Commands.COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants
-import com.example.radioplayer.utils.Constants.IS_TO_CLEAR_HISTORY_ITEMS
 import com.example.radioplayer.utils.Constants.LAZY_LIST_NAME
-import com.example.radioplayer.utils.Constants.PAGE_SIZE
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
-import com.example.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_LAZY_LIST
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
-import com.example.radioplayer.utils.Utils.fromDateToString
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.sql.Date
 import java.util.*
 import javax.inject.Inject
 
@@ -224,7 +209,7 @@ class DatabaseViewModel @Inject constructor(
     val favFragStationsFlow = favFragStationsSwitch.asFlow().flatMapLatest {
         when (it) {
             SEARCH_FROM_FAVOURITES -> {
-                Log.d("CHECKTAGS", "getting all fav stations flow already?")
+
                 getAllFavStationsFlow
             }
             SEARCH_FROM_PLAYLIST -> stationsInPlaylistFlow

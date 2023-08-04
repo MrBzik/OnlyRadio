@@ -1,8 +1,6 @@
 package com.example.radioplayer.ui.stubs
 
-import android.app.Activity
 import android.content.Context
-import android.content.ContextWrapper
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
@@ -11,12 +9,9 @@ import com.example.radioplayer.R
 import com.example.radioplayer.databinding.StubSettingsGeneralBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.MainActivity
-import com.example.radioplayer.ui.dialogs.BufferSettingsDialog
-import com.example.radioplayer.ui.dialogs.HistoryOptionsDialog
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.ui.viewmodels.SettingsViewModel
 import com.example.radioplayer.utils.Constants
-import com.example.radioplayer.utils.RecPref
 import com.example.radioplayer.utils.addImage
 import com.example.radioplayer.utils.dpToP
 
@@ -124,14 +119,16 @@ class SettingsGeneral () {
 
         val initialValue = generalDialogsCall.recInitialValue()
 
-        bindGeneral.tvRecordingSettingsValue.text = RecPref.setTvRecQualityValue(initialValue)
+//        bindGeneral.tvRecordingSettingsValue.text = RecPref.setTvRecQualityValue(initialValue)
 
 
         bindGeneral.tvRecordingSettingsValue.setOnClickListener {
 
-           generalDialogsCall.recOptionsDialog(){newValue ->
-               bindGeneral.tvRecordingSettingsValue.text = RecPref.setTvRecQualityValue(newValue)
-           }
+           generalDialogsCall.recOptionsDialog()
+//           {
+//                   newValue ->
+//               bindGeneral.tvRecordingSettingsValue.text = RecPref.setTvRecQualityValue(newValue)
+//           }
         }
     }
 

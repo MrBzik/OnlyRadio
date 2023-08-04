@@ -10,6 +10,8 @@ object Constants {
 
     const val ADD_RADIO_STATION_URL = "https://www.radio-browser.info/add"
 
+    const val VALID_URL_PREF = "valid url pref"
+
 //    const val BASE_RADIO_URLTEST = "https://ts1.api.radio-browser.info"
 
 
@@ -137,6 +139,9 @@ object Constants {
     const val REC_QUALITY_HIGH = 0.6f
     const val REC_QUALITY_ULTRA = 0.8f
     const val REC_QUALITY_MAX = 0.9f
+
+    const val RECORDING_AUTO_STOP_PREF = "RECORDING_AUTO_STOP_PREF"
+    const val RECORDING_NAMING_PREF = "recording naming pref"
 
 
 

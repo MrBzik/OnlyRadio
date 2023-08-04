@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -40,7 +39,6 @@ import com.example.radioplayer.utils.tagsListMindful
 import com.example.radioplayer.utils.tagsListOther
 import com.example.radioplayer.utils.tagsListReligion
 import com.example.radioplayer.utils.tagsListSpecial
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 

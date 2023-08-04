@@ -1,31 +1,19 @@
 package com.example.radioplayer.ui.stubs
 
-import android.media.session.PlaybackState
-import android.os.Bundle
 import android.support.v4.media.session.PlaybackStateCompat
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
-import com.example.radioplayer.data.local.entities.RadioStation
-import com.example.radioplayer.data.local.entities.Recording
-import com.example.radioplayer.databinding.FragmentPlayerBinding
 import com.example.radioplayer.databinding.StubPlayerActivityMainBinding
 import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.exoPlayer.isPlayEnabled
 import com.example.radioplayer.exoPlayer.isPlaying
-import com.example.radioplayer.extensions.loadImage
-import com.example.radioplayer.ui.MainActivity
+import com.example.radioplayer.extensions.loadSingleImage
 import com.example.radioplayer.ui.animations.slideAnim
-import com.example.radioplayer.ui.viewmodels.MainViewModel
-import com.example.radioplayer.ui.viewmodels.RecordingsViewModel
 import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.RandomColors
-import javax.inject.Inject
+import com.example.radioplayer.utils.Utils
 
 
 class MainPlayerView(private val bind : StubPlayerActivityMainBinding,
@@ -87,6 +75,12 @@ class MainPlayerView(private val bind : StubPlayerActivityMainBinding,
     }
 
 
+    fun updateRecordingDuration(dur : Long){
+
+        bind.tvBitrate.text = "left: " + Utils.timerFormatCut(dur)
+    }
+
+
      fun updateImage(){
 
         var newName = ""
@@ -120,7 +114,7 @@ class MainPlayerView(private val bind : StubPlayerActivityMainBinding,
         } else {
 
             bind.ivCurrentStationImage.visibility = View.VISIBLE
-            glide.loadImage(
+            glide.loadSingleImage(
                 uri = newImage,
                 tvPlaceholder = bind.tvPlaceholder,
                 ivItemImage = bind.ivCurrentStationImage,

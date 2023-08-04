@@ -1,7 +1,6 @@
 package com.example.radioplayer.exoPlayer
 
 import android.content.Context
-import android.util.Log
 import com.example.radioplayer.data.local.entities.BookmarkedTitle
 import com.example.radioplayer.data.local.entities.HistoryDate
 import com.example.radioplayer.data.local.entities.RadioStation
@@ -11,8 +10,6 @@ import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.sql.Date
 
@@ -58,7 +55,7 @@ class DBOperators (private val service: RadioService) {
                 previousPlayedStationId = service.currentRadioStation?.stationuuid ?: ""
                 stationStartPlayingTime = System.currentTimeMillis()
 
-                Log.d("CHECKTAGS", "duration start for id : $previousPlayedStationId")
+//                Log.d("CHECKTAGS", "duration start for id : $previousPlayedStationId")
 
             } else {
                 durationUpdateHelper()

@@ -1,27 +1,17 @@
 package com.example.radioplayer.ui.dialogs
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.content.res.Configuration
-import android.graphics.Color
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.LayerDrawable
-import android.graphics.drawable.RippleDrawable
 import android.os.Bundle
-import android.telecom.TelecomManager
-import android.telephony.TelephonyManager
 import android.text.InputType
-import android.util.Log
 import android.widget.ArrayAdapter
-import androidx.core.content.ContextCompat
 import com.example.radioplayer.R
 import com.example.radioplayer.databinding.DialogSearchParamsBinding
-import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 import com.example.radioplayer.ui.viewmodels.SearchDialogsViewModel
 import com.google.android.material.slider.RangeSlider
-import java.util.*
+import java.util.Locale
 
 
 const val ORDER_VOTES = "Top voted"

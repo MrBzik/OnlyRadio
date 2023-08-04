@@ -2,23 +2,14 @@ package com.example.radioplayer.dagger
 
 import android.app.Application
 import android.content.Context
-import android.media.AudioFormat
-import android.os.Handler
-import com.example.radioplayer.data.remote.RadioApi
-import com.example.radioplayer.utils.Constants
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.LoadControl
 import com.google.android.exoplayer2.audio.AudioAttributes
-import com.google.android.exoplayer2.audio.AudioCapabilities
-import com.google.android.exoplayer2.audio.AudioCapabilities.DEFAULT_AUDIO_CAPABILITIES
 import com.google.android.exoplayer2.audio.AudioCapabilities.getCapabilities
 import com.google.android.exoplayer2.audio.AudioSink
 import com.google.android.exoplayer2.audio.DefaultAudioSink
-import com.google.android.exoplayer2.source.hls.HlsDataSourceFactory
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.*
 import dagger.Module
 import dagger.Provides
@@ -27,9 +18,6 @@ import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ServiceScoped
 import dev.brookmg.exorecord.lib.ExoRecord
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import javax.inject.Singleton
 
 
 @Module

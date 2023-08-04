@@ -6,14 +6,15 @@ import android.content.ClipboardManager
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
-import androidx.viewpager2.widget.ViewPager2.*
+import androidx.viewpager2.widget.ViewPager2.ORIENTATION_HORIZONTAL
+import androidx.viewpager2.widget.ViewPager2.SCROLL_STATE_DRAGGING
+import androidx.viewpager2.widget.ViewPager2.SCROLL_STATE_IDLE
 import com.bumptech.glide.RequestManager
 import com.example.radioplayer.R
 import com.example.radioplayer.adapters.ViewPagerStationsAdapter
@@ -43,7 +44,8 @@ import com.example.radioplayer.utils.addAction
 import com.example.radioplayer.utils.toRadioStation
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -641,10 +643,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     }
 
 
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d("CHECKTAGS", "calling station detail's on destroy")
-    }
 
 
 }

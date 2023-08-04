@@ -3,7 +3,6 @@ package com.example.radioplayer.adapters
 import android.content.ClipDescription
 import android.content.res.Configuration
 import android.graphics.drawable.ColorDrawable
-import android.util.Log
 import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +14,6 @@ import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Playlist
-import com.example.radioplayer.databinding.ItemHeaderPlaylistBinding
 import com.example.radioplayer.databinding.ItemPlaylistCoverBinding
 import com.example.radioplayer.ui.MainActivity
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES

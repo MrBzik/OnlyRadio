@@ -1,8 +1,6 @@
 package com.example.radioplayer.adapters
 
 import android.annotation.SuppressLint
-import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,24 +10,13 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
-import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.Recording
 import com.example.radioplayer.databinding.ItemRecordingWithSeekbarBinding
-import com.example.radioplayer.exoPlayer.RadioService
 import com.example.radioplayer.extensions.loadImage
-import com.example.radioplayer.ui.animations.fadeOut
 import com.example.radioplayer.ui.fragments.RecordingsFragment
 import com.example.radioplayer.utils.RandomColors
 import com.example.radioplayer.utils.Utils
-import org.w3c.dom.Text
-import java.text.DateFormat
 import java.util.*
 import javax.inject.Inject
 

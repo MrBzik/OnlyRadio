@@ -2,12 +2,7 @@ package com.example.radioplayer.ui.dialogs
 
 import android.content.Context
 import android.os.Bundle
-import android.view.Gravity
 import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatDialog
-import androidx.core.view.isVisible
 import com.example.radioplayer.databinding.DialogPickNameBinding
 import com.example.radioplayer.ui.viewmodels.MainViewModel
 

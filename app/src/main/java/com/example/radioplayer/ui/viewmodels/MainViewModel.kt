@@ -14,8 +14,13 @@ import com.example.radioplayer.data.local.entities.RadioStation
 import com.example.radioplayer.data.remote.entities.RadioStations
 import com.example.radioplayer.exoPlayer.*
 import com.example.radioplayer.ui.dialogs.*
-import com.example.radioplayer.utils.Constants
 import com.example.radioplayer.utils.Commands.COMMAND_NEW_SEARCH
+import com.example.radioplayer.utils.Constants
+import com.example.radioplayer.utils.Constants.API_RADIO_SEARCH_URL
+import com.example.radioplayer.utils.Constants.BASE_RADIO_URL
+import com.example.radioplayer.utils.Constants.BASE_RADIO_URL1
+import com.example.radioplayer.utils.Constants.BASE_RADIO_URL2
+import com.example.radioplayer.utils.Constants.BASE_RADIO_URL3
 import com.example.radioplayer.utils.Constants.IS_CHANGE_MEDIA_ITEMS
 import com.example.radioplayer.utils.Constants.IS_NAME_EXACT
 import com.example.radioplayer.utils.Constants.IS_NEW_SEARCH
@@ -34,10 +39,12 @@ import com.example.radioplayer.utils.Constants.SEARCH_PREF_MIN_BIT
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_NAME
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_ORDER
 import com.example.radioplayer.utils.Constants.SEARCH_PREF_TAG
+import com.example.radioplayer.utils.Constants.VALID_URL_PREF
 import com.example.radioplayer.utils.toRadioStation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import retrofit2.Response
 import java.util.*
 import javax.inject.Inject
 
@@ -85,11 +92,11 @@ class MainViewModel @Inject constructor(
        val isPlayerBuffering = radioSource.isPlayerBuffering
 
 
-
-
        var noResultDetection : MutableLiveData<Boolean> = MutableLiveData()
        var isNewSearch = true
 
+       private val validUrlPref = app.getSharedPreferences(VALID_URL_PREF, Context.MODE_PRIVATE)
+       private var currentUrl = validUrlPref.getString(BASE_RADIO_URL, BASE_RADIO_URL3) ?: BASE_RADIO_URL3
 
 
 //     fun disconnectMediaBrowser(){
@@ -100,8 +107,6 @@ class MainViewModel @Inject constructor(
     fun connectMediaBrowser(){
         radioServiceConnection.connectBrowser()
     }
-
-
 
     val connectivityObserver = NetworkConnectivityObserver(getApplication())
 
@@ -249,7 +254,7 @@ class MainViewModel @Inject constructor(
 
            if(isNewSearch) isToShowLoadingMessage.value = true
 
-           Log.d("CHECKTAGS", "is new search? $isNewSearch")
+//           Log.d("CHECKTAGS", "is new search? $isNewSearch")
 
                val calcOffset = limit * offset
 
@@ -272,14 +277,12 @@ class MainViewModel @Inject constructor(
            val lang = if(isSearchFilterLanguage) Locale.getDefault().isO3Language
                         else ""
 
-           var response : RadioStations? = null
+           var response : Response<RadioStations>?
            var listOfStations = emptyList<RadioStation>()
 
            searchJob = viewModelScope.launch {
 
                while(true){
-
-//                   Log.d("CHECKTAGS", "search is looping")
 
                    response = radioSource.getRadioStationsSource(
                        offset = calcOffset,
@@ -293,13 +296,14 @@ class MainViewModel @Inject constructor(
                        order = orderSetting,
                        minBit = minBitrateNew,
                        maxBit = maxBitrateNew,
-
+                       url = currentUrl + API_RADIO_SEARCH_URL
                        )
 
-                   if(response == null) {
+                   if(response?.body() == null) {
 
                     hasInternetConnection.postValue(false)
-
+                       currentUrl = updateCurrentUrl()
+                       validUrlPref.edit().putString(BASE_RADIO_URL, currentUrl).apply()
                        delay(1000)
                        ensureActive()
                    }
@@ -310,13 +314,13 @@ class MainViewModel @Inject constructor(
 
                hasInternetConnection.postValue(true)
 
-               if(isNewSearch && response?.size == 0){
+               if(isNewSearch && response?.body()?.size == 0){
                    noResultDetection.postValue(true)
                } else {
                    noResultDetection.postValue(false)
                }
 
-               listOfStations = response?.let {
+               listOfStations = response?.body()?.let {
 
                    it.map { station ->
 
@@ -325,7 +329,7 @@ class MainViewModel @Inject constructor(
                } ?: emptyList()
 
                while(!RadioServiceConnection.isConnected){
-                   Log.d("CHECKTAGS", "not connected")
+//                   Log.d("CHECKTAGS", "not connected")
                    delay(50)
                }
 
@@ -345,6 +349,13 @@ class MainViewModel @Inject constructor(
 
         }
 
+    private fun updateCurrentUrl(): String {
+        return when(currentUrl[8]){
+            'd' -> BASE_RADIO_URL2
+             'n' -> BASE_RADIO_URL3
+             else -> BASE_RADIO_URL1
+        }
+    }
 
 
     private fun searchStationsPaging(): Flow<PagingData<RadioStation>> {

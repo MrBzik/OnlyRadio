@@ -1,7 +1,6 @@
 package com.example.radioplayer.exoPlayer.callbacks
 
 import android.app.Service.STOP_FOREGROUND_DETACH
-import android.util.Log
 import android.widget.Toast
 import androidx.core.text.isDigitsOnly
 import com.example.radioplayer.data.local.entities.RadioStation
@@ -17,14 +16,17 @@ import com.example.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.example.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.example.radioplayer.utils.Constants.TITLE_UNKNOWN
 import com.example.radioplayer.utils.toRadioStation
-import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.MediaMetadata
+import com.google.android.exoplayer2.PlaybackException
+import com.google.android.exoplayer2.Player
 
 class RadioPlayerEventListener (
     private val radioService : RadioService
         ) : Player.Listener {
 
     private var isMetadataUpdating = false
-    private var lastTitle = ""
+    private var lastTitle = "SOMEVLLWAQ2338jr5-__si21na_11ol"
 
 
 
@@ -142,7 +144,7 @@ class RadioPlayerEventListener (
                     }
                 }
             } catch (e : Exception){
-                Log.d("CHECKTAGS", e.stackTraceToString())
+//                Log.d("CHECKTAGS", e.stackTraceToString())
             }
 
 

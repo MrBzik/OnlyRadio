@@ -1,34 +1,18 @@
 package com.example.radioplayer.adapters
 
 import android.annotation.SuppressLint
-import android.content.ClipData
-import android.content.ClipDescription
-import android.content.Intent
-import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
-import com.example.radioplayer.R
 import com.example.radioplayer.data.local.entities.RadioStation
-import com.example.radioplayer.databinding.ItemRadioWithTextBinding
 import com.example.radioplayer.databinding.ItemViewPagerStationBinding
-import com.example.radioplayer.exoPlayer.RadioService
-import com.example.radioplayer.extensions.loadImage
-import com.example.radioplayer.ui.animations.fadeOut
+import com.example.radioplayer.extensions.loadSingleImage
 import com.example.radioplayer.utils.RandomColors
-import javax.inject.Inject
 
 class ViewPagerStationsAdapter constructor(
     private val glide : RequestManager,
@@ -62,7 +46,7 @@ class ViewPagerStationsAdapter constructor(
             } else {
                 ivIcon.visibility = View.VISIBLE
 
-                glide.loadImage(
+                glide.loadSingleImage(
                     uri = station.favicon,
                     tvPlaceholder = tvPlaceholder,
                     ivItemImage = ivIcon
