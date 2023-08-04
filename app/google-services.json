@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:790726641813:android:90272a0afbcd83a4c2739c",
+        "mobilesdk_app_id": "1:790726641813:android:7b09865cd46d6741c2739c",
         "android_client_info": {
-          "package_name": "com.example.radioplayer"
+          "package_name": "com.onlyradio.radioplayer"
         }
       },
       "oauth_client": [

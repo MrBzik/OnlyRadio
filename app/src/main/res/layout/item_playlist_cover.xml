@@ -32,7 +32,7 @@
 <!--            android:background="@drawable/dark_gradient"-->
 <!--            android:layout_marginTop="50dp"/>-->
 
-        <com.example.radioplayer.utils.TextCutIn
+        <com.onlyradio.radioplayer.utils.TextCutIn
             android:id="@+id/tvPlaylistName"
             android:layout_width="match_parent"
             android:paddingHorizontal="4dp"

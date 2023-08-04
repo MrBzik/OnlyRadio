@@ -15,11 +15,11 @@ localProperties.load(new FileInputStream(localPropertiesFile))
 
 
 android {
-    namespace 'com.example.radioplayer'
+    namespace 'com.onlyradio.radioplayer'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.radioplayer"
+        applicationId "com.onlyradio.radioplayer"
         minSdk 24
         targetSdk 33
         versionCode 1
@@ -44,10 +44,10 @@ android {
         }
 
         debug {
-//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//            minifyEnabled true
-//            shrinkResources true
-            debuggable true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            shrinkResources true
+            debuggable false
         }
     }
 

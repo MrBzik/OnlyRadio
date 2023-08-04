@@ -20,4 +20,4 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keepclassmembers class com.example.radioplayer.data** {*;}
+-keepclassmembers class com.onlyradio.radioplayer.data** {*;}

@@ -46,7 +46,7 @@
 
 
 
-    <com.example.radioplayer.utils.SpinnerExt
+    <com.onlyradio.radioplayer.utils.SpinnerExt
         android:id="@+id/spinnerDates"
         android:layout_width="0dp"
         android:layout_height="60dp"

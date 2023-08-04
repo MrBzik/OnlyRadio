@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.example.radioplayer.utils.TextViewOutlined xmlns:android="http://schemas.android.com/apk/res/android"
+<com.onlyradio.radioplayer.utils.TextViewOutlined xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/tvTitle"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,4 +8,4 @@
     >
 
 
-</com.example.radioplayer.utils.TextViewOutlined>
+</com.onlyradio.radioplayer.utils.TextViewOutlined>

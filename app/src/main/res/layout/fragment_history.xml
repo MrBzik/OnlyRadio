@@ -31,7 +31,7 @@
 <!--        android:background="@drawable/toolbar_history_titles_protected"-->
 <!--        />-->
 
-<!--    <com.example.radioplayer.utils.TextViewOutlined-->
+<!--    <com.onlyradio.radioplayer.utils.TextViewOutlined-->
 <!--        android:id="@+id/tvSliderHeader"-->
 <!--        android:layout_width="wrap_content"-->
 <!--        android:layout_height="60dp"-->
@@ -90,7 +90,7 @@
 <!--        app:layout_constraintEnd_toEndOf="@id/guideline66"-->
 <!--        />-->
 
-    <com.example.radioplayer.utils.TextViewOutlined
+    <com.onlyradio.radioplayer.utils.TextViewOutlined
         android:id="@+id/tvTitles"
         android:layout_width="0dp"
         android:layout_height="60dp"
@@ -103,7 +103,7 @@
         />
 
 
-<!--    <com.example.radioplayer.utils.TextViewOutlined-->
+<!--    <com.onlyradio.radioplayer.utils.TextViewOutlined-->
 <!--        android:id="@+id/tvBookmarks"-->
 <!--        android:layout_width="0dp"-->
 <!--        android:layout_height="60dp"-->
@@ -116,7 +116,7 @@
 <!--        />-->
 
 
-    <com.example.radioplayer.utils.SpinnerExt
+    <com.onlyradio.radioplayer.utils.SpinnerExt
         android:id="@+id/spinnerDates"
         android:layout_width="0dp"
         android:layout_height="60dp"
@@ -165,7 +165,7 @@
 <!--        app:layout_constraintTop_toTopOf="parent"-->
 <!--        />-->
 
-    <com.example.radioplayer.utils.TextViewOutlined
+    <com.onlyradio.radioplayer.utils.TextViewOutlined
         android:id="@+id/tvStations"
         android:layout_width="0dp"
         android:layout_height="60dp"
