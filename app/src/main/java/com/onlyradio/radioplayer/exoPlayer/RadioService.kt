@@ -7,12 +7,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.media.audiofx.EnvironmentalReverb
+import android.media.audiofx.PresetReverb
 import android.media.audiofx.Virtualizer
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
+
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
@@ -900,7 +902,7 @@ class RadioService : MediaBrowserServiceCompat() {
     private fun clearMediaItems(isNoList : Boolean = true){
 
 
-        if(exoPlayer.currentMediaItemIndex != 0){
+        if(exoPlayer.currentMediaItemIndex > 0){
 
             exoPlayer.removeMediaItems(0, exoPlayer.currentMediaItemIndex)
         }

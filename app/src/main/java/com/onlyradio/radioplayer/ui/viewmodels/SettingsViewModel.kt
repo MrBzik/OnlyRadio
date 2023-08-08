@@ -10,6 +10,7 @@ import com.onlyradio.radioplayer.utils.Commands.COMMAND_TOGGLE_REVERB
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_UPDATE_RADIO_PLAYBACK_PITCH
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_UPDATE_RADIO_PLAYBACK_SPEED
 import com.onlyradio.radioplayer.utils.Constants
+import com.onlyradio.radioplayer.utils.Constants.TEXT_SIZE_DEFAULT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -23,7 +24,7 @@ class SettingsViewModel @Inject constructor(
     var isSmoothTransitionNeeded = false
 
     val textSizePref = app.getSharedPreferences(Constants.TEXT_SIZE_STATION_TITLE_PREF, Context.MODE_PRIVATE)
-    var stationsTitleSize = textSizePref.getFloat(Constants.TEXT_SIZE_STATION_TITLE_PREF, 20f)
+    var stationsTitleSize = textSizePref.getFloat(Constants.TEXT_SIZE_STATION_TITLE_PREF, TEXT_SIZE_DEFAULT)
 
 
     fun changeReverbMode(){

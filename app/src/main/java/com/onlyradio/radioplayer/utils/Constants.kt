@@ -98,6 +98,7 @@ object Constants {
     const val SHORT_DATE_FORMAT = "MMM, ', ' d"
 
     const val TEXT_SIZE_STATION_TITLE_PREF = "pref for text size of stations titles"
+    const val TEXT_SIZE_DEFAULT = 18f
 
 
 
@@ -118,7 +119,6 @@ object Constants {
     const val IS_SEARCH_FILTER_LANGUAGE = "is to filter by system language"
 
 
-    const val SEARCH_PREF_NAME_AUTO = "search pref name auto search"
     const val SEARCH_PREF_FULL_AUTO = "search pref fully auto"
 
 

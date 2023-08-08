@@ -6,26 +6,36 @@
     android:layout_height="101dp"
     >
 
-    <ImageView
-        android:id="@+id/ivItemImage"
-        android:layout_marginTop="11dp"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="65dp"
         android:layout_height="65dp"
-        android:alpha="0.7"
-        />
-
-
-    <TextView
-        android:id="@+id/tvPlaceholder"
-        android:text="Rec."
         android:layout_marginTop="11dp"
-        android:layout_width="65dp"
-        android:layout_height="65dp"
-        android:fontFamily="@font/ranchers"
-        android:gravity="center"
-        android:textColor="@color/main_background"
-        android:textSize="28sp"
-        />
+        app:cardCornerRadius="@dimen/item_cardview_corners"
+        >
+
+        <ImageView
+            android:id="@+id/ivItemImage"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:alpha="0.7"
+            />
+
+
+        <TextView
+            android:id="@+id/tvPlaceholder"
+            android:text="Rec."
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:fontFamily="@font/ranchers"
+            android:gravity="center"
+            android:textColor="@color/main_background"
+            android:textSize="28sp"
+            />
+    </com.google.android.material.card.MaterialCardView>
+
+
+
+
 
     <SeekBar
         android:id="@+id/seekBar"
@@ -49,7 +59,7 @@
         android:layout_width="match_parent"
         android:layout_height="87dp"
         android:orientation="vertical"
-        android:layout_marginStart="85dp"
+        android:layout_marginStart="73dp"
         android:layout_marginEnd="8dp"
 
         >

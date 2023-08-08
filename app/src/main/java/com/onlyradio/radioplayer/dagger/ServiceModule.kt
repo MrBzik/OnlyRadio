@@ -85,7 +85,7 @@ object ServiceModule {
                 .setAudioCapabilities(getCapabilities(app))
                 .setAudioProcessorChain(DefaultAudioSink
                     .DefaultAudioProcessorChain(exoRecord.exoRecordProcessor))
-                .setEnableFloatOutput(true)
+                .setEnableFloatOutput(false)
                 .setEnableAudioTrackPlaybackParams(true)
                 .build()
 
