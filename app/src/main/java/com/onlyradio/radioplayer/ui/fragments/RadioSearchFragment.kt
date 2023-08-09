@@ -186,7 +186,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
 
-        if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
+//        if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
 
             if(isToHandleNewStationObserver){
 
@@ -202,7 +202,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
             else {
                 isToHandleNewStationObserver = true
             }
-        }
+//        }
     }
 }
 

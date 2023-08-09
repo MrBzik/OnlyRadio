@@ -13,5 +13,5 @@
     <dimen name="stub_player_margin_horizontal">0dp</dimen>
 
     <dimen name="dialog_top_margin">0dp</dimen>
-
+    <dimen name="item_cardview_corners">3dp</dimen>
 </resources>

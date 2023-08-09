@@ -358,8 +358,11 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
 //            Log.d("CHECKTAGS", "collecting currentplayingstation again?")
 
-            if(historyViewModel.currentTab.value == TAB_STATIONS &&
-                    RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
+            if(historyViewModel.currentTab.value == TAB_STATIONS
+//                &&
+//                    RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS
+
+            ){
 
                 if(isToHandleNewStationObserver){
 

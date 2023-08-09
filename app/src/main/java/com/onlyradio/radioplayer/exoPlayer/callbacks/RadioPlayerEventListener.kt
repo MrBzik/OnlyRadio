@@ -141,6 +141,11 @@ class RadioPlayerEventListener (
                         val recording = radioService.stationsFromRecordings[index]
                         radioService.currentRecording = recording
                         RadioService.currentPlayingRecording.postValue(recording)
+
+                        radioService.currentRadioStation?.let {
+                            RadioService.currentPlayingStation.postValue(null)
+                            radioService.currentRadioStation = null
+                        }
                     }
                 }
             } catch (e : Exception){
@@ -152,6 +157,11 @@ class RadioPlayerEventListener (
 
                 radioService.currentRadioStation = it
                 RadioService.currentPlayingStation.postValue(it)
+
+                radioService.currentRecording?.let {
+                    RadioService.currentPlayingRecording.postValue(null)
+                    radioService.currentRecording = null
+                }
                 radioService.dbOperators.updateStationLastClicked(it.stationuuid)
                 radioService.dbOperators.checkDateAndUpdateHistory(it.stationuuid)
             }

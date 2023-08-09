@@ -131,7 +131,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             currentStation = station
 
-            if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
+//            if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
 
                 if (isToHandleNewStationObserver) {
 
@@ -146,7 +146,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 } else{
                     isToHandleNewStationObserver = true
                 }
-            }
+//            }
         }
     }
 

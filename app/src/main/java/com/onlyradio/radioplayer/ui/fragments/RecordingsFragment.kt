@@ -180,7 +180,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
             currentRecording = it
 
-            if(RadioService.currentMediaItems == SEARCH_FROM_RECORDINGS){
+//            if(RadioService.currentMediaItems == SEARCH_FROM_RECORDINGS){
 
                 if(isToHandleNewRecording){
 
@@ -195,7 +195,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
                 } else {
                     isToHandleNewRecording = true
                 }
-            }
+//            }
         }
     }
 

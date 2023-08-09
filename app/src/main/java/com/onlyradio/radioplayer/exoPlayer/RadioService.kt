@@ -480,6 +480,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
                             if(pos == currentPlayingItemPosition) {
+                                currentPlayingItemPosition = -1
                                 currentMediaItems = NO_ITEMS
                                 exoPlayer.stop()
                                 exoPlayer.clearMediaItems()
