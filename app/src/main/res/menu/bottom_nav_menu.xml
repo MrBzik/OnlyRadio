@@ -5,30 +5,30 @@
 
     <item
         android:id="@+id/mi_radioSearchFragment"
-        android:title="Search"
+        android:title="@string/search"
 
         />
 
     <item
         android:id="@+id/mi_favStationsFragment"
-        android:title="Fav."
+        android:title="@string/fav"
 
        />
 
 
     <item
         android:id="@+id/mi_historyFragment"
-        android:title="History"
+        android:title="@string/history"
        />
 
     <item
         android:id="@+id/mi_recordingsFragment"
-        android:title="Rec."
+        android:title="@string/rec"
         />
 
     <item
         android:id="@+id/mi_settingsFragment"
-        android:title="Options"/>
+        android:title="@string/options"/>
 
 
 </menu>

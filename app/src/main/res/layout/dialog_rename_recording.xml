@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/dialog_gradient_for_background"
@@ -24,7 +23,7 @@
         android:layout_marginHorizontal="8dp"
         android:layout_marginTop="@dimen/dialog_top_margin"
         android:gravity="center_vertical"
-        android:text="Rename recording"
+        android:text="@string/rename_recording_title"
         android:textAppearance="@style/dialogTitleText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/guidelineMarginTop" />
@@ -36,7 +35,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:hint="Type new name"
+        android:hint="@string/rename_rec_hint"
         app:endIconMode="clear_text"
         app:layout_constraintBottom_toTopOf="@+id/tvBack"
         app:layout_constraintEnd_toEndOf="parent"

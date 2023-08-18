@@ -26,7 +26,7 @@ class NoResultMessage (
                 llTag.visibility = View.GONE
             } else {
                 llTag.visibility = View.VISIBLE
-                val tagExact = if(mainViewModel.isTagExact) "(Exact)" else ""
+                val tagExact = if(mainViewModel.isTagExact) "(${bind.root.resources.getString(R.string.exact)})" else ""
                 tvTag.text = "${mainViewModel.lastSearchTag} $tagExact"
             }
 
@@ -34,7 +34,7 @@ class NoResultMessage (
                 llName.visibility = View.GONE
             } else {
                 llName.visibility = View.VISIBLE
-                val nameExact = if(mainViewModel.isNameExact) "(Exact)" else ""
+                val nameExact = if(mainViewModel.isNameExact) "(${bind.root.resources.getString(R.string.exact)})" else ""
                 tvName.text = "${mainViewModel.lastSearchName} $nameExact"
             }
 

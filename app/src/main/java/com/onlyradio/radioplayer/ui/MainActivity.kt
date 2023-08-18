@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val playerUtils : MainPlayerView by lazy {
-        MainPlayerView(bindPlayer!!, glide)
+        MainPlayerView(bindPlayer!!, glide, resources.getString(R.string.time_left))
     }
 
     @Inject

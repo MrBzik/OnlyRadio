@@ -17,8 +17,6 @@ import java.util.Locale
 const val ORDER_VOTES = "Top voted"
 const val ORDER_POP = "Most popular"
 const val ORDER_TREND = "Trending now"
-const val ORDER_BIT_MIN = "Bitrate (up)"
-const val ORDER_BIT_MAX = "Bitrate (down)"
 const val ORDER_RANDOM = "Random order"
 
 const val BITRATE_0 = 0
@@ -63,17 +61,19 @@ class SearchParamsDialog (
     private var newOrderSetting : String? = null
 
 
+//
+//    private val listOfOrder =
+//        listOf(ORDER_VOTES, ORDER_POP, ORDER_TREND,
+//            ORDER_RANDOM)
 
-    private val listOfOrder =
-        listOf(ORDER_VOTES, ORDER_POP, ORDER_TREND,
-//            ORDER_BIT_MIN, ORDER_BIT_MAX,
-            ORDER_RANDOM)
-
-
+    private var stationsCount = ""
+    private var systemStr = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
+        setStrings()
 
         setOrderExpander()
 
@@ -92,10 +92,16 @@ class SearchParamsDialog (
     }
 
 
+
+    private fun setStrings(){
+        stationsCount = context.resources.getString(R.string.stations_count)
+        systemStr = context.resources.getString(R.string.system)
+    }
+
     private fun updateStationsCountForLanguage(){
 
         searchDialogsViewModel.updateLanguageCount {
-            bind.tvStationsLangCount.text = "$it st."
+            bind.tvStationsLangCount.text = "$it $stationsCount"
         }
 
     }
@@ -129,7 +135,7 @@ class SearchParamsDialog (
 
     private fun setLanguageOption(){
 
-        bind.tvLanguageValue.text = "System: ${Locale.getDefault().displayLanguage}"
+        bind.tvLanguageValue.text = "$systemStr: ${Locale.getDefault().displayLanguage}"
 
         bind.switchLanguagePref.isChecked = mainViewModel.isSearchFilterLanguage
 
@@ -140,7 +146,8 @@ class SearchParamsDialog (
 
         bind.actvOrder.inputType = InputType.TYPE_NULL
 
-        orderAdapter = ArrayAdapter(requireContext, R.layout.item_text_drop_down_menu, listOfOrder)
+        orderAdapter = ArrayAdapter(requireContext, R.layout.item_text_drop_down_menu,
+            requireContext.resources.getStringArray(R.array.search_order_array))
 
         bind.actvOrder.apply {
 
@@ -152,15 +159,18 @@ class SearchParamsDialog (
                     ORDER_VOTES -> 0
                     ORDER_POP -> 1
                     ORDER_TREND -> 2
-//                    ORDER_BIT_MIN -> 3
-//                    ORDER_BIT_MAX -> 4
                     else -> 3
                 }
             )
 
             setOnItemClickListener { _, _, position, _ ->
 
-                newOrderSetting = orderAdapter.getItem(position)
+                newOrderSetting = when(position){
+                    0 -> ORDER_VOTES
+                    1 -> ORDER_POP
+                    2 -> ORDER_TREND
+                    else -> ORDER_RANDOM
+                }
             }
 
 
@@ -246,7 +256,7 @@ class SearchParamsDialog (
 
         }
 
-        bind.tvStationsCountValue.text = "~ $result st."
+        bind.tvStationsCountValue.text = "~ $result $stationsCount"
 
 
     }

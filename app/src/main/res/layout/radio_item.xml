@@ -2,7 +2,6 @@
 <LinearLayout
     android:id="@+id/radioItemRootLayout"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="83dp"
     android:orientation="horizontal"
@@ -31,7 +30,6 @@
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:ellipsize="end"
-            android:text="some name "
             android:textColor="@color/default_text_color"
             android:alpha="0.7"
             android:fontFamily="sans-serif-smallcaps"
@@ -48,7 +46,6 @@
             android:textColor="@color/default_text_color"
             android:alpha="0.6"
             android:gravity="bottom"
-            android:text="countryggg"
             android:maxLines="1"
             android:textSize="14sp"
             />

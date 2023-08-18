@@ -156,7 +156,7 @@ class SettingsGeneral () {
 
 
         bindGeneral.tvFullAutoSearchHint.text =
-            "(Default: start new searches manually by Swipe-up or with [icon] button)"
+            bindGeneral.root.context.getString(R.string.auto_search_hint)
 
         bindGeneral.tvFullAutoSearchHint.addImage(
             atText = "[icon]",

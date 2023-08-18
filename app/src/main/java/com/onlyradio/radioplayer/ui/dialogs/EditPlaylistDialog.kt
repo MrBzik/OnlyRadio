@@ -26,8 +26,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
-@ExperimentalCoroutinesApi
-@FlowPreview
 class EditPlaylistDialog (
     private val requireContext : Context,
     var listOfPlaylists : List<Playlist>,
@@ -211,12 +209,14 @@ class EditPlaylistDialog (
 
         bind.tvAccept.setOnClickListener {
 
-            var nameField = bind.etPlaylistName.text.toString()
+            val nameField = bind.etPlaylistName.text.toString()
 
             if(listOfPlaylistNames.contains(nameField) &&
                 nameField != currentPlaylistName
             ) {
-                Toast.makeText(requireContext, "Name already taken", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext,
+                    requireContext.resources.getString(R.string.playlist_name_taken),
+                    Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 

@@ -151,12 +151,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         bind.stubTvExtras.setOnInflateListener{ _, bindView ->
             bindTvExtras = StubTvTitleBinding.bind(bindView)
-            (bindTvExtras?.tvTitle as TextView).text = "Effects"
+            (bindTvExtras?.tvTitle as TextView).text = resources.getString(R.string.main_extras_title)
         }
 
         bind.stubTvGeneral.setOnInflateListener{ _, bindView ->
             bindTvGeneral = StubTvTitleBinding.bind(bindView)
-            (bindTvGeneral?.tvTitle as TextView).text = "General"
+            (bindTvGeneral?.tvTitle as TextView).text = resources.getString(R.string.main_general_title)
         }
 
 
@@ -214,7 +214,8 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         if(settingsViewModel.isInSettingsExtras){
 
-        bind.stubSettingsExtras.visibility = View.VISIBLE
+            bind.stubSettingsExtras.visibility = View.VISIBLE
+
             if(isToAnimate){
                 bindExtras?.root?.slideAnim(350, 100, R.anim.fade_in_anim)
             }
@@ -229,7 +230,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         } else {
 
-            bind.stubSettingsGeneral.visibility = View.VISIBLE
+                bind.stubSettingsGeneral.visibility = View.VISIBLE
                 if(isToAnimate){
                 bindGeneral?.root?.slideAnim(350, 100, R.anim.fade_in_anim)
             }

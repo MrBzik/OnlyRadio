@@ -17,7 +17,9 @@ import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.extensions.loadImage
 import com.onlyradio.radioplayer.ui.animations.AdapterFadeAnim.adapterItemFadeIn
 import com.onlyradio.radioplayer.utils.RandomColors
+import com.onlyradio.radioplayer.utils.Utils
 import com.onlyradio.radioplayer.utils.Utils.convertLongToDate
+import java.text.DateFormat
 import javax.inject.Inject
 
 
@@ -26,13 +28,15 @@ private const val TYPE_DATE_SEPARATOR = 1
 private const val TYPE_DATE_SEPARATOR_ENCLOSING = 2
 
 
-class TitleAdapter @Inject constructor(
-    private val glide : RequestManager
+class TitleAdapter constructor(
+    private val glide : RequestManager,
+    private val dateToday : String
 
 ) : PagingDataAdapter<TitleWithDateModel, RecyclerView.ViewHolder>(TitlesComparator) {
 
     private val randColors = RandomColors()
 
+    private val currentDate = Utils.convertLongToOnlyDate(System.currentTimeMillis(), DateFormat.LONG)
     class TitleViewHolder (val bind: ItemTitleBinding)
         : RecyclerView.ViewHolder(bind.root)
 
@@ -101,8 +105,8 @@ class TitleAdapter @Inject constructor(
 
         if(item is TitleWithDateModel.TitleDateSeparator)
             (holder as DateSeparatorViewHolder).apply {
-                if(RadioService.currentDateString == item.date){
-                    bind.tvDate.text = "Today"
+                if(currentDate == item.date){
+                    bind.tvDate.text = dateToday
                 } else {
                     bind.tvDate.text = item.date
                 }
@@ -110,8 +114,8 @@ class TitleAdapter @Inject constructor(
 
         else if(item is TitleWithDateModel.TitleDateSeparatorEnclosing)
             (holder as DateSeparatorEnclosingViewHolder).apply {
-                if(RadioService.currentDateString == item.date){
-                    bind.tvDate.text = "Today"
+                if(currentDate == item.date){
+                    bind.tvDate.text = dateToday
                 } else {
                     bind.tvDate.text = item.date
                 }

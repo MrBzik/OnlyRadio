@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import java.sql.Date
+import java.text.DateFormat
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -71,17 +72,21 @@ class HistoryViewModel @Inject constructor(
         }
 
 
-        val date = response.date.date
+        val date = response.date.time
 
         val stationsWithDate: MutableList<StationWithDateModel> = mutableListOf()
 
-        stationsWithDate.add(StationWithDateModel.DateSeparator(date))
+        stationsWithDate.add(StationWithDateModel.DateSeparator(
+            Utils.convertLongToOnlyDate(date, DateFormat.LONG)
+        ))
 
         response.radioStations.reversed().forEach {
             stationsWithDate.add(StationWithDateModel.Station(it))
         }
 
-        stationsWithDate.add(StationWithDateModel.DateSeparatorEnclosing(date))
+        stationsWithDate.add(StationWithDateModel.DateSeparatorEnclosing(
+            Utils.convertLongToOnlyDate(date, DateFormat.LONG)
+        ))
 
         return stationsWithDate
     }
@@ -93,19 +98,23 @@ class HistoryViewModel @Inject constructor(
         val response = radioSource.getStationsInOneDate(selectedDate)
 
         val stations = response.radioStations.reversed()
-        val date = response.date.date
+        val date = response.date.time
 
         radioSource.updateStationsInOneDate(stations)
 
         val stationsWithDate: MutableList<StationWithDateModel> = mutableListOf()
 
-        stationsWithDate.add(StationWithDateModel.DateSeparator(date))
+        stationsWithDate.add(StationWithDateModel.DateSeparator(
+            Utils.convertLongToOnlyDate(date, DateFormat.LONG)
+        ))
 
         stations.forEach {
             stationsWithDate.add(StationWithDateModel.Station(it))
         }
 
-        stationsWithDate.add(StationWithDateModel.DateSeparatorEnclosing(date))
+        stationsWithDate.add(StationWithDateModel.DateSeparatorEnclosing(
+            Utils.convertLongToOnlyDate(date, DateFormat.LONG)
+        ))
 
         if(selectedDate == RadioService.currentDateLong &&
             RadioService.currentMediaItems == Constants.SEARCH_FROM_HISTORY_ONE_DATE
@@ -123,8 +132,6 @@ class HistoryViewModel @Inject constructor(
     private var isTitleHeaderSet = false
     private var dateToString = ""
 
-    private val calendar = Calendar.getInstance()
-
     private suspend fun getTitlesInAllDates(pageIndex : Int, pageSize : Int) : List<TitleWithDateModel>{
 
 //        Log.d("CHECKTAGS", "callings all titles get fun")
@@ -139,8 +146,7 @@ class HistoryViewModel @Inject constructor(
                 if(isTitleHeaderSet) {
                     titlesWithDates.add(TitleWithDateModel.TitleDateSeparatorEnclosing(dateToString))
                 }
-                calendar.time = Date(title.date)
-                dateToString = Utils.fromDateToString(calendar)
+                dateToString = Utils.convertLongToOnlyDate(title.date, DateFormat.LONG)
                 titlesWithDates.add(TitleWithDateModel.TitleDateSeparator(dateToString))
                 isTitleHeaderSet = true
                 lastTitleDate = title.date
@@ -170,12 +176,9 @@ class HistoryViewModel @Inject constructor(
 
         if(!isTitleOneDateHeaderSet){
             isTitleOneDateHeaderSet = true
-            calendar.time = Date(selectedDate)
             titlesWithDates.add(
                 TitleWithDateModel.TitleDateSeparator(
-                    Utils.fromDateToString(
-                        calendar
-                    )
+                    Utils.convertLongToOnlyDate(selectedDate, DateFormat.LONG)
                 ))
         }
 
@@ -188,9 +191,7 @@ class HistoryViewModel @Inject constructor(
                 isTitleOneDateFooterSet = true
                 titlesWithDates.add(
                     TitleWithDateModel.TitleDateSeparatorEnclosing(
-                        Utils.fromDateToString(
-                            calendar
-                        )
+                        Utils.convertLongToOnlyDate(selectedDate, DateFormat.LONG)
                     ))
             }
         }

@@ -44,6 +44,7 @@ import com.onlyradio.radioplayer.utils.addAction
 import com.onlyradio.radioplayer.utils.toRadioStation
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.DateFormat
 import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
@@ -169,10 +170,10 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
             SEARCH_FROM_HISTORY_ONE_DATE -> {
 
-              val calendar = Calendar.getInstance()
-              calendar.time = Date(historyViewModel.selectedDate)
+//              val calendar = Calendar.getInstance()
+//              calendar.time = Date(historyViewModel.selectedDate)
 
-                listName = Utils.fromDateToStringShort(calendar)
+                listName = Utils.convertLongToOnlyDate(historyViewModel.selectedDate, DateFormat.MEDIUM)
 
 
                 RadioSource.stationsFromHistoryOneDate
@@ -281,7 +282,11 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
     private fun setupPagerView(){
 
-        viewPagerAdapter = ViewPagerStationsAdapter(glide){
+        viewPagerAdapter = ViewPagerStationsAdapter(
+            glide = glide,
+            languagesTitle = requireContext().resources.getString(R.string.languages_title),
+            tagsTitle = requireContext().resources.getString(R.string.tags_title),
+        ){
             val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
             startActivity(webIntent)
         }
@@ -404,7 +409,8 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
              )
          )
 
-            Toast.makeText(requireContext(), "Title bookmarked", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), resources.getString(R.string.title_bookmarked),
+                Toast.LENGTH_SHORT).show()
 
 
         }
@@ -421,7 +427,8 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
             Snackbar.make(
                 requireActivity().findViewById(R.id.rootLayout),
-                "Title copied", Snackbar.LENGTH_LONG).apply {
+                    resources.getString(R.string.title_copied),
+                    Snackbar.LENGTH_LONG).apply {
                     setAction("WEBSEARCH"){
                         val intent = Intent(Intent.ACTION_WEB_SEARCH)
                         intent.putExtra(SearchManager.QUERY, songTitle)
@@ -473,7 +480,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             } else {
 
                 durationOfRecording = bind.tvTimer.text.toString()
-                bind.tvTimer.text = "Processing..."
+                bind.tvTimer.text = requireContext().resources.getString(R.string.rec_processing)
                 bind.fabRecording.setImageResource(R.drawable.ic_start_recording)
 
                 if(!isConverterCallbackSet){
@@ -481,7 +488,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
                         if(finished){
 
-                            bind.tvTimer.text = "Saved"
+                            bind.tvTimer.text = requireContext().resources.getString(R.string.rec_saved)
                             isRecording = false
 
                         }
@@ -546,7 +553,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         AddStationToPlaylistDialog(
             requireContext(), listOfPlaylists, favViewModel, pixabayViewModel, glide,
-            "Add station to an existing playlist or a new one"
+            resources.getString(R.string.add_to_playlist_title)
         ) { playlistName ->
             insertStationInPlaylist(playlistName)
         }.show()
@@ -579,7 +586,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                 currentRadioStation?.let {
                     favViewModel.updateIsFavouredState(0, it.stationuuid)
                     Snackbar.make(requireActivity().findViewById(R.id.rootLayout),
-                        "Station removed from favs", Snackbar.LENGTH_SHORT).show()
+                        resources.getString(R.string.removed_from_favs), Snackbar.LENGTH_SHORT).show()
                     favViewModel.isStationFavoured.postValue(false)
                 }
 
@@ -587,7 +594,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                 currentRadioStation?.let {
                     favViewModel.updateIsFavouredState(System.currentTimeMillis(), it.stationuuid)
                     Snackbar.make(requireActivity().findViewById(R.id.rootLayout),
-                        "Station saved to favs", Snackbar.LENGTH_SHORT).show()
+                        resources.getString(R.string.saved_to_favs), Snackbar.LENGTH_SHORT).show()
                     favViewModel.isStationFavoured.postValue(true)
                 }
             }
@@ -604,10 +611,10 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                 station.stationuuid, playlistName
             ) {
 
-                val message = if(it) "Already in $playlistName"
-                               else "Station added to $playlistName"
+                val message = if(it) resources.getString(R.string.already_in_playlist) + playlistName
+                               else resources.getString(R.string.added_to_playlist) + playlistName
 
-                    Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
+                Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
                         message, Snackbar.LENGTH_SHORT).show()
 
             }

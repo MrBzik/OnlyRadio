@@ -32,7 +32,7 @@ class SpinnerExt(context : Context, attr : AttributeSet?) : AppCompatSpinner(con
         // indicator for when the container holding this Spinner may lose focus
         mOpenInitiated = true
 
-            mListener?.onSpinnerOpened(this)
+        mListener?.onSpinnerOpened(this)
 
         return super.performClick()
     }
@@ -58,7 +58,7 @@ class SpinnerExt(context : Context, attr : AttributeSet?) : AppCompatSpinner(con
     private fun performClosedEvent() {
         mOpenInitiated = false
 
-            mListener?.onSpinnerClosed(this)
+        mListener?.onSpinnerClosed(this)
 
     }
 

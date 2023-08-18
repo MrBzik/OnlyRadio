@@ -20,6 +20,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.MediaMetadata
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
+import com.onlyradio.radioplayer.R
 
 class RadioPlayerEventListener (
     private val radioService : RadioService
@@ -45,7 +46,7 @@ class RadioPlayerEventListener (
                         .replace("WALMRadio.com", "")
 
 
-                        if(withoutWalm.equals("NULL", ignoreCase = true) || withoutWalm.isBlank()
+                    if(withoutWalm.equals("NULL", ignoreCase = true) || withoutWalm.isBlank()
                             || withoutWalm.length < 3 || withoutWalm.isDigitsOnly() ||
                             withoutWalm.equals("unknown", true)
                             || withoutWalm.contains("{\"STATUS\"", true) ||
@@ -54,7 +55,8 @@ class RadioPlayerEventListener (
                             RadioService.currentSongTitle.postValue("")
                             RadioService.currentlyPlayingSong = TITLE_UNKNOWN
 
-                        } else {
+                        }
+                    else {
                             RadioService.currentSongTitle.postValue(withoutWalm)
 
                             if(radioService.exoPlayer.playWhenReady){
@@ -223,12 +225,12 @@ class RadioPlayerEventListener (
         if(RadioService.isToReconnect && radioService.exoPlayer.playWhenReady){
             radioService.exoPlayer.prepare()
 
-           Toast.makeText(radioService, "Reconnecting...", Toast.LENGTH_SHORT).show()
+           Toast.makeText(radioService, radioService.resources.getString(R.string.reconnecting), Toast.LENGTH_SHORT).show()
 
 
 
         } else {
-            Toast.makeText(radioService, "Station not responding", Toast.LENGTH_SHORT).show()
+            Toast.makeText(radioService, radioService.resources.getString(R.string.not_responding), Toast.LENGTH_SHORT).show()
         }
     }
 }

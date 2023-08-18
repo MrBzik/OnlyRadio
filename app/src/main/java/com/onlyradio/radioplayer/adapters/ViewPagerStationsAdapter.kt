@@ -16,7 +16,9 @@ import com.onlyradio.radioplayer.utils.RandomColors
 
 class ViewPagerStationsAdapter constructor(
     private val glide : RequestManager,
-    private val homePageClick : (String) -> Unit
+    private val languagesTitle : String,
+    private val tagsTitle : String,
+    private val homePageClick : (String) -> Unit,
 ) : RecyclerView.Adapter<ViewPagerStationsAdapter.StationDetailsHolder>() {
 
     private val randColors = RandomColors()
@@ -59,12 +61,12 @@ class ViewPagerStationsAdapter constructor(
             if(!station.language.isNullOrBlank()){
                 tvLanguage.isVisible = true
                 val languages = station.language.replace(",", ", ")
-                tvLanguage.text = "Languages : $languages"
+                tvLanguage.text = "$languagesTitle $languages"
             }
             if(!station.tags.isNullOrBlank()){
                 tvTags.isVisible = true
                 val tags = station.tags.replace(",", ", ")
-                tvTags.text = "Tags : $tags"
+                tvTags.text = "$tagsTitle $tags"
             }
 
 

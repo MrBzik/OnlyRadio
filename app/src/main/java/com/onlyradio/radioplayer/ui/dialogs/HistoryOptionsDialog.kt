@@ -100,12 +100,12 @@ class HistoryOptionsDialog (
             valueTo = 100f
             stepSize = 5f
 
-            bind.tvBookmarkNumberValue.text = getBookmarkVal(initialBookmarkNumber)
+            bind.tvBookmarkNumberValue.text = getBookmarkValTitle(initialBookmarkNumber)
 
             values = listOf(initialBookmarkNumber.toFloat())
 
             setLabelFormatter { value ->
-                getBookmarkVal(value.toInt(), true)
+                getBookmarkVal(value.toInt())
 
             }
 
@@ -117,7 +117,7 @@ class HistoryOptionsDialog (
                 override fun onStopTrackingTouch(slider: RangeSlider) {
                     newBookmarkNumber = slider.values.first().toInt()
 
-                    bind.tvBookmarkNumberValue.text = getBookmarkVal(newBookmarkNumber)
+                    bind.tvBookmarkNumberValue.text = getBookmarkValTitle(newBookmarkNumber)
 
                     if(newBookmarkNumber < initialBookmarkNumber){
                         bind.tvWarning.visibility = View.VISIBLE
@@ -129,19 +129,22 @@ class HistoryOptionsDialog (
         }
     }
 
-
-    private fun getBookmarkVal(value : Int, isShrink : Boolean = false) : String {
+    private fun getBookmarkValTitle(value : Int) : String {
 
         return if(value == 100){
-            if(isShrink)
-                "Unlimited"
-            else
-            "Bookmarks - unlimited"
+                "unlimited"
         } else {
-            if(isShrink)
+                value.toString()
+        }
+    }
+
+
+    private fun getBookmarkVal(value : Int) : String {
+
+        return if(value == 100){
+                "Unlimited"
+        } else {
             "$value titles"
-            else
-             "Bookmarks - $value"
         }
     }
 

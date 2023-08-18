@@ -3,7 +3,6 @@
     android:id="@+id/tvExtras"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:text="Extras"
     android:textAppearance="@style/mainTextTitle"
     android:gravity="center"
     >

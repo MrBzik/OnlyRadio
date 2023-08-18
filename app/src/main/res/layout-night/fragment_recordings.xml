@@ -33,7 +33,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="@id/guidelineHorizontal"
         android:textAppearance="@style/mainTextTitle"
-        android:text="Recordings"/>
+        android:text="@string/recordings_frag_title"/>
 
 
 
@@ -42,7 +42,7 @@
         android:layout_width="wrap_content"
         android:layout_height="60dp"
         android:gravity="center"
-        android:text="Swipe-delete"
+        android:text="@string/swipe_delete"
         android:textAppearance="@style/swipeDeleteStyle"
         android:textColor="@color/color_interactive"
         app:layout_constraintStart_toStartOf="@+id/guidelineHorizontal"

@@ -65,13 +65,15 @@
 
         <TextView
             android:id="@+id/tvReconnect"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
-            android:text="Reconnect to streams"
+            android:layout_marginEnd="8dp"
+            android:text="@string/reconnect_to_streams"
             android:textAppearance="@style/dialogItemText"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/switchReconnect"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.SwitchCompat
@@ -94,7 +96,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="30dp"
-            android:text="Dark mode"
+            android:text="@string/dark_mode"
             android:textAppearance="@style/dialogItemText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvReconnect" />
@@ -161,7 +163,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="6dp"
-            android:text="(Default: keep service if audio is playing)"
+            android:text="@string/kill_service_setting_tip"
             android:lineSpacingExtra="4dp"
             android:textSize="13sp"
             android:textAppearance="@style/dialogItemText"
@@ -196,7 +198,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="30dp"
-            android:text="Text"
+            android:text="@string/text_setting"
             android:textAppearance="@style/dialogItemText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/viewBoxForStationsTitleSize" />
@@ -221,7 +223,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="30dp"
-            android:text="Buffer options"
+            android:text="@string/buffer_options"
             android:textAppearance="@style/dialogItemText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/viewBoxForStationsTitleSize" />
@@ -249,7 +251,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="30dp"
-            android:text="History options"
+            android:text="@string/history_options"
             android:textAppearance="@style/dialogItemText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvControlBuffer" />
@@ -275,7 +277,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="30dp"
-            android:text="Rec. options"
+            android:text="@string/rec_options"
             android:textAppearance="@style/dialogItemText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvHistorySettingTitle" />
@@ -334,7 +336,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="30dp"
-            android:text="Auto search"
+            android:text="@string/auto_search"
             android:lineSpacingExtra="4dp"
             android:textAppearance="@style/dialogItemText"
             app:layout_constraintStart_toStartOf="parent"
@@ -382,7 +384,7 @@
             android:layout_marginTop="30dp"
             android:textAppearance="@style/dialogItemText"
             android:textColor="@color/interactive_option_color"
-            android:text="Check it out"
+            android:text="@string/check_it_out"
             app:layout_constraintTop_toBottomOf="@+id/tvFullAutoSearchHint"
             app:layout_constraintEnd_toEndOf="parent"
             />
@@ -394,7 +396,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginEnd="10dp"
             android:minHeight="28dp"
-            android:text="Know some cool radio stations? You can help community!"
+            android:text="@string/community_tip"
             android:textAppearance="@style/hintText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/tvAddStationTitleBtn"

@@ -54,11 +54,13 @@ import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.onlyradio.radioplayer.utils.SpinnerExt
 import com.onlyradio.radioplayer.utils.addAction
 import com.google.android.material.snackbar.Snackbar
+import com.onlyradio.radioplayer.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.DateFormat
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -128,7 +130,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         collectCurrentTabChanges()
 
     }
-
 
     private fun collectCurrentTabChanges(){
         viewLifecycleOwner.lifecycleScope.launch {
@@ -286,7 +287,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 datesAdapter.apply {
                     datesList = dates
                     if(historyViewModel.selectedDate > 0L)
-                    selectedItemPosition += 1
+                        selectedItemPosition += 1
                 }
             }
         }
@@ -459,7 +460,10 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         if(stationsHistoryAdapter == null){
 
-            stationsHistoryAdapter = PagingHistoryAdapter(glide)
+            stationsHistoryAdapter = PagingHistoryAdapter(
+                glide,
+            resources.getString(R.string.date_today)
+                )
 
             stationsHistoryAdapter?.apply {
 
@@ -499,7 +503,10 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     private fun setTitlesHistoryAdapter(){
 
         if(titlesHistoryAdapter == null){
-            titlesHistoryAdapter = TitleAdapter(glide)
+            titlesHistoryAdapter = TitleAdapter(
+                glide,
+            requireContext().resources.getString(R.string.date_today)
+                )
             titlesHistoryAdapter?.apply {
                 alpha = requireContext().resources.getInteger(R.integer.radio_text_placeholder_alpha).toFloat()/10
                 titleSize = settingsViewModel.stationsTitleSize
@@ -509,7 +516,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 onBookmarkClickListener { title ->
 
-                    Toast.makeText(requireContext(), "Title bookmarked", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), resources.getString(R.string.title_bookmarked),
+                        Toast.LENGTH_SHORT).show()
 
                     historyViewModel.upsertBookmarkedTitle(title)
                 }
@@ -542,7 +550,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         Snackbar.make(
             requireActivity().findViewById(R.id.rootLayout),
-            "Title copied", Snackbar.LENGTH_LONG).apply {
+            resources.getString(R.string.title_copied), Snackbar.LENGTH_LONG).apply {
 
             setAction("WEBSEARCH"){
 
@@ -596,7 +604,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         bind.rvHistory.apply {
             if(adapter !is BookmarkedTitlesAdapter)
-            adapter = bookmarkedTitlesAdapter
+                adapter = bookmarkedTitlesAdapter
             setHasFixedSize(false)
         }
 
@@ -716,7 +724,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
           var isToChangeMediaItems = false
 
-            if(historyViewModel.selectedDate > 0 &&
+          if(historyViewModel.selectedDate > 0 &&
                 RadioService.selectedHistoryDate != historyViewModel.selectedDate){
                 RadioService.selectedHistoryDate = historyViewModel.selectedDate
                 RadioSource.updateHistoryOneDateStations()
@@ -752,11 +760,11 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 Snackbar.make(
                     requireActivity().findViewById(R.id.rootLayout),
-                    "Bookmark deleted",
+                    resources.getString(R.string.bookmark_deleted),
                     Snackbar.LENGTH_LONG
                 ).apply {
 
-                    setAction("UNDO"){
+                    setAction(resources.getString(R.string.action_undo)){
                         historyViewModel.restoreBookmarkTitle(bookmark)
                     }
                 }.show()

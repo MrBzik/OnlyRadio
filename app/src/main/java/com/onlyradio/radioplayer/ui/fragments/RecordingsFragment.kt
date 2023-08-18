@@ -182,7 +182,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
 //            if(RadioService.currentMediaItems == SEARCH_FROM_RECORDINGS){
 
-                if(isToHandleNewRecording){
+            if(isToHandleNewRecording){
 
                     bind.rvRecordings.apply {
                         smoothScrollToPosition(RadioService.currentPlayingItemPosition)
@@ -336,7 +336,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
                 Snackbar.make(
                     requireActivity().findViewById(R.id.rootLayout),
-                    "Recording deleted",
+                    resources.getString(R.string.recording_deleted),
                     Snackbar.LENGTH_LONG
                 ).apply {
 
@@ -352,7 +352,7 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
                         }
                     }
                     )
-                    setAction("UNDO"){
+                    setAction(resources.getString(R.string.action_undo)){
                         recordingsViewModel.insertNewRecording(recording)
                         if(RadioService.currentMediaItems == SEARCH_FROM_RECORDINGS){
                             recordingsViewModel.restoreRecordingMediaItem(position)

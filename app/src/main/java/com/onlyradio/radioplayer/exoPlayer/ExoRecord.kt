@@ -77,7 +77,7 @@ class ExoRecordImpl (private val service: RadioService) {
 
                     if(duration > RadioService.autoStopRec) {
                         if(RadioService.autoStopRec != 180 * 60000)
-                        stopRecording()
+                            stopRecording()
                     } else {
 
                         val time = Utils.timerFormat(duration)

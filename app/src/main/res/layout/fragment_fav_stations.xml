@@ -114,7 +114,7 @@
         android:layout_height="60dp"
         android:layout_marginStart="12dp"
         android:gravity="center"
-        android:text="Playlists"
+        android:text="@string/playlists_expand_title"
         android:textAppearance="@style/mainTextButtons"
         app:drawableEndCompat="@drawable/ic_playlists_arrow_expand"
         app:layout_constraintEnd_toEndOf="parent"

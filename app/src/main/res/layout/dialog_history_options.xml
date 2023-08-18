@@ -16,7 +16,7 @@
         android:layout_marginStart="8dp"
         android:gravity="center_vertical"
         android:layout_marginTop="@dimen/dialog_top_margin"
-        android:text="History options"
+        android:text="@string/history_options_title"
         android:textAppearance="@style/dialogTitleText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -29,7 +29,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="20dp"
         android:fontFamily="@font/aldrich"
-        android:text="Maximum number of dates to keep for stations and titles before clean up (on app launch)"
+        android:text="@string/history_options_main_hint"
         android:textColor="@color/default_secondary_text_color"
         android:textSize="13sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -66,22 +66,33 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="20dp"
         android:fontFamily="@font/aldrich"
-        android:text="Maximum number of bookmarked titles to keep (also swipe to delete)"
+        android:text="@string/bookmark_setting_title"
         android:textColor="@color/default_secondary_text_color"
         android:textSize="13sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rangeSliderHistoryDates" />
 
     <TextView
-        android:id="@+id/tvBookmarkNumberValue"
+        android:id="@+id/tvBookmarkNumberTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="8dp"
-        android:text="10 bookmarked titles"
+        android:text="@string/history_bookmarks_title"
         android:textColor="@color/selected_genre_color"
         android:textAppearance="@style/dialogItemText"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvBookmarkedTitlesHint" />
+
+    <TextView
+        android:id="@+id/tvBookmarkNumberValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="10"
+        android:textColor="@color/selected_genre_color"
+        android:textAppearance="@style/dialogItemText"
+        app:layout_constraintStart_toEndOf="@id/tvBookmarkNumberTitle"
         app:layout_constraintTop_toBottomOf="@id/tvBookmarkedTitlesHint" />
 
 
@@ -92,7 +103,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvBookmarkNumberValue" />
+        app:layout_constraintTop_toBottomOf="@+id/tvBookmarkNumberTitle" />
 
     <TextView
         android:id="@+id/tvWarning"
@@ -100,7 +111,7 @@
         android:layout_height="wrap_content"
         android:paddingHorizontal="8dp"
         android:layout_marginTop="20dp"
-        android:text="Saving new options may result in cleaning current history"
+        android:text="@string/history_settings_warning"
         android:textSize="13sp"
         android:visibility="invisible"
         android:fontFamily="@font/aldrich"

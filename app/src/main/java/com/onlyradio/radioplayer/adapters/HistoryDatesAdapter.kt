@@ -9,6 +9,7 @@ import android.widget.TextView
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.data.local.entities.HistoryDate
 import com.onlyradio.radioplayer.utils.Utils
+import java.text.DateFormat
 import java.util.Calendar
 import java.util.Date
 
@@ -49,13 +50,13 @@ class HistoryDatesAdapter(
 
        val textView = view.findViewById<TextView>(R.id.tvSpinnerDate)
 
-        val date = Date(datesList[position].time)
+//        val date = Date(datesList[position].time)
 
 
        if(position != 0){
 
-           calendar.time = date
-           val dateString = Utils.fromDateToStringShort(calendar)
+//           calendar.time = date
+           val dateString = Utils.convertLongToOnlyDate(datesList[position].time, DateFormat.MEDIUM)
 
            textView.text = dateString
 
@@ -63,7 +64,7 @@ class HistoryDatesAdapter(
 
        } else {
 
-           textView.text = "All dates"
+           textView.text = requireContext.resources.getString(R.string.all_dates)
             if(selectedItemPosition <=0){
                 textView.setTextColor(selectedColor)
 
@@ -84,7 +85,7 @@ class HistoryDatesAdapter(
         return view
     }
 
-    private val calendar = Calendar.getInstance()
+//    private val calendar = Calendar.getInstance()
 
 //    private val formatLess = SimpleDateFormat(SHORT_DATE_FORMAT, Locale.getDefault())
 

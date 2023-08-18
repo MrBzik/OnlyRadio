@@ -76,7 +76,7 @@ class NavigationImpl (
         }
 
         if(mainViewModel.isInDetailsFragment.value == true)
-        mainViewModel.updateIsInDetails(false)
+           mainViewModel.updateIsInDetails(false)
 
         return true
     }

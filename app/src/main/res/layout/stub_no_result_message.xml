@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:textAppearance="@style/noResultTitlesText"
-        android:text="No results for:"
+        android:text="@string/no_results_title"
         />
 
 
@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/noResultTitlesText"
-            android:text="Tag: "
+            android:text="@string/no_results_tag"
            />
 
         <TextView
@@ -39,7 +39,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/noResultValuesText"
-            android:text="jazz"
             app:drawableEndCompat="@drawable/ic_remove" />
 
     </LinearLayout>
@@ -58,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/noResultTitlesText"
-            android:text="Name: "
+            android:text="@string/no_results_name"
             />
 
         <TextView
@@ -66,7 +65,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/noResultValuesText"
-            android:text="fallout"
             app:drawableEndCompat="@drawable/ic_remove" />
 
     </LinearLayout>
@@ -84,7 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/noResultTitlesText"
-            android:text="Country: "
+            android:text="@string/no_results_country"
             />
 
         <TextView
@@ -92,7 +90,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/noResultValuesText"
-            android:text="USA"
             app:drawableEndCompat="@drawable/ic_remove" />
 
     </LinearLayout>
@@ -110,7 +107,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/noResultTitlesText"
-            android:text="Language: "
+            android:text="@string/no_results_language"
             />
 
         <TextView
@@ -118,7 +115,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/noResultValuesText"
-            android:text="english"
             app:drawableEndCompat="@drawable/ic_remove" />
 
     </LinearLayout>
@@ -136,7 +132,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/noResultTitlesText"
-            android:text="Bitrate min: "
+            android:text="@string/no_results_bitrate_min"
             />
 
         <TextView
@@ -144,7 +140,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/noResultValuesText"
-            android:text="24 kbps"
             app:drawableEndCompat="@drawable/ic_remove" />
 
     </LinearLayout>
@@ -162,7 +157,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/noResultTitlesText"
-            android:text="Bitrate max: "
+            android:text="@string/no_results_bitrate_max"
             />
 
         <TextView
@@ -170,7 +165,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/noResultValuesText"
-            android:text="320 kbps"
             app:drawableEndCompat="@drawable/ic_remove" />
 
     </LinearLayout>

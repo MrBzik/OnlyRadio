@@ -127,7 +127,7 @@ class BufferSettingsDialog (
 
             val initialValue = RadioService.bufferForPlayback
 
-            bind.tvPlaybackBufferTitle.text = "To start audio - $initialValue mls"
+            bind.tvPlaybackBufferValue.text = "$initialValue mls"
 
             values = listOf(initialValue.toFloat())
 
@@ -144,7 +144,7 @@ class BufferSettingsDialog (
                 override fun onStopTrackingTouch(slider: RangeSlider) {
                     val newValue = slider.values.first().toInt()
 
-                    bind.tvPlaybackBufferTitle.text = "To start audio - $newValue mls"
+                    bind.tvPlaybackBufferValue.text = "$newValue mls"
                 }
             })
         }

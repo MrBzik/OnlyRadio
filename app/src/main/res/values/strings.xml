@@ -2,22 +2,224 @@
     <string name="app_name">Only Radio</string>
     <string name="notification_channel_name">Radio Channel</string>
     <string name="notification_channel_description">Shows the currently playing station</string>
-    <string name="open">Open</string>
-    <string name="close">Close</string>
+
+    <!--    Main Activity-->
+
+    <string name="time_left">left:</string>
     <string name="Expand">Details</string>
     <string name="Hide">Hide</string>
-    <string name="dialog_back_button">Back</string>
-    <string name="dialog_create_playlist">New playlist</string>
-    <string name="dialog_accept_button">Accept</string>
-    <string name="dialog_clear_selection">Clear selection</string>
-    <string name="Favoured">Favoured</string>
-    <string name="text_placeholder_alpha">0.6</string>
-    <string name="foreground_pref">Kill service on app close</string>
+
+
+<!--    Hint Messages -->
+
     <string name="recordings_frag_tip">New recording can be started in Details. Stop recording in Details or notification</string>
     <string name="fav_frag_hint">Add new stations in Details. Drag and drop to move stations into playlists. Swipe away to delete</string>
     <string name="playlist__hint">Add new stations in Details. Drag and drop to move stations between playlists. Also use "Export" option of Lazy list</string>
     <string name="lazy_list_hint">Stations most listened recently can be found here, excluding already favoured ones or added to playlists</string>
     <string name="bookmarks_message">Bookmark titles from Details, notification or history-titles tab itself. Swipe to delete. Click on any title to see more options</string>
+
+
+<!--    Bottom Navigation-->
+    <string name="search">Search</string>
+    <string name="fav">Fav.</string>
+    <string name="history">History</string>
+    <string name="rec">Rec.</string>
+    <string name="options">Options</string>
+
+<!--    Search Fragment-->
+    <string name="loading_message">Waiting for response from servers…</string>
+    <string name="Tag">Tag</string>
+    <string name="Name">Name</string>
+    <string name="Country">Country</string>
+
+
+<!--    General Settings-->
+    <string name="main_general_title">General</string>
+    <string name="reconnect_to_streams">Reconnect to streams</string>
+    <string name="dark_mode">Dark mode</string>
+    <string name="foreground_pref">Kill service on app close</string>
+    <string name="kill_service_setting_tip">(Default: keep service if audio is playing)</string>
+    <string name="auto_search_hint">(Default: start new searches manually by Swipe-down or with [icon] button)</string>
+    <string name="text_setting">Text</string>
+    <string name="buffer_options">Buffer options</string>
+    <string name="history_options">History options</string>
+    <string name="rec_options">Rec. options</string>
+    <string name="auto_search">Auto search</string>
+    <string name="check_it_out">Check it out</string>
+    <string name="community_tip">Know some cool radio stations? You can help community!</string>
+
+
+<!--    Extra Settings-->
+    <string name="main_extras_title">Effects</string>
+    <string name="rec_speed_tip">(Rec. speed is set separately in Details)*</string>
+    <string name="speed_edge_tip">(Keep in mind stream edge when speeding up)*</string>
+    <string name="speed_title">speed :</string>
+    <string name="pitch_title">pitch :</string>
+    <string name="speed_pitch_separate_tip">(Separating speed/pitch is more stable on vocals and podcasts)*</string>
+    <string name="distance_effect">Distance effect</string>
+
+<!--    No Results Message-->
+    <string name="no_results_title">No results for:</string>
+    <string name="no_results_tag">Tag:</string>
+    <string name="no_results_name">Name:</string>
+    <string name="no_results_country">Country:</string>
+    <string name="no_results_language">Language:</string>
+    <string name="no_results_bitrate_min">Bitrate min:</string>
+    <string name="no_results_bitrate_max">Bitrate max:</string>
+
+<!--    Text Buttons-->
+    <string name="homepage_btn">Homepage</string>
+    <string name="bookmark_btn">Bookmark</string>
     <string name="setSetting">Show</string>
+    <string name="dialog_back_button">Back</string>
+    <string name="dialog_create_playlist">New playlist</string>
+    <string name="dialog_accept_button">Accept</string>
+    <string name="dialog_clear_selection">Clear selection</string>
+
+
+<!--    Fragment Favourites-->
+
+    <string name="favourite_title">Favoured</string>
+    <string name="export">Export</string>
+    <string name="edit">Edit</string>
+    <string name="playlists_expand_title">Playlists</string>
+
+<!--    Playlists-->
+    <string name="lazy_title_half_1">Lazy</string>
+    <string name="lazy_title_half_2">playlist</string>
+    <string name="create_new_playlist">Create new playlist</string>
+
+<!--    Fragment Station Details-->
+    <string name="add_to_playlist">Add to playlist</string>
+    <string name="languages_title">Languages:</string>
+    <string name="tags_title">Tags:</string>
+    <string name="rec_processing">Processing…</string>
+    <string name="rec_saved">Saved</string>
+
+
+<!--    History Fragment-->
+    <string name="date_today">Today</string>
+    <string name="all_dates">All dates</string>
+    <string name="history_titles_tab">Titles</string>
+    <string name="history_stations_tab">Stations</string>
+
+
+    <!--    Dialogs-->
+    <string name="stations_count">st.</string>
+    <string name="system">System</string>
+    <string name="exact">Exact</string>
+
+
+
+    <!--    Buffer Settings Dialog-->
+
+    <string name="buffer_options_title">Buffer options</string>
+    <string name="buffer_main_hint">How much data to load in advance for smooth listening</string>
+    <string name="adaptive_load_controller">Adaptive load controller</string>
+    <string name="adaptive_load_controller_hint">Ensures buffer responsiveness to low settings. Use if smaller buffer is needed</string>
+    <string name="to_start_audio_title">To start audio -</string>
+
+
+<!--    Fragment Recordings-->
+    <string name="recordings_frag_title">Recordings</string>
+    <string name="swipe_delete">Swipe-delete</string>
+
+<!--    Fragment Recordings Details-->
+    <string name="rename_btn">Rename</string>
+    <string name="rec_date_from">From:</string>
+    <string name="rec_occupied_space">Occupied space:</string>
+    <string name="rec_play_speed">Play speed</string>
+
+
+<!--    Search Params Dialog-->
+
+    <string name="search_options_title">Search options</string>
+    <string name="search_order_by">Order by</string>
+    <string name="bitrate_title">Bitrate</string>
+    <string name="search_bitrate_hint">Setting min bitrate will hide stations with no bitrate info</string>
+    <string name="bitrate_min">Min</string>
+    <string name="bitrate_max">Max</string>
+    <string name="search_language_title">Should include language</string>
+
+<!--    Rename Recording Dialog-->
+    <string name="rename_recording_title">Rename recording</string>
+    <string name="rename_rec_hint">Type new name</string>
+
+<!--    Recordings Settings Dialog-->
+    <string name="recording_options_dialog_title">Recording options</string>
+    <string name="rec_settings_restriction_hint">Recordings are meant for personal use only. As for now they are not accessible outside this app</string>
+    <string name="stop_rec_after_title">Stop rec. after:</string>
+    <string name="rec_title_setting">Use song title for rec. name if available</string>
+
+<!--    Pick Tag Dialog-->
+    <string name="tag_dialog_title">Search by tag</string>
+    <string name="search_tag_hint">Type tag…</string>
+
+<!--    Pick Name Dialog-->
+    <string name="search_by_name_dialog_title">Search by name</string>
+
+<!--    Pick Country Dialog-->
+    <string name="search_by_country_title">Search by country</string>
+    <string name="type_country_name_hint">Type country name…</string>
+
+<!--    History Settings Dialog-->
+    <string name="history_options_title">History options</string>
+    <string name="history_options_main_hint">Maximum number of dates to keep for stations and titles before clean up</string>
+    <string name="bookmark_setting_title">Maximum number of bookmarked titles to keep</string>
+    <string name="history_settings_warning">Saving new options may result in cleaning current history on next app launch</string>
+    <string name="history_bookmarks_title">Bookmarks - </string>
+
+
+
+<!--    Add Station To Playlists Dialog-->
+    <string name="add_to_playlist_message">No playlists yet</string>
+    <string name="add_to_playlist_title">Add station to an existing playlist or a new one</string>
+    <string name="export_into_playlists_title">Export stations from Lazy list to an existing playlist or a new one</string>
+
+
+<!--    Create Playlist Dialog-->
+    <string name="create_playlist_title">Create playlist</string>
+    <string name="playlist_name_hint">Playlist name…</string>
+    <string name="search_images_hint">Search images…</string>
+
+<!--    Delete Playlist Dialog-->
+    <string name="delete_playlist_dialog_title">Delete playlist and its content?</string>
+    <string name="delete">Delete</string>
+
+<!--    Edit Playlist Dialog-->
+    <string name="edit_playlist_dialog_title">Edit playlist</string>
+    <string name="new_playlist_name_hint">New playlist name…</string>
+
+
+<!--    SnackBars -->
+    <string name="title_copied">Title copied</string>
+    <string name="removed_from_favs">Station removed from favs</string>
+    <string name="saved_to_favs">Station saved to favs</string>
+    <string name="removed_from_playlist">Station removed from </string>
+    <string name="removed_from_lazy_list">Station removed from Lazy list</string>
+    <string name="already_in_playlist">Already in </string>
+    <string name="moved_to_playlist">Station moved to </string>
+    <string name="added_to_playlist">Station added to </string>
+    <string name="recording_deleted">Recording deleted</string>
+    <string name="bookmark_deleted">Bookmark deleted</string>
+    <string name="action_undo">UNDO</string>
+
+<!--    Toasts-->
+    <string name="reconnecting">Reconnecting…</string>
+    <string name="not_responding">Station not responding…</string>
+    <string name="reverb_error">Oops… Try rebooting device for the effect to work</string>
+    <string name="playlist_name_empty">Name is empty</string>
+    <string name="playlist_name_taken">Name already taken</string>
+    <string name="playlist_no_image">No image selected</string>
+    <string name="title_bookmarked">Title bookmarked</string>
+    <string name="same_search_query">Same search query</string>
+
+<!--    Search Order-->
+    <string-array name="search_order_array">
+        <item>Top voted</item>
+        <item>Most popular</item>
+        <item>Trending now</item>
+        <item>Random order</item>
+    </string-array>
 
 </resources>

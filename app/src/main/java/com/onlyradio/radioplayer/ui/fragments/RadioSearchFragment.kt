@@ -466,7 +466,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
                 clearAdapter(check)
                 if(!check){
-                    Toast.makeText(requireContext(), "Same search query", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(),
+                        resources.getString(R.string.same_search_query), Toast.LENGTH_SHORT).show()
                 }
 
             }
@@ -480,9 +481,10 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         bind.fabInitiateSearch.setOnClickListener {
 
           val check =  mainViewModel.initiateNewSearch()
-            clearAdapter(check)
+          clearAdapter(check)
           if(!check){
-              Toast.makeText(requireContext(), "Same search query", Toast.LENGTH_SHORT).show()
+              Toast.makeText(requireContext(),
+                  resources.getString(R.string.same_search_query), Toast.LENGTH_SHORT).show()
           }
 
         }
@@ -512,8 +514,9 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             handleNewParams()
 
-            (bind.tvTag as TextView).text  = it.ifBlank { "Tag" }
-
+            (bind.tvTag as TextView).text  = it.ifBlank {
+                requireContext().resources.getString(R.string.Tag)
+            }
         }
 
         mainViewModel.searchParamName.observe(viewLifecycleOwner){
@@ -523,7 +526,9 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                 handleNewParams()
             }
 
-            (bind.tvName as TextView).text = it.ifBlank { "Name" }
+            (bind.tvName as TextView).text = it.ifBlank {
+                requireContext().resources.getString(R.string.Name)
+            }
 
         }
 
@@ -531,7 +536,9 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             handleNewParams()
 
-            (bind.tvSelectedCountry as TextView).text = it.ifBlank {"Country"}
+            (bind.tvSelectedCountry as TextView).text = it.ifBlank {
+                requireContext().resources.getString(R.string.Country)
+            }
         }
     }
 

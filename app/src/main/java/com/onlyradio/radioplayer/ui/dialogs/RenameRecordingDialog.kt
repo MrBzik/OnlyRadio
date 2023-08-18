@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.WindowManager
 import android.widget.Toast
+import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.databinding.DialogRenameRecordingBinding
 
 class RenameRecordingDialog (
@@ -34,7 +35,9 @@ class RenameRecordingDialog (
             val newName = bind.etNewName.text.toString()
 
             if(newName.isBlank()){
-               Toast.makeText(requireContext, "Name is empty", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext,
+                    requireContext.resources.getString(R.string.playlist_name_empty),
+                    Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             if(newName == oldName) {

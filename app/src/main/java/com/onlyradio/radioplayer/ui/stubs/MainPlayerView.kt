@@ -17,7 +17,8 @@ import com.onlyradio.radioplayer.utils.Utils
 
 
 class MainPlayerView(private val bind : StubPlayerActivityMainBinding,
-                     private val glide : RequestManager
+                     private val glide : RequestManager,
+                     private val timeLeftPrefix : String
                      )  {
 
 
@@ -77,7 +78,7 @@ class MainPlayerView(private val bind : StubPlayerActivityMainBinding,
 
     fun updateRecordingDuration(dur : Long){
 
-        bind.tvBitrate.text = "left: " + Utils.timerFormatCut(dur)
+        bind.tvBitrate.text = "$timeLeftPrefix " + Utils.timerFormatCut(dur)
     }
 
 

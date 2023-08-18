@@ -256,12 +256,12 @@ class MainViewModel @Inject constructor(
 
 //           Log.d("CHECKTAGS", "is new search? $isNewSearch")
 
-               val calcOffset = limit * offset
+           val calcOffset = limit * offset
 
 //                var isReversedOrder = true
 
 
-                val orderSetting = when(newSearchOrder){
+           val orderSetting = when(newSearchOrder){
                     ORDER_VOTES -> "votes"
                     ORDER_POP -> "clickcount"
                     ORDER_TREND -> "clicktrend"
@@ -389,11 +389,10 @@ class MainViewModel @Inject constructor(
             maxBitrateNew == maxBitrateOld &&
             isSearchFilterLanguage == wasSearchFilterLanguage
 
-        )
-            return false
+        ) return false
 
 
-            return true.also {
+        return true.also {
                 isNewSearch = true
                 lastSearchName = searchParamName.value ?: ""
                 lastSearchTag = searchParamTag.value ?: ""

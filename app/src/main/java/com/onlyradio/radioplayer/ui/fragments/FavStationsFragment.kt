@@ -133,7 +133,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
 //            if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
 
-                if (isToHandleNewStationObserver) {
+            if (isToHandleNewStationObserver) {
 
                     val index = getCurrentItemPosition(station)
 
@@ -142,8 +142,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                     } else {
                         mainAdapter.updateOnStationChange(station, null)
                     }
-
-                } else{
+                }
+            else{
                     isToHandleNewStationObserver = true
                 }
 //            }
@@ -238,7 +238,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 AddStationToPlaylistDialog(
                     requireContext(), listOfPlaylists,
                      favViewModel, pixabayViewModel, glide,
-                    "Export stations from Lazy list to an existing playlist or a new one",
+                    resources.getString(R.string.export_into_playlists_title),
                 ) { playlistName ->
                     favViewModel.exportStationFromLazyList(playlistName)
                 }.show()
@@ -463,7 +463,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             (bind.tvPlaylistEdit as TextView).text = ""
 
-            bind.tvFavouredTitle.text = "Favoured"
+            bind.tvFavouredTitle.text = resources.getString(R.string.favourite_title)
 
             bind.tvPlaylistsExpand.updateLayoutParams<ConstraintLayout.LayoutParams> {
                 startToStart = bind.guidelineMiddle.id
@@ -511,9 +511,9 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         }
 
         if(newTab == SEARCH_FROM_LAZY_LIST){
-            (bind.tvPlaylistEdit as TextView).text = "Export"
+            (bind.tvPlaylistEdit as TextView).text = resources.getString(R.string.export)
         } else if(newTab == SEARCH_FROM_PLAYLIST) {
-            (bind.tvPlaylistEdit as TextView).text = "Edit"
+            (bind.tvPlaylistEdit as TextView).text = resources.getString(R.string.edit)
         }
 
     }
@@ -598,7 +598,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             layoutAnimation = (activity as MainActivity).layoutAnimationController
 
-                post {
+            post {
 
                     val index = getCurrentItemPosition(RadioService.currentPlayingStation.value)
 
@@ -662,10 +662,11 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         favViewModel.updateIsFavouredState(0, stationID).also{
             Snackbar.make(
                 requireActivity().findViewById(R.id.rootLayout),
-                "Station removed from favs", Snackbar.LENGTH_LONG
+                resources.getString(R.string.removed_from_favs),
+                 Snackbar.LENGTH_LONG
             ).apply {
 
-                setAction("UNDO"){
+                setAction(resources.getString(R.string.action_undo)){
                     favViewModel.updateIsFavouredState(favouredAt, stationID)
 
                     if(RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES){
@@ -691,9 +692,10 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             withContext(Dispatchers.Main){
                 Snackbar.make(
                     requireActivity().findViewById(R.id.rootLayout),
-                    "Station removed from $playlistName", Snackbar.LENGTH_LONG
+                    resources.getString(R.string.removed_from_playlist) + playlistName,
+                    Snackbar.LENGTH_LONG
                 ).apply {
-                    setAction("UNDO"){
+                    setAction(resources.getString(R.string.action_undo)){
 
                         if(RadioService.currentMediaItems == SEARCH_FROM_PLAYLIST
                             && currentPlaylistName == RadioService.currentPlaylistName){
@@ -723,10 +725,10 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         Snackbar.make(
             requireActivity().findViewById(R.id.rootLayout),
-            "Station removed from Lazy list", Snackbar.LENGTH_LONG
+            resources.getString(R.string.removed_from_lazy_list), Snackbar.LENGTH_LONG
         ).apply {
 
-            setAction("UNDO"){
+            setAction(resources.getString(R.string.action_undo)){
 
                 RadioSource.restoreItemFromLazyList(pos)
                 if(currentTab == SEARCH_FROM_LAZY_LIST){
@@ -761,8 +763,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 stationID, playlistName
             ) {
 
-                val message = if(it) "Already in $playlistName"
-                else "Station moved to $playlistName"
+                val message = if(it) resources.getString(R.string.already_in_playlist) + playlistName
+                else resources.getString(R.string.moved_to_playlist) + playlistName
 
                 Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
                     message, Snackbar.LENGTH_SHORT).show()

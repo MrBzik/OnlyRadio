@@ -28,8 +28,7 @@ import kotlinx.coroutines.launch
 
 const val NO_IMAGE = "no image"
 
-@ExperimentalCoroutinesApi
-@FlowPreview
+
 class CreatePlaylistDialog (
    private val requireContext : Context,
    var listOfPlaylists : List<Playlist>,
@@ -146,15 +145,21 @@ class CreatePlaylistDialog (
             val nameField = bind.etPlaylistName.text.toString()
 
             if(nameField.isBlank()) {
-                Toast.makeText(requireContext, "Name is empty", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext,
+                    requireContext.resources.getString(R.string.playlist_name_empty),
+                    Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             else if(listOfPlaylistNames.contains(nameField)) {
-                Toast.makeText(requireContext, "Name already taken", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext,
+                    requireContext.resources.getString(R.string.playlist_name_taken),
+                    Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             else if (imageSelected == NO_IMAGE){
-                Toast.makeText(requireContext, "No image selected", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext,
+                    requireContext.resources.getString(R.string.playlist_no_image),
+                    Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 

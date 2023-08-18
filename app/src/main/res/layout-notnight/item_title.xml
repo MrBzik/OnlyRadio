@@ -58,7 +58,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:text="Title name"
             android:textColor="@color/default_text_color"
             android:fontFamily="sans-serif-smallcaps"
             android:gravity="center|start"
@@ -72,7 +71,6 @@
             android:fontFamily="@font/aldrich"
             android:textColor="@color/default_secondary_text_color"
             android:maxLines="1"
-            android:text="some radio station name"
             android:textSize="14sp"
             />
 
@@ -85,7 +83,6 @@
             android:fontFamily="@font/aldrich"
             android:textColor="@color/default_secondary_text_color"
             android:maxLines="1"
-            android:text="Bookmark"
             android:textSize="14sp"
 
             />
@@ -107,7 +104,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/aldrich"
         android:textColor="@color/default_text_color"
-        android:text="Bookmark"
+        android:text="@string/bookmark_btn"
         android:textSize="14sp"
         android:layout_marginStart="58dp"
         android:layout_marginBottom="6dp"

@@ -84,6 +84,7 @@ import com.google.android.exoplayer2.audio.AuxEffectInfo
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
+import com.onlyradio.radioplayer.R
 import dagger.hilt.android.AndroidEntryPoint
 import dev.brookmg.exorecord.lib.ExoRecord
 import kotlinx.coroutines.CoroutineScope
@@ -716,7 +717,7 @@ class RadioService : MediaBrowserServiceCompat() {
 //        }
         } catch (e : Exception){
             reverbMode = 0
-            Toast.makeText(this, "Oops... Try rebooting device for the effect to work", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, resources.getString(R.string.reverb_error), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -828,7 +829,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
             isRecordingDurationListenerRunning = true
 
-                  serviceScope.launch {
+            serviceScope.launch {
 
                 while (isFromRecording && isPlaybackStatePlaying){
 
@@ -1021,7 +1022,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
             if(index == 0){
                 if(items.size != 1)
-                exoPlayer.addMediaItems(items.subList(1, items.lastIndex))
+                    exoPlayer.addMediaItems(items.subList(1, items.lastIndex))
             } else {
 
                 exoPlayer.addMediaItems(0, items.subList(0, index))

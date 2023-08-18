@@ -33,7 +33,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="@id/guidelineTitle"
         android:textAppearance="@style/mainTextTitle"
-        android:text="Recordings"/>
+        android:text="@string/recordings_frag_title"/>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineMiddle"
@@ -48,7 +48,7 @@
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:gravity="center"
-        android:text="Swipe-delete"
+        android:text="@string/swipe_delete"
         android:textAppearance="@style/mainTextButtons"
         app:layout_constraintStart_toStartOf="@id/guidelineMiddle"
         app:layout_constraintEnd_toEndOf="parent"

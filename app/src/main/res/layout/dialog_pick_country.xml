@@ -16,7 +16,7 @@
         android:layout_height="50dp"
         android:gravity="center_vertical"
         android:layout_marginStart="8dp"
-        android:text="Search by country"
+        android:text="@string/search_by_country_title"
         android:textAppearance="@style/dialogTitleText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -25,7 +25,7 @@
         android:id="@+id/editText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Type country name..."
+        android:hint="@string/type_country_name_hint"
         android:inputType="text|textNoSuggestions"
         android:textColor="@color/search_text_color"
         android:backgroundTint="@color/Separator"

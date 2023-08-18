@@ -45,7 +45,7 @@
             android:fontFamily="@font/aldrich"
             android:maxLines="2"
             android:ellipsize="end"
-            android:text="Lazy"
+            android:text="@string/lazy_title_half_1"
             android:textAlignment="center"
             />
 
@@ -60,7 +60,7 @@
             android:fontFamily="@font/aldrich"
             android:maxLines="2"
             android:ellipsize="end"
-            android:text="playlist"
+            android:text="@string/lazy_title_half_2"
             android:gravity="bottom|center_horizontal"
             />
 
