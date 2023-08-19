@@ -17,7 +17,7 @@
     <string name="fav_frag_hint">Новые станции можно добавить в "Деталях". Добавленные станции можно перетаскивать в плейлисты, и удалять свайпом влево-вправо</string>
     <string name="playlist__hint">Новые станции можно добавить в "Деталях", а также "Экспортом" из "Лениста". Добавленные станции можно перетаскивать между плейлистами</string>
     <string name="lazy_list_hint">Тут будут появляться наиболее прослушиваемые станции за последнее время, исключая уже добавленные в избранные и плейлисты</string>
-    <string name="bookmarks_message">Вы можете отмечать песни в "Деталях", уведомлении либо из общего списка песен в "Истории". Удалить свайпом влево-вправо. Чтобы увидеть доп. опции кликайте на названия песен</string>
+    <string name="bookmarks_message">Вы можете отмечать песни в "Деталях", уведомлении либо из общего списка песен в "Истории". Удалить свайпом влево-вправо. Кликайте на названия песен чтобы увидеть доп. опции</string>
 
 
     <!--    Bottom Navigation-->
@@ -52,7 +52,7 @@
 
     <!--    Extra Settings-->
     <string name="main_extras_title">Эффекты</string>
-    <string name="rec_speed_tip">(Скорость записи регулируется отдельно в "Деталях")*</string>
+    <string name="rec_speed_tip">(Скорость записей регулируется отдельно в "Деталях")*</string>
     <string name="speed_edge_tip">(Учитывайте границу потока при увеличении скорости)*</string>
     <string name="speed_title">ск-сть :</string>
     <string name="pitch_title">высота :</string>
@@ -176,7 +176,7 @@
     <string name="bookmark_setting_title">Макс кол-во отмеченных названий песен</string>
     <string name="history_settings_warning">Новые настройки (и возможная очистка текущей истории) примут силу при последующем запуске приложения</string>
     <string name="history_dates_title">Даты</string>
-    <string name="bookmarks_count_title">Отмеченные песни</string>
+    <string name="bookmarks_count_title">Песни в Отмеченных</string>
 
 
     <!--    Add Station To Playlists Dialog-->
@@ -187,7 +187,7 @@
 
     <!--    Create Playlist Dialog-->
     <string name="create_playlist_title">Создать плейлист</string>
-    <string name="playlist_name_hint">Название плейлиста…</string>
+    <string name="playlist_name_hint">Имя плейлиста…</string>
     <string name="search_images_hint">Поиск обложки…</string>
 
     <!--    Delete Playlist Dialog-->
@@ -209,8 +209,10 @@
     <string name="moved_to_playlist">Станция перемещена в </string>
     <string name="added_to_playlist">Станция добавлена в </string>
     <string name="recording_deleted">Запись удалена</string>
-    <string name="bookmark_deleted">Песня удалена из отмеченных</string>
+    <string name="bookmark_deleted">Песня удалена из Отмеченных</string>
     <string name="action_undo">ВЕРНУТЬ</string>
+    <string name="update_downloading">Обновление загружается…</string>
+    <string name="update_downloaded">Обновление успешно загружено. Перезапуск приложения…</string>
 
     <!--    Toasts-->
     <string name="reconnecting">Ожидание…</string>
@@ -219,7 +221,7 @@
     <string name="playlist_name_empty">Название не введено</string>
     <string name="playlist_name_taken">Название занято</string>
     <string name="playlist_no_image">Изображение не выбрано</string>
-    <string name="title_bookmarked">Название отмечено</string>
+    <string name="title_bookmarked">Название песни добалено в Отмеченные</string>
     <string name="same_search_query">Измените запрос</string>
 
     <!--    Search Order-->

@@ -1,7 +1,6 @@
 package com.onlyradio.radioplayer.ui.stubs
 
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.RequestManager
@@ -64,11 +63,9 @@ class MainPlayerView(private val bind : StubPlayerActivityMainBinding,
         if(title.isBlank()){
             bind.tvStationTitle.apply {
                 text = resources.getString(R.string.playing_no_info)
-                Log.d("CHECKTAGS", "setting regular color")
                 setTextColor(ContextCompat.getColor(bind.root.context,R.color.regular_text_color))
             }
         } else {
-            Log.d("CHECKTAGS", "setting selected color, title $title")
             bind.tvStationTitle.apply {
                 text = title
                 setTextColor(ContextCompat.getColor(bind.root.context,R.color.selected_text_color))

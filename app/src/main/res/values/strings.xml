@@ -213,6 +213,10 @@
     <string name="recording_deleted">Recording deleted</string>
     <string name="bookmark_deleted">Bookmark deleted</string>
     <string name="action_undo">UNDO</string>
+    <string name="update_downloading">Update is downloading…</string>
+    <string name="update_downloaded">Update downloaded successfully. Restarting app…</string>
+
+
 
 <!--    Toasts-->
     <string name="reconnecting">Reconnecting…</string>

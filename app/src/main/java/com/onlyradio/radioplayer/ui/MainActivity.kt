@@ -8,6 +8,7 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.doOnLayout
@@ -16,6 +17,16 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bumptech.glide.RequestManager
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.play.core.appupdate.AppUpdateInfo
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.InstallState
+import com.google.android.play.core.install.InstallStateUpdatedListener
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.android.play.core.ktx.isFlexibleUpdateAllowed
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.data.local.entities.Recording
@@ -33,6 +44,7 @@ import com.onlyradio.radioplayer.ui.viewmodels.RecordingsViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.SettingsViewModel
 import com.onlyradio.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -67,15 +79,18 @@ class MainActivity : AppCompatActivity() {
         NavigationImpl(supportFragmentManager, mainViewModel)
     }
 
-    private val playerUtils : MainPlayerView by lazy {
-        MainPlayerView(bindPlayer!!, glide, resources.getString(R.string.time_left))
-    }
+    private var playerUtils : MainPlayerView? = null
+
 
     @Inject
     lateinit var glide : RequestManager
 
     private var currentPlayingStation : RadioStation? = null
     private var currentPlayingRecording : Recording? = null
+
+
+    private lateinit var appUpdateManager : AppUpdateManager
+    private val updateType = AppUpdateType.FLEXIBLE
 
     companion object{
         var uiMode = 0
@@ -97,13 +112,19 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        appUpdateManager = AppUpdateManagerFactory.create(applicationContext)
+        appUpdateManager.registerListener(installStateUpdatedListener)
+        checkForUpdates()
+
         setTheme(R.style.Theme_RadioPlayer)
 
         bind = ActivityMainBinding.inflate(layoutInflater)
         setContentView(bind.root)
 
         bind.stubPlayer.setOnInflateListener{ _, view ->
-                bindPlayer = StubPlayerActivityMainBinding.bind(view)
+            bindPlayer = StubPlayerActivityMainBinding.bind(view)
+            playerUtils = MainPlayerView(bindPlayer!!, glide, resources.getString(R.string.time_left))
+            callPlayerStubRelatedMethods()
         }
 
 //        window.navigationBarColor = ContextCompat.getColor(this, R.color.toolbar)
@@ -130,6 +151,41 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    private fun checkForUpdates(){
+
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { info->
+            val isUpdateAvailable = info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+            val isUpdateAllowed = info.isFlexibleUpdateAllowed
+
+            if(isUpdateAvailable && isUpdateAllowed){
+                appUpdateManager.startUpdateFlowForResult(
+                    info, updateType, this, 123
+                )
+            }
+        }
+    }
+
+    private val installStateUpdatedListener = InstallStateUpdatedListener{state ->
+
+        when(state.installStatus()){
+
+            InstallStatus.DOWNLOADING -> {
+                Toast.makeText(applicationContext, resources.getString(R.string.update_downloading),
+                    Toast.LENGTH_SHORT).show()
+            }
+
+            InstallStatus.DOWNLOADED -> {
+                Toast.makeText(applicationContext, resources.getString(R.string.update_downloaded),
+                    Toast.LENGTH_SHORT).show()
+
+                lifecycleScope.launch {
+                    delay(2000)
+                    appUpdateManager.completeUpdate()
+                }
+            }
+        }
+    }
+
 
     private fun observeRecordingDuration(){
 
@@ -138,7 +194,7 @@ class MainActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED){
 
                 recordingsViewModel.durationWithPosition.collectLatest {
-                    playerUtils.updateRecordingDuration(it)
+                    playerUtils?.updateRecordingDuration(it)
                 }
             }
         }
@@ -189,12 +245,12 @@ class MainActivity : AppCompatActivity() {
 
         bindPlayer?.let {
             if(it.root.visibility == View.GONE)
-                playerUtils.slideInPlayer()
+                playerUtils?.slideInPlayer()
         } ?: kotlin.run {
-            inflatePlayerStubAndCallRelatedMethods()
+            bind.stubPlayer.inflate()
         }
 
-        playerUtils.updateImage()
+        playerUtils?.updateImage()
 
     }
 
@@ -219,11 +275,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun inflatePlayerStubAndCallRelatedMethods (){
+    private fun callPlayerStubRelatedMethods (){
 
-        bind.stubPlayer.inflate()
-
-        playerUtils.slideInPlayer()
+        playerUtils?.slideInPlayer()
 
         clickListenerToHandleNavigationWithDetailsFragment()
 
@@ -249,7 +303,7 @@ class MainActivity : AppCompatActivity() {
 
         mainViewModel.currentSongTitle.observe(this){ title ->
 
-            playerUtils.handleTitleText(title)
+            playerUtils?.handleTitleText(title)
         }
     }
 
@@ -308,7 +362,7 @@ class MainActivity : AppCompatActivity() {
 
         mainViewModel.playbackState.observe(this){
 
-            playerUtils.handleIcons(it)
+            playerUtils?.handleIcons(it)
 
         }
     }
@@ -326,6 +380,9 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-
+    override fun onDestroy() {
+        super.onDestroy()
+        appUpdateManager.unregisterListener(installStateUpdatedListener)
+    }
 }
 
