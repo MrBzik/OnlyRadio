@@ -68,10 +68,12 @@ class SearchParamsDialog (
 
     private var stationsCount = ""
     private var systemStr = ""
+    private var maxValue = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        maxValue = requireContext.resources.getString(R.string.maximum_value)
 
         setStrings()
 
@@ -153,15 +155,14 @@ class SearchParamsDialog (
 
             setAdapter(orderAdapter)
 
-            setSelection(
+            val selection =  when(mainViewModel.newSearchOrder){
+                ORDER_VOTES -> 0
+                ORDER_POP -> 1
+                ORDER_TREND -> 2
+                else -> 3
+            }
 
-                when(mainViewModel.newSearchOrder){
-                    ORDER_VOTES -> 0
-                    ORDER_POP -> 1
-                    ORDER_TREND -> 2
-                    else -> 3
-                }
-            )
+            setSelection(selection)
 
             setOnItemClickListener { _, _, position, _ ->
 
@@ -174,7 +175,7 @@ class SearchParamsDialog (
             }
 
 
-            setText(mainViewModel.newSearchOrder, false)
+            setText(orderAdapter.getItem(selection), false)
 
             if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES){
                 setDropDownBackgroundResource(R.drawable.dialog_gradient_for_background)
@@ -201,7 +202,7 @@ class SearchParamsDialog (
             setLabelFormatter { value ->
 
                 when(value){
-                    0f -> "Unset"
+                    0f -> maxValue
                     1f -> "$BITRATE_24 kbps"
                     2f -> "$BITRATE_32 kbps"
                     3f -> "$BITRATE_64 kbps"
@@ -210,7 +211,7 @@ class SearchParamsDialog (
                     6f -> "$BITRATE_192 kbps"
                     7f -> "$BITRATE_256 kbps"
                     8f -> "$BITRATE_320 kbps"
-                    else -> "Unset"
+                    else -> maxValue
                 }
             }
 

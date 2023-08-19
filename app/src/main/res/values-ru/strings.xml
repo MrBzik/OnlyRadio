@@ -9,13 +9,13 @@
     <string name="time_left">Ост.:</string>
     <string name="Expand">Детали</string>
     <string name="Hide">Скрыть</string>
-
+    <string name="playing_no_info">Играет: неизвестно</string>
 
     <!--    Hint Messages -->
 
     <string name="recordings_frag_tip">Новую запись можно начать в "Деталях". Остановить также в "Деталях" и уведомлении</string>
-    <string name="fav_frag_hint">Станции можно добавить в избранные в "Деталях". Добавленные станции можно перетаскивать в плейлисты. Удалять свайпом влево-вправо</string>
-    <string name="playlist__hint">Станции можно добавить в плейлист в "Деталях", а также "Экспортом" из "Ленивого Плейлиста". Добавленные станции можно перетаскивать между плейлистами</string>
+    <string name="fav_frag_hint">Новые станции можно добавить в "Деталях". Добавленные станции можно перетаскивать в плейлисты, и удалять свайпом влево-вправо</string>
+    <string name="playlist__hint">Новые станции можно добавить в "Деталях", а также "Экспортом" из "Лениста". Добавленные станции можно перетаскивать между плейлистами</string>
     <string name="lazy_list_hint">Тут будут появляться наиболее прослушиваемые станции за последнее время, исключая уже добавленные в избранные и плейлисты</string>
     <string name="bookmarks_message">Вы можете отмечать песни в "Деталях", уведомлении либо из общего списка песен в "Истории". Удалить свайпом влево-вправо. Чтобы увидеть доп. опции кликайте на названия песен</string>
 
@@ -41,7 +41,7 @@
     <string name="foreground_pref">Завершать сервис при закрытии приложения</string>
     <string name="kill_service_setting_tip">(По умолчанию: оставлять сервис если играет аудио)</string>
     <string name="auto_search">Авто поиск</string>
-    <string name="auto_search_hint">(По умолчанию: начинать ноый поиск свайпом вниз либо [icon] кнопкой)</string>
+    <string name="auto_search_hint">(По умолчанию: начинать новый поиск свайпом вниз либо [icon] кнопкой)</string>
     <string name="text_setting">Размер шрифта</string>
     <string name="buffer_options">Опции буфера</string>
     <string name="history_options">Опции истории</string>
@@ -82,20 +82,23 @@
 
     <string name="favourite_title">Избранное</string>
     <string name="export">Экспорт</string>
-    <string name="edit">Редактировать</string>
+    <string name="edit">Ред.</string>
     <string name="playlists_expand_title">Плейлисты</string>
 
     <!--    Playlists-->
-    <string name="lazy_title_half_1">Ленивый</string>
-    <string name="lazy_title_half_2">плейлист</string>
+    <string name="lazy_playlist_name">Ленист</string>
     <string name="create_new_playlist">Создать новый плейлист</string>
 
     <!--    Fragment Station Details-->
-    <string name="add_to_playlist">Добавть в плейлист</string>
+    <string name="add_to_playlist">В плейлист</string>
     <string name="languages_title">Языки:</string>
     <string name="tags_title">Теги:</string>
     <string name="rec_processing">Обработка…</string>
     <string name="rec_saved">Готово</string>
+    <string name="from_history">Из истории</string>
+    <string name="from_fav">Избранное</string>
+    <string name="from_search">Из поиска</string>
+    <string name="in_fall_out">Вне списков</string>
 
 
     <!--    History Fragment-->
@@ -109,7 +112,7 @@
     <string name="stations_count">ст.</string>
     <string name="system">Система</string>
     <string name="exact">Точно</string>
-
+    <string name="setting_unlimited">Любое</string>
 
 
     <!--    Buffer Settings Dialog-->
@@ -118,7 +121,7 @@
     <string name="buffer_main_hint">Сколько данных загружать наперед для плавного прослушивания</string>
     <string name="adaptive_load_controller">Адаптивный контроллер загрузки</string>
     <string name="adaptive_load_controller_hint">Дает большую отзывчивость буфера к низким настройкам. Полезен если необходим меньший размер буфера</string>
-    <string name="to_start_audio_title">Чтобы начать проигрывание -</string>
+    <string name="to_start_audio_title">Мин буфер до начала проигрывания </string>
 
 
     <!--    Fragment Recordings-->
@@ -128,7 +131,7 @@
     <!--    Fragment Recordings Details-->
     <string name="rename_btn">Переименовать</string>
     <string name="rec_date_from">Дата:</string>
-    <string name="rec_occupied_space">Занимаемое место:</string>
+    <string name="rec_occupied_space">Вес на устройстве:</string>
     <string name="rec_play_speed">Скорость</string>
 
 
@@ -140,17 +143,21 @@
     <string name="search_bitrate_hint">Установка мин битрейта скроет станции без информации о битрейте</string>
     <string name="bitrate_min">Мин</string>
     <string name="bitrate_max">Макс</string>
-    <string name="search_language_title">Должен включать язык</string>
+    <string name="maximum_value">Любой</string>
+    <string name="search_language_title">Фильтр по языку</string>
 
     <!--    Rename Recording Dialog-->
-    <string name="rename_recording_title">Установть название</string>
+    <string name="rename_recording_title">Сменить название</string>
     <string name="rename_rec_hint">Введите название</string>
 
     <!--    Recordings Settings Dialog-->
     <string name="recording_options_dialog_title">Опции записи</string>
     <string name="rec_settings_restriction_hint">Записи предназначены для личного использования. Они доступны лишь в пределах данного приложения</string>
-    <string name="stop_rec_after_title">Макс время записи:</string>
-    <string name="rec_title_setting">Именовать записи по названию песни если доступно</string>
+    <string name="stop_rec_after_title">Макс время : </string>
+    <string name="rec_title_setting">Название по песне если доступно</string>
+    <string name="time_hours">ч</string>
+    <string name="time_mins">м</string>
+    <string name="rec_quality_title">Качество:</string>
 
     <!--    Pick Tag Dialog-->
     <string name="tag_dialog_title">Поиск по тегу</string>
@@ -168,14 +175,14 @@
     <string name="history_options_main_hint">Макс кол-во дат для станций и названий песен до авто чистки</string>
     <string name="bookmark_setting_title">Макс кол-во отмеченных названий песен</string>
     <string name="history_settings_warning">Новые настройки (и возможная очистка текущей истории) примут силу при последующем запуске приложения</string>
-    <string name="history_bookmarks_title"> Отмеченные песни - </string>
-
+    <string name="history_dates_title">Даты</string>
+    <string name="bookmarks_count_title">Отмеченные песни</string>
 
 
     <!--    Add Station To Playlists Dialog-->
     <string name="add_to_playlist_message">Нет плейлистов</string>
     <string name="add_to_playlist_title">Добавит станцию в существующий или новый плейлист</string>
-    <string name="export_into_playlists_title">Экспортировать станции из "Ленивого плейлиста" в существующий или новый плейлист</string>
+    <string name="export_into_playlists_title">Экспортировать станции из "Лениста" в существующий или новый плейлист</string>
 
 
     <!--    Create Playlist Dialog-->
@@ -188,7 +195,7 @@
     <string name="delete">Удалить</string>
 
     <!--    Edit Playlist Dialog-->
-    <string name="edit_playlist_dialog_title">Редактировать плейлист</string>
+    <string name="edit_playlist_dialog_title">Редактировать</string>
     <string name="new_playlist_name_hint">Новое название…</string>
 
 
@@ -197,7 +204,7 @@
     <string name="removed_from_favs">Станция удалена из избранных</string>
     <string name="saved_to_favs">Станция сохранена в избранные</string>
     <string name="removed_from_playlist">Станция удалена из </string>
-    <string name="removed_from_lazy_list">Станция удалена из "Ленивого плейлиста"</string>
+    <string name="removed_from_lazy_list">Станция удалена из "Лениста"</string>
     <string name="already_in_playlist">Уже есть в </string>
     <string name="moved_to_playlist">Станция перемещена в </string>
     <string name="added_to_playlist">Станция добавлена в </string>
@@ -206,9 +213,9 @@
     <string name="action_undo">ВЕРНУТЬ</string>
 
     <!--    Toasts-->
-    <string name="reconnecting">Переподключение…</string>
+    <string name="reconnecting">Ожидание…</string>
     <string name="not_responding">Станция не отвечает…</string>
-    <string name="reverb_error">Гхм… Попробуйте перезапустить устройство</string>
+    <string name="reverb_error">Ммм… Попробуйте перезапустить устройство</string>
     <string name="playlist_name_empty">Название не введено</string>
     <string name="playlist_name_taken">Название занято</string>
     <string name="playlist_no_image">Изображение не выбрано</string>

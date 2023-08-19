@@ -3,7 +3,7 @@
 
     <style name="mainTextButtons" parent="android:Widget.TextView">
         <item name="android:textColor">@color/interactive_text_color</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">16sp</item>
         <item name="android:fontFamily">@font/aldrich</item>
         <item name="android:shadowDx">0.0</item>
         <item name="android:shadowDy">0.0</item>
@@ -15,7 +15,7 @@
 
     <style name="swipeDeleteStyle" parent="android:Widget.TextView">
         <item name="android:textColor">@color/interactive_text_color</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">16sp</item>
         <item name="android:fontFamily">@font/aldrich</item>
         <item name="android:shadowDx">1.5</item>
         <item name="android:shadowDy">1.3</item>
@@ -42,6 +42,7 @@
         <item name="android:textSize">18sp</item>
         <item name="android:fontFamily">sans-serif-smallcaps</item>
     </style>
+
     <style name="bottomNavTextInactive" parent="android:Widget.TextView">
         <item name="android:textColor">@color/regular_text_color</item>
         <item name="android:textSize">12sp</item>

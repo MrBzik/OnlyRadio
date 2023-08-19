@@ -37,7 +37,6 @@ import com.onlyradio.radioplayer.ui.dialogs.CreatePlaylistDialog
 import com.onlyradio.radioplayer.ui.dialogs.EditPlaylistDialog
 import com.onlyradio.radioplayer.ui.dialogs.RemovePlaylistDialog
 import com.onlyradio.radioplayer.ui.viewmodels.PixabayViewModel
-import com.onlyradio.radioplayer.utils.Constants.LAZY_LIST_NAME
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_LAZY_LIST
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
@@ -306,6 +305,11 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     }
 
 
+    private fun getLazyList(){
+        favViewModel.getLazyPlaylist(
+            resources.getString(R.string.lazy_playlist_name)
+        )
+    }
 
     private fun setPlaylistAdapterClickListeners(){
 
@@ -324,7 +328,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
                     bind.rvFavStations.scheduleLayoutAnimation()
                 }
-                favViewModel.getLazyPlaylist()
+                getLazyList()
 
             }
 
@@ -536,7 +540,9 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         favViewModel.listOfAllPlaylists.observe(viewLifecycleOwner){ originalList ->
 
-            val listWithHeader = mutableListOf(Playlist(LAZY_LIST_NAME, ""))
+            val listWithHeader = mutableListOf(Playlist(
+                resources.getString(R.string.lazy_playlist_name)
+                , ""))
 
             listWithHeader.addAll(originalList)
 
@@ -719,7 +725,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         }
 
         RadioSource.removeItemFromLazyList(pos)
-        favViewModel.getLazyPlaylist()
+        getLazyList()
 //        mainAdapter.listOfStations = RadioSource.lazyListStations
 //        mainAdapter.notifyItemRemoved(pos)
 
@@ -732,7 +738,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
                 RadioSource.restoreItemFromLazyList(pos)
                 if(currentTab == SEARCH_FROM_LAZY_LIST){
-                    favViewModel.getLazyPlaylist()
+                    getLazyList()
 //                    mainAdapter.listOfStations = RadioSource.lazyListStations
 //                    mainAdapter.notifyItemInserted(pos)
                 }

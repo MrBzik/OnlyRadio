@@ -128,7 +128,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         val list = when(RadioService.currentMediaItems){
             SEARCH_FROM_API -> {
-                listName = "From search"
+                listName = resources.getString(R.string.from_search)
 
                 mainViewModel.radioSource.stationsFromApi.map {
                     it.toRadioStation()
@@ -138,7 +138,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
             SEARCH_FROM_FAVOURITES -> {
 
-                listName = "From favoured"
+                listName = resources.getString(R.string.from_fav)
 
                 if(favViewModel.isStationFavoured.value == false){
                     RadioService.currentPlayingStation.value?.let {
@@ -157,13 +157,13 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
 
             SEARCH_FROM_LAZY_LIST -> {
-                listName = "Lazy list"
+                listName = resources.getString(R.string.lazy_playlist_name)
                 RadioSource.lazyListStations
             }
 
 
             SEARCH_FROM_HISTORY -> {
-                listName = "From history"
+                listName = resources.getString(R.string.from_history)
 
                 mainViewModel.radioSource.stationsFromHistory
             }
@@ -181,7 +181,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
             NO_PLAYLIST -> {
 
-                listName = "In fall out"
+                listName = resources.getString(R.string.in_fall_out)
                 RadioService.currentPlayingStation.value?.let {
                     listOf(it)
                 } ?: emptyList()
@@ -364,9 +364,9 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         mainViewModel.currentSongTitle.observe(viewLifecycleOwner){ title ->
 
 
-            if(title.equals("NULL", ignoreCase = true) || title.isBlank()){
+            if(title.isBlank()){
 
-                bind.tvSongTitle.text = TITLE_UNKNOWN
+                bind.tvSongTitle.text = resources.getString(R.string.playing_no_info)
 
                 bind.tvSongTitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.default_text_color))
 

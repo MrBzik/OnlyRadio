@@ -16,7 +16,6 @@ import com.onlyradio.radioplayer.utils.Commands.COMMAND_ON_DROP_STATION_IN_PLAYL
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_REMOVE_MEDIA_ITEM
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_UPDATE_FAV_PLAYLIST
 import com.onlyradio.radioplayer.utils.Constants
-import com.onlyradio.radioplayer.utils.Constants.LAZY_LIST_NAME
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_LAZY_LIST
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
@@ -268,13 +267,15 @@ class DatabaseViewModel @Inject constructor(
     }
 
 
-    fun getLazyPlaylist() {
+    fun getLazyPlaylist(name : String) {
 
         favFragStationsSwitch.postValue(SEARCH_FROM_LAZY_LIST)
 
 //        isInLazyPlaylist = true
 //        isInFavouriteTab.postValue(false)
-        currentPlaylistName.postValue(LAZY_LIST_NAME)
+        currentPlaylistName.postValue(
+            name
+        )
 
 //        if(isLazyPlaylistSourceSet){
 //            observableListOfStations.value = stationsInLazyPlaylist.value

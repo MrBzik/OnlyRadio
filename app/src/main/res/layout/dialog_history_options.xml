@@ -37,15 +37,27 @@
 
 
     <TextView
-        android:id="@+id/tvHistoryDatesValue"
+        android:id="@+id/tvHistoryDatesTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="8dp"
-        android:text="3 dates"
+        android:text="@string/history_dates_title"
+        android:textAppearance="@style/dialogItemText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvDatesHint" />
+
+    <TextView
+        android:id="@+id/tvHistoryDatesValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="8dp"
+        android:text="3"
         android:textAppearance="@style/dialogItemText"
         android:textColor="@color/selected_genre_color"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvDatesHint" />
 
 
@@ -72,14 +84,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rangeSliderHistoryDates" />
 
+
     <TextView
         android:id="@+id/tvBookmarkNumberTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
         android:layout_marginTop="8dp"
-        android:text="@string/history_bookmarks_title"
-        android:textColor="@color/selected_genre_color"
+        android:layout_marginStart="20dp"
+        android:text="@string/bookmarks_count_title"
         android:textAppearance="@style/dialogItemText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvBookmarkedTitlesHint" />
@@ -89,10 +101,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:text="10"
         android:textColor="@color/selected_genre_color"
         android:textAppearance="@style/dialogItemText"
-        app:layout_constraintStart_toEndOf="@id/tvBookmarkNumberTitle"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvBookmarkedTitlesHint" />
 
 
@@ -103,7 +117,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvBookmarkNumberTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/tvBookmarkNumberValue" />
 
     <TextView
         android:id="@+id/tvWarning"

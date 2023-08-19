@@ -73,7 +73,6 @@ object Constants {
     const val ITEM_INDEX = "index of item"
     const val ITEM_ID = "id of item"
 
-    const val LAZY_LIST_NAME = "Lazy list"
 
     const val IS_CHANGE_MEDIA_ITEMS = "id of station from history"
     const val IS_SAME_STATION = "is same radio station"

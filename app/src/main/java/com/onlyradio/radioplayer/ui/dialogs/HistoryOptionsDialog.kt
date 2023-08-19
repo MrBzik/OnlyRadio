@@ -10,9 +10,10 @@ import com.onlyradio.radioplayer.utils.Constants
 import com.onlyradio.radioplayer.utils.Constants.HISTORY_PREF_BOOKMARK
 import com.onlyradio.radioplayer.utils.Constants.HISTORY_PREF_DATES
 import com.google.android.material.slider.RangeSlider
+import com.onlyradio.radioplayer.R
 
 class HistoryOptionsDialog (
-    requireContext : Context,
+    private val requireContext : Context,
     private val historyPref : SharedPreferences,
     private val cleanupCheck : () -> Unit
         ) : BaseDialog<DialogHistoryOptionsBinding> (
@@ -29,10 +30,13 @@ class HistoryOptionsDialog (
     private var newDatesNumber = initialDatesNumber
     private var newBookmarkNumber = initialBookmarkNumber
 
+    private var unlimitedBookmarksStr = ""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        unlimitedBookmarksStr = requireContext.resources.getString(R.string.setting_unlimited)
 
         setRangeHistoryDates()
 
@@ -54,7 +58,7 @@ class HistoryOptionsDialog (
             stepSize = 2f
 
 
-            bind.tvHistoryDatesValue.text = getDatesValue(initialDatesNumber)
+            bind.tvHistoryDatesValue.text = initialDatesNumber.toString()
 
             values = listOf(initialDatesNumber.toFloat())
 
@@ -72,7 +76,7 @@ class HistoryOptionsDialog (
                     newDatesNumber = slider.values.first().toInt()
 
 
-                    bind.tvHistoryDatesValue.text = getDatesValue(newDatesNumber)
+                    bind.tvHistoryDatesValue.text = newDatesNumber.toString()
 
                     if(newDatesNumber < initialDatesNumber){
                         bind.tvWarning.visibility = View.VISIBLE
@@ -84,6 +88,7 @@ class HistoryOptionsDialog (
             })
         }
     }
+
 
     private fun getDatesValue(value : Int) : String {
         return  if(value == 1){
@@ -132,7 +137,7 @@ class HistoryOptionsDialog (
     private fun getBookmarkValTitle(value : Int) : String {
 
         return if(value == 100){
-                "unlimited"
+                unlimitedBookmarksStr
         } else {
                 value.toString()
         }
@@ -142,7 +147,7 @@ class HistoryOptionsDialog (
     private fun getBookmarkVal(value : Int) : String {
 
         return if(value == 100){
-                "Unlimited"
+                unlimitedBookmarksStr
         } else {
             "$value titles"
         }

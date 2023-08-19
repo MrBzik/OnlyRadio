@@ -193,7 +193,8 @@
 
     <TextView
         android:id="@+id/tvRangeTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_marginEnd="8dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
         android:layout_marginTop="36dp"
@@ -201,6 +202,7 @@
         android:textAppearance="@style/dialogItemText"
         app:layout_constraintTop_toBottomOf="@+id/fabNextReverb"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/switchWideRange"
         />
 
     <androidx.appcompat.widget.SwitchCompat

@@ -42,22 +42,22 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:text="Q: "
+        android:text="@string/rec_quality_title"
         android:textAppearance="@style/dialogItemText"
         android:textColor="@color/default_secondary_text_color"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvMainHint" />
 
-    <TextView
-        android:id="@+id/tvRecQualityValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Normal"
-        android:textAppearance="@style/dialogItemText"
-        android:textColor="@color/selected_genre_color"
-        app:layout_constraintStart_toEndOf="@+id/tvRecQualityTitle"
-        app:layout_constraintTop_toBottomOf="@id/tvMainHint" />
+<!--    <TextView-->
+<!--        android:id="@+id/tvRecQualityValue"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="20dp"-->
+<!--        android:text="Normal"-->
+<!--        android:textAppearance="@style/dialogItemText"-->
+<!--        android:textColor="@color/selected_genre_color"-->
+<!--        app:layout_constraintStart_toEndOf="@+id/tvRecQualityTitle"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/tvMainHint" />-->
 
 
     <TextView
@@ -79,7 +79,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvRecQualityValue" />
+        app:layout_constraintTop_toBottomOf="@+id/tvRecQualityTitle" />
 
 
 
@@ -100,10 +100,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
         android:text="10m"
         android:textAppearance="@style/dialogItemText"
         android:textColor="@color/selected_genre_color"
-        app:layout_constraintStart_toEndOf="@+id/tvRecAutoStopTitle"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/rangeSliderRecQuality" />
 
     <com.google.android.material.slider.RangeSlider

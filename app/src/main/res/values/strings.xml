@@ -8,6 +8,8 @@
     <string name="time_left">left:</string>
     <string name="Expand">Details</string>
     <string name="Hide">Hide</string>
+    <string name="playing_no_info">Playing: no info</string>
+
 
 
 <!--    Hint Messages -->
@@ -85,8 +87,7 @@
     <string name="playlists_expand_title">Playlists</string>
 
 <!--    Playlists-->
-    <string name="lazy_title_half_1">Lazy</string>
-    <string name="lazy_title_half_2">playlist</string>
+    <string name="lazy_playlist_name">Lazy list</string>
     <string name="create_new_playlist">Create new playlist</string>
 
 <!--    Fragment Station Details-->
@@ -95,6 +96,11 @@
     <string name="tags_title">Tags:</string>
     <string name="rec_processing">Processing…</string>
     <string name="rec_saved">Saved</string>
+    <string name="from_history">From history</string>
+    <string name="from_fav">From favoured</string>
+    <string name="from_search">From search</string>
+    <string name="in_fall_out">In fall out</string>
+
 
 
 <!--    History Fragment-->
@@ -108,7 +114,7 @@
     <string name="stations_count">st.</string>
     <string name="system">System</string>
     <string name="exact">Exact</string>
-
+    <string name="setting_unlimited">Any</string>
 
 
     <!--    Buffer Settings Dialog-->
@@ -117,7 +123,7 @@
     <string name="buffer_main_hint">How much data to load in advance for smooth listening</string>
     <string name="adaptive_load_controller">Adaptive load controller</string>
     <string name="adaptive_load_controller_hint">Ensures buffer responsiveness to low settings. Use if smaller buffer is needed</string>
-    <string name="to_start_audio_title">To start audio -</string>
+    <string name="to_start_audio_title">Ensure buffer size to start playing audio</string>
 
 
 <!--    Fragment Recordings-->
@@ -139,7 +145,8 @@
     <string name="search_bitrate_hint">Setting min bitrate will hide stations with no bitrate info</string>
     <string name="bitrate_min">Min</string>
     <string name="bitrate_max">Max</string>
-    <string name="search_language_title">Should include language</string>
+    <string name="maximum_value">Any</string>
+    <string name="search_language_title">Filter by language</string>
 
 <!--    Rename Recording Dialog-->
     <string name="rename_recording_title">Rename recording</string>
@@ -148,8 +155,11 @@
 <!--    Recordings Settings Dialog-->
     <string name="recording_options_dialog_title">Recording options</string>
     <string name="rec_settings_restriction_hint">Recordings are meant for personal use only. As for now they are not accessible outside this app</string>
-    <string name="stop_rec_after_title">Stop rec. after:</string>
+    <string name="stop_rec_after_title">Max rec. time:</string>
     <string name="rec_title_setting">Use song title for rec. name if available</string>
+    <string name="time_hours">h</string>
+    <string name="time_mins">m</string>
+    <string name="rec_quality_title">Quality:</string>
 
 <!--    Pick Tag Dialog-->
     <string name="tag_dialog_title">Search by tag</string>
@@ -167,8 +177,8 @@
     <string name="history_options_main_hint">Maximum number of dates to keep for stations and titles before clean up</string>
     <string name="bookmark_setting_title">Maximum number of bookmarked titles to keep</string>
     <string name="history_settings_warning">Saving new options may result in cleaning current history on next app launch</string>
-    <string name="history_bookmarks_title">Bookmarks - </string>
-
+    <string name="history_dates_title">Dates</string>
+    <string name="bookmarks_count_title">Bookmarks</string>
 
 
 <!--    Add Station To Playlists Dialog-->
@@ -214,7 +224,8 @@
     <string name="title_bookmarked">Title bookmarked</string>
     <string name="same_search_query">Same search query</string>
 
-<!--    Search Order-->
+
+    <!--    Search Order-->
     <string-array name="search_order_array">
         <item>Top voted</item>
         <item>Most popular</item>

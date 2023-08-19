@@ -16,6 +16,7 @@ import com.onlyradio.radioplayer.utils.Constants.REC_QUALITY_MEDIUM
 import com.onlyradio.radioplayer.utils.Constants.REC_QUALITY_ULTRA
 import com.onlyradio.radioplayer.utils.RecPref
 import com.google.android.material.slider.RangeSlider
+import com.onlyradio.radioplayer.R
 
 
 class RecordingOptionsDialog (
@@ -30,6 +31,10 @@ class RecordingOptionsDialog (
     private var newAutoStopOption : Int? = null
     private var newNamingPref : Boolean? = null
 
+    private var timeMax = ""
+    private var timeHours = ""
+    private var timeMins = ""
+
     private var initialRecQuality = RecPref.qualityFloatToInt(
         recordingQualityPref.getFloat(RECORDING_QUALITY_PREF, REC_QUALITY_DEF)
     )
@@ -41,6 +46,7 @@ class RecordingOptionsDialog (
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        setTimeStrings()
 
         setRangeRecQuality()
 
@@ -94,6 +100,11 @@ class RecordingOptionsDialog (
     }
 
 
+    private fun setTimeStrings(){
+        timeMins = requireContext.resources.getString(R.string.time_mins)
+        timeHours = requireContext.resources.getString(R.string.time_hours)
+        timeMax = requireContext.resources.getString(R.string.setting_unlimited)
+    }
 
     private fun setRangeRecQuality(){
         bind.rangeSliderRecQuality.apply {
@@ -102,7 +113,7 @@ class RecordingOptionsDialog (
             stepSize = 1f
 
 
-            bind.tvRecQualityValue.text = RecPref.setTvRecQualityValue(initialRecQuality)
+//            bind.tvRecQualityValue.text = RecPref.setTvRecQualityValue(initialRecQuality)
 
             bind.tvQualityEstimate.text = setTvEstimateText(initialRecQuality)
 
@@ -122,7 +133,7 @@ class RecordingOptionsDialog (
                     newQualityOption = slider.values.first().toInt()
 
                     newQualityOption?.let { value ->
-                        bind.tvRecQualityValue.text = RecPref.setTvRecQualityValue(value)
+//                        bind.tvRecQualityValue.text = RecPref.setTvRecQualityValue(value)
                         bind.tvQualityEstimate.text = setTvEstimateText(value)
                     }
                 }
@@ -193,16 +204,16 @@ class RecordingOptionsDialog (
     private fun minsToString(mins : Int) : String{
 
         if(mins == 180)
-            return "unset"
+            return timeMax
 
         val hours = mins / 60
 
         val minsRemain = mins -( hours * 60)
 
         return if (hours > 0){
-            "$hours h $minsRemain m"
+            "$hours $timeHours $minsRemain $timeMins"
         } else {
-            "$minsRemain m"
+            "$minsRemain $timeMins"
         }
     }
 

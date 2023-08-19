@@ -27,10 +27,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:fontFamily="@font/aldrich"
+            android:layout_marginTop="20dp"
             android:text="@string/buffer_main_hint"
-            android:textColor="@color/default_secondary_text_color"
-            android:textSize="13sp"
+            android:textAppearance="@style/hintText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
 
@@ -40,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="8dp"
             android:textAppearance="@style/dialogItemText"
             android:textColor="@color/selected_genre_color"
             app:layout_constraintStart_toStartOf="parent"
@@ -110,10 +109,10 @@
             android:id="@+id/tvPlaybackBufferTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="20dp"
             android:text="@string/to_start_audio_title"
-            android:textAppearance="@style/dialogItemText"
+            android:textAppearance="@style/hintText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/rangeSliderBufferInSeconds" />
 
@@ -121,11 +120,12 @@
             android:id="@+id/tvPlaybackBufferValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="20dp"
             android:textColor="@color/selected_genre_color"
             android:textAppearance="@style/dialogItemText"
-            app:layout_constraintStart_toEndOf="@+id/tvPlaybackBufferTitle"
-            app:layout_constraintTop_toBottomOf="@id/rangeSliderBufferInSeconds" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvPlaybackBufferTitle" />
 
 
         <com.google.android.material.slider.RangeSlider
@@ -135,7 +135,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvPlaybackBufferTitle" />
+            app:layout_constraintTop_toBottomOf="@+id/tvPlaybackBufferValue" />
 
 
         <TextView
