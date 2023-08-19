@@ -107,9 +107,9 @@ dependencies {
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
 
     //Navigation
-    implementation "androidx.navigation:navigation-fragment-ktx:2.5.3"
-    implementation "androidx.navigation:navigation-ui-ktx:2.5.3"
-    implementation("androidx.navigation:navigation-dynamic-features-fragment:2.5.3")
+    implementation "androidx.navigation:navigation-fragment-ktx:2.6.0"
+    implementation "androidx.navigation:navigation-ui-ktx:2.6.0"
+    implementation("androidx.navigation:navigation-dynamic-features-fragment:2.6.0")
 
 
     //Page 3
@@ -136,8 +136,19 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 
     // Auto updates
-    implementation "com.google.android.play:app-update:2.1.0"
-    implementation "com.google.android.play:app-update-ktx:2.1.0"
+    implementation "com.google.android.play:app-update:2.0.1"
+    implementation "com.google.android.play:app-update-ktx:2.0.1"
+
+
+    constraints {
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
+            because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
+        }
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0") {
+            because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
+        }
+    }
+
 
 //     Memory leaks
 //    debugImplementation "com.squareup.leakcanary:leakcanary-android:2.10"
