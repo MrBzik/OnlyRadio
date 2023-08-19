@@ -101,11 +101,11 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
                 ).show()
             }
 
-            override fun recInitialValue(): Int {
-               return RecPref.qualityFloatToInt(
-                    recordingQualityPref.getFloat(RECORDING_QUALITY_PREF, REC_QUALITY_DEF)
-                )
-            }
+//            override fun recInitialValue(): Int {
+//               return RecPref.qualityFloatToInt(
+//                    recordingQualityPref.getFloat(RECORDING_QUALITY_PREF, REC_QUALITY_DEF)
+//                )
+//            }
 
             override fun historyDialog() {
                 HistoryOptionsDialog(requireContext(), historyPref){
@@ -322,13 +322,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
             val color = ContextCompat.getColor(requireContext(), R.color.nav_bar_settings_frag)
 //            val colorStatus = ContextCompat.getColor(requireContext(), R.color.status_bar_settings_frag)
 
-          bind.viewSeparator.visibility = View.GONE
-
+            bind.viewSeparator.visibility = View.GONE
             if(!settingsViewModel.isSmoothTransitionNeeded){
 
-            (activity as MainActivity).apply {
-                window.navigationBarColor = color
-                window.statusBarColor = color
+                (activity as MainActivity).apply {
+                    window.navigationBarColor = color
+                    window.statusBarColor = color
                 }
             }
 

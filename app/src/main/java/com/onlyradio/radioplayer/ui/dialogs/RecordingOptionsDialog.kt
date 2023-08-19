@@ -34,14 +34,23 @@ class RecordingOptionsDialog (
     private var timeMax = ""
     private var timeHours = ""
     private var timeMins = ""
+    private var timeMinLong = ""
 
-    private var initialRecQuality = RecPref.qualityFloatToInt(
-        recordingQualityPref.getFloat(RECORDING_QUALITY_PREF, REC_QUALITY_DEF)
-    )
+    private var initialRecQuality =
+        when (recordingQualityPref.getFloat(RECORDING_QUALITY_PREF, REC_QUALITY_DEF)) {
+        REC_QUALITY_LOW -> 0
+        REC_QUALITY_MEDIUM -> 1
+        REC_QUALITY_DEF -> 2
+        REC_QUALITY_HIGH -> 3
+        REC_QUALITY_ULTRA -> 4
+        else -> 5
+    }
 
     private var initialRecAutoStopMins = recordingQualityPref.getInt(RECORDING_AUTO_STOP_PREF, 180)
 
     private var initialNamingPref = recordingQualityPref.getBoolean(RECORDING_NAMING_PREF, false)
+
+    private val recQualityArray = requireContext.resources.getStringArray(R.array.rec_quality_array)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,12 +113,13 @@ class RecordingOptionsDialog (
         timeMins = requireContext.resources.getString(R.string.time_mins)
         timeHours = requireContext.resources.getString(R.string.time_hours)
         timeMax = requireContext.resources.getString(R.string.setting_unlimited)
+        timeMinLong = requireContext.getString(R.string.rec_setting_min)
     }
 
     private fun setRangeRecQuality(){
         bind.rangeSliderRecQuality.apply {
-            valueFrom = 1f
-            valueTo = 6f
+            valueFrom = 0f
+            valueTo = 5f
             stepSize = 1f
 
 
@@ -120,7 +130,7 @@ class RecordingOptionsDialog (
             values = listOf(initialRecQuality.toFloat())
 
             setLabelFormatter { value ->
-                RecPref.setTvRecQualityValue(value.toInt())
+                recQualityArray[value.toInt()]
             }
 
 
@@ -146,12 +156,12 @@ class RecordingOptionsDialog (
     private fun setTvEstimateText(value : Int) : String  {
 
       return when(value){
-            1 -> "1 minute ~ 500kb"
-            2 -> "1 minute ~ 750kb"
-            3 -> "1 minute ~ 1mb"
-            4 -> "1 minute ~ 1.5mb"
-            5 -> "1 minute ~ 2mb"
-            else -> "1 minute ~ 2.3mb"
+            0 -> "1 $timeMinLong ~ 500kb"
+            1 -> "1 $timeMinLong ~ 750kb"
+            2 -> "1 $timeMinLong ~ 1mb"
+            3 -> "1 $timeMinLong ~ 1.5mb"
+            4 -> "1 $timeMinLong ~ 2mb"
+            else -> "1 $timeMinLong ~ 2.3mb"
         }
     }
 
@@ -159,11 +169,11 @@ class RecordingOptionsDialog (
    private fun qualityIntToFloat(value : Int) : Float {
 
         return when(value){
-            1 -> REC_QUALITY_LOW
-            2 -> REC_QUALITY_MEDIUM
-            3 -> REC_QUALITY_DEF
-            4 -> REC_QUALITY_HIGH
-            5 -> REC_QUALITY_ULTRA
+            0 -> REC_QUALITY_LOW
+            1 -> REC_QUALITY_MEDIUM
+            2 -> REC_QUALITY_DEF
+            3 -> REC_QUALITY_HIGH
+            4 -> REC_QUALITY_ULTRA
             else -> REC_QUALITY_MAX
         }
     }

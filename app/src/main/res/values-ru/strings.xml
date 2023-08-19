@@ -122,7 +122,7 @@
     <string name="adaptive_load_controller">Адаптивный контроллер загрузки</string>
     <string name="adaptive_load_controller_hint">Дает большую отзывчивость буфера к низким настройкам. Полезен если необходим меньший размер буфера</string>
     <string name="to_start_audio_title">Мин буфер до начала проигрывания </string>
-
+    <string name="buffer_setting_sec">сек.</string>
 
     <!--    Fragment Recordings-->
     <string name="recordings_frag_title">Записи</string>
@@ -153,11 +153,12 @@
     <!--    Recordings Settings Dialog-->
     <string name="recording_options_dialog_title">Опции записи</string>
     <string name="rec_settings_restriction_hint">Записи предназначены для личного использования. Они доступны лишь в пределах данного приложения</string>
-    <string name="stop_rec_after_title">Макс время : </string>
+    <string name="stop_rec_after_title">Макс время: </string>
     <string name="rec_title_setting">Название по песне если доступно</string>
     <string name="time_hours">ч</string>
     <string name="time_mins">м</string>
     <string name="rec_quality_title">Качество:</string>
+    <string name="rec_setting_min">мин.</string>
 
     <!--    Pick Tag Dialog-->
     <string name="tag_dialog_title">Поиск по тегу</string>
@@ -231,5 +232,16 @@
         <item>В тренде</item>
         <item>Случайно</item>
     </string-array>
+
+    <!--    Recording Quality Preferences-->
+    <string-array name="rec_quality_array">
+        <item>Низкое</item>
+        <item>Среднее</item>
+        <item>Оптимальное</item>
+        <item>Высокое</item>
+        <item>Ультра</item>
+        <item>Макс</item>
+    </string-array>
+
 
 </resources>

@@ -10,23 +10,13 @@ object RecPref {
 
      fun qualityFloatToInt(value : Float) : Int {
 
-        return if(value == REC_QUALITY_LOW) 1
-        else if(value == REC_QUALITY_MEDIUM) 2
-        else if(value == REC_QUALITY_DEF) 3
-        else if(value == REC_QUALITY_HIGH) 4
-        else if(value == REC_QUALITY_ULTRA) 5
-        else 6
-    }
-
-    fun setTvRecQualityValue(value : Int) : String {
-
-        return when(value){
-            1 -> "Low"
-            2  -> "Medium"
-            3  -> "Normal"
-            4  -> "High"
-            5 -> "Ultra"
-            else -> "Max"
+        return when (value) {
+            REC_QUALITY_LOW -> 0
+            REC_QUALITY_MEDIUM -> 1
+            REC_QUALITY_DEF -> 2
+            REC_QUALITY_HIGH -> 3
+            REC_QUALITY_ULTRA -> 4
+            else -> 5
         }
     }
 

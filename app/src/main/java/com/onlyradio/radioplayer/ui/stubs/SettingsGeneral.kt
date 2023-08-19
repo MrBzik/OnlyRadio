@@ -117,7 +117,7 @@ class SettingsGeneral () {
 
     private fun setupRecSettingClickListener(){
 
-        val initialValue = generalDialogsCall.recInitialValue()
+//        val initialValue = generalDialogsCall.recInitialValue()
 
 //        bindGeneral.tvRecordingSettingsValue.text = RecPref.setTvRecQualityValue(initialValue)
 

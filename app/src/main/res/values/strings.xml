@@ -118,12 +118,12 @@
 
 
     <!--    Buffer Settings Dialog-->
-
     <string name="buffer_options_title">Buffer options</string>
     <string name="buffer_main_hint">How much data to load in advance for smooth listening</string>
     <string name="adaptive_load_controller">Adaptive load controller</string>
     <string name="adaptive_load_controller_hint">Ensures buffer responsiveness to low settings. Use if smaller buffer is needed</string>
     <string name="to_start_audio_title">Ensure buffer size to start playing audio</string>
+    <string name="buffer_setting_sec">sec</string>
 
 
 <!--    Fragment Recordings-->
@@ -160,6 +160,7 @@
     <string name="time_hours">h</string>
     <string name="time_mins">m</string>
     <string name="rec_quality_title">Quality:</string>
+    <string name="rec_setting_min">min</string>
 
 <!--    Pick Tag Dialog-->
     <string name="tag_dialog_title">Search by tag</string>
@@ -235,6 +236,17 @@
         <item>Most popular</item>
         <item>Trending now</item>
         <item>Random order</item>
+    </string-array>
+
+
+    <!--    Recording Quality Preferences-->
+    <string-array name="rec_quality_array">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>Optimal</item>
+        <item>High</item>
+        <item>Ultra</item>
+        <item>Max</item>
     </string-array>
 
 </resources>

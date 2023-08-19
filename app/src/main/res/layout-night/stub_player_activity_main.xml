@@ -57,7 +57,7 @@
         android:paddingHorizontal="8dp"
         android:paddingTop="8dp"
         android:textSize="14sp"
-
+        android:text="@string/playing_no_info"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -5,7 +5,7 @@ interface GeneralDialogsCall {
      fun recOptionsDialog(
 //          newValue : (Int) -> Unit
      )
-     fun recInitialValue() : Int
+//     fun recInitialValue() : Int
      fun historyDialog()
      fun bufferDialog()
 

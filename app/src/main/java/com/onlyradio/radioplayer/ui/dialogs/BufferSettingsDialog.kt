@@ -22,9 +22,12 @@ class BufferSettingsDialog (
     DialogBufferSettingsBinding::inflate
                 ){
 
+    private var secSuffix = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        secSuffix = requireContext.getString(R.string.buffer_setting_sec)
 
 //        adjustDialogHeight(bind.clBufferSettingDialog)
 
@@ -62,12 +65,12 @@ class BufferSettingsDialog (
 
             val initialValue = RadioService.bufferSizeInMills / 1000
 
-            bind.tvBufferInSecondsTitle.text = "$initialValue seconds"
+            bind.tvBufferInSecondsTitle.text = "$initialValue $secSuffix"
 
             values = listOf(initialValue .toFloat())
 
             setLabelFormatter { value ->
-                "${value.toInt()} seconds"
+                "${value.toInt()} $secSuffix"
             }
 
 
@@ -79,7 +82,7 @@ class BufferSettingsDialog (
                 override fun onStopTrackingTouch(slider: RangeSlider) {
                     val newValue = slider.values.first().toInt()
 
-                    bind.tvBufferInSecondsTitle.text = "$newValue seconds"
+                    bind.tvBufferInSecondsTitle.text = "$newValue $secSuffix"
                 }
             })
 
@@ -121,18 +124,18 @@ class BufferSettingsDialog (
 
     private fun setRangePlaybackBuffer(){
         bind.rangeSliderPlaybackBuffer.apply {
-            valueFrom = 500f
-            valueTo = 10000f
-            stepSize = 500f
+            valueFrom = 1000f
+            valueTo = 30000f
+            stepSize = 1000f
 
             val initialValue = RadioService.bufferForPlayback
 
-            bind.tvPlaybackBufferValue.text = "$initialValue mls"
+            bind.tvPlaybackBufferValue.text = "${initialValue / 1000} $secSuffix"
 
             values = listOf(initialValue.toFloat())
 
             setLabelFormatter { value ->
-                "${value.toInt()} milliseconds"
+                "${value.toInt() / 1000} $secSuffix"
 
             }
 
@@ -144,7 +147,7 @@ class BufferSettingsDialog (
                 override fun onStopTrackingTouch(slider: RangeSlider) {
                     val newValue = slider.values.first().toInt()
 
-                    bind.tvPlaybackBufferValue.text = "$newValue mls"
+                    bind.tvPlaybackBufferValue.text = "${newValue / 1000} $secSuffix"
                 }
             })
         }

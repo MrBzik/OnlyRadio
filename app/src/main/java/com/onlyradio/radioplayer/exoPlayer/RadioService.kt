@@ -750,7 +750,12 @@ class RadioService : MediaBrowserServiceCompat() {
 
         bufferSizeInMills = buffPref.getInt(BUFFER_SIZE_IN_MILLS, DEFAULT_MAX_BUFFER_MS)
 //        bufferSizeInBytes = buffPref.getInt(BUFFER_SIZE_IN_BYTES, DEFAULT_TARGET_BUFFER_BYTES)
-        bufferForPlayback = buffPref.getInt(BUFFER_FOR_PLAYBACK, DEFAULT_BUFFER_FOR_PLAYBACK_MS)
+        bufferForPlayback = buffPref.getInt(BUFFER_FOR_PLAYBACK, 3000)
+        if(bufferForPlayback % 1000 == 500){
+            bufferForPlayback += 500
+            buffPref.edit().putInt(BUFFER_FOR_PLAYBACK, bufferForPlayback).apply()
+        }
+
 //        isToSetBufferInBytes = buffPref.getBoolean(IS_TO_SET_BUFFER_IN_BYTES, false)
         isAdaptiveLoaderToUse = buffPref.getBoolean(IS_ADAPTIVE_LOADER_TO_USE, false)
 
@@ -795,7 +800,7 @@ class RadioService : MediaBrowserServiceCompat() {
         exoPlayer.stop()
         exoPlayer = provideExoPlayer()
         mediaSessionConnector.setPlayer(exoPlayer)
-
+        radioNotificationManager.showNotification(exoPlayer)
         preparePlayer(
             playNow = isToPlay,
             itemIndex = currentPlayingItemPosition,
