@@ -172,6 +172,7 @@ class SearchParamsDialog (
                     2 -> ORDER_TREND
                     else -> ORDER_RANDOM
                 }
+
             }
 
 

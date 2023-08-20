@@ -43,9 +43,9 @@ class FilterTagsAdapter(): ListAdapter<TagWithGenre, RecyclerView.ViewHolder>(DI
                 )
             )
             holder.itemView.setOnClickListener {
-                val item = getItem(holder.absoluteAdapterPosition) as TagWithGenre.Tag
+                val item = getItem(holder.bindingAdapterPosition) as TagWithGenre.Tag
                 onItemClickListener?.let { click ->
-                    click(item, holder.absoluteAdapterPosition)
+                    click(item, holder.bindingAdapterPosition)
                 }
             }
             return holder
@@ -57,10 +57,10 @@ class FilterTagsAdapter(): ListAdapter<TagWithGenre, RecyclerView.ViewHolder>(DI
                 )
             )
             holder.itemView.setOnClickListener {
-                val item = getItem(holder.absoluteAdapterPosition) as TagWithGenre.Genre
+                val item = getItem(holder.bindingAdapterPosition) as TagWithGenre.Genre
                 handleGenreTextStyle(!item.isOpened, holder.bind.tvText)
                 onItemClickListener?.let { click ->
-                    click(item, holder.absoluteAdapterPosition)
+                    click(item, holder.bindingAdapterPosition)
                 }
             }
             return holder

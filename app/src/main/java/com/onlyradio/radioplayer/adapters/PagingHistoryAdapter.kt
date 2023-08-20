@@ -57,16 +57,16 @@ class PagingHistoryAdapter constructor(
 
                 holder.itemView.setOnClickListener {
 
-                    val item = getItem(holder.absoluteAdapterPosition) as StationWithDateModel.Station
+                    val item = getItem(holder.bindingAdapterPosition) as StationWithDateModel.Station
 
                     utils.onItemClickListener?.let { click ->
 
-                        click(item.radioStation, holder.absoluteAdapterPosition)
+                        click(item.radioStation, holder.bindingAdapterPosition)
                     }
 
                     if(item.radioStation.stationuuid == currentRadioStationID){
 
-                        if(selectedAdapterPosition != holder.absoluteAdapterPosition){
+                        if(selectedAdapterPosition != holder.bindingAdapterPosition){
 
                             previousItemHolder?.bind?.let {
                                 utils.restoreState(it)
@@ -75,7 +75,7 @@ class PagingHistoryAdapter constructor(
                     }
                     else {
 
-                        selectedAdapterPosition = holder.absoluteAdapterPosition
+                        selectedAdapterPosition = holder.bindingAdapterPosition
                         currentRadioStationID = item.radioStation.stationuuid
 
                         previousItemHolder?.bind?.let {
@@ -84,7 +84,7 @@ class PagingHistoryAdapter constructor(
                         }
 
                     }
-                    selectedAdapterPosition = holder.absoluteAdapterPosition
+                    selectedAdapterPosition = holder.bindingAdapterPosition
                     previousItemHolder = holder
                 }
 
@@ -146,7 +146,7 @@ class PagingHistoryAdapter constructor(
                         }
 
                         previousItemHolder = holder
-                        selectedAdapterPosition = holder.absoluteAdapterPosition
+                        selectedAdapterPosition = holder.bindingAdapterPosition
                         utils.handleStationPlaybackState(this)
 
                 } else
@@ -165,7 +165,7 @@ class PagingHistoryAdapter constructor(
 
     fun updateStationPlaybackState(){
        previousItemHolder?.let{
-           if(it.absoluteAdapterPosition == selectedAdapterPosition){
+           if(it.bindingAdapterPosition == selectedAdapterPosition){
                utils.handleStationPlaybackState(it.bind)
            }
        }
@@ -183,7 +183,7 @@ class PagingHistoryAdapter constructor(
             }
         }
         holder?.let {
-            selectedAdapterPosition = holder.absoluteAdapterPosition
+            selectedAdapterPosition = holder.bindingAdapterPosition
             previousItemHolder = holder
 
             utils.handleStationPlaybackState(holder.bind)

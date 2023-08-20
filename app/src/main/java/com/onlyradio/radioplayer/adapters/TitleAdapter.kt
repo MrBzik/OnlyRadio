@@ -60,7 +60,7 @@ class TitleAdapter constructor(
 
                 holder.itemView.setOnClickListener {
 
-                    val item = getItem(holder.absoluteAdapterPosition) as TitleWithDateModel.TitleItem
+                    val item = getItem(holder.bindingAdapterPosition) as TitleWithDateModel.TitleItem
 
                     onItemClickListener?.let { click ->
 
@@ -72,7 +72,7 @@ class TitleAdapter constructor(
 
                 holder.bind.tvBookmark.setOnClickListener {
 
-                    val item = getItem(holder.absoluteAdapterPosition) as TitleWithDateModel.TitleItem
+                    val item = getItem(holder.bindingAdapterPosition) as TitleWithDateModel.TitleItem
 
                     onBookmarkClickListener?.let { click ->
                         click(item.title)

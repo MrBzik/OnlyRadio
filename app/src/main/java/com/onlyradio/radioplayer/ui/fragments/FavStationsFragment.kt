@@ -641,7 +641,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.absoluteAdapterPosition
+                val position = viewHolder.bindingAdapterPosition
                 val stationID = mainAdapter.listOfStations[position].stationuuid
                 when (currentTab) {
                     SEARCH_FROM_FAVOURITES -> {

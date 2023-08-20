@@ -32,23 +32,23 @@ class RadioDatabaseAdapter @Inject constructor(
        )
 
         holder.itemView.setOnLongClickListener {
-            val station =  listOfStations[holder.absoluteAdapterPosition]
+            val station =  listOfStations[holder.bindingAdapterPosition]
             val clipText = station.stationuuid
             val item = ClipData.Item(clipText)
             val mimeTypes = arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN)
             val data = ClipData("STATION_ID", mimeTypes, item)
             val dragShadowBuilder = View.DragShadowBuilder(it)
             it.startDragAndDrop(data, dragShadowBuilder, it, 0)
-            FavStationsFragment.dragAndDropItemPos = holder.absoluteAdapterPosition
+            FavStationsFragment.dragAndDropItemPos = holder.bindingAdapterPosition
             FavStationsFragment.dragAndDropStation = station
             true
         }
 
 
         holder.itemView.setOnClickListener {
-            val station = listOfStations[holder.absoluteAdapterPosition]
+            val station = listOfStations[holder.bindingAdapterPosition]
             utils.onItemClickListener?.let { click ->
-                click(station, holder.absoluteAdapterPosition)
+                click(station, holder.bindingAdapterPosition)
 
                 updateOnStationChange(station, holder, true)
             }
@@ -67,7 +67,7 @@ class RadioDatabaseAdapter @Inject constructor(
         }
 
         if(station.stationuuid == currentRadioStationId) {
-            selectedAdapterPosition = holder.absoluteAdapterPosition
+            selectedAdapterPosition = holder.bindingAdapterPosition
             previousItemHolder = holder
             utils.handleStationPlaybackState(holder.bind)
         } else
@@ -91,7 +91,7 @@ class RadioDatabaseAdapter @Inject constructor(
 
     fun updateStationPlaybackState(){
         previousItemHolder?.let{
-            if(it.absoluteAdapterPosition == selectedAdapterPosition){
+            if(it.bindingAdapterPosition == selectedAdapterPosition){
                 utils.handleStationPlaybackState(it.bind)
             }
         }
@@ -107,7 +107,7 @@ class RadioDatabaseAdapter @Inject constructor(
             }
         }
         holder?.let {
-            selectedAdapterPosition = holder.absoluteAdapterPosition
+            selectedAdapterPosition = holder.bindingAdapterPosition
             previousItemHolder = holder
             if(!isClicked){
                 utils.handleStationPlaybackState(holder.bind)

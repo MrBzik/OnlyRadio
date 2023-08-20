@@ -147,14 +147,14 @@ class PlaylistsAdapter @Inject constructor(
 
             playlistClickListener?.let { click ->
 
-                val playlist = differ.currentList[playlistHolder.absoluteAdapterPosition]
+                val playlist = differ.currentList[playlistHolder.bindingAdapterPosition]
 
                 if(
                     currentTab != SEARCH_FROM_PLAYLIST || playlist.playlistName != currentPlaylistName
                 ) {
 
-                    click(differ.currentList[playlistHolder.absoluteAdapterPosition],
-                        playlistHolder.absoluteAdapterPosition - 1
+                    click(differ.currentList[playlistHolder.bindingAdapterPosition],
+                        playlistHolder.bindingAdapterPosition - 1
                     )
 
                     handleHighlightOnPlaylistClick(playlistHolder)

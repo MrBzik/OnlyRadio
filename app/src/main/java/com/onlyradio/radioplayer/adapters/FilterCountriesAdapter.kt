@@ -45,9 +45,9 @@ class FilterCountriesAdapter(): ListAdapter<CountryWithRegion, RecyclerView.View
                 )
             )
             holder.itemView.setOnClickListener {
-                val item = getItem(holder.absoluteAdapterPosition) as CountryWithRegion.Country
+                val item = getItem(holder.bindingAdapterPosition) as CountryWithRegion.Country
                 onItemClickListener?.let { click ->
-                    click(item, holder.absoluteAdapterPosition)
+                    click(item, holder.bindingAdapterPosition)
                 }
             }
             return holder
@@ -59,10 +59,10 @@ class FilterCountriesAdapter(): ListAdapter<CountryWithRegion, RecyclerView.View
                 )
             )
             holder.itemView.setOnClickListener {
-                val item = getItem(holder.absoluteAdapterPosition) as CountryWithRegion.Region
+                val item = getItem(holder.bindingAdapterPosition) as CountryWithRegion.Region
                 handleGenreTextStyle(!item.isOpened, holder.bind.tvText)
                 onItemClickListener?.let { click ->
-                    click(item, holder.absoluteAdapterPosition)
+                    click(item, holder.bindingAdapterPosition)
                 }
             }
             return holder

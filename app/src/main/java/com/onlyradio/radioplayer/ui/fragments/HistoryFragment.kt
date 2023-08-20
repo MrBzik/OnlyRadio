@@ -752,7 +752,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
 
-                val position = viewHolder.absoluteAdapterPosition
+                val position = viewHolder.bindingAdapterPosition
 
                 val bookmark = bookmarkedTitlesAdapter.listOfTitles[position]
 

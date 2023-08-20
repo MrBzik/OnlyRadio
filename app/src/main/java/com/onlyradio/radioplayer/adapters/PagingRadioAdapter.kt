@@ -1,6 +1,7 @@
 package com.onlyradio.radioplayer.adapters
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
@@ -29,11 +30,11 @@ class PagingRadioAdapter @Inject constructor(
        )
         holder.itemView.setOnClickListener {
 
-            val item = getItem(holder.absoluteAdapterPosition)
+            val item = getItem(holder.bindingAdapterPosition)
 
             item?.let { station ->
                 utils.onItemClickListener?.let { click ->
-                    click(station, holder.absoluteAdapterPosition)
+                    click(station, holder.bindingAdapterPosition)
 
                     updateOnStationChange(station, holder, true)
                 }
@@ -60,7 +61,7 @@ class PagingRadioAdapter @Inject constructor(
         }
 
         if(station.stationuuid == currentRadioStationId){
-            selectedAdapterPosition = holder.absoluteAdapterPosition
+            selectedAdapterPosition = holder.bindingAdapterPosition
             previousItemHolder = holder
             utils.handleStationPlaybackState(holder.bind)
 
@@ -81,7 +82,7 @@ class PagingRadioAdapter @Inject constructor(
 
     fun updateStationPlaybackState(){
         previousItemHolder?.let{
-            if(it.absoluteAdapterPosition == selectedAdapterPosition){
+            if(it.bindingAdapterPosition == selectedAdapterPosition){
                 utils.handleStationPlaybackState(it.bind)
             }
         }
@@ -100,7 +101,7 @@ class PagingRadioAdapter @Inject constructor(
             }
         }
         holder?.let {
-            selectedAdapterPosition = holder.absoluteAdapterPosition
+            selectedAdapterPosition = holder.bindingAdapterPosition
             previousItemHolder = holder
             if(!isClicked){
                 utils.handleStationPlaybackState(holder.bind)
