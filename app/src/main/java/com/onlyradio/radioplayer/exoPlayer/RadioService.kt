@@ -14,6 +14,7 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
+import android.util.Log
 
 import android.widget.Toast
 import androidx.core.net.toUri
@@ -84,6 +85,7 @@ import com.google.android.exoplayer2.audio.AuxEffectInfo
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
+import com.onlyradio.radioplayer.BuildConfig
 import com.onlyradio.radioplayer.R
 import dagger.hilt.android.AndroidEntryPoint
 import dev.brookmg.exorecord.lib.ExoRecord

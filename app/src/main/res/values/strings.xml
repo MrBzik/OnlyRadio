@@ -62,12 +62,12 @@
 
 <!--    No Results Message-->
     <string name="no_results_title">No results for:</string>
-    <string name="no_results_tag">Tag:</string>
-    <string name="no_results_name">Name:</string>
-    <string name="no_results_country">Country:</string>
-    <string name="no_results_language">Language:</string>
-    <string name="no_results_bitrate_min">Bitrate min:</string>
-    <string name="no_results_bitrate_max">Bitrate max:</string>
+    <string name="no_results_tag">"Tag: "</string>
+    <string name="no_results_name">"Name: "</string>
+    <string name="no_results_country">"Country: "</string>
+    <string name="no_results_language">"Language: "</string>
+    <string name="no_results_bitrate_min">"Bitrate min: "</string>
+    <string name="no_results_bitrate_max">"Bitrate max: "</string>
 
 <!--    Text Buttons-->
     <string name="homepage_btn">Homepage</string>

@@ -22,8 +22,8 @@ android {
         applicationId "com.onlyradio.radioplayer"
         minSdk 24
         targetSdk 33
-        versionCode 8
-        versionName "1.7"
+        versionCode 9
+        versionName "1.8"
         buildConfigField "String", "API_KEY", localProperties['apiKey']
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -87,8 +87,8 @@ dependencies {
 //    implementation 'com.github.brookmg.exorecord:exorecordogg:0.3.3'
 
     // ExoRecording Fork
-    implementation 'com.github.MrBzik.ExoRecord:exorecord:TestTrim'
-    implementation 'com.github.MrBzik.ExoRecord:exorecordogg:TestTrim'
+    implementation 'com.github.MrBzik.ExoRecord:exorecord:Rules'
+    implementation 'com.github.MrBzik.ExoRecord:exorecordogg:Rules'
 
 //    implementation 'com.arthenica:ffmpeg-kit-min:5.1'
 

@@ -17,7 +17,7 @@
     <string name="fav_frag_hint">Новые станции можно добавить в "Деталях". Добавленные станции можно перетаскивать в плейлисты, и удалять свайпом влево-вправо</string>
     <string name="playlist__hint">Новые станции можно добавить в "Деталях", а также "Экспортом" из "Лениста". Добавленные станции можно перетаскивать между плейлистами</string>
     <string name="lazy_list_hint">Тут будут появляться наиболее прослушиваемые станции за последнее время, исключая уже добавленные в избранные и плейлисты</string>
-    <string name="bookmarks_message">Вы можете отмечать песни в "Деталях", уведомлении либо из общего списка песен в "Истории". Удалить свайпом влево-вправо. Кликайте на названия песен чтобы увидеть доп. опции</string>
+    <string name="bookmarks_message">Вы можете отмечать песни в "Деталях", уведомлении либо из общего списка песен в "Истории". Удалять свайпом влево-вправо. Кликайте на названия песен чтобы увидеть доп. опции</string>
 
 
     <!--    Bottom Navigation-->
@@ -61,12 +61,12 @@
 
     <!--    No Results Message-->
     <string name="no_results_title">Нет совпадений для:</string>
-    <string name="no_results_tag">Тег:</string>
-    <string name="no_results_name">Название:</string>
-    <string name="no_results_country">Страна:</string>
-    <string name="no_results_language">Язык:</string>
-    <string name="no_results_bitrate_min">Битрейт мин:</string>
-    <string name="no_results_bitrate_max">Битрейт макс:</string>
+    <string name="no_results_tag">"Тег: "</string>
+    <string name="no_results_name">"Название: "</string>
+    <string name="no_results_country">"Страна: "</string>
+    <string name="no_results_language">"Язык: "</string>
+    <string name="no_results_bitrate_min">"Битрейт мин: "</string>
+    <string name="no_results_bitrate_max">"Битрейт макс: "</string>
 
     <!--    Text Buttons-->
     <string name="homepage_btn">Домашняя страница</string>
