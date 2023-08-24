@@ -46,11 +46,14 @@ class RadioDatabaseAdapter @Inject constructor(
 
 
         holder.itemView.setOnClickListener {
-            val station = listOfStations[holder.bindingAdapterPosition]
-            utils.onItemClickListener?.let { click ->
-                click(station, holder.bindingAdapterPosition)
 
-                updateOnStationChange(station, holder, true)
+            if(holder.bindingAdapterPosition >= 0){
+                val station = listOfStations[holder.bindingAdapterPosition]
+                utils.onItemClickListener?.let { click ->
+                    click(station, holder.bindingAdapterPosition)
+
+                    updateOnStationChange(station, holder, true)
+                }
             }
         }
 

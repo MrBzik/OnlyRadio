@@ -444,9 +444,12 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         bind.tvSelectedCountry.setOnClickListener {
 
-            CountryPickerDialog(requireContext(), mainViewModel, searchDialogsViewModels){
+            CountryPickerDialog(requireContext(), searchDialogsViewModels)
+            { countryCode, countryName ->
                 if(mainViewModel.isFullAutoSearch)
                     isToInitiateNewSearch = true
+
+                mainViewModel.updateCountrySearchSelection(countryCode, countryName)
             }.show()
 
         }

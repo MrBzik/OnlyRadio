@@ -38,14 +38,17 @@ class RecordingsAdapter @Inject constructor(
 
         holder.itemView.setOnClickListener {
 
-            val recording = differ.currentList[holder.bindingAdapterPosition]
+            if(holder.bindingAdapterPosition >= 0){
 
-            onItemClickListener?.let { click ->
-                click(recording, holder.bindingAdapterPosition)
+                val recording = differ.currentList[holder.bindingAdapterPosition]
 
-                RecordingsFragment.isToHandleNewRecording = false
+                onItemClickListener?.let { click ->
+                    click(recording, holder.bindingAdapterPosition)
 
-                handleRecordingChange(recording, holder)
+                    RecordingsFragment.isToHandleNewRecording = false
+
+                    handleRecordingChange(recording, holder)
+                }
             }
         }
 

@@ -32,10 +32,13 @@ class BookmarkedTitlesAdapter @Inject constructor(
        )
 
         holder.itemView.setOnClickListener {
-            val title = listOfTitles[holder.bindingAdapterPosition]
-            onItemClickListener?.let { click ->
-                click(title)
 
+            if(holder.bindingAdapterPosition >= 0){
+                val title = listOfTitles[holder.bindingAdapterPosition]
+                onItemClickListener?.let { click ->
+                    click(title)
+
+                }
             }
         }
 

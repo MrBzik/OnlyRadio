@@ -60,25 +60,28 @@ class TitleAdapter constructor(
 
                 holder.itemView.setOnClickListener {
 
-                    val item = getItem(holder.bindingAdapterPosition) as TitleWithDateModel.TitleItem
+                    if(holder.bindingAdapterPosition >= 0){
+                        val item = getItem(holder.bindingAdapterPosition) as TitleWithDateModel.TitleItem
 
-                    onItemClickListener?.let { click ->
+                        onItemClickListener?.let { click ->
 
-                        click(item.title)
+                            click(item.title)
 
+                        }
                     }
                 }
 
 
                 holder.bind.tvBookmark.setOnClickListener {
+                    if (holder.bindingAdapterPosition >= 0){
 
-                    val item = getItem(holder.bindingAdapterPosition) as TitleWithDateModel.TitleItem
-
-                    onBookmarkClickListener?.let { click ->
-                        click(item.title)
-
+                        val item = getItem(holder.bindingAdapterPosition) as TitleWithDateModel.TitleItem
+                        onBookmarkClickListener?.let { click ->
+                            click(item.title)
+                        }
 //                        handleBookmarkImage(!item.title.isBookmarked, holder.bind.ivBookmark)
                     }
+
                 }
 
                 return holder

@@ -30,13 +30,16 @@ class PagingRadioAdapter @Inject constructor(
        )
         holder.itemView.setOnClickListener {
 
-            val item = getItem(holder.bindingAdapterPosition)
+            if(holder.bindingAdapterPosition >= 0){
 
-            item?.let { station ->
-                utils.onItemClickListener?.let { click ->
-                    click(station, holder.bindingAdapterPosition)
+                val item = getItem(holder.bindingAdapterPosition)
 
-                    updateOnStationChange(station, holder, true)
+                item?.let { station ->
+                    utils.onItemClickListener?.let { click ->
+                        click(station, holder.bindingAdapterPosition)
+
+                        updateOnStationChange(station, holder, true)
+                    }
                 }
             }
         }

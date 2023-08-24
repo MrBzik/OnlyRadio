@@ -57,35 +57,38 @@ class PagingHistoryAdapter constructor(
 
                 holder.itemView.setOnClickListener {
 
-                    val item = getItem(holder.bindingAdapterPosition) as StationWithDateModel.Station
+                    if(holder.bindingAdapterPosition >= 0){
 
-                    utils.onItemClickListener?.let { click ->
+                        val item = getItem(holder.bindingAdapterPosition) as StationWithDateModel.Station
 
-                        click(item.radioStation, holder.bindingAdapterPosition)
-                    }
+                        utils.onItemClickListener?.let { click ->
 
-                    if(item.radioStation.stationuuid == currentRadioStationID){
+                            click(item.radioStation, holder.bindingAdapterPosition)
+                        }
 
-                        if(selectedAdapterPosition != holder.bindingAdapterPosition){
+                        if(item.radioStation.stationuuid == currentRadioStationID){
 
-                            previousItemHolder?.bind?.let {
-                                utils.restoreState(it)
+                            if(selectedAdapterPosition != holder.bindingAdapterPosition){
+
+                                previousItemHolder?.bind?.let {
+                                    utils.restoreState(it)
+                                }
                             }
                         }
-                    }
-                    else {
+                        else {
 
-                        selectedAdapterPosition = holder.bindingAdapterPosition
-                        currentRadioStationID = item.radioStation.stationuuid
+                            selectedAdapterPosition = holder.bindingAdapterPosition
+                            currentRadioStationID = item.radioStation.stationuuid
 
-                        previousItemHolder?.bind?.let {
+                            previousItemHolder?.bind?.let {
 
-                            utils.restoreState(it)
+                                utils.restoreState(it)
+                            }
+
                         }
-
+                        selectedAdapterPosition = holder.bindingAdapterPosition
+                        previousItemHolder = holder
                     }
-                    selectedAdapterPosition = holder.bindingAdapterPosition
-                    previousItemHolder = holder
                 }
 
                 return holder

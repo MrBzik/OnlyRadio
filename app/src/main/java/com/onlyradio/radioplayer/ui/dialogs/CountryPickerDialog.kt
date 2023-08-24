@@ -39,9 +39,8 @@ import com.onlyradio.radioplayer.utils.listOfWestEurope
 
 class CountryPickerDialog(
    private val requireContext : Context,
-   private val mainViewModel: MainViewModel,
    private val searchDialogsViewModel : SearchDialogsViewModel,
-   private val handleNewParams : () -> Unit
+   private val handleNewParams : (countryCode : String, countryName : String) -> Unit
 )
     : BaseDialog<DialogPickCountryBinding>(
     requireContext,
@@ -171,9 +170,8 @@ class CountryPickerDialog(
 
             } else if(countryItem is CountryWithRegion.Country) {
 
-                handleNewParams()
-                mainViewModel.searchParamCountry.postValue(countryItem.countryCode)
-                mainViewModel.searchFullCountryName = countryItem.countryName
+                handleNewParams(countryItem.countryCode, countryItem.countryName)
+
 
                 dismiss()
 
@@ -236,10 +234,8 @@ class CountryPickerDialog(
 
         bind.tvClearSelection.setOnClickListener{
 
-            handleNewParams()
+            handleNewParams("", "")
 
-            mainViewModel.searchParamCountry.postValue("")
-            mainViewModel.searchFullCountryName = ""
             dismiss()
         }
     }

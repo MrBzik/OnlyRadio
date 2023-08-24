@@ -175,6 +175,11 @@ class MainViewModel @Inject constructor(
 
 
 
+    fun updateCountrySearchSelection(countryCode: String, countryName : String){
+        searchParamCountry.value = countryCode
+        searchFullCountryName = countryName
+    }
+
     fun saveSearchPrefs(){
         searchPreferences.edit().apply {
             putString(SEARCH_PREF_TAG, searchParamTag.value)

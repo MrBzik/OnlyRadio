@@ -85,6 +85,7 @@ import com.google.android.exoplayer2.audio.AuxEffectInfo
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
+import com.google.android.exoplayer2.util.Assertions
 import com.onlyradio.radioplayer.BuildConfig
 import com.onlyradio.radioplayer.R
 import dagger.hilt.android.AndroidEntryPoint
@@ -96,6 +97,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.lang.IllegalArgumentException
 import java.sql.Date
 import java.util.Calendar
 import javax.inject.Inject
@@ -910,19 +912,26 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private fun clearMediaItems(isNoList : Boolean = true){
 
+        try{
+            if(exoPlayer.currentMediaItemIndex > 0){
 
-        if(exoPlayer.currentMediaItemIndex > 0){
+                exoPlayer.removeMediaItems(0, exoPlayer.currentMediaItemIndex)
+            }
 
-            exoPlayer.removeMediaItems(0, exoPlayer.currentMediaItemIndex)
-        }
+            if(exoPlayer.mediaItemCount > 1 && exoPlayer.currentMediaItemIndex == 0){
+                exoPlayer.removeMediaItems(1, exoPlayer.mediaItemCount)
+            }
 
-        if(exoPlayer.mediaItemCount != 1){
-            exoPlayer.removeMediaItems(1, exoPlayer.mediaItemCount)
-        }
-
-        if(isNoList){
-            currentPlayingItemPosition = 0
-            currentMediaItems = NO_PLAYLIST
+            if(isNoList){
+                currentPlayingItemPosition = 0
+                currentMediaItems = NO_PLAYLIST
+            }
+        } catch (e : Exception){
+            throw IllegalArgumentException(
+                "Strange crash from google testers I can't reproduce. " +
+                        "\nExoplayer currentMediaItemIndex: ${exoPlayer.currentAdGroupIndex}" +
+                        "Exoplayer mediaItemCount: ${exoPlayer.mediaItemCount}"
+            )
         }
     }
 
@@ -956,9 +965,10 @@ class RadioService : MediaBrowserServiceCompat() {
             if(isToChangeMediaItems)
                 updateMediaItems( currentMediaItems, isSameStation, itemIndex)
 
+
             if(!isSameStation){
-                if(itemIndex != -1){
-                    exoPlayer.seekTo(itemIndex, 0L)
+                if(itemIndex >= 0 && exoPlayer.mediaItemCount > 0){
+                    exoPlayer.seekToDefaultPosition(itemIndex)
                 }
                 exoPlayer.prepare()
             }
