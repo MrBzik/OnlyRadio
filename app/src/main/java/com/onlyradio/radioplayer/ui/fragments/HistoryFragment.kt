@@ -573,10 +573,18 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 try{
                     startActivity(intent)
-                }catch (e : Exception){
+                } catch (e : Exception){
                     val webIntent = Intent(Intent.ACTION_VIEW,
                     Uri.parse("https://www.youtube.com/results?search_query=$title"))
-                    startActivity(webIntent)
+                    try {
+                        startActivity(webIntent)
+                    } catch (e : Exception){
+                        Toast.makeText(requireContext(),
+                            resources.getString(R.string.no_browser_error),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
                 }
             }
         }.show()

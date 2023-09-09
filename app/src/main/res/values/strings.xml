@@ -228,6 +228,8 @@
     <string name="playlist_no_image">No image selected</string>
     <string name="title_bookmarked">Title bookmarked</string>
     <string name="same_search_query">Same search query</string>
+    <string name="no_browser_error_plus_clipboard">No browser found on the device. Address was copied to clipboard</string>
+    <string name="no_browser_error">No browser found on the device</string>
 
 
     <!--    Search Order-->

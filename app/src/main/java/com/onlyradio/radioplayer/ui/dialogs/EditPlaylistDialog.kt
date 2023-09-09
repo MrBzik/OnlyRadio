@@ -17,11 +17,9 @@ import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.adapters.PagingPixabayAdapter
 import com.onlyradio.radioplayer.data.local.entities.Playlist
 import com.onlyradio.radioplayer.databinding.DialogEditPlaylistBinding
+import com.onlyradio.radioplayer.extensions.observeKeyboardState
 import com.onlyradio.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.PixabayViewModel
-import com.onlyradio.radioplayer.utils.KeyboardObserver
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -116,19 +114,22 @@ class EditPlaylistDialog (
 
     private fun handleKeyboardToggle(){
 
-        KeyboardObserver.observeKeyboardState(bind.root, {
-            bind.tvTitle.visibility = View.GONE
-            bind.tvDelete.visibility = View.GONE
+        bind.root.observeKeyboardState(
+            {
+                bind.tvTitle.visibility = View.GONE
+                bind.tvDelete.visibility = View.GONE
 
 //            isFocusHandlingNeeded = false
-        },{
-            bind.tvTitle.visibility = View.VISIBLE
-            bind.tvDelete.visibility = View.VISIBLE
+            },{
+                bind.tvTitle.visibility = View.VISIBLE
+                bind.tvDelete.visibility = View.VISIBLE
 
 //            isFocusHandlingNeeded = true
-            bind.etSearchQuery.clearFocus()
-            bind.etPlaylistName.clearFocus()
-        }, {})
+                bind.etSearchQuery.clearFocus()
+                bind.etPlaylistName.clearFocus()
+            }, {}
+        )
+
     }
 
 

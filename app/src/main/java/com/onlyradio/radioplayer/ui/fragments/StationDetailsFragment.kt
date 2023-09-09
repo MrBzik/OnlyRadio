@@ -288,7 +288,15 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             tagsTitle = requireContext().resources.getString(R.string.tags_title),
         ){
             val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
-            startActivity(webIntent)
+            try {
+                startActivity(webIntent)
+            } catch (e : Exception){
+                val clip = ClipData.newPlainText("label", it)
+                clipBoard?.setPrimaryClip(clip)
+                Toast.makeText(requireContext(),
+                    resources.getString(R.string.no_browser_error_plus_clipboard),
+                    Toast.LENGTH_LONG).show()
+            }
         }
 
         bind.viewPager.apply {
@@ -432,14 +440,36 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                     setAction("WEBSEARCH"){
                         val intent = Intent(Intent.ACTION_WEB_SEARCH)
                         intent.putExtra(SearchManager.QUERY, songTitle)
-                        startActivity(intent)
+                        try {
+                            startActivity(intent)
+                        } catch (e : Exception){
+                            Toast.makeText(
+                                requireContext(),
+                                resources.getString(R.string.no_browser_error),
+                                Toast.LENGTH_SHORT
+                                ).show()
+                        }
                     }
                 addAction(R.layout.snackbar_extra_action, "YOUTUBE"){
                     val intent = Intent(Intent.ACTION_SEARCH)
                     intent.setPackage("com.google.android.youtube")
                     intent.putExtra(SearchManager.QUERY, songTitle)
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    startActivity(intent)
+                    try {
+                        startActivity(intent)
+                    } catch (e : Exception){
+                        val webIntent = Intent(Intent.ACTION_VIEW,
+                        Uri.parse("https://www.youtube.com/results?search_query=$songTitle"))
+                        try {
+                            startActivity(webIntent)
+                        } catch (e : Exception){
+                            Toast.makeText(
+                                requireContext(),
+                                resources.getString(R.string.no_browser_error),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
                 }
             }.show()
 

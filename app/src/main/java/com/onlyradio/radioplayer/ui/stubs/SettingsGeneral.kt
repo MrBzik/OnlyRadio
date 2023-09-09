@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.net.Uri
+import android.widget.Toast
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.databinding.StubSettingsGeneralBinding
 import com.onlyradio.radioplayer.exoPlayer.RadioService
@@ -202,7 +203,15 @@ class SettingsGeneral () {
             val intent = Intent(
                 Intent.ACTION_VIEW,
                 Uri.parse(Constants.ADD_RADIO_STATION_URL))
-            context.startActivity(intent)
+            try {
+                context.startActivity(intent)
+            } catch (e : Exception){
+                Toast.makeText(context,
+                    context.resources.getString(R.string.no_browser_error),
+                    Toast.LENGTH_SHORT
+                    ).show()
+            }
+
         }
     }
 

@@ -15,9 +15,9 @@ import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.adapters.FilterTagsAdapter
 import com.onlyradio.radioplayer.adapters.models.serializable.TagWithGenre
 import com.onlyradio.radioplayer.databinding.DialogPickTagBinding
+import com.onlyradio.radioplayer.extensions.observeKeyboardState
 import com.onlyradio.radioplayer.ui.viewmodels.MainViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.SearchDialogsViewModel
-import com.onlyradio.radioplayer.utils.KeyboardObserver.observeKeyboardState
 import com.onlyradio.radioplayer.utils.TAG_BY_CLASSIC
 import com.onlyradio.radioplayer.utils.TAG_BY_EXPERIMENTAL
 import com.onlyradio.radioplayer.utils.TAG_BY_GENRE
@@ -114,21 +114,27 @@ class TagPickerDialog (
 
 
     private fun handleKeyboardToggle (){
-        observeKeyboardState(bind.root, {
-            bind.tvTitle.visibility = View.GONE
-            bind.tvSwitchSearchExact.visibility = View.GONE
-            bind.switchMatchExact.visibility = View.GONE
 
-        }, {
-            bind.tvTitle.visibility = View.VISIBLE
-            bind.tvSwitchSearchExact.visibility = View.VISIBLE
-            bind.switchMatchExact.visibility = View.VISIBLE
-            bind.editText.clearFocus()
+        bind.root.observeKeyboardState(
+            {
+                bind.tvTitle.visibility = View.GONE
+                bind.tvSwitchSearchExact.visibility = View.GONE
+                bind.switchMatchExact.visibility = View.GONE
 
-        }, {
-            bind.editText.requestFocus()
+            }, {
+                bind.tvTitle.visibility = View.VISIBLE
+                bind.tvSwitchSearchExact.visibility = View.VISIBLE
+                bind.switchMatchExact.visibility = View.VISIBLE
+                bind.editText.clearFocus()
 
-        })
+            }, {
+                bind.editText.requestFocus()
+
+            }
+        )
+
+
+//        observeKeyboardState(bind.root, )
     }
 
 

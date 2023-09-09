@@ -1,7 +1,12 @@
 package com.onlyradio.radioplayer.utils
 
 
+import android.util.Log
 import android.view.View
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 object KeyboardObserver {
@@ -18,7 +23,6 @@ object KeyboardObserver {
         var isFirstRun = true
         var fullScreenSize = 0
         var lastEmition = false
-
 
 
         view.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->

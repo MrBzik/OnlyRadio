@@ -3,16 +3,15 @@ package com.onlyradio.radioplayer.ui.dialogs
 
 import android.content.Context
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.adapters.FilterCountriesAdapter
 import com.onlyradio.radioplayer.adapters.models.CountryWithRegion
 import com.onlyradio.radioplayer.databinding.DialogPickCountryBinding
-import com.onlyradio.radioplayer.ui.viewmodels.MainViewModel
+import com.onlyradio.radioplayer.extensions.observeKeyboardState
 import com.onlyradio.radioplayer.ui.viewmodels.SearchDialogsViewModel
 import com.onlyradio.radioplayer.utils.COUNTRY_REGION_AFRICA
 import com.onlyradio.radioplayer.utils.COUNTRY_REGION_ASIA
@@ -24,7 +23,6 @@ import com.onlyradio.radioplayer.utils.COUNTRY_REGION_OCEANIA
 import com.onlyradio.radioplayer.utils.COUNTRY_REGION_SOUTH_AMERICA
 import com.onlyradio.radioplayer.utils.COUNTRY_REGION_THE_CARIBBEAN
 import com.onlyradio.radioplayer.utils.COUNTRY_REGION_WEST_EUROPE
-import com.onlyradio.radioplayer.utils.KeyboardObserver
 import com.onlyradio.radioplayer.utils.listOfAfrica
 import com.onlyradio.radioplayer.utils.listOfAsia
 import com.onlyradio.radioplayer.utils.listOfCentralAmerica
@@ -90,38 +88,56 @@ class CountryPickerDialog(
 
     private fun handleKeyboardToggle (){
 
-        KeyboardObserver.observeKeyboardState(bind.root, {
 
-            bind.tvTitle.visibility = View.GONE
+        bind.root.observeKeyboardState(
+            {
+                bind.tvTitle.visibility = View.GONE
+
+            }, {
+                bind.tvTitle.visibility = View.VISIBLE
+                bind.editText.clearFocus()
+            }, { bind.editText.requestFocus() }
+        )
 
 
-        }, {
-
-            bind.tvTitle.visibility = View.VISIBLE
-            bind.editText.clearFocus()
-
-
-        }, { bind.editText.requestFocus() })
+//        KeyboardObserver.observeKeyboardState(bind.root, {
+//
+//            bind.tvTitle.visibility = View.GONE
+//
+//
+//        }, {
+//
+//            bind.tvTitle.visibility = View.VISIBLE
+//            bind.editText.clearFocus()
+//
+//
+//        }, { bind.editText.requestFocus() })
     }
 
 
     private fun filterCountriesOnEditTextListener(){
 
-        bind.editText.addTextChangedListener(object : TextWatcher{
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
+//        val listener = object :TextWatcher{
+//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+//            }
+//
+//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//                countryAdapter.filter.filter(s)
+//            }
+//
+//            override fun afterTextChanged(s: Editable?) {
+//            }
+//        }
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                countryAdapter.filter.filter(s)
+        bind.editText.addTextChangedListener {
+            it?.let {
+                countryAdapter.filter.filter(it)
             }
+        }
 
-            override fun afterTextChanged(s: Editable?) {
-            }
-        })
+//        bind.editText.addTextChangedListener(listener)
 
     }
-
-
 
 
     private fun setupRecyclerView(){
