@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
 import com.onlyradio.radioplayer.adapters.models.CountryWithRegion
 import com.onlyradio.radioplayer.databinding.ItemCountryBinding
 import com.onlyradio.radioplayer.databinding.ItemGenreBinding
@@ -18,7 +19,9 @@ import com.onlyradio.radioplayer.databinding.ItemGenreBinding
 const val VIEW_TYPE_COUNTRY = 0
 const val VIEW_TYPE_REGION = 1
 
-class FilterCountriesAdapter(): ListAdapter<CountryWithRegion, RecyclerView.ViewHolder>(DIFF_CALLBACK),
+class FilterCountriesAdapter(
+    private val glide : RequestManager
+): ListAdapter<CountryWithRegion, RecyclerView.ViewHolder>(DIFF_CALLBACK),
     Filterable {
 
     var originalList: List<CountryWithRegion> = currentList.toList()
@@ -85,10 +88,9 @@ class FilterCountriesAdapter(): ListAdapter<CountryWithRegion, RecyclerView.View
 
                 tvStationsCount.text = item.stationsCount.toString()
 
-                Glide.with(ivCountryFlag)
-                    .load(
-                        Uri.parse(
-                            "file:///android_asset/flags/${item.countryCode.lowercase()}.png"))
+                glide.load(
+                    Uri.parse(
+                        "file:///android_asset/flags/${item.countryCode.lowercase()}.png"))
                     .into(ivCountryFlag)
 
             }

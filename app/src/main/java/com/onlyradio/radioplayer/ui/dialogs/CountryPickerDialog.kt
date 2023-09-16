@@ -7,6 +7,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.RequestManager
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.adapters.FilterCountriesAdapter
 import com.onlyradio.radioplayer.adapters.models.CountryWithRegion
@@ -38,6 +39,7 @@ import com.onlyradio.radioplayer.utils.listOfWestEurope
 class CountryPickerDialog(
    private val requireContext : Context,
    private val searchDialogsViewModel : SearchDialogsViewModel,
+   private val glide : RequestManager,
    private val handleNewParams : (countryCode : String, countryName : String) -> Unit
 )
     : BaseDialog<DialogPickCountryBinding>(
@@ -142,7 +144,7 @@ class CountryPickerDialog(
 
     private fun setupRecyclerView(){
 
-        countryAdapter = FilterCountriesAdapter()
+        countryAdapter = FilterCountriesAdapter(glide)
 
         countryAdapter.apply {
             submitList(searchDialogsViewModel.listOfCountries)

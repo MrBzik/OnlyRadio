@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.RequestManager
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.adapters.PagingRadioAdapter
 import com.onlyradio.radioplayer.data.local.entities.RadioStation
@@ -48,6 +49,9 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     @Inject
     lateinit var pagingRadioAdapter : PagingRadioAdapter
+
+    @Inject
+    lateinit var glide : RequestManager
 
     private var textLoadAnim : TextLoadAnim? = null
 
@@ -444,7 +448,10 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         bind.tvSelectedCountry.setOnClickListener {
 
-            CountryPickerDialog(requireContext(), searchDialogsViewModels)
+            CountryPickerDialog(
+                requireContext = requireContext(),
+                searchDialogsViewModel = searchDialogsViewModels,
+                glide = glide)
             { countryCode, countryName ->
                 if(mainViewModel.isFullAutoSearch)
                     isToInitiateNewSearch = true
