@@ -4,18 +4,23 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.media.MediaExtractor
 import android.media.MediaFormat
+import android.util.Log
+import android.widget.Toast
 import com.onlyradio.radioplayer.data.local.entities.Recording
 import com.onlyradio.radioplayer.utils.Constants
 import com.onlyradio.radioplayer.utils.Constants.TITLE_UNKNOWN
 import com.onlyradio.radioplayer.utils.Utils
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.audio.AudioProcessor
+import com.onlyradio.radioplayer.R
 import dev.brookmg.exorecord.lib.ExoRecord
 import dev.brookmg.exorecord.lib.IExoRecord
 import dev.brookmg.exorecordogg.ExoRecordOgg
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 import java.util.Timer
 import java.util.TimerTask
 
@@ -137,43 +142,68 @@ class ExoRecordImpl (private val service: RadioService) {
     )
             = service.serviceScope.launch(Dispatchers.IO) {
 
-        val recQualityPref = service.getSharedPreferences(Constants.RECORDING_QUALITY_PREF, Context.MODE_PRIVATE)
-        val setting = recQualityPref.getFloat(
-            Constants.RECORDING_QUALITY_PREF,
-            Constants.REC_QUALITY_DEF
-        )
+        var isSuccess = true
 
-//        Log.d("CHECKTAGS", "setting is : $setting")
+        try {
+            val recQualityPref = service.getSharedPreferences(Constants.RECORDING_QUALITY_PREF, Context.MODE_PRIVATE)
+            val setting = recQualityPref.getFloat(
+                Constants.RECORDING_QUALITY_PREF,
+                Constants.REC_QUALITY_DEF
+            )
+            
+            ExoRecordOgg.convertFile(
+                service.application,
+                filePath,
+                sampleRate,
+                channelsCount,
+                setting
+            ){ progress ->
 
-        ExoRecordOgg.convertFile(
-            service.application,
-            filePath,
-            sampleRate,
-            channelsCount,
-            setting
-        ){ progress ->
+                if(progress == 100.0f && isSuccess){
 
-            if(progress == 100.0f){
-
-//                Log.d("CHECKTAGS", "progress is 100")
-
-
-                try {
                     insertNewRecording(
                         filePath,
                         timeStamp,
                         duration
                     )
                     service.deleteFile(filePath)
-                    isConverterWorking = false
-                    service.radioSource.exoRecordFinishConverting.postValue(true)
-                    recordingCheck.edit().putBoolean(IS_RECORDING_HANDLED, true).apply()
-                } catch (e: java.lang.Exception){
-//                    Log.d("CHECKTAGS", e.stackTraceToString())
+
+                    onConversionEnd()
                 }
-                this.cancel()
+            }
+        } catch (e: java.lang.Exception){
+
+            isSuccess = false
+
+            try {
+                val fileList = service.fileList().filter {
+                    it.endsWith(".wav")
+                }
+
+                fileList.forEach { name ->
+
+                    service.deleteFile(name)
+                }
+
+                onConversionEnd()
+
+                withContext(Dispatchers.Main){
+                    Toast.makeText(service, service.getText(R.string.exorecord_error), Toast.LENGTH_LONG).show()
+                }
+
+            } catch (ex : Exception){
+
             }
         }
+
+        this.cancel()
+
+    }
+
+    private fun onConversionEnd(){
+        isConverterWorking = false
+        service.radioSource.exoRecordFinishConverting.postValue(true)
+        recordingCheck.edit().putBoolean(IS_RECORDING_HANDLED, true).apply()
     }
 
     private suspend fun insertNewRecording(

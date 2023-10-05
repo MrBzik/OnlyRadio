@@ -226,6 +226,7 @@
     <string name="same_search_query">Измените запрос</string>
     <string name="no_browser_error_plus_clipboard">Не найден браузер на устройстве. Адрес сайта скопирован в буфер</string>
     <string name="no_browser_error">Не найден браузер на устройстве</string>
+    <string name="exorecord_error">Что-то пошло не так…</string>
 
     <!--    Search Order-->
     <string-array name="search_order_array">

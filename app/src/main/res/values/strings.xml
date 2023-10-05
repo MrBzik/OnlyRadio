@@ -230,6 +230,7 @@
     <string name="same_search_query">Same search query</string>
     <string name="no_browser_error_plus_clipboard">No browser found on the device. Address was copied to clipboard</string>
     <string name="no_browser_error">No browser found on the device</string>
+    <string name="exorecord_error">Something went wrong…</string>
 
 
     <!--    Search Order-->
