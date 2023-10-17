@@ -28,27 +28,26 @@ fun RequestManager.loadImage(
     load(uri)
         .apply(RequestOptions().override(90, 90))
         .listener(object : RequestListener<Drawable> {
+
             override fun onLoadFailed(
                 e: GlideException?,
                 model: Any?,
-                target: Target<Drawable>?,
+                target: Target<Drawable>,
                 isFirstResource: Boolean
             ): Boolean {
-
                 return true
             }
 
             override fun onResourceReady(
-                resource: Drawable?,
-                model: Any?,
+                resource: Drawable,
+                model: Any,
                 target: Target<Drawable>?,
-                dataSource: DataSource?,
+                dataSource: DataSource,
                 isFirstResource: Boolean
             ): Boolean {
+                if(dataSource.name == "REMOTE"){
 
-                if(dataSource?.name == "REMOTE"){
-
-                    resource?.let { saveImage(it) }
+                    saveImage(resource)
 
                     tvPlaceholder.fadeOut(FADE_OUT_DURATION, alpha, position){ pos ->
                         if(pos != updatedHolderPos()) {
@@ -78,23 +77,23 @@ fun RequestManager.loadSingleImage(
 ){
     load(uri)
         .listener(object : RequestListener<Drawable>{
+
             override fun onLoadFailed(
                 e: GlideException?,
                 model: Any?,
-                target: Target<Drawable>?,
+                target: Target<Drawable>,
                 isFirstResource: Boolean
             ): Boolean {
-
                 ivItemImage.visibility = View.GONE
                 setTvPlaceHolderLetter()
                 return true
             }
 
             override fun onResourceReady(
-                resource: Drawable?,
-                model: Any?,
+                resource: Drawable,
+                model: Any,
                 target: Target<Drawable>?,
-                dataSource: DataSource?,
+                dataSource: DataSource,
                 isFirstResource: Boolean
             ): Boolean {
                 tvPlaceholder.alpha = 0f

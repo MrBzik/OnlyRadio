@@ -5,8 +5,9 @@ plugins {
     id "androidx.navigation.safeargs.kotlin"
     id("com.google.firebase.crashlytics")
     id 'com.google.gms.google-services'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.7.20'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.10'
     id 'kotlin-kapt'
+    id("com.google.devtools.ksp")
 }
 
 def localPropertiesFile = rootProject.file("local.properties")
@@ -16,22 +17,29 @@ localProperties.load(new FileInputStream(localPropertiesFile))
 
 android {
     namespace 'com.onlyradio.radioplayer'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.onlyradio.radioplayer"
         minSdk 24
-        targetSdk 33
+        targetSdk 34
         versionCode 13
         versionName "2.0.2"
         buildConfigField "String", "API_KEY", localProperties['apiKey']
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        kapt {
-            arguments {
-                arg("room.schemaLocation", "$projectDir/schemas".toString())
-            }
+//        kapt {
+//            arguments {
+//                arg("room.schemaLocation", "$projectDir/schemas".toString())
+//            }
+//        }
+
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
         }
+
+
+
 
     }
 
@@ -47,7 +55,7 @@ android {
 //            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 //            minifyEnabled true
 //            shrinkResources true
-            debuggable true
+            debuggable false
         }
     }
 
@@ -58,29 +66,29 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
 }
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'com.google.android.material:material:1.7.0'
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.10.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
     //ExoPlayer
-    api "com.google.android.exoplayer:exoplayer-core:2.18.5"
-    api "com.google.android.exoplayer:exoplayer-ui:2.18.5"
-    api "com.google.android.exoplayer:extension-mediasession:2.18.5"
-    implementation 'com.google.android.exoplayer:exoplayer-hls:2.18.5'
+    api "com.google.android.exoplayer:exoplayer-core:2.19.1"
+    api "com.google.android.exoplayer:exoplayer-ui:2.19.1"
+    api "com.google.android.exoplayer:extension-mediasession:2.19.1"
+    implementation 'com.google.android.exoplayer:exoplayer-hls:2.19.1'
 
 //    //ExoPlayer recording
 //    implementation 'com.github.brookmg.exorecord:exorecord:0.3.3'
@@ -99,28 +107,27 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
     //Dagger - Hilt
-    implementation "com.google.dagger:hilt-android:2.44"
-    kapt "com.google.dagger:hilt-android-compiler:2.44"
+    implementation "com.google.dagger:hilt-android:2.48.1"
+    kapt "com.google.dagger:hilt-android-compiler:2.48.1"
 
     // Glide
-    implementation 'com.github.bumptech.glide:glide:4.11.0'
-    kapt 'com.github.bumptech.glide:compiler:4.11.0'
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
+    ksp 'com.github.bumptech.glide:ksp:4.16.0'
 
     //Navigation
-    implementation "androidx.navigation:navigation-fragment-ktx:2.6.0"
-    implementation "androidx.navigation:navigation-ui-ktx:2.6.0"
-    implementation("androidx.navigation:navigation-dynamic-features-fragment:2.6.0")
+    implementation "androidx.navigation:navigation-fragment-ktx:2.7.4"
+    implementation "androidx.navigation:navigation-ui-ktx:2.7.4"
+    implementation("androidx.navigation:navigation-dynamic-features-fragment:2.7.4")
 
 
     //Page 3
-    implementation("androidx.paging:paging-runtime:3.1.1")
+    implementation("androidx.paging:paging-runtime:3.2.1")
 
     //Room
-    implementation "androidx.room:room-runtime:2.4.3"
-    kapt "androidx.room:room-compiler:2.4.3"
+    implementation "androidx.room:room-ktx:2.5.2"
+    implementation "androidx.room:room-runtime:2.5.2"
+    ksp "androidx.room:room-compiler:2.5.2"
 
-    // Kotlin Extensions and Coroutines support for Room
-    implementation "androidx.room:room-ktx:2.4.3"
 
     // Swipe to refresh
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
@@ -129,25 +136,25 @@ dependencies {
     implementation("androidx.cardview:cardview:1.0.0")
 
     // Crashlytics
-    implementation("com.google.firebase:firebase-crashlytics-ktx:18.3.2")
+    implementation("com.google.firebase:firebase-crashlytics-ktx:18.4.3")
 
 
     // Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 
     // Auto updates
-    implementation "com.google.android.play:app-update:2.0.1"
-    implementation "com.google.android.play:app-update-ktx:2.0.1"
+    implementation "com.google.android.play:app-update:2.1.0"
+    implementation "com.google.android.play:app-update-ktx:2.1.0"
 
 
-    constraints {
-        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
-            because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
-        }
-        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0") {
-            because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
-        }
-    }
+//    constraints {
+//        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
+//            because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
+//        }
+//        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0") {
+//            because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
+//        }
+//    }
 
 
 //     Memory leaks
