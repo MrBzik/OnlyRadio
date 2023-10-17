@@ -166,6 +166,19 @@ object Constants {
 
     const val IS_ADAPTIVE_LOADER_TO_USE = "is to use adaptive loader"
 
+    // UPDATES
+
+    const val UPDATES_PREF = "updates shared pref"
+
+    const val UPDATES_AUTO_PREF = "updates auto pref"
+
+    const val UPDATES_AVAILABLE = 0
+    const val UPDATES_DOWNLOADING = 1
+    const val UPDATES_DOWNLOADED = 2
+    const val UPDATES_NOT_AVAILABLE = 3
+    const val UPDATES_INSTALLING = 4
+    const val UPDATES_FAILED = 5
+
 
     // Audio effects
 

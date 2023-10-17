@@ -5,7 +5,9 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.net.Uri
+import android.view.View
 import android.widget.Toast
+import androidx.core.view.isVisible
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.databinding.StubSettingsGeneralBinding
 import com.onlyradio.radioplayer.exoPlayer.RadioService
@@ -13,62 +15,114 @@ import com.onlyradio.radioplayer.ui.MainActivity
 import com.onlyradio.radioplayer.ui.viewmodels.MainViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.SettingsViewModel
 import com.onlyradio.radioplayer.utils.Constants
+import com.onlyradio.radioplayer.utils.Constants.UPDATES_AVAILABLE
+import com.onlyradio.radioplayer.utils.Constants.UPDATES_DOWNLOADED
+import com.onlyradio.radioplayer.utils.Constants.UPDATES_DOWNLOADING
+import com.onlyradio.radioplayer.utils.Constants.UPDATES_FAILED
+import com.onlyradio.radioplayer.utils.Constants.UPDATES_INSTALLING
+import com.onlyradio.radioplayer.utils.Constants.UPDATES_NOT_AVAILABLE
 import com.onlyradio.radioplayer.utils.addImage
 import com.onlyradio.radioplayer.utils.dpToP
 
-class SettingsGeneral () {
+class SettingsGeneral {
 
 
-    private lateinit var bindGeneral : StubSettingsGeneralBinding
-    private lateinit var settingsViewModel: SettingsViewModel
-    private lateinit var mainViewModel: MainViewModel
-
-    private val context by lazy {
-        bindGeneral.root.context
-    }
-
-    private lateinit var generalDialogsCall : GeneralDialogsCall
-
-
-    fun setFields(
-        settingsModel: SettingsViewModel,
-        mainModel: MainViewModel,
-        dialogsCall: GeneralDialogsCall
+    fun setGeneralLogic(
+        bindGeneral: StubSettingsGeneralBinding,
+        generalDialogsCall: GeneralDialogsCall,
+        mainViewModel: MainViewModel,
+        settingsViewModel: SettingsViewModel
     ){
-        settingsViewModel = settingsModel
-        mainViewModel = mainModel
-        generalDialogsCall = dialogsCall
-    }
 
-    fun updateBinding(bind : StubSettingsGeneralBinding){
-        bindGeneral = bind
-    }
+        getInitialUiMode(bindGeneral)
 
+        setReconnectButton(bindGeneral)
 
-    fun setGeneralLogic(){
+        setForegroundPrefButton(bindGeneral)
 
-        getInitialUiMode()
+        setDialogCallers(bindGeneral = bindGeneral, generalDialogsCall = generalDialogsCall)
 
-        setReconnectButton()
+        setFullAutoSearch(bindGeneral, mainViewModel)
 
-        setForegroundPrefButton()
+        setStationTitleSize(bindGeneral, settingsViewModel)
 
-        setupRecSettingClickListener()
+        setAddStationClickListener(bindGeneral)
 
-        historySettingsClickListener()
+        setUpdatesSwitchListener(bindGeneral, settingsViewModel)
 
-        setBufferSettingsClickListener()
-
-        setFullAutoSearch()
-
-        setStationTitleSize()
-
-        setAddStationClickListener()
+        setCheckForUpdatesClickListener(bindGeneral, settingsViewModel)
 
     }
 
 
-    private fun getInitialUiMode(){
+    private fun setCheckForUpdatesClickListener(bindGeneral : StubSettingsGeneralBinding, settingsViewModel: SettingsViewModel){
+
+        bindGeneral.tvUpdatesAvailableCheck.setOnClickListener {
+            settingsViewModel.requestUpdates()
+        }
+    }
+
+
+    private fun setUpdatesSwitchListener(bindGeneral : StubSettingsGeneralBinding, settingsViewModel: SettingsViewModel){
+
+        bindGeneral.switchUpdatesAutoCheck.isChecked = settingsViewModel.checkUpdatesPref()
+
+        bindGeneral.tvUpdatesAvailableCheck.isVisible = !settingsViewModel.checkUpdatesPref()
+
+        bindGeneral.switchUpdatesAutoCheck.setOnCheckedChangeListener { _, isChecked ->
+
+            settingsViewModel.changeAutoUpdatesPref(isChecked)
+            if(isChecked)
+                bindGeneral.tvUpdatesAvailableCheck.visibility = View.GONE
+            else bindGeneral.tvUpdatesAvailableCheck.visibility = View.VISIBLE
+
+        }
+    }
+
+
+    fun changeUpdateStatus(status: Int, bindGeneral : StubSettingsGeneralBinding){
+
+        val context = bindGeneral.root.context
+
+        val text =
+
+        when(status){
+
+            UPDATES_AVAILABLE -> {
+                context.getString(R.string.updates_status_available)
+            }
+
+            UPDATES_NOT_AVAILABLE -> {
+                context.getString(R.string.updates_status_not_available)
+            }
+
+            UPDATES_DOWNLOADING -> {
+                context.getString(R.string.updates_status_downloading)
+            }
+
+            UPDATES_DOWNLOADED -> {
+                context.getString(R.string.updates_status_downloaded)
+            }
+
+            UPDATES_INSTALLING -> {
+                context.getString(R.string.updates_status_installing)
+            }
+
+            UPDATES_FAILED -> {
+                context.getString(R.string.updates_status_failed)
+            }
+
+            else -> {
+                ""
+            }
+
+        }
+
+        bindGeneral.tvUpdatesAvailableCheck.text = text
+
+    }
+
+    private fun getInitialUiMode(bindGeneral : StubSettingsGeneralBinding){
 
 //       val mode = requireContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
 
@@ -83,9 +137,9 @@ class SettingsGeneral () {
         }
     }
 
-    private fun setReconnectButton(){
+    private fun setReconnectButton(bindGeneral : StubSettingsGeneralBinding){
 
-        val reconnectPref = context.getSharedPreferences(Constants.RECONNECT_PREF, Context.MODE_PRIVATE)
+        val reconnectPref = bindGeneral.root.context.getSharedPreferences(Constants.RECONNECT_PREF, Context.MODE_PRIVATE)
 
         val initialMode = reconnectPref.getBoolean(Constants.RECONNECT_PREF, true)
 
@@ -100,10 +154,10 @@ class SettingsGeneral () {
         }
     }
 
-    private fun setForegroundPrefButton(){
+    private fun setForegroundPrefButton(bindGeneral : StubSettingsGeneralBinding){
 
         val foregroundPref : SharedPreferences by lazy{
-            context.getSharedPreferences(Constants.FOREGROUND_PREF, Context.MODE_PRIVATE)
+            bindGeneral.root.context.getSharedPreferences(Constants.FOREGROUND_PREF, Context.MODE_PRIVATE)
         }
 
         bindGeneral.switchForegroundPref.apply {
@@ -116,44 +170,59 @@ class SettingsGeneral () {
     }
 
 
-    private fun setupRecSettingClickListener(){
+
+    private fun setDialogCallers(generalDialogsCall: GeneralDialogsCall, bindGeneral : StubSettingsGeneralBinding){
+
+         fun setupRecSettingClickListener(){
 
 //        val initialValue = generalDialogsCall.recInitialValue()
 
 //        bindGeneral.tvRecordingSettingsValue.text = RecPref.setTvRecQualityValue(initialValue)
 
 
-        bindGeneral.tvRecordingSettingsValue.setOnClickListener {
+            bindGeneral.tvRecordingSettingsValue.setOnClickListener {
 
-           generalDialogsCall.recOptionsDialog()
+                generalDialogsCall.recOptionsDialog()
 //           {
 //                   newValue ->
 //               bindGeneral.tvRecordingSettingsValue.text = RecPref.setTvRecQualityValue(newValue)
 //           }
+            }
         }
+
+         fun historySettingsClickListener(){
+
+            bindGeneral.tvHistorySettingValue.setOnClickListener {
+
+                generalDialogsCall.historyDialog()
+
+            }
+        }
+
+
+         fun setBufferSettingsClickListener(){
+
+            bindGeneral.tvControlBufferValue.setOnClickListener {
+
+                generalDialogsCall.bufferDialog()
+
+            }
+        }
+
+        setupRecSettingClickListener()
+
+        historySettingsClickListener()
+
+        setBufferSettingsClickListener()
+
+
     }
 
-    private fun historySettingsClickListener(){
-
-        bindGeneral.tvHistorySettingValue.setOnClickListener {
-
-            generalDialogsCall.historyDialog()
-
-        }
-    }
 
 
-    private fun setBufferSettingsClickListener(){
-
-        bindGeneral.tvControlBufferValue.setOnClickListener {
-
-           generalDialogsCall.bufferDialog()
-
-        }
-    }
 
 
-    private fun setFullAutoSearch(){
+    private fun setFullAutoSearch(bindGeneral : StubSettingsGeneralBinding, mainViewModel: MainViewModel){
 
 
         bindGeneral.tvFullAutoSearchHint.text =
@@ -162,8 +231,8 @@ class SettingsGeneral () {
         bindGeneral.tvFullAutoSearchHint.addImage(
             atText = "[icon]",
             imgSrc = R.drawable.ic_new_radio_search,
-            imgWidth = 30f.dpToP(context),
-            imgHeight = 30f.dpToP(context)
+            imgWidth = 30f.dpToP(bindGeneral.root.context),
+            imgHeight = 30f.dpToP(bindGeneral.root.context)
         )
 
         bindGeneral.switchFullAutoSearchPref.apply {
@@ -176,7 +245,7 @@ class SettingsGeneral () {
         }
     }
 
-    private fun setStationTitleSize(){
+    private fun setStationTitleSize(bindGeneral : StubSettingsGeneralBinding, settingsViewModel : SettingsViewModel){
 
         bindGeneral.tvStationsTitleSize.apply {
 
@@ -196,9 +265,11 @@ class SettingsGeneral () {
         }
     }
 
-    private fun setAddStationClickListener(){
+    private fun setAddStationClickListener(bindGeneral : StubSettingsGeneralBinding){
 
         bindGeneral.tvAddStationTitleBtn.setOnClickListener {
+
+            val context = bindGeneral.root.context
 
             val intent = Intent(
                 Intent.ACTION_VIEW,

@@ -10,7 +10,10 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.databinding.FragmentSettingsBinding
 import com.onlyradio.radioplayer.databinding.StubSettingsExtrasBinding
@@ -38,6 +41,8 @@ import com.onlyradio.radioplayer.utils.Constants.HISTORY_PREF
 import com.onlyradio.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
 import com.onlyradio.radioplayer.utils.Constants.REC_QUALITY_DEF
 import com.onlyradio.radioplayer.utils.RecPref
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 
 class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
@@ -48,9 +53,9 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         requireContext().getSharedPreferences(RECORDING_QUALITY_PREF, Context.MODE_PRIVATE)
     }
 
-    private val darkModePref : SharedPreferences by lazy{
-        requireContext().getSharedPreferences(DARK_MODE_PREF, Context.MODE_PRIVATE)
-    }
+//    private val darkModePref : SharedPreferences by lazy{
+//        requireContext().getSharedPreferences(DARK_MODE_PREF, Context.MODE_PRIVATE)
+//    }
 
     private val bufferPref : SharedPreferences by lazy {
         requireContext().getSharedPreferences(BUFFER_PREF, Context.MODE_PRIVATE)
@@ -62,9 +67,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
     }
 
 
-    private val bluetoothViewModel : BluetoothViewModel by lazy{
-        ViewModelProvider(requireActivity())[BluetoothViewModel::class.java]
-    }
+
+
+
+//    private val bluetoothViewModel : BluetoothViewModel by lazy{
+//        ViewModelProvider(requireActivity())[BluetoothViewModel::class.java]
+//    }
 
 
     private var bindTvGeneral : StubTvTitleBinding? = null
@@ -83,11 +91,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
     }
 
     private val settingsGeneral by lazy {
-        SettingsGeneral().apply {
-            setFields(
-                settingsViewModel, mainViewModel, generalDialogsCall
-            )
-        }
+        SettingsGeneral()
     }
 
     private val generalDialogsCall by lazy {
@@ -142,9 +146,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         setTitleButtonsClickListeners()
 
+        observeUpdateState()
+
 //        setBluetoothDialog()
 
     }
+
 
 
     private fun setStubsListeners(){
@@ -162,9 +169,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         bind.stubSettingsGeneral.setOnInflateListener { _, bindView ->
             bindGeneral = StubSettingsGeneralBinding.bind(bindView)
-            bindGeneral?.let {
-                settingsGeneral.updateBinding(it)
-            }
         }
 
         bind.stubSettingsExtras.setOnInflateListener { _, bindView ->
@@ -183,7 +187,15 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
     private fun setGeneralLogic(){
 
-        settingsGeneral.setGeneralLogic()
+        bindGeneral?.let { bindGeneral ->
+            settingsGeneral.setGeneralLogic(
+                bindGeneral = bindGeneral,
+                generalDialogsCall = generalDialogsCall,
+                mainViewModel = mainViewModel,
+                settingsViewModel = settingsViewModel
+            )
+        }
+
 
         setSwitchNightModeListener()
 
@@ -259,6 +271,10 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
 
 
+    private fun observeUpdatesState(){}
+
+
+
 
 //    private fun openAudioSettings(){
 //
@@ -313,6 +329,28 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 //        }
 //
 //    }
+
+
+
+
+    private fun observeUpdateState(){
+
+        lifecycleScope.launch {
+
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+
+                settingsViewModel.updatesStatus.collectLatest {status ->
+
+                    if(!settingsViewModel.isInSettingsExtras){
+
+                        bindGeneral?.let {bindGeneral ->
+                            settingsGeneral.changeUpdateStatus(status, bindGeneral)
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 
     private fun setToolbar(){

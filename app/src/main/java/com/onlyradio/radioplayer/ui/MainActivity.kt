@@ -21,9 +21,6 @@ import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
-import com.google.android.play.core.install.model.InstallStatus
-import com.google.android.play.core.install.model.UpdateAvailability
-import com.google.android.play.core.ktx.isFlexibleUpdateAllowed
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.data.local.entities.Recording
@@ -31,6 +28,7 @@ import com.onlyradio.radioplayer.databinding.ActivityMainBinding
 import com.onlyradio.radioplayer.databinding.StubPlayerActivityMainBinding
 import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.ui.animations.LoadingAnim
+import com.onlyradio.radioplayer.ui.delegates.Navigation
 import com.onlyradio.radioplayer.ui.delegates.NavigationImpl
 import com.onlyradio.radioplayer.ui.fragments.*
 import com.onlyradio.radioplayer.ui.stubs.MainPlayerView
@@ -40,11 +38,12 @@ import com.onlyradio.radioplayer.ui.viewmodels.MainViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.RecordingsViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.SettingsViewModel
 import com.onlyradio.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
+import com.onlyradio.radioplayer.utils.Constants.UPDATES_DOWNLOADED
+import com.onlyradio.radioplayer.utils.Constants.UPDATES_DOWNLOADING
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.io.IOException
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -72,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val navigation : NavigationImpl by lazy {
+    private val navigation : Navigation by lazy {
         NavigationImpl(supportFragmentManager, mainViewModel)
     }
 
@@ -88,6 +87,12 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appUpdateManager : AppUpdateManager
     private val updateType = AppUpdateType.FLEXIBLE
+
+    private val installStateUpdatedListener = InstallStateUpdatedListener { state ->
+
+        settingsViewModel.onInstallUpdateStatus(state)
+
+    }
 
     companion object{
         var uiMode = 0
@@ -142,6 +147,8 @@ class MainActivity : AppCompatActivity() {
 
         setOnBottomNavItemReselect()
 
+        observeUpdatesState()
+
             bind.root.doOnLayout {
                 flHeight = bind.viewHeight.height
             }
@@ -151,33 +158,48 @@ class MainActivity : AppCompatActivity() {
     private fun checkForUpdates(){
 
         appUpdateManager.appUpdateInfo.addOnSuccessListener { info->
-            val isUpdateAvailable = info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-            val isUpdateAllowed = info.isFlexibleUpdateAllowed
-
-            if(isUpdateAvailable && isUpdateAllowed){
-                appUpdateManager.startUpdateFlowForResult(
-                    info, updateType, this, 123
-                )
-            }
+            settingsViewModel.onUpdatesSuccessListener(info)
         }
     }
 
-    private val installStateUpdatedListener = InstallStateUpdatedListener{state ->
 
-        when(state.installStatus()){
+    private fun initializeUpdate(){
+        appUpdateManager.startUpdateFlowForResult(
+            settingsViewModel.updateInfo, updateType, this, 123
+        )
+    }
 
-            InstallStatus.DOWNLOADING -> {
-                Toast.makeText(applicationContext, resources.getString(R.string.update_downloading),
-                    Toast.LENGTH_SHORT).show()
+    private fun observeUpdatesState(){
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                settingsViewModel.updatesStatus.collectLatest { status ->
+
+                    when(status){
+
+                        UPDATES_DOWNLOADING -> {
+                            Toast.makeText(applicationContext, resources.getString(R.string.update_downloading),
+                                Toast.LENGTH_SHORT).show()
+                        }
+
+                        UPDATES_DOWNLOADED -> {
+                            Toast.makeText(applicationContext, resources.getString(R.string.update_downloaded),
+                                Toast.LENGTH_SHORT).show()
+                            lifecycleScope.launch {
+                                delay(2000)
+                                appUpdateManager.completeUpdate()
+                            }
+                        }
+                    }
+                }
             }
+        }
 
-            InstallStatus.DOWNLOADED -> {
-                Toast.makeText(applicationContext, resources.getString(R.string.update_downloaded),
-                    Toast.LENGTH_SHORT).show()
 
-                lifecycleScope.launch {
-                    delay(2000)
-                    appUpdateManager.completeUpdate()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                settingsViewModel.updatesInitialize.collectLatest { _ ->
+                    initializeUpdate()
                 }
             }
         }

@@ -46,6 +46,13 @@
     <string name="buffer_options">Опции буфера</string>
     <string name="history_options">Опции истории</string>
     <string name="rec_options">Опции записи</string>
+    <string name="auto_updates">Уведомлять об обновлениях</string>
+    <string name="updates_status_available">Доступны обновления</string>
+    <string name="updates_status_not_available">Нет обновлений</string>
+    <string name="updates_status_downloading">Загрузка обновлений…</string>
+    <string name="updates_status_downloaded">Загрузка обновлений завершена</string>
+    <string name="updates_status_installing">Установка обновлений</string>
+    <string name="updates_status_failed">Обновления не установлены</string>
     <string name="check_it_out">Перейти</string>
     <string name="community_tip">Знаете ещё радиостанции? Вы можете помочь сообществу!</string>
 

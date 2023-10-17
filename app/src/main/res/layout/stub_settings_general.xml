@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-
     >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
         >
 
 
@@ -162,6 +162,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginTop="6dp"
             android:text="@string/kill_service_setting_tip"
             android:lineSpacingExtra="4dp"
@@ -335,6 +336,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginTop="30dp"
             android:text="@string/auto_search"
             android:lineSpacingExtra="4dp"
@@ -348,6 +350,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginTop="6dp"
             android:lineSpacingExtra="4dp"
             android:textSize="13sp"
@@ -371,6 +374,45 @@
 
 
 
+        <TextView
+            android:id="@+id/tvUpdatesAutoCheck"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="30dp"
+            android:text="@string/auto_updates"
+            android:textAppearance="@style/dialogItemText"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/switchUpdatesAutoCheck"
+            app:layout_constraintTop_toBottomOf="@+id/tvFullAutoSearchHint" />
+
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchUpdatesAutoCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:minHeight="48dp"
+            app:layout_constraintBottom_toBottomOf="@+id/tvUpdatesAutoCheck"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvUpdatesAutoCheck"
+            app:thumbTint="@color/switch_thumb_color"
+            app:trackTint="@color/switch_track_color" />
+
+
+
+        <TextView
+            android:id="@+id/tvUpdatesAvailableCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="30dp"
+            android:textAppearance="@style/dialogItemText"
+            android:textColor="@color/interactive_option_color"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvUpdatesAutoCheck" />
 
 
 
@@ -385,7 +427,7 @@
             android:textAppearance="@style/dialogItemText"
             android:textColor="@color/interactive_option_color"
             android:text="@string/check_it_out"
-            app:layout_constraintTop_toBottomOf="@+id/tvFullAutoSearchHint"
+            app:layout_constraintTop_toBottomOf="@+id/tvUpdatesAvailableCheck"
             app:layout_constraintEnd_toEndOf="parent"
             />
 
