@@ -1,4 +1,4 @@
-package com.onlyradio.radioplayer.vorbis
+package com.onlyradio.radioplayer.vorbis.models
 
 data class VorbisInfo(
     /**

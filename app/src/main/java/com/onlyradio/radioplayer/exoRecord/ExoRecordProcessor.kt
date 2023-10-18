@@ -5,9 +5,8 @@ import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.audio.AudioProcessor
 import com.onlyradio.radioplayer.exoPlayer.RadioService
-import com.onlyradio.radioplayer.utils.Logger
 import com.onlyradio.radioplayer.vorbis.VorbisFileOutputStream
-import com.onlyradio.radioplayer.vorbis.VorbisInfo
+import com.onlyradio.radioplayer.vorbis.models.VorbisInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,7 +24,6 @@ class ExoRecordProcessor constructor(
     private var channelCount: Int = 0
     private var bytePerFrame: Int = 0
 
-//    @C.Encoding
     private var encoding: Int = 0
     private var isActive: Boolean = false
 
@@ -35,7 +33,6 @@ class ExoRecordProcessor constructor(
     private var outputBuffer: ByteBuffer? = null
 
     private var inputEnded: Boolean = false
-//    private var wavFile: WavFile? = null
     private var fileName: String = ""
 
     private var vorbis : VorbisFileOutputStream? = null
@@ -45,7 +42,6 @@ class ExoRecordProcessor constructor(
         channelCount = Format.NO_VALUE
         sampleRateHz = Format.NO_VALUE
     }
-
 
 
     override fun configure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat {
@@ -58,12 +54,7 @@ class ExoRecordProcessor constructor(
         this.encoding = inputAudioFormat.encoding
         this.bytePerFrame = inputAudioFormat.bytesPerFrame
 
-
-        Logger.log("on configure: samplerate: $sampleRateHz")
-
         isActive = !RadioService.isFromRecording
-
-        Logger.log("isActive: $isActive")
 
         return inputAudioFormat
     }
@@ -198,9 +189,8 @@ class ExoRecordProcessor constructor(
                 channels = channelCount,
                 sampleRate = sampleRateHz,
                 quality = quality
-            ))
-
-        Logger.log("channels: $channelCount, sampleRate: $sampleRateHz, quality: $quality")
+            )
+        )
 
         isActive = true
         isRecording = true

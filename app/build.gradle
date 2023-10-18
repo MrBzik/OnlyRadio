@@ -60,10 +60,10 @@ android {
         }
 
         debug {
-//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//            minifyEnabled true
-//            shrinkResources true
-            debuggable true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            shrinkResources true
+            debuggable false
         }
     }
 
@@ -115,9 +115,6 @@ dependencies {
     api "com.google.android.exoplayer:extension-mediasession:$exoplayer_version"
     implementation "com.google.android.exoplayer:exoplayer-hls:$exoplayer_version"
 
-//    //ExoPlayer recording
-//    implementation 'com.github.brookmg.exorecord:exorecord:0.3.3'
-//    implementation 'com.github.brookmg.exorecord:exorecordogg:0.3.3'
 
     // ExoRecording Fork
 //    implementation 'com.github.MrBzik.ExoRecord:exorecord:Rules'

@@ -22,3 +22,4 @@
 
 -keepclassmembers class com.onlyradio.radioplayer.data** {*;}
 -keepclassmembers class com.onlyradio.radioplayer.adapters.models.serializable** {*;}
+-keepclassmembers class com.onlyradio.radioplayer.vorbis.models** {*;}

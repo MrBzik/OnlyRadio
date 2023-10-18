@@ -408,8 +408,6 @@ class RadioService : MediaBrowserServiceCompat() {
 
                     COMMAND_START_RECORDING -> {
 
-                        Logger.log("COMMAND_START_RECORDING")
-
                         if(isPlaybackStatePlaying){
 
                             exoRecordImp.onCommandStartRecording()

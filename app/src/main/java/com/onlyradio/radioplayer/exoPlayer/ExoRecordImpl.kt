@@ -45,9 +45,6 @@ class ExoRecordImpl (private val service: RadioService) {
         service.exoRecord
     }
 
-    private var recSampleRate = 0
-    private var recChannelsCount = 2
-
     private var isExoRecordListenerToSet = true
 
     fun onCommandStartRecording(){
