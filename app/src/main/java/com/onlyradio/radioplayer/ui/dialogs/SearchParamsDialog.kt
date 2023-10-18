@@ -32,19 +32,9 @@ const val BITRATE_MAX = 1000000
 
 
 
-/*
-       7200       1285     3282     1986    13537      3102    833      1296      0
-
-            310         2565     488     382      671      104      29      442
-
-         0         32        64       96      128       192     256      320     max
-
-                                                            4038
-
-*/
 
 
-val bitrateCalclList = arrayListOf(7000, 60, 230, 20, 1300, 2600, 3300, 500, 2000, 400, 13540, 700, 3100, 100, 850, 50, 1300, 450, 0)
+val bitrateCalclList = arrayListOf(8000, 60, 250, 30, 1350, 2850, 3800, 550, 2050, 500, 15100, 850, 3400, 150, 800, 50, 1700, 450, 0)
 
 class SearchParamsDialog (
     private val requireContext : Context,
@@ -105,7 +95,6 @@ class SearchParamsDialog (
         searchDialogsViewModel.updateLanguageCount {
             bind.tvStationsLangCount.text = "$it $stationsCount"
         }
-
     }
 
 

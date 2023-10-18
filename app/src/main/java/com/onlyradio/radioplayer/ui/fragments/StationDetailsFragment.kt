@@ -484,8 +484,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     }
 
     private var isRecording = false
-    private var isTimerObserverSet = false
-    private var isConverterCallbackSet = false
+
     private var durationOfRecording = ""
 
     private fun observeExoRecordState(){
@@ -494,38 +493,21 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
             if(it){
                  isRecording = true
-
                  bind.tvTimer.visibility = View.VISIBLE
-
-                 if(!isTimerObserverSet){
-                     recordingsViewModel.exoRecordTimer.observe(viewLifecycleOwner){ time ->
-                         bind.tvTimer.text = time as String
-                     }
-                     isTimerObserverSet = true
-                 }
-
                  bind.fabRecording.setImageResource(R.drawable.ic_stop_recording)
-
-
             } else {
-
                 durationOfRecording = bind.tvTimer.text.toString()
-                bind.tvTimer.text = requireContext().resources.getString(R.string.rec_processing)
                 bind.fabRecording.setImageResource(R.drawable.ic_start_recording)
+                bind.tvTimer.text = requireContext().resources.getString(R.string.rec_saved)
+                isRecording = false
 
-                if(!isConverterCallbackSet){
-                    recordingsViewModel.exoRecordFinishConverting.observe(viewLifecycleOwner){ finished ->
-
-                        if(finished){
-
-                            bind.tvTimer.text = requireContext().resources.getString(R.string.rec_saved)
-                            isRecording = false
-
-                        }
-                    }
-                    isConverterCallbackSet = true
-                }
             }
+        }
+
+
+        recordingsViewModel.exoRecordTimer.observe(viewLifecycleOwner){ time ->
+            if(isRecording)
+                bind.tvTimer.text = time as String
         }
     }
 
@@ -661,8 +643,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     override fun onDestroyView() {
         super.onDestroyView()
 
-        isTimerObserverSet = false
-        isConverterCallbackSet = false
         bind.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
         bind.viewPager.adapter = null
         _bind = null
@@ -678,8 +658,4 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
         }
 
     }
-
-
-
-
 }

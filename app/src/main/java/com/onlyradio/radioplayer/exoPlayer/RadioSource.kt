@@ -163,7 +163,6 @@ class RadioSource @Inject constructor(
 
     val exoRecordState : MutableLiveData<Boolean> = MutableLiveData(false)
     val exoRecordTimer : MutableLiveData<String> = MutableLiveData()
-    val exoRecordFinishConverting : MutableLiveData<Boolean> = MutableLiveData()
 
 
 

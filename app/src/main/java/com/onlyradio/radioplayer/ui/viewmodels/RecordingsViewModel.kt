@@ -183,7 +183,7 @@ class RecordingsViewModel @Inject constructor(
     fun stopRecording(){
         radioServiceConnection.sendCommand(COMMAND_STOP_RECORDING, null)
     }
-    val exoRecordFinishConverting = radioSource.exoRecordFinishConverting
+
     val exoRecordState = radioSource.exoRecordState
     val exoRecordTimer = radioSource.exoRecordTimer
 

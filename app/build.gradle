@@ -39,9 +39,17 @@ android {
         }
 
 
-
+        ndk { abiFilters 'arm64-v8a', 'x86_64', 'armeabi-v7a', 'x86' }
 
     }
+
+
+    externalNativeBuild {
+        ndkBuild {
+            path "src/main/jni/Android.mk"
+        }
+    }
+
 
     buildTypes {
         release {
@@ -55,7 +63,7 @@ android {
 //            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 //            minifyEnabled true
 //            shrinkResources true
-            debuggable false
+            debuggable true
         }
     }
 
@@ -72,9 +80,20 @@ android {
     kotlinOptions {
         jvmTarget = '17'
     }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/libs']
+        }
+    }
+
 }
 
 dependencies {
+
+    def media3_version = "1.1.1"
+
+    def exoplayer_version = "2.19.1"
 
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
@@ -84,19 +103,25 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
+//    implementation "androidx.media3:media3-exoplayer:$media3_version"
+//    implementation "androidx.media3:media3-exoplayer-hls:$media3_version"
+//    implementation "androidx.media3:media3-ui:$media3_version"
+//    implementation "androidx.media3:media3-session:$media3_version"
+
+
     //ExoPlayer
-    api "com.google.android.exoplayer:exoplayer-core:2.19.1"
-    api "com.google.android.exoplayer:exoplayer-ui:2.19.1"
-    api "com.google.android.exoplayer:extension-mediasession:2.19.1"
-    implementation 'com.google.android.exoplayer:exoplayer-hls:2.19.1'
+    api "com.google.android.exoplayer:exoplayer-core:$exoplayer_version"
+    api "com.google.android.exoplayer:exoplayer-ui:$exoplayer_version"
+    api "com.google.android.exoplayer:extension-mediasession:$exoplayer_version"
+    implementation "com.google.android.exoplayer:exoplayer-hls:$exoplayer_version"
 
 //    //ExoPlayer recording
 //    implementation 'com.github.brookmg.exorecord:exorecord:0.3.3'
 //    implementation 'com.github.brookmg.exorecord:exorecordogg:0.3.3'
 
     // ExoRecording Fork
-    implementation 'com.github.MrBzik.ExoRecord:exorecord:Rules'
-    implementation 'com.github.MrBzik.ExoRecord:exorecordogg:Rules'
+//    implementation 'com.github.MrBzik.ExoRecord:exorecord:Rules'
+//    implementation 'com.github.MrBzik.ExoRecord:exorecordogg:Rules'
 
 //    implementation 'com.arthenica:ffmpeg-kit-min:5.1'
 
@@ -136,7 +161,7 @@ dependencies {
     implementation("androidx.cardview:cardview:1.0.0")
 
     // Crashlytics
-    implementation("com.google.firebase:firebase-crashlytics-ktx:18.4.3")
+//    implementation("com.google.firebase:firebase-crashlytics-ktx:18.4.3")
 
 
     // Serialization

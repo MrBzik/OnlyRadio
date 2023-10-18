@@ -101,7 +101,6 @@
     <string name="add_to_playlist">Add to playlist</string>
     <string name="languages_title">Languages:</string>
     <string name="tags_title">Tags:</string>
-    <string name="rec_processing">Processing…</string>
     <string name="rec_saved">Saved</string>
     <string name="from_history">From history</string>
     <string name="from_fav">From favoured</string>

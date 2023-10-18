@@ -15,7 +15,6 @@ import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
-
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
@@ -88,8 +87,9 @@ import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
 import com.google.android.exoplayer2.util.Assertions
 import com.onlyradio.radioplayer.BuildConfig
 import com.onlyradio.radioplayer.R
+import com.onlyradio.radioplayer.exoRecord.ExoRecord
+import com.onlyradio.radioplayer.utils.Logger
 import dagger.hilt.android.AndroidEntryPoint
-import dev.brookmg.exorecord.lib.ExoRecord
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -407,6 +407,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
                     COMMAND_START_RECORDING -> {
+
+                        Logger.log("COMMAND_START_RECORDING")
 
                         if(isPlaybackStatePlaying){
 

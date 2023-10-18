@@ -222,27 +222,6 @@ class MainViewModel @Inject constructor(
            searchBy.postValue(true)
        }
 
-// REPOSITION OF SEARCH FAB
-//       var fabX = 0f
-//       var fabY = 0f
-//
-//       var fabPref: SharedPreferences = app.getSharedPreferences(SEARCH_BTN_PREF, Context.MODE_PRIVATE)
-//       var isFabMoved = fabPref.getBoolean(IS_FAB_UPDATED, false)
-//
-//       var isFabUpdated = false
-//       init {
-//            if(isFabMoved){
-//                fabX = fabPref.getFloat(FAB_POSITION_X, 0f)
-//                fabY = fabPref.getFloat(FAB_POSITION_Y, 0f)
-//            }
-//        }
-
-
-
-//       var isWaitingForNewPage = false
-//       var isWaitingForNewSearch = false
-//       val isServerNotResponding : MutableLiveData<Boolean> = MutableLiveData(false)
-//
 
        val searchLoadingState : MutableLiveData<Boolean> = MutableLiveData()
 
@@ -259,23 +238,12 @@ class MainViewModel @Inject constructor(
 
            if(isNewSearch) isToShowLoadingMessage.value = true
 
-//           Log.d("CHECKTAGS", "is new search? $isNewSearch")
-
            val calcOffset = limit * offset
-
-//                var isReversedOrder = true
-
 
            val orderSetting = when(newSearchOrder){
                     ORDER_VOTES -> "votes"
                     ORDER_POP -> "clickcount"
                     ORDER_TREND -> "clicktrend"
-
-//                    ORDER_BIT_MIN -> {
-//                        isReversedOrder = false
-//                        "bitrate"
-//                    }
-//                    ORDER_BIT_MAX -> "bitrate"
                     else -> "random"
                 }
 
@@ -412,8 +380,6 @@ class MainViewModel @Inject constructor(
                 if(searchJob.isActive){
                     searchJob.cancel()
                 }
-
-
                 searchBy.postValue(false)
 
             }

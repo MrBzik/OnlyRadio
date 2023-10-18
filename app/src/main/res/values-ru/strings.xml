@@ -100,7 +100,6 @@
     <string name="add_to_playlist">В плейлист</string>
     <string name="languages_title">Языки:</string>
     <string name="tags_title">Теги:</string>
-    <string name="rec_processing">Обработка…</string>
     <string name="rec_saved">Готово</string>
     <string name="from_history">Из истории</string>
     <string name="from_fav">Избранное</string>

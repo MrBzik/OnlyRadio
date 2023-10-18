@@ -11,13 +11,13 @@ import com.google.android.exoplayer2.audio.AudioCapabilities.getCapabilities
 import com.google.android.exoplayer2.audio.AudioSink
 import com.google.android.exoplayer2.audio.DefaultAudioSink
 import com.google.android.exoplayer2.upstream.*
+import com.onlyradio.radioplayer.exoRecord.ExoRecord
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ServiceScoped
-import dev.brookmg.exorecord.lib.ExoRecord
 
 
 @Module
@@ -96,7 +96,6 @@ object ServiceModule {
     @ServiceScoped
     fun providesExoRecord(@ApplicationContext app : Context) =
         ExoRecord(app.applicationContext as Application)
-
 
 //            .setAudioCapabilities(AudioCapabilities(intArrayOf(22), 8))
 
