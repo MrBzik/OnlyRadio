@@ -14,8 +14,6 @@
                 android:type="linear"
                 >
 
-
-
                 <item
                     android:color="#5C7091"
                     android:offset="0.0" />

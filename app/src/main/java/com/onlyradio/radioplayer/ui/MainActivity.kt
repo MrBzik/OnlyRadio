@@ -101,6 +101,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
     override fun onBackPressed() {
 
         if(mainViewModel.isInDetailsFragment.value == false) {

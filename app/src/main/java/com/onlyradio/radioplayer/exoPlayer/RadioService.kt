@@ -900,14 +900,22 @@ class RadioService : MediaBrowserServiceCompat() {
                        .build()
                }
            } else{
-               return MediaDescriptionCompat.Builder()
-                   .setIconUri(stationsFromRecordings[windowIndex].iconUri.toUri())
-                   .setTitle(stationsFromRecordings[windowIndex].name)
-                   .build()
+               return try {
+                   val index = minOf(windowIndex, stationsFromRecordings.lastIndex)
+
+                   MediaDescriptionCompat.Builder()
+                       .setIconUri(stationsFromRecordings[index].iconUri.toUri())
+                       .setTitle(stationsFromRecordings[index].name)
+                       .build()
+               } catch (e : Exception){
+
+                   MediaDescriptionCompat.Builder()
+                       .setTitle("Some error occurred")
+                       .build()
+               }
            }
        }
    }
-
 
 
     private fun clearMediaItems(isNoList : Boolean = true){
@@ -928,7 +936,7 @@ class RadioService : MediaBrowserServiceCompat() {
             }
         } catch (e : Exception){
             throw IllegalArgumentException(
-                "Strange crash from google testers I can't reproduce. " +
+                "Strange crash from google I can't reproduce. " +
                         "\nExoplayer currentMediaItemIndex: ${exoPlayer.currentAdGroupIndex}" +
                         "Exoplayer mediaItemCount: ${exoPlayer.mediaItemCount}"
             )

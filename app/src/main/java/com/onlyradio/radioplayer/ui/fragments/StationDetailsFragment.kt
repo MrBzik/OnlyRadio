@@ -119,8 +119,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
     }
 
 
-
-
     private fun getCurrentPlaylistItems(){
 
 

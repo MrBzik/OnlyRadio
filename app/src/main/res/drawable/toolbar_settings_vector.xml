@@ -4,7 +4,8 @@
     android:height="50dp"
     android:viewportWidth="360"
     android:viewportHeight="208">
-    <path android:pathData="M0,0 L360,0 L360,208 L0,208 Z">
+    <path
+        android:pathData="M0,0 L360,0 L360,208 L0,208 Z">
         <aapt:attr name="android:fillColor">
             <gradient
                 android:endX="360"
@@ -15,19 +16,22 @@
                 >
 
 
-
                 <item
+                    android:name="first_start"
                     android:color="#FFFFFF"
                     android:offset="0.0" />
                 <item
+                    android:name="first_end"
                     android:color="#FFFFFF"
                     android:offset="0.472" />
 
 
                 <item
+                    android:name="second_start"
                     android:color="#5C7091"
                     android:offset="0.475" />
                 <item
+                    android:name="second_end"
                     android:color="#5C7091"
                     android:offset="1" />
 

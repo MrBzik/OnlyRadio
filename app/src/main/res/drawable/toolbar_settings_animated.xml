@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/toolbar_settings_vector" >
+    <target
+        android:name="first_start"
+        android:animation="@animator/toolbar_settings_anim" />
+    <target
+        android:name="first_end"
+        android:animation="@animator/toolbar_settings_anim" />
+    <target
+        android:name="second_start"
+        android:animation="@animator/toolbar_settings_anim_to_white" />
+    <target
+        android:name="second_end"
+        android:animation="@animator/toolbar_settings_anim_to_white" />
+</animated-vector>
