@@ -266,7 +266,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         textViewB = bindTvGeneral?.tvTitle as TextView,
         isToAnimate = isToAnimate,
         toolbar = bind.viewToolbar,
-        fragment = FRAG_OPTIONS
+        fragment = FRAG_OPTIONS,
     )
 
 

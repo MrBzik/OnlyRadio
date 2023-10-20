@@ -677,7 +677,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             textViewB = bind.tvTitles as TextView,
             isToAnimate = isToAnimate,
             toolbar = bind.viewToolbar,
-            fragment = FRAG_HISTORY
+            fragment = FRAG_HISTORY,
         )
 
     private fun subscribeToHistory(){

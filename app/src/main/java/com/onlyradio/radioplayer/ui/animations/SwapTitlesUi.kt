@@ -5,16 +5,14 @@ import android.graphics.Color
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.view.View
 import android.widget.TextView
-import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
+import androidx.core.content.ContextCompat
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.ui.MainActivity
 import com.onlyradio.radioplayer.utils.Constants.FRAG_HISTORY
 import com.onlyradio.radioplayer.utils.Constants.FRAG_OPTIONS
-import com.onlyradio.radioplayer.utils.Logger
 import com.onlyradio.radioplayer.utils.TextViewOutlined
 
 object SwapTitlesUi {
-
 
     fun swap(conditionA : Boolean,
              textViewA : TextView,
@@ -45,17 +43,27 @@ object SwapTitlesUi {
                 }
             }
         } else {
-
             if(conditionA){
-
-                val drawable = when (fragment){
-                    FRAG_HISTORY -> R.drawable.toolbar_history_stations_vector
-                    FRAG_OPTIONS -> R.drawable.toolbar_settings_vector
-                    else -> 0
+                when (fragment){
+                    FRAG_HISTORY -> {
+                      if(isToAnimate) {
+                          (ContextCompat.getDrawable(toolbar.context, R.drawable.toolbar_animated_history_stations)
+                                  as AnimatedVectorDrawable).apply {
+                                  toolbar.background = this
+                                  start()
+                              }
+                      } else toolbar.setBackgroundResource(R.drawable.toolbar_history_stations_vector)
+                    }
+                    FRAG_OPTIONS -> {
+                        if(isToAnimate){
+                            (ContextCompat.getDrawable(toolbar.context, R.drawable.toolbar_animated_settings_extras)
+                                    as AnimatedVectorDrawable).apply {
+                                        toolbar.background = this
+                                        start()
+                                }
+                        } else toolbar.setBackgroundResource(R.drawable.toolbar_settings_extras_vector)
+                    }
                 }
-
-
-                (toolbar.background as AnimatedVectorDrawable).start()
 
                 (textViewA as TextViewOutlined).apply {
                     isSingleColor = true
@@ -68,15 +76,26 @@ object SwapTitlesUi {
                 }
 
             } else {
-
-                val drawable = when (fragment){
-                    FRAG_HISTORY -> R.drawable.toolbar_history_titles_vector
-                    FRAG_OPTIONS -> R.drawable.toolbar_settings_animated
-                    else -> 0
+                when (fragment){
+                    FRAG_HISTORY -> {
+                        if(isToAnimate) {
+                            (ContextCompat.getDrawable(toolbar.context, R.drawable.toolbar_animated_history_titles)
+                                    as AnimatedVectorDrawable).apply {
+                                toolbar.background = this
+                                start()
+                            }
+                        } else toolbar.setBackgroundResource(R.drawable.toolbar_history_titles_vector)
+                    }
+                    FRAG_OPTIONS -> {
+                        if(isToAnimate){
+                            (ContextCompat.getDrawable(toolbar.context, R.drawable.toolbar_animated_settings_general)
+                                    as AnimatedVectorDrawable).apply {
+                                toolbar.background = this
+                                start()
+                            }
+                        } else toolbar.setBackgroundResource(R.drawable.toolbar_settings_vector)
+                    }
                 }
-
-                toolbar.setBackgroundResource(drawable)
-
 
 
                 (textViewB as TextViewOutlined).apply {

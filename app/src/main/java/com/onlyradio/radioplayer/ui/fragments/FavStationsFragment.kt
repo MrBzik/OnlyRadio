@@ -2,6 +2,7 @@ package com.onlyradio.radioplayer.ui.fragments
 
 
 import android.content.res.Configuration
+import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -86,6 +87,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     private var isToHandleNewStationObserver = false
 
+    private var isOnViewCreated = false
+
     companion object{
 
         var dragAndDropItemPos = -1
@@ -96,6 +99,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        isOnViewCreated = true
 
         pixabayViewModel = ViewModelProvider(requireActivity())[PixabayViewModel::class.java]
 
@@ -149,7 +154,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         }
     }
 
-    private fun getCurrentItemPosition(station : RadioStation?) : Int{
+    private fun getCurrentItemPosition(station : RadioStation?) : Int {
         if(currentTab == SEARCH_FROM_FAVOURITES && RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES ||
             currentTab == SEARCH_FROM_PLAYLIST && RadioService.currentMediaItems == SEARCH_FROM_PLAYLIST &&
             currentPlaylistName == RadioService.currentPlaylistName ||
@@ -392,7 +397,10 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         favViewModel.currentPlaylistName.observe(viewLifecycleOwner){
 
-            bind.tvPlaylistName.text = it
+            bind.tvPlaylistName.apply {
+                visibility = View.VISIBLE
+                text = it
+            }
             currentPlaylistName = it
             playlistAdapter.currentPlaylistName = it
 
@@ -463,7 +471,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         if(newTab == SEARCH_FROM_FAVOURITES){
 
-            bind.tvPlaylistName.text = ""
+            bind.tvPlaylistName.visibility = View.INVISIBLE
 
             (bind.tvPlaylistEdit as TextView).text = ""
 
@@ -526,12 +534,16 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){
 
-            if(isInFav)
-                bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_fav_vector)
-
-            else
-                bind.viewToolbar.setBackgroundResource(R.drawable.toolbar_playlists_vector)
-
+            if(isOnViewCreated){
+                isOnViewCreated = false
+                val drawableId = if(isInFav) R.drawable.toolbar_favourite else R.drawable.toolbar_playlists
+                bind.viewToolbar.setBackgroundResource(drawableId)
+            } else {
+                val drawableId = if(isInFav) R.drawable.toolbar_animated_favourite else R.drawable.toolbar_animated_fav_playlists
+                val drawable = ContextCompat.getDrawable(requireContext(), drawableId) as AnimatedVectorDrawable
+                bind.viewToolbar.background = drawable
+                drawable.start()
+            }
         }
     }
 

@@ -122,7 +122,6 @@
         android:popupBackground="@drawable/spinner_gradient_for_background"
         android:background="@null"
         android:elevation="-1dp"
-
         style="@style/listPopupWindow"
         app:layout_constraintStart_toStartOf="@id/guidelineMid"
         app:layout_constraintEnd_toEndOf="parent"
