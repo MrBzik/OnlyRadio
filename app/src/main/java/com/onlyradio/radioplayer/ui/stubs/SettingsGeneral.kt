@@ -58,7 +58,7 @@ class SettingsGeneral {
     private fun setCheckForUpdatesClickListener(bindGeneral : StubSettingsGeneralBinding, settingsViewModel: SettingsViewModel){
 
         bindGeneral.tvUpdatesAvailableCheck.setOnClickListener {
-            settingsViewModel.requestUpdates()
+            settingsViewModel.requestUpdates(true)
         }
     }
 

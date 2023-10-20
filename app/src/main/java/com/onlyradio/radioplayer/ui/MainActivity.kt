@@ -3,6 +3,7 @@ package com.onlyradio.radioplayer.ui
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.Animation
@@ -19,6 +20,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.bumptech.glide.RequestManager
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.onlyradio.radioplayer.R
@@ -40,6 +42,7 @@ import com.onlyradio.radioplayer.ui.viewmodels.SettingsViewModel
 import com.onlyradio.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
 import com.onlyradio.radioplayer.utils.Constants.UPDATES_DOWNLOADED
 import com.onlyradio.radioplayer.utils.Constants.UPDATES_DOWNLOADING
+import com.onlyradio.radioplayer.utils.Logger
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -157,17 +160,22 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun checkForUpdates(){
-
         appUpdateManager.appUpdateInfo.addOnSuccessListener { info->
             settingsViewModel.onUpdatesSuccessListener(info)
         }
     }
 
 
-    private fun initializeUpdate(){
-        appUpdateManager.startUpdateFlowForResult(
-            settingsViewModel.updateInfo, updateType, this, 123
+    private fun initializeUpdate(isFromUser: Boolean){
+        val res = appUpdateManager.startUpdateFlowForResult(
+            settingsViewModel.updateInfo, this, AppUpdateOptions.defaultOptions(updateType), 123
         )
+        if(!res && isFromUser){
+            checkForUpdates()
+            appUpdateManager.startUpdateFlowForResult(
+                settingsViewModel.updateInfo, this, AppUpdateOptions.defaultOptions(updateType), 123
+            )
+        }
     }
 
     private fun observeUpdatesState(){
@@ -199,8 +207,8 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED){
-                settingsViewModel.updatesInitialize.collectLatest { _ ->
-                    initializeUpdate()
+                settingsViewModel.updatesInitialize.collectLatest { isFromUser ->
+                    initializeUpdate(isFromUser)
                 }
             }
         }
