@@ -31,6 +31,7 @@ import com.onlyradio.radioplayer.ui.dialogs.TagPickerDialog
 import com.onlyradio.radioplayer.ui.stubs.NoResultMessage
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
+import com.onlyradio.radioplayer.utils.Logger
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -213,20 +214,17 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private fun getCurrentItemPosition(station : RadioStation?) : Int {
 
-        if(RadioService.currentMediaItems == SEARCH_FROM_API ){
+        return if(RadioService.currentMediaItems == SEARCH_FROM_API )
 
-            return RadioService.currentPlayingItemPosition
+            mainViewModel.getPlayerCurrentIndex()
 
-        } else {
+         else
 
-            val index = pagingRadioAdapter.snapshot().items
+            pagingRadioAdapter.snapshot().items
                 .indexOfFirst {
-
                     it.stationuuid == (station?.stationuuid
                         ?: RadioService.currentPlayingStation.value?.stationuuid)
-                }
 
-            return index
         }
 
     }
@@ -380,21 +378,25 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
                         bind.rvSearchStations.apply {
                             if(isInitialLaunch){
 
-                                if(RadioService.currentPlayingItemPosition == -1){
+                                post {
+                                    val index = getCurrentItemPosition(null)
+
+                                    if(index != -1 ) scrollToPosition(index)
+
                                     startLayoutAnimation()
-                                } else {
-
-                                    post {
-                                        val index = getCurrentItemPosition(null)
-
-                                        if(index != -1 ) scrollToPosition(index)
-
-                                        startLayoutAnimation()
-                                    }
-
                                 }
 
                                 isInitialLaunch = false
+
+//                                if(RadioService.currentPlayingItemPosition == -1){
+//                                    startLayoutAnimation()
+//                                } else {
+//
+//
+//
+//                                }
+
+
 
                             } else {
                                 scrollToPosition(0)

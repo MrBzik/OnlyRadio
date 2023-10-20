@@ -43,6 +43,15 @@ class RadioServiceConnection (
 
     private var mediaControllerCallback = MediaControllerCallback()
 
+    lateinit var playerPosition : (() -> Int)
+    fun setterForPlayerPos(pos : () -> Int){
+        playerPosition = pos
+    }
+    fun getPlayerCurrentIndex() : Int {
+        return playerPosition()
+    }
+
+
     val transportControls: MediaControllerCompat.TransportControls
         get() = mediaController.transportControls
 
@@ -121,7 +130,6 @@ class RadioServiceConnection (
    }
 
    private inner class MediaControllerCallback : MediaControllerCompat.Callback(){
-
 
 
        override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {

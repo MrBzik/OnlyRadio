@@ -202,7 +202,7 @@ object Constants {
      const val COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS = "command update history one date media items"
      const val COMMAND_CLEAR_MEDIA_ITEMS = "command clear media items"
      const val COMMAND_REMOVE_MEDIA_ITEM = "command remove media item"
-     const val COMMAND_ADD_MEDIA_ITEM = "command add media item"
+     const val COMMAND_RESTORE_MEDIA_ITEM = "command add media item"
      const val COMMAND_ON_DROP_STATION_IN_PLAYLIST = "command on drop station in playlist"
      const val COMMAND_CHANGE_REVERB_MODE = "change reverb mode"
      const val COMMAND_TOGGLE_REVERB = "change bass boost level"

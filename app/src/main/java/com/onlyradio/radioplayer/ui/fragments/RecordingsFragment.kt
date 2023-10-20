@@ -185,9 +185,9 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
             if(isToHandleNewRecording){
 
                     bind.rvRecordings.apply {
-                        smoothScrollToPosition(RadioService.currentPlayingItemPosition)
+                        smoothScrollToPosition(mainViewModel.getPlayerCurrentIndex())
                         post {
-                            val holder = findViewHolderForAdapterPosition(RadioService.currentPlayingItemPosition)
+                            val holder = findViewHolderForAdapterPosition(mainViewModel.getPlayerCurrentIndex())
                             recordingsAdapter.handleRecordingChange(it, holder as RecordingsAdapter.RecordingItemHolder)
                         }
                     }

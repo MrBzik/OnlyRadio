@@ -160,7 +160,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             currentPlaylistName == RadioService.currentPlaylistName ||
             currentTab == SEARCH_FROM_LAZY_LIST && RadioService.currentMediaItems == SEARCH_FROM_LAZY_LIST
         )
-            return RadioService.currentPlayingItemPosition
+            return mainViewModel.getPlayerCurrentIndex()
 
         else return mainAdapter.listOfStations
             .indexOfFirst {

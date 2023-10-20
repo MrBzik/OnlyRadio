@@ -104,6 +104,8 @@ class MainViewModel @Inject constructor(
 //         radioServiceConnection.disconnectBrowser()
 //    }
 
+    fun getPlayerCurrentIndex() : Int = radioServiceConnection.getPlayerCurrentIndex()
+
     fun connectMediaBrowser(){
         radioServiceConnection.connectBrowser()
     }
@@ -410,7 +412,6 @@ class MainViewModel @Inject constructor(
                 playbackState.value?.let { playbackState ->
                     when {
                         playbackState.isPlaying -> {
-
                             if(isToChangeMediaItems) isToPlay = false
                             else
                             radioServiceConnection.transportControls.pause()

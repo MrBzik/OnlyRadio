@@ -213,7 +213,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         bind.viewPager.apply {
             post {
-                setCurrentItem(RadioService.currentPlayingItemPosition, false)
+                setCurrentItem(mainViewModel.getPlayerCurrentIndex(), false)
                     observePlayingRadioStation()
                     bind.viewPager.registerOnPageChangeCallback(pageChangeCallback)
                 post {
@@ -354,7 +354,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                     } else {
 
                         isToTogglePlayStation = false
-                        setCurrentItem(RadioService.currentPlayingItemPosition, true)
+                        setCurrentItem(mainViewModel.getPlayerCurrentIndex(), true)
                     }
                 }
             }

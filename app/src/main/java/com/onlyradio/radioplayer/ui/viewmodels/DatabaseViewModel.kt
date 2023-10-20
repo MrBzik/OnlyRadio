@@ -10,7 +10,7 @@ import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.exoPlayer.RadioServiceConnection
 import com.onlyradio.radioplayer.exoPlayer.RadioSource
 import com.onlyradio.radioplayer.repositories.DatabaseRepository
-import com.onlyradio.radioplayer.utils.Commands.COMMAND_ADD_MEDIA_ITEM
+import com.onlyradio.radioplayer.utils.Commands.COMMAND_RESTORE_MEDIA_ITEM
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_CLEAR_MEDIA_ITEMS
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_ON_DROP_STATION_IN_PLAYLIST
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_REMOVE_MEDIA_ITEM
@@ -373,7 +373,7 @@ class DatabaseViewModel @Inject constructor(
 
     fun restoreMediaItem(index : Int){
         radioServiceConnection.sendCommand(
-            COMMAND_ADD_MEDIA_ITEM,
+            COMMAND_RESTORE_MEDIA_ITEM,
             bundleOf(Pair(Constants.ITEM_INDEX, index)))
     }
 

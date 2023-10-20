@@ -104,7 +104,7 @@ class RadioPlayerEventListener (
             val index = radioService.exoPlayer.currentMediaItemIndex
 
             var station : RadioStation? = null
-            RadioService.currentPlayingItemPosition = index
+//            RadioService.currentPlayingItemPosition = index
 
             try {
                 when(RadioService.currentMediaItems){

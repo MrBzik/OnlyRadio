@@ -182,9 +182,9 @@ class RadioSource @Inject constructor(
         val date = response.date.time
 
 
-        if(RadioService.currentMediaItems == SEARCH_FROM_HISTORY){
-            RadioService.currentPlayingItemPosition = 0
-        }
+//        if(RadioService.currentMediaItems == SEARCH_FROM_HISTORY){
+//            RadioService.currentPlayingItemPosition = 0
+//        }
 
         if (offset == 0) {
 

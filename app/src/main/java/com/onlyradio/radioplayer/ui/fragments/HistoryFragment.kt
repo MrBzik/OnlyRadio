@@ -370,7 +370,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                     val index =
 
                         if(historyViewModel.selectedDate == RadioService.selectedHistoryDate){
-                            RadioService.currentPlayingItemPosition + 1
+                            mainViewModel.getPlayerCurrentIndex() + 1
                         } else if(
                             historyViewModel.selectedDate == 0L
                             && RadioService.currentMediaItems == SEARCH_FROM_HISTORY) {
@@ -398,7 +398,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     private fun adjustHistoryIndex() : Int {
 
         val map = mainViewModel.radioSource.allHistoryMap
-        val index = RadioService.currentPlayingItemPosition
+        val index = mainViewModel.getPlayerCurrentIndex()
 
         if(index < map[0] - 2)
             return index + 1
