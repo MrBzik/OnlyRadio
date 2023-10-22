@@ -13,6 +13,7 @@ import com.google.android.exoplayer2.audio.AudioProcessor
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.exoRecord.ExoRecord
 import com.onlyradio.radioplayer.exoRecord.IExoRecord
+import com.onlyradio.radioplayer.extensions.makeToast
 import com.onlyradio.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
 import com.onlyradio.radioplayer.utils.Constants.REC_QUALITY_DEF
 import com.onlyradio.radioplayer.utils.Logger
@@ -125,7 +126,7 @@ class ExoRecordImpl (private val service: RadioService) {
 
                 recordingCheck.edit().putBoolean(IS_RECORDING_HANDLED, true).apply()
             } catch (e : Exception){
-                Toast.makeText(service, service.getText(R.string.exorecord_error), Toast.LENGTH_LONG).show()
+                service.makeToast(R.string.exorecord_error)
             }
         }
     }

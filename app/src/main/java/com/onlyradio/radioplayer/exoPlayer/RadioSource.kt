@@ -32,6 +32,7 @@ import com.google.android.exoplayer2.MediaItem
 import retrofit2.Response
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 class RadioSource @Inject constructor(
     private val radioApi: RadioApi,
     private val radioDAO: RadioDAO,
@@ -39,13 +40,12 @@ class RadioSource @Inject constructor(
 
 ) {
 
-
     val isPlayerBuffering : MutableLiveData<Boolean> = MutableLiveData()
 
 
     // Search tab
 
-    var stationsFromLastSearch: RadioStations? = RadioStations()
+    private var stationsFromLastSearch: RadioStations? = RadioStations()
     var stationsFromApi = mutableListOf<RadioStationsItem>()
 //    var stationsFromApiMetadata = mutableListOf<MediaMetadataCompat>()
     var stationsFromApiMediaItems = mutableListOf<MediaItem>()
@@ -82,7 +82,7 @@ class RadioSource @Inject constructor(
 
         var stationInOneDateResponse = listOf<RadioStation>()
         var stationsFromHistoryOneDate = listOf<RadioStation>()
-        var stationsFromHistoryOneDateMetadata = listOf<MediaMetadataCompat>()
+//        var stationsFromHistoryOneDateMetadata = listOf<MediaMetadataCompat>()
         var stationsFromHistoryOneDateMediaItems = listOf<MediaItem>()
 //        var isStationsFromHistoryOneDateUpdated = false
 
@@ -90,9 +90,9 @@ class RadioSource @Inject constructor(
         fun updateHistoryOneDateStations(){
             stationsFromHistoryOneDate = stationInOneDateResponse
 
-            stationsFromHistoryOneDateMetadata = stationInOneDateResponse.map{ station ->
-                station.toMediaMetadataCompat()
-            }.toMutableList()
+//            stationsFromHistoryOneDateMetadata = stationInOneDateResponse.map{ station ->
+//                station.toMediaMetadataCompat()
+//            }.toMutableList()
 
             stationsFromHistoryOneDateMediaItems = stationInOneDateResponse.map { station ->
                 MediaItem.fromUri(station.url!!)
@@ -337,19 +337,6 @@ class RadioSource @Inject constructor(
 
 
 
-    suspend fun getStationsInPlaylist(playlistName: String) {
-
-        val response = radioDAO.getStationsInPlaylist(playlistName)
-
-//       val list = response?.radioStations ?: emptyList()
-
-//        stationsFromPlaylistMetadata = list.map { station ->
-//            station.toMediaMetadataCompat()
-//        }.toMutableList()
-
-    }
-
-
 
 //    private var validBaseUrl = validBaseUrlPref.getString(BASE_RADIO_URL, BASE_RADIO_URL3)
 
@@ -365,7 +352,7 @@ class RadioSource @Inject constructor(
         country: String = "", language : String = "",
         tag: String = "", isTagExact : Boolean,
         name: String = "", isNameExact : Boolean, order : String,
-       minBit : Int, maxBit : Int,
+        minBit : Int, maxBit : Int,
         offset: Int = 0, pageSize: Int,
         url : String
 
@@ -376,70 +363,38 @@ class RadioSource @Inject constructor(
 
         val response = try {
 
-//            if(tag == "" && name == "" && country == ""){
-//                radioApi.getTopVotedStations(
-//                    offset = offset, limit = pageSize,
-//                    url =  "${validBaseUrl}$API_RADIO_TOP_VOTE_SEARCH_URL"
-//                )
-//            } else {
-                if(country != "") {
-                    radioApi.searchRadio(
-                        country = country, language = language,
-                        tag = tag, tagExact = tagExact,
-                        name = name, nameExact = nameExact,
-                        sortBy = order,
-                        bitrateMin = minBit, bitrateMax = maxBit,
-                        offset = offset, limit = pageSize,
-                        url = url
-                    )
-                } else {
-                    radioApi.searchRadioWithoutCountry(
-                        language = language,
-                        tag = tag, tagExact = tagExact,
-                        name = name, nameExact = nameExact,
-                        sortBy = order,
-                        bitrateMin = minBit, bitrateMax = maxBit,
-                        offset = offset, limit = pageSize,
-                        url = url
-                    )
-                }
+            if(country != "") {
+                radioApi.searchRadio(
+                    country = country, language = language,
+                    tag = tag, tagExact = tagExact,
+                    name = name, nameExact = nameExact,
+                    sortBy = order,
+                    bitrateMin = minBit, bitrateMax = maxBit,
+                    offset = offset, limit = pageSize,
+                    url = url
+                )
+            } else {
+                radioApi.searchRadioWithoutCountry(
+                    language = language,
+                    tag = tag, tagExact = tagExact,
+                    name = name, nameExact = nameExact,
+                    sortBy = order,
+                    bitrateMin = minBit, bitrateMax = maxBit,
+                    offset = offset, limit = pageSize,
+                    url = url
+                )
+            }
 
         } catch (e : Exception){
 
             null
         }
-//                if(response?.body() == null) {
-//
-//                    for(i in currentUrlIndex until listOfUrls.size){
-//
-//                        if(i == initialBaseUrlIndex) {
-//                            currentUrlIndex++
-//                        }
-//                        else {
-//                            currentUrlIndex ++
-//                            validBaseUrl = listOfUrls[i]
-//                            return getRadioStationsSource(
-//                               country = country, language = language,
-//                               tag = tag, isTagExact = isTagExact,
-//                               name = name, isNameExact = isNameExact,
-//                               order = order,
-//                               minBit = minBit, maxBit = maxBit,
-//                               offset = offset,
-//                               pageSize = pageSize)
-//                        }
-//                    }
-//                }
-//
-//                if(currentUrlIndex > 0){
-//                    validBaseUrlPref.edit().putString(BASE_RADIO_URL, listOfUrls[currentUrlIndex-1]).apply()
-//                    currentUrlIndex = 0
-//                }
 
-            stationsFromLastSearch = response?.body()
+        stationsFromLastSearch = response?.body()
 
         return response
 
-        }
+    }
 
     suspend fun getAllCountries() = radioApi.getAllCountries(
         validBaseUrlPref.getString(BASE_RADIO_URL, BASE_RADIO_URL3) + API_RADIO_ALL_COUNTRIES)
@@ -452,58 +407,28 @@ class RadioSource @Inject constructor(
 
 //            state = STATE_PROCESSING
 
-              stationsFromLastSearch?.let {
+              stationsFromLastSearch?.let {listOfStations ->
 
                   if(isNewSearch) {
 
-                      stationsFromApi = it
+                      stationsFromApi = listOfStations
 
-                      stationsFromApiMediaItems = it.map { station ->
+                      stationsFromApiMediaItems = listOfStations.map { station ->
                           MediaItem.fromUri(station.url_resolved.toUri())
                       }.toMutableList()
 
 
-//                      stationsFromApiMetadata = it.map { station ->
-//                          stationItemToMediaMetadataCompat(station)
-//                      }.toMutableList()
-
-//                      isStationsFromApiUpdated = true
-
                   } else {
 
-                      stationsFromApi.addAll(it)
+                      stationsFromApi.addAll(listOfStations)
 
+                      listOfStations.map { station ->
 
-                      if(RadioService.currentMediaItems == SEARCH_FROM_API){
+                          val item = MediaItem.fromUri(station.url_resolved.toUri())
+                          stationsFromApiMediaItems.add(item)
 
-                          it.map { station ->
-
-//                              stationsFromApiMetadata.add(
-//                                  stationItemToMediaMetadataCompat(station)
-//                              )
-
-                              val item = MediaItem.fromUri(station.url_resolved.toUri())
-                              exoPlayer.addMediaItem(item)
-                              stationsFromApiMediaItems.add(item)
-
-                          }
-                      }
-
-                      else {
-
-                          it.map { station ->
-
-//                              stationsFromApiMetadata.add(
-//                                  stationItemToMediaMetadataCompat(station)
-//                              )
-
-                              stationsFromApiMediaItems.add(
-                                  MediaItem.fromUri(station.url_resolved.toUri())
-                              )
-                          }
-
-//                          isStationsFromApiUpdated = true
-
+                          if(RadioService.currentMediaItems == SEARCH_FROM_API)
+                            exoPlayer.addMediaItem(item)
                       }
                   }
               }

@@ -21,6 +21,7 @@ import com.onlyradio.radioplayer.databinding.StubNoResultMessageBinding
 import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.exoPlayer.isPlayEnabled
 import com.onlyradio.radioplayer.exoPlayer.isPlaying
+import com.onlyradio.radioplayer.extensions.makeToast
 import com.onlyradio.radioplayer.ui.MainActivity
 import com.onlyradio.radioplayer.ui.animations.TextLoadAnim
 import com.onlyradio.radioplayer.ui.animations.slideAnim
@@ -323,7 +324,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
            val isToChangeMediaItems = RadioService.currentMediaItems != SEARCH_FROM_API
 
-            mainViewModel.playOrToggleStation(station, SEARCH_FROM_API,
+            mainViewModel.playOrToggleStation(station.stationuuid, SEARCH_FROM_API,
                 itemIndex = index, isToChangeMediaItems = isToChangeMediaItems)
         }
     }
@@ -478,10 +479,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
                 clearAdapter(check)
                 if(!check){
-                    Toast.makeText(requireContext(),
-                        resources.getString(R.string.same_search_query), Toast.LENGTH_SHORT).show()
+                    requireContext().makeToast(R.string.same_search_query)
                 }
-
             }
         }
     }
@@ -495,10 +494,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
           val check =  mainViewModel.initiateNewSearch()
           clearAdapter(check)
           if(!check){
-              Toast.makeText(requireContext(),
-                  resources.getString(R.string.same_search_query), Toast.LENGTH_SHORT).show()
+              requireContext().makeToast(R.string.same_search_query)
           }
-
         }
     }
 

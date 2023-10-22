@@ -587,7 +587,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
 
 
-            mainViewModel.playOrToggleStation(station, searchFlag, itemIndex = position, isToChangeMediaItems =
+            mainViewModel.playOrToggleStation(station.stationuuid, searchFlag, itemIndex = position, isToChangeMediaItems =
             isToChangeMediaItems)
         }
     }
@@ -710,7 +710,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             withContext(Dispatchers.Main){
                 Snackbar.make(
                     requireActivity().findViewById(R.id.rootLayout),
-                    resources.getString(R.string.removed_from_playlist) + playlistName,
+                    resources.getString(R.string.removed_from_playlist) + " " + playlistName,
                     Snackbar.LENGTH_LONG
                 ).apply {
                     setAction(resources.getString(R.string.action_undo)){
@@ -781,8 +781,8 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 stationID, playlistName
             ) {
 
-                val message = if(it) resources.getString(R.string.already_in_playlist) + playlistName
-                else resources.getString(R.string.moved_to_playlist) + playlistName
+                val message = if(it) resources.getString(R.string.already_in_playlist) + " " + playlistName
+                else resources.getString(R.string.moved_to_playlist) + " " + playlistName
 
                 Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
                     message, Snackbar.LENGTH_SHORT).show()

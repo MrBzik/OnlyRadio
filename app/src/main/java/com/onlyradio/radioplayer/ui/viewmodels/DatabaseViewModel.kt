@@ -248,9 +248,6 @@ class DatabaseViewModel @Inject constructor(
             currentPlaylistName.postValue(playlistName)
 //            isInLazyPlaylist = false
 //            isInFavouriteTab.postValue(false)
-
-            // to update service
-            radioSource.getStationsInPlaylist(playlistName)
     }
 
 

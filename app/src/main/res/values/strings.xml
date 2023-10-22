@@ -212,16 +212,14 @@
     <string name="title_copied">Title copied</string>
     <string name="removed_from_favs">Station removed from favs</string>
     <string name="saved_to_favs">Station saved to favs</string>
-    <string name="removed_from_playlist">Station removed from </string>
+    <string name="removed_from_playlist">Station removed from</string>
     <string name="removed_from_lazy_list">Station removed from Lazy list</string>
-    <string name="already_in_playlist">Already in </string>
-    <string name="moved_to_playlist">Station moved to </string>
-    <string name="added_to_playlist">Station added to </string>
+    <string name="already_in_playlist">Already in</string>
+    <string name="moved_to_playlist">Station moved to</string>
+    <string name="added_to_playlist">Station added to</string>
     <string name="recording_deleted">Recording deleted</string>
     <string name="bookmark_deleted">Bookmark deleted</string>
     <string name="action_undo">UNDO</string>
-    <string name="update_downloading">Update is downloading…</string>
-    <string name="update_downloaded">Update downloaded successfully. Restarting app…</string>
 
 
 
@@ -237,7 +235,8 @@
     <string name="no_browser_error_plus_clipboard">No browser found on the device. Address was copied to clipboard</string>
     <string name="no_browser_error">No browser found on the device</string>
     <string name="exorecord_error">Something went wrong…</string>
-
+    <string name="update_downloading">Update is downloading…</string>
+    <string name="update_downloaded">Update downloaded successfully. Restarting app…</string>
 
     <!--    Search Order-->
     <string-array name="search_order_array">

@@ -54,31 +54,30 @@ class SettingsViewModel @Inject constructor(
     val updatesStatus = _updatesStatus.asStateFlow()
 
 
-    lateinit var updateInfo : AppUpdateInfo
-
     private val _updatesInitialize = Channel<Boolean>()
 
     val updatesInitialize = _updatesInitialize.receiveAsFlow()
 
-    fun onUpdatesSuccessListener(info: AppUpdateInfo){
-        updateInfo = info
+    fun onUpdatesSuccessListener(info: AppUpdateInfo) : Boolean {
 
         val isUpdateAvailable = info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
         val isUpdateAllowed = info.isFlexibleUpdateAllowed
 
+        val isAvailable = isUpdateAvailable && isUpdateAllowed
+
         _updatesStatus.value =
-            if(isUpdateAvailable && isUpdateAllowed) UPDATES_AVAILABLE
+            if(isAvailable) UPDATES_AVAILABLE
         else UPDATES_NOT_AVAILABLE
 
-        if(checkUpdatesPref())
-            requestUpdates(false)
+        return isAvailable
+
     }
 
-    fun requestUpdates(isFromUser : Boolean){
+    fun requestUpdates(isToUpdate : Boolean){
 
         if (_updatesStatus.value == UPDATES_AVAILABLE){
             viewModelScope.launch {
-                _updatesInitialize.send(isFromUser)
+                _updatesInitialize.send(isToUpdate)
             }
         }
     }
@@ -107,7 +106,6 @@ class SettingsViewModel @Inject constructor(
             InstallStatus.INSTALLING -> {
                 UPDATES_INSTALLING
             }
-
                 else -> -1
             }
     }

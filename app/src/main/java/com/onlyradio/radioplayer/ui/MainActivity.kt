@@ -10,6 +10,8 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.doOnLayout
@@ -17,18 +19,26 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.findNavController
 import com.bumptech.glide.RequestManager
+import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.android.play.core.ktx.isFlexibleUpdateAllowed
 import com.onlyradio.radioplayer.R
+import com.onlyradio.radioplayer.connectivityObserver.ConnectivityObserver
+import com.onlyradio.radioplayer.connectivityObserver.NetworkConnectivityObserver
 import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.data.local.entities.Recording
 import com.onlyradio.radioplayer.databinding.ActivityMainBinding
 import com.onlyradio.radioplayer.databinding.StubPlayerActivityMainBinding
 import com.onlyradio.radioplayer.exoPlayer.RadioService
+import com.onlyradio.radioplayer.extensions.makeToast
 import com.onlyradio.radioplayer.ui.animations.LoadingAnim
 import com.onlyradio.radioplayer.ui.delegates.Navigation
 import com.onlyradio.radioplayer.ui.delegates.NavigationImpl
@@ -46,6 +56,8 @@ import com.onlyradio.radioplayer.utils.Logger
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -97,6 +109,8 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private lateinit var connectivityObserver: NetworkConnectivityObserver
+
     companion object{
         var uiMode = 0
         var flHeight = 0
@@ -104,23 +118,25 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
-    override fun onBackPressed() {
-
-        if(mainViewModel.isInDetailsFragment.value == false) {
-            this.moveTaskToBack(true)
-        }  else {
-            navigation.handleNavigationToFragments(bind.bottomNavigationView.selectedItemId)
-        }
-    }
+//    override fun onBackPressed() {
+//
+//        super.onBackPressed()
+//        if(mainViewModel.isInDetailsFragment.value == false) {
+//            this.moveTaskToBack(true)
+//        }  else {
+//            navigation.handleNavigationToFragments(bind.bottomNavigationView.selectedItemId)
+//        }
+//    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        appUpdateManager = AppUpdateManagerFactory.create(applicationContext)
-        appUpdateManager.registerListener(installStateUpdatedListener)
-        checkForUpdates()
+        setOnBackPressed()
+
+        setConnectivityObserver()
+
+        initialCheckForUpdates()
 
         setTheme(R.style.Theme_RadioPlayer)
 
@@ -158,23 +174,68 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
+    private fun setOnBackPressed(){
 
-    private fun checkForUpdates(){
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                if(mainViewModel.isInDetailsFragment.value == false) {
+                    this@MainActivity.moveTaskToBack(true)
+                }  else {
+                    navigation.handleNavigationToFragments(bind.bottomNavigationView.selectedItemId)
+                }
+            }
+        })
+    }
+
+    private fun setConnectivityObserver() {
+
+        connectivityObserver = NetworkConnectivityObserver(this)
+
+        mainViewModel.updateInternetConnectionStatus(connectivityObserver.isNetworkAvailable())
+
+        connectivityObserver.observe().onEach {
+
+            val status = when (it) {
+                ConnectivityObserver.Status.Available -> true
+                else -> false
+            }
+
+            mainViewModel.updateInternetConnectionStatus(status)
+
+        }.launchIn(lifecycleScope)
+    }
+
+
+    private fun initialCheckForUpdates(){
+
+        appUpdateManager = AppUpdateManagerFactory.create(applicationContext)
+        appUpdateManager.registerListener(installStateUpdatedListener)
+
+        val isToUpdate = settingsViewModel.checkUpdatesPref()
+
+        checkForUpdates(isToUpdate)
+
+    }
+
+
+    private fun checkForUpdates(isToUpdate : Boolean){
         appUpdateManager.appUpdateInfo.addOnSuccessListener { info->
-            settingsViewModel.onUpdatesSuccessListener(info)
+
+            val isAvailable = settingsViewModel.onUpdatesSuccessListener(info)
+
+            if(isAvailable && isToUpdate)
+                initializeUpdate(info)
         }
     }
 
 
-    private fun initializeUpdate(isFromUser: Boolean){
-        val res = appUpdateManager.startUpdateFlowForResult(
-            settingsViewModel.updateInfo, this, AppUpdateOptions.defaultOptions(updateType), 123
-        )
-        if(!res && isFromUser){
-            checkForUpdates()
+    private fun initializeUpdate(info: AppUpdateInfo){
+        try {
             appUpdateManager.startUpdateFlowForResult(
-                settingsViewModel.updateInfo, this, AppUpdateOptions.defaultOptions(updateType), 123
+                info, this, AppUpdateOptions.defaultOptions(updateType), 123
             )
+        } catch (e: Exception){
+            this.makeToast(R.string.updates_status_failed)
         }
     }
 
@@ -183,20 +244,18 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 settingsViewModel.updatesStatus.collectLatest { status ->
-
                     when(status){
 
                         UPDATES_DOWNLOADING -> {
-                            Toast.makeText(applicationContext, resources.getString(R.string.update_downloading),
-                                Toast.LENGTH_SHORT).show()
+                            this@MainActivity.makeToast(R.string.update_downloading)
                         }
 
                         UPDATES_DOWNLOADED -> {
-                            Toast.makeText(applicationContext, resources.getString(R.string.update_downloaded),
-                                Toast.LENGTH_SHORT).show()
-                            lifecycleScope.launch {
-                                delay(2000)
+                            try {
+                                this@MainActivity.makeToast(R.string.update_downloaded)
                                 appUpdateManager.completeUpdate()
+                            } catch (e: Exception){
+                                this@MainActivity.makeToast(R.string.updates_status_failed)
                             }
                         }
                     }
@@ -207,8 +266,8 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED){
-                settingsViewModel.updatesInitialize.collectLatest { isFromUser ->
-                    initializeUpdate(isFromUser)
+                settingsViewModel.updatesInitialize.collectLatest { isToUpdate ->
+                    checkForUpdates(isToUpdate)
                 }
             }
         }
@@ -340,6 +399,7 @@ class MainActivity : AppCompatActivity() {
 
         bind.bottomNavigationView.setOnItemSelectedListener {
             navigation.handleNavigationToFragments(it.itemId)
+            true
         }
     }
 
@@ -377,7 +437,7 @@ class MainActivity : AppCompatActivity() {
             } else {
 
                 currentPlayingStation?.let { mainViewModel.playOrToggleStation(
-                    it,
+                    it.stationuuid,
                     isToChangeMediaItems = false,
                     searchFlag = RadioService.currentMediaItems
                 ) }

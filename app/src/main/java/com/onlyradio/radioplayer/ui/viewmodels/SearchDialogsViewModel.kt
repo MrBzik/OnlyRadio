@@ -280,20 +280,23 @@ class SearchDialogsViewModel @Inject constructor(
 //    }
 
 
-
     val tagsListFlow by lazy {
         MutableStateFlow(initiateTagsList())
     }
 
-    fun updateTagsFlow(genre : TagWithGenre.Genre, position : Int){
+    fun updateTagsFlow(position : Int){
 
-        tagsListFlow.update {
+        if (position >= tagsListFlow.value.size) return
+        val genre = tagsListFlow.value[position]
+        if(genre !is TagWithGenre.Genre) return
 
-            val list = getList(genre.genre)
-            if(genre.isOpened) it.removeAll(list)
-            else it.addAll(position+1, list)
-            (it[position] as TagWithGenre.Genre).isOpened = !genre.isOpened
-            it.clone() as ArrayList<TagWithGenre>
+        tagsListFlow.update { allTags ->
+            val newList : MutableList<TagWithGenre> = allTags.toMutableList()
+            val listToManage = getList(genre.genre)
+            if(genre.isOpened) newList.removeAll(listToManage)
+            else newList.addAll(position+1, listToManage)
+            genre.isOpened = !genre.isOpened
+            newList.toList()
         }
     }
 
@@ -325,7 +328,7 @@ class SearchDialogsViewModel @Inject constructor(
     }
 
 
-    private fun initiateTagsList() : ArrayList<TagWithGenre>{
+    private fun initiateTagsList() : List<TagWithGenre>{
 
         val file = File(app.filesDir.absolutePath + File.separator + TAGS_FILE_NAME)
 
@@ -335,13 +338,13 @@ class SearchDialogsViewModel @Inject constructor(
 
         val isExists = file.exists()
 
-        return ArrayList<TagWithGenre>().apply {
+        if(isExists) {
+            val json = file.readText()
+            val list = Json.decodeFromString<List<List<TagWithGenre.Tag>>>(json)
+            updateTagsLists(list)
+        }
 
-            if(isExists) {
-                val json = file.readText()
-                val list = Json.decodeFromString<List<List<TagWithGenre.Tag>>>(json)
-                updateTagsLists(list)
-            }
+        return ArrayList<TagWithGenre>().apply {
 
             add(TagWithGenre.Genre(TAG_BY_PERIOD))
             addAll(tagsListByPeriod)

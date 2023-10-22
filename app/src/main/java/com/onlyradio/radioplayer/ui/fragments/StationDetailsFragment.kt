@@ -43,6 +43,7 @@ import com.onlyradio.radioplayer.utils.Utils
 import com.onlyradio.radioplayer.utils.addAction
 import com.onlyradio.radioplayer.utils.toRadioStation
 import com.google.android.material.snackbar.Snackbar
+import com.onlyradio.radioplayer.extensions.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.DateFormat
 import java.util.Calendar
@@ -264,7 +265,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                 val playWhenReady = mainViewModel.playbackState.value?.isPlaying ?: true
 
                 mainViewModel.playOrToggleStation(
-                    station =  newStation, searchFlag =  RadioService.currentMediaItems,
+                    stationId = newStation.stationuuid, searchFlag =  RadioService.currentMediaItems,
                     playWhenReady = playWhenReady, itemIndex = position,
                     isToChangeMediaItems = false
                 )
@@ -291,9 +292,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             } catch (e : Exception){
                 val clip = ClipData.newPlainText("label", it)
                 clipBoard?.setPrimaryClip(clip)
-                Toast.makeText(requireContext(),
-                    resources.getString(R.string.no_browser_error_plus_clipboard),
-                    Toast.LENGTH_LONG).show()
+                requireContext().makeToast(R.string.no_browser_error_plus_clipboard)
             }
         }
 
@@ -415,9 +414,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
              )
          )
 
-            Toast.makeText(requireContext(), resources.getString(R.string.title_bookmarked),
-                Toast.LENGTH_SHORT).show()
-
+            requireContext().makeToast(R.string.title_bookmarked)
 
         }
     }
@@ -441,11 +438,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                         try {
                             startActivity(intent)
                         } catch (e : Exception){
-                            Toast.makeText(
-                                requireContext(),
-                                resources.getString(R.string.no_browser_error),
-                                Toast.LENGTH_SHORT
-                                ).show()
+                            requireContext().makeToast(R.string.no_browser_error)
                         }
                     }
                 addAction(R.layout.snackbar_extra_action, "YOUTUBE"){
@@ -461,11 +454,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                         try {
                             startActivity(webIntent)
                         } catch (e : Exception){
-                            Toast.makeText(
-                                requireContext(),
-                                resources.getString(R.string.no_browser_error),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            requireContext().makeToast(R.string.no_browser_error)
                         }
                     }
                 }
@@ -621,8 +610,8 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                 station.stationuuid, playlistName
             ) {
 
-                val message = if(it) resources.getString(R.string.already_in_playlist) + playlistName
-                               else resources.getString(R.string.added_to_playlist) + playlistName
+                val message = if(it) resources.getString(R.string.already_in_playlist) + " " + playlistName
+                               else resources.getString(R.string.added_to_playlist) + " " + playlistName
 
                 Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
                         message, Snackbar.LENGTH_SHORT).show()

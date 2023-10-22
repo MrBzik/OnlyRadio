@@ -23,8 +23,8 @@ android {
         applicationId "com.onlyradio.radioplayer"
         minSdk 24
         targetSdk 34
-        versionCode 14
-        versionName "2.0.3"
+        versionCode 16
+        versionName "2.0.5"
         buildConfigField "String", "API_KEY", localProperties['apiKey']
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

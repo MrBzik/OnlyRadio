@@ -175,12 +175,11 @@ class PagingHistoryAdapter constructor(
     }
 
 
-    fun updateOnStationChange(station : RadioStation,
+    fun updateOnStationChange(stationId : String,
                               holder : StationViewHolder?
     ){
-        if(station.stationuuid != currentRadioStationID) {
-
-            currentRadioStationID = station.stationuuid
+        if(stationId != currentRadioStationID) {
+            currentRadioStationID = stationId
             previousItemHolder?.bind?.let {
                 utils.restoreState(it)
             }

@@ -85,6 +85,7 @@ import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.exoRecord.ExoRecord
+import com.onlyradio.radioplayer.extensions.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -302,6 +303,7 @@ class RadioService : MediaBrowserServiceCompat() {
         radioServiceConnection.setterForPlayerPos {
             exoPlayer.currentMediaItemIndex
         }
+
 
     }
 
@@ -719,7 +721,7 @@ class RadioService : MediaBrowserServiceCompat() {
 //        }
         } catch (e : Exception){
             reverbMode = 0
-            Toast.makeText(this, resources.getString(R.string.reverb_error), Toast.LENGTH_LONG).show()
+            this.makeToast(R.string.reverb_error)
         }
     }
 

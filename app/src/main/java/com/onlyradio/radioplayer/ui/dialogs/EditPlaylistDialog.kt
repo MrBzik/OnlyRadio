@@ -17,6 +17,7 @@ import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.adapters.PagingPixabayAdapter
 import com.onlyradio.radioplayer.data.local.entities.Playlist
 import com.onlyradio.radioplayer.databinding.DialogEditPlaylistBinding
+import com.onlyradio.radioplayer.extensions.makeToast
 import com.onlyradio.radioplayer.extensions.observeKeyboardState
 import com.onlyradio.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.PixabayViewModel
@@ -215,9 +216,7 @@ class EditPlaylistDialog (
             if(listOfPlaylistNames.contains(nameField) &&
                 nameField != currentPlaylistName
             ) {
-                Toast.makeText(requireContext,
-                    requireContext.resources.getString(R.string.playlist_name_taken),
-                    Toast.LENGTH_SHORT).show()
+                requireContext.makeToast(R.string.playlist_name_taken)
                 return@setOnClickListener
             }
 

@@ -22,7 +22,7 @@ interface Navigation {
 
     fun initialNavigation()
 
-    fun handleNavigationToFragments(itemId : Int) : Boolean
+    fun handleNavigationToFragments(itemId : Int)
 
     fun handleNavigationWithDetailsFragment(itemId: Int)
 
@@ -56,6 +56,7 @@ class NavigationImpl (
     override fun initialNavigation() {
         if(mainViewModel.isInitialLaunchOfTheApp){
             mainViewModel.isInitialLaunchOfTheApp = false
+            supportFragmentManager.popBackStack()
             supportFragmentManager.beginTransaction().apply {
                 replace(R.id.flFragment, radioSearchFragment)
                 addToBackStack(null)
@@ -64,11 +65,13 @@ class NavigationImpl (
         }
     }
 
-    override fun handleNavigationToFragments(itemId : Int) : Boolean {
+    override fun handleNavigationToFragments(itemId : Int)  {
 
         if(itemId != R.id.mi_radioSearchFragment){
             mainViewModel.updateIsToPlayLoadAnim(false)
         }
+
+        supportFragmentManager.popBackStack()
 
         getFragment(itemId).apply {
             exitTransition = null
@@ -78,7 +81,6 @@ class NavigationImpl (
         if(mainViewModel.isInDetailsFragment.value == true)
            mainViewModel.updateIsInDetails(false)
 
-        return true
     }
 
 
@@ -91,6 +93,8 @@ class NavigationImpl (
             getFragment(itemId).exitTransition = Fade()
 
             mainViewModel.updateIsToPlayLoadAnim(false)
+
+            supportFragmentManager.popBackStack()
 
             supportFragmentManager.beginTransaction().apply {
 

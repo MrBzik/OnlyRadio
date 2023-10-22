@@ -11,6 +11,7 @@ import androidx.core.view.isVisible
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.databinding.StubSettingsGeneralBinding
 import com.onlyradio.radioplayer.exoPlayer.RadioService
+import com.onlyradio.radioplayer.extensions.makeToast
 import com.onlyradio.radioplayer.ui.MainActivity
 import com.onlyradio.radioplayer.ui.viewmodels.MainViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.SettingsViewModel
@@ -118,7 +119,8 @@ class SettingsGeneral {
 
         }
 
-        bindGeneral.tvUpdatesAvailableCheck.text = text
+        if(text.isNotBlank())
+            bindGeneral.tvUpdatesAvailableCheck.text = text
 
     }
 
@@ -277,12 +279,8 @@ class SettingsGeneral {
             try {
                 context.startActivity(intent)
             } catch (e : Exception){
-                Toast.makeText(context,
-                    context.resources.getString(R.string.no_browser_error),
-                    Toast.LENGTH_SHORT
-                    ).show()
+                context.makeToast(R.string.no_browser_error)
             }
-
         }
     }
 

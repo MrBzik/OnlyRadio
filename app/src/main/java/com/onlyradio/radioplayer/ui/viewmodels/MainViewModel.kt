@@ -110,39 +110,14 @@ class MainViewModel @Inject constructor(
         radioServiceConnection.connectBrowser()
     }
 
-    val connectivityObserver = NetworkConnectivityObserver(getApplication())
+    var hasInternetConnection : MutableLiveData<Boolean> = MutableLiveData()
 
-    var hasInternetConnection : MutableLiveData<Boolean> = MutableLiveData(
-        connectivityObserver.isNetworkAvailable()
-    )
-
-    private fun setConnectivityObserver() {
-
-        connectivityObserver.observe().onEach {
-
-            when (it) {
-                ConnectivityObserver.Status.Available -> {
-                    hasInternetConnection.postValue(true)
-
-//                    if(wasSearchInterrupted){
-//                        wasSearchInterrupted = false
-//                        searchBy.postValue(true)
-//                    }
-                }
-                ConnectivityObserver.Status.Unavailable -> {
-                    hasInternetConnection.postValue(false)
-                }
-                ConnectivityObserver.Status.Lost -> {
-                    hasInternetConnection.postValue(false)
-                }
-                else -> {}
-            }
-        }.launchIn(viewModelScope)
+    fun updateInternetConnectionStatus(status : Boolean){
+        hasInternetConnection.postValue(status)
     }
 
-    init {
-        setConnectivityObserver()
-    }
+
+
 
        val searchPreferences = app.getSharedPreferences("SearchPref", Context.MODE_PRIVATE)
 
@@ -388,57 +363,55 @@ class MainViewModel @Inject constructor(
     }
 
 
-        fun playOrToggleStation(
-            station : RadioStation? = null,
-            searchFlag : Int,
-            playWhenReady : Boolean = true,
-            itemIndex : Int = -1,
+    fun playOrToggleStation(
+        stationId : String? = null,
+        searchFlag : Int,
+        playWhenReady : Boolean = true,
+        itemIndex : Int = -1,
 //            historyItemId : String? = null,
-            isToChangeMediaItems : Boolean
-        ) : Boolean {
+        isToChangeMediaItems : Boolean
+    ) : Boolean {
 
-            val isPrepared = playbackState.value?.isPrepared ?: false
+        val isPrepared = playbackState.value?.isPrepared ?: false
 
-            val id = station?.stationuuid
+        if(isPrepared && stationId == RadioService.currentPlayingStation.value?.stationuuid
+            && RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS
+        ){
 
-            if(isPrepared && id == RadioService.currentPlayingStation.value?.stationuuid
-                && RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS
-                    ){
+            RadioService.currentMediaItems = searchFlag
 
-                RadioService.currentMediaItems = searchFlag
+            var isToPlay = false
 
-                var isToPlay = false
-
-                playbackState.value?.let { playbackState ->
-                    when {
-                        playbackState.isPlaying -> {
-                            if(isToChangeMediaItems) isToPlay = false
-                            else
+            playbackState.value?.let { playbackState ->
+                when {
+                    playbackState.isPlaying -> {
+                        if(isToChangeMediaItems) isToPlay = false
+                        else
                             radioServiceConnection.transportControls.pause()
-                        }
+                    }
 
-                        playbackState.isPlayEnabled -> {
-                            if(isToChangeMediaItems) isToPlay = true
-                            else
+                    playbackState.isPlayEnabled -> {
+                        if(isToChangeMediaItems) isToPlay = true
+                        else
                             radioServiceConnection.transportControls.play()
-                        }
                     }
                 }
+            }
 
-                if(isToChangeMediaItems){
+            if(isToChangeMediaItems){
 
-                    radioServiceConnection.transportControls
-                        .playFromMediaId(id, bundleOf(
-                            Pair(SEARCH_FLAG, searchFlag),
-                            Pair(PLAY_WHEN_READY, isToPlay),
-                            Pair(ITEM_INDEX, itemIndex),
-                            Pair(IS_CHANGE_MEDIA_ITEMS, true),
-                            Pair(IS_SAME_STATION, true)
-                        ))
-                }
+                radioServiceConnection.transportControls
+                    .playFromMediaId(stationId, bundleOf(
+                        Pair(SEARCH_FLAG, searchFlag),
+                        Pair(PLAY_WHEN_READY, isToPlay),
+                        Pair(ITEM_INDEX, itemIndex),
+                        Pair(IS_CHANGE_MEDIA_ITEMS, true),
+                        Pair(IS_SAME_STATION, true)
+                    ))
+            }
 
-                return false
-            } else {
+            return false
+        } else {
 
 //                id?.let {
 //                    radioServiceConnection.sendCommand(COMMAND_UPDATE_HISTORY,
@@ -446,19 +419,19 @@ class MainViewModel @Inject constructor(
 //                    )
 //                }
 
-                RadioService.currentMediaItems = searchFlag
-                radioServiceConnection.transportControls
-                    .playFromMediaId(id, bundleOf(
-                        Pair(SEARCH_FLAG, searchFlag),
-                        Pair(PLAY_WHEN_READY, playWhenReady),
-                        Pair(ITEM_INDEX, itemIndex),
-                        Pair(IS_CHANGE_MEDIA_ITEMS, isToChangeMediaItems),
-                        Pair(IS_SAME_STATION, false)
-                    ))
+            RadioService.currentMediaItems = searchFlag
+            radioServiceConnection.transportControls
+                .playFromMediaId(stationId, bundleOf(
+                    Pair(SEARCH_FLAG, searchFlag),
+                    Pair(PLAY_WHEN_READY, playWhenReady),
+                    Pair(ITEM_INDEX, itemIndex),
+                    Pair(IS_CHANGE_MEDIA_ITEMS, isToChangeMediaItems),
+                    Pair(IS_SAME_STATION, false)
+                ))
 
-                return true
-            }
+            return true
         }
+    }
 
 
 }

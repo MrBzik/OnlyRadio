@@ -54,6 +54,7 @@ import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.onlyradio.radioplayer.utils.SpinnerExt
 import com.onlyradio.radioplayer.utils.addAction
 import com.google.android.material.snackbar.Snackbar
+import com.onlyradio.radioplayer.extensions.makeToast
 import com.onlyradio.radioplayer.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -382,9 +383,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                         }
 
                     if(index != -1 && index != null){
-                            handleNewRadioStation(index, station)
+                            handleNewRadioStation(index, station.stationuuid)
                         } else {
-                            stationsHistoryAdapter?.updateOnStationChange(station, null)
+                            stationsHistoryAdapter?.updateOnStationChange(station.stationuuid, null)
                     }
 
                 } else {
@@ -421,7 +422,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
 
 
-    private fun handleNewRadioStation(position : Int, station : RadioStation){
+    private fun handleNewRadioStation(position : Int, stationId : String){
 
         bind.rvHistory.smoothScrollToPosition(position)
 
@@ -431,7 +432,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 .findViewHolderForAdapterPosition(position)
 
             holder?.let {
-                stationsHistoryAdapter?.updateOnStationChange(station, holder as PagingHistoryAdapter.StationViewHolder)
+                stationsHistoryAdapter?.updateOnStationChange(stationId, holder as PagingHistoryAdapter.StationViewHolder)
             }
         }
     }
@@ -516,8 +517,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 onBookmarkClickListener { title ->
 
-                    Toast.makeText(requireContext(), resources.getString(R.string.title_bookmarked),
-                        Toast.LENGTH_SHORT).show()
+                    requireContext().makeToast(R.string.title_bookmarked)
 
                     historyViewModel.upsertBookmarkedTitle(title)
                 }
@@ -579,10 +579,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                     try {
                         startActivity(webIntent)
                     } catch (e : Exception){
-                        Toast.makeText(requireContext(),
-                            resources.getString(R.string.no_browser_error),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        requireContext().makeToast(R.string.no_browser_error)
                     }
 
                 }
@@ -743,7 +740,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 isToChangeMediaItems = true
             }
 
-           val isNewItem = mainViewModel.playOrToggleStation(station, flag,
+           val isNewItem = mainViewModel.playOrToggleStation(station.stationuuid, flag,
                 itemIndex = position, isToChangeMediaItems = isToChangeMediaItems)
 
             if(isToChangeMediaItems || isNewItem){

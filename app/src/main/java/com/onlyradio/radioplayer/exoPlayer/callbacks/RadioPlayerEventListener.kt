@@ -21,6 +21,7 @@ import com.google.android.exoplayer2.MediaMetadata
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.onlyradio.radioplayer.R
+import com.onlyradio.radioplayer.extensions.makeToast
 
 class RadioPlayerEventListener (
     private val radioService : RadioService
@@ -224,13 +225,10 @@ class RadioPlayerEventListener (
 
         if(RadioService.isToReconnect && radioService.exoPlayer.playWhenReady){
             radioService.exoPlayer.prepare()
-
-           Toast.makeText(radioService, radioService.resources.getString(R.string.reconnecting), Toast.LENGTH_SHORT).show()
-
-
+            radioService.makeToast(R.string.reconnecting)
 
         } else {
-            Toast.makeText(radioService, radioService.resources.getString(R.string.not_responding), Toast.LENGTH_SHORT).show()
+            radioService.makeToast(R.string.not_responding)
         }
     }
 }

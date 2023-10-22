@@ -187,7 +187,7 @@ class TagPickerDialog (
 
             if(tag is TagWithGenre.Genre){
 
-                searchDialogsViewModel.updateTagsFlow(tag, position)
+                searchDialogsViewModel.updateTagsFlow(position)
 
 //                if(tag.isOpened) {
 //

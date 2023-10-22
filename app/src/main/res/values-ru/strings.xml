@@ -210,11 +210,11 @@
     <string name="title_copied">Название скопировано</string>
     <string name="removed_from_favs">Станция удалена из избранных</string>
     <string name="saved_to_favs">Станция сохранена в избранные</string>
-    <string name="removed_from_playlist">Станция удалена из </string>
+    <string name="removed_from_playlist">Станция удалена из</string>
     <string name="removed_from_lazy_list">Станция удалена из "Лениста"</string>
-    <string name="already_in_playlist">Уже есть в </string>
-    <string name="moved_to_playlist">Станция перемещена в </string>
-    <string name="added_to_playlist">Станция добавлена в </string>
+    <string name="already_in_playlist">Уже есть в</string>
+    <string name="moved_to_playlist">Станция перемещена в</string>
+    <string name="added_to_playlist">Станция добавлена в</string>
     <string name="recording_deleted">Запись удалена</string>
     <string name="bookmark_deleted">Песня удалена из Отмеченных</string>
     <string name="action_undo">ВЕРНУТЬ</string>
