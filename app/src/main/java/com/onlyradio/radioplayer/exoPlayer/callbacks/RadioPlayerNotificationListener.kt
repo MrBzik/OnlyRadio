@@ -3,6 +3,8 @@ package com.onlyradio.radioplayer.exoPlayer.callbacks
 import android.app.Notification
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo
+import android.os.Build
 import androidx.core.content.ContextCompat
 import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.utils.Constants.NOTIFICATION_ID
@@ -58,8 +60,14 @@ class RadioPlayerNotificationListener (
                     )
 
 //                startForegroundService()
+                if(Build.VERSION.SDK_INT >= 29){
+                    startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+                }
 
-                startForeground(NOTIFICATION_ID, notification)
+                else {
+                    startForeground(NOTIFICATION_ID, notification)
+                }
+
                 isForegroundService = true
 
             }

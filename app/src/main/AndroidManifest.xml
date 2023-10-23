@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
 
 <!--    <uses-permission android:name="android.permission.BLUETOOTH" />-->
 <!--    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"-->
@@ -36,7 +37,9 @@
         android:theme="@style/splashScreenTheme"
         tools:targetApi="31">
         <service android:name=".exoPlayer.RadioService"
-            android:exported="false">
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback"
+            >
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService"/>
             </intent-filter>

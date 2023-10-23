@@ -71,7 +71,7 @@ class NavigationImpl (
             mainViewModel.updateIsToPlayLoadAnim(false)
         }
 
-//        supportFragmentManager.popBackStack()
+        supportFragmentManager.popBackStack()
 
         getFragment(itemId).apply {
             exitTransition = null
@@ -94,7 +94,7 @@ class NavigationImpl (
 
             mainViewModel.updateIsToPlayLoadAnim(false)
 
-//            supportFragmentManager.popBackStack()
+            supportFragmentManager.popBackStack()
 
             supportFragmentManager.beginTransaction().apply {
 
