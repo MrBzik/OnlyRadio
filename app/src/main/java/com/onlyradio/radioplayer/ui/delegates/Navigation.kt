@@ -56,7 +56,7 @@ class NavigationImpl (
     override fun initialNavigation() {
         if(mainViewModel.isInitialLaunchOfTheApp){
             mainViewModel.isInitialLaunchOfTheApp = false
-            supportFragmentManager.popBackStack()
+
             supportFragmentManager.beginTransaction().apply {
                 replace(R.id.flFragment, radioSearchFragment)
                 addToBackStack(null)
@@ -71,7 +71,7 @@ class NavigationImpl (
             mainViewModel.updateIsToPlayLoadAnim(false)
         }
 
-        supportFragmentManager.popBackStack()
+//        supportFragmentManager.popBackStack()
 
         getFragment(itemId).apply {
             exitTransition = null
@@ -94,7 +94,7 @@ class NavigationImpl (
 
             mainViewModel.updateIsToPlayLoadAnim(false)
 
-            supportFragmentManager.popBackStack()
+//            supportFragmentManager.popBackStack()
 
             supportFragmentManager.beginTransaction().apply {
 

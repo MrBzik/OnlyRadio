@@ -49,7 +49,9 @@ abstract class BaseFragment<VB: ViewBinding>(
         (activity as MainActivity).settingsViewModel
     }
 
-    val searchDialogsViewModels : SearchDialogsViewModel by viewModels()
+    val searchDialogsViewModels : SearchDialogsViewModel by lazy {
+        (activity as MainActivity).searchDialogsViewModel
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

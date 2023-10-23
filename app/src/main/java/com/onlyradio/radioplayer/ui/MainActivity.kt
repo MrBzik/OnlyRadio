@@ -48,6 +48,7 @@ import com.onlyradio.radioplayer.ui.viewmodels.DatabaseViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.HistoryViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.MainViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.RecordingsViewModel
+import com.onlyradio.radioplayer.ui.viewmodels.SearchDialogsViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.SettingsViewModel
 import com.onlyradio.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
 import com.onlyradio.radioplayer.utils.Constants.UPDATES_DOWNLOADED
@@ -69,6 +70,7 @@ class MainActivity : AppCompatActivity() {
     val recordingsViewModel : RecordingsViewModel by viewModels()
     val historyViewModel : HistoryViewModel by viewModels()
     val favViewModel : DatabaseViewModel by viewModels()
+    val searchDialogsViewModel : SearchDialogsViewModel by viewModels()
 
     lateinit var bind : ActivityMainBinding
     var bindPlayer : StubPlayerActivityMainBinding? = null
