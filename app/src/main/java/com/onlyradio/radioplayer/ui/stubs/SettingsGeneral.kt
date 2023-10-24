@@ -7,6 +7,7 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.view.View
 import androidx.core.view.isVisible
+import com.onlyradio.radioplayer.BuildConfig
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.databinding.StubSettingsGeneralBinding
 import com.onlyradio.radioplayer.exoPlayer.RadioService
@@ -60,16 +61,27 @@ class SettingsGeneral {
 
     private fun setUpdatesSwitchListener(bindGeneral : StubSettingsGeneralBinding, settingsViewModel: SettingsViewModel){
 
-        bindGeneral.switchUpdatesAutoCheck.isChecked = settingsViewModel.checkUpdatesPref()
+        bindGeneral.tvAppVersion.text = "v. " + BuildConfig.VERSION_NAME
 
-        bindGeneral.tvUpdatesAvailableCheck.isVisible = !settingsViewModel.checkUpdatesPref()
+        val isAutoUpdatesCheck = settingsViewModel.checkUpdatesPref()
+
+        bindGeneral.switchUpdatesAutoCheck.isChecked = isAutoUpdatesCheck
+
+        bindGeneral.tvUpdatesAvailableCheck.isVisible = !isAutoUpdatesCheck
+        bindGeneral.tvAppVersion.isVisible = !isAutoUpdatesCheck
 
         bindGeneral.switchUpdatesAutoCheck.setOnCheckedChangeListener { _, isChecked ->
 
             settingsViewModel.changeAutoUpdatesPref(isChecked)
-            if(isChecked)
+            if(isChecked){
                 bindGeneral.tvUpdatesAvailableCheck.visibility = View.GONE
-            else bindGeneral.tvUpdatesAvailableCheck.visibility = View.VISIBLE
+                bindGeneral.tvAppVersion.visibility = View.GONE
+            }
+
+            else {
+                bindGeneral.tvUpdatesAvailableCheck.visibility = View.VISIBLE
+                bindGeneral.tvAppVersion.visibility = View.VISIBLE
+            }
 
         }
     }

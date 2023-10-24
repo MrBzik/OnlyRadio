@@ -14,6 +14,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.onlyradio.radioplayer.BuildConfig
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.databinding.FragmentSettingsBinding
 import com.onlyradio.radioplayer.databinding.StubSettingsExtrasBinding
