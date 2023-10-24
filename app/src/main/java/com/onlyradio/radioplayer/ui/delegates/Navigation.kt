@@ -71,8 +71,6 @@ class NavigationImpl (
             mainViewModel.updateIsToPlayLoadAnim(false)
         }
 
-        supportFragmentManager.popBackStack()
-
         getFragment(itemId).apply {
             exitTransition = null
             supportFragmentManager.navigate(this)
@@ -94,16 +92,17 @@ class NavigationImpl (
 
             mainViewModel.updateIsToPlayLoadAnim(false)
 
-            mainViewModel.onNavigationWithDetails(true)
+//            mainViewModel.onNavigationWithDetails(true)
 
             supportFragmentManager.beginTransaction().apply {
+
 
                 if(!RadioService.isFromRecording){
                     replace(R.id.flFragment, stationDetailsFragment)
                 } else {
                     replace(R.id.flFragment, recordingDetailsFragment)
                 }
-                addToBackStack(null)
+//                addToBackStack(null)
                 commit()
             }
         }

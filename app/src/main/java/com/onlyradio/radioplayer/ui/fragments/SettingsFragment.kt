@@ -227,10 +227,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
         if(settingsViewModel.isInSettingsExtras){
 
             bind.stubSettingsExtras.visibility = View.VISIBLE
+            bindExtras?.root?.slideAnim(350, 100, R.anim.fade_in_anim)
 
-            if(isToAnimate){
-                bindExtras?.root?.slideAnim(350, 100, R.anim.fade_in_anim)
-            }
+
+//            if(isToAnimate){
+//
+//            }
 
             if(isGeneralLogicSet)
                 bind.stubSettingsGeneral.visibility = View.GONE
@@ -242,10 +244,13 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
         } else {
 
-                bind.stubSettingsGeneral.visibility = View.VISIBLE
-                if(isToAnimate){
-                bindGeneral?.root?.slideAnim(350, 100, R.anim.fade_in_anim)
-            }
+            bind.stubSettingsGeneral.visibility = View.VISIBLE
+            bindGeneral?.root?.slideAnim(350, 100, R.anim.fade_in_anim)
+
+//
+//                if(isToAnimate){
+//
+//            }
 
                 if(isExtrasLogicSet)
                     bind.stubSettingsExtras.visibility = View.GONE

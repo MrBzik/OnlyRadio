@@ -430,15 +430,15 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    var isStationDetailsNavigated = false
-    var isRecordingsDetailsNavigated = false
-
-    fun onNavigationWithDetails(state : Boolean){
-        if(RadioService.isFromRecording)
-            isRecordingsDetailsNavigated = state
-        else isStationDetailsNavigated = state
-
-    }
+//    var isStationDetailsNavigated = false
+//    var isRecordingsDetailsNavigated = false
+//
+//    fun onNavigationWithDetails(state : Boolean){
+//        if(RadioService.isFromRecording)
+//            isRecordingsDetailsNavigated = state
+//        else isStationDetailsNavigated = state
+//
+//    }
 
 }
 
