@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.net.Uri
 import android.view.View
-import android.widget.Toast
 import androidx.core.view.isVisible
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.databinding.StubSettingsGeneralBinding
@@ -16,12 +15,7 @@ import com.onlyradio.radioplayer.ui.MainActivity
 import com.onlyradio.radioplayer.ui.viewmodels.MainViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.SettingsViewModel
 import com.onlyradio.radioplayer.utils.Constants
-import com.onlyradio.radioplayer.utils.Constants.UPDATES_AVAILABLE
-import com.onlyradio.radioplayer.utils.Constants.UPDATES_DOWNLOADED
-import com.onlyradio.radioplayer.utils.Constants.UPDATES_DOWNLOADING
-import com.onlyradio.radioplayer.utils.Constants.UPDATES_FAILED
-import com.onlyradio.radioplayer.utils.Constants.UPDATES_INSTALLING
-import com.onlyradio.radioplayer.utils.Constants.UPDATES_NOT_AVAILABLE
+import com.onlyradio.radioplayer.utils.UpdatesStatus
 import com.onlyradio.radioplayer.utils.addImage
 import com.onlyradio.radioplayer.utils.dpToP
 
@@ -81,48 +75,31 @@ class SettingsGeneral {
     }
 
 
-    fun changeUpdateStatus(status: Int, bindGeneral : StubSettingsGeneralBinding){
+    fun onUpdateStatus(status : UpdatesStatus, bindGeneral : StubSettingsGeneralBinding) {
 
         val context = bindGeneral.root.context
 
-        val text =
-
-        when(status){
-
-            UPDATES_AVAILABLE -> {
+        val text = when(status){
+            UpdatesStatus.UPDATES_AVAILABLE ->
                 context.getString(R.string.updates_status_available)
-            }
-
-            UPDATES_NOT_AVAILABLE -> {
+            UpdatesStatus.UPDATES_NOT_AVAILABLE ->
                 context.getString(R.string.updates_status_not_available)
-            }
-
-            UPDATES_DOWNLOADING -> {
+            UpdatesStatus.UPDATES_DOWNLOADING ->
                 context.getString(R.string.updates_status_downloading)
-            }
-
-            UPDATES_DOWNLOADED -> {
+            UpdatesStatus.UPDATES_DOWNLOADED ->
                 context.getString(R.string.updates_status_downloaded)
-            }
-
-            UPDATES_INSTALLING -> {
+            UpdatesStatus.UPDATES_INSTALLING ->
                 context.getString(R.string.updates_status_installing)
-            }
-
-            UPDATES_FAILED -> {
+            UpdatesStatus.UPDATES_FAILED ->
                 context.getString(R.string.updates_status_failed)
-            }
-
-            else -> {
-                ""
-            }
-
+            UpdatesStatus.UPDATES_REQUESTED ->
+                context.getString(R.string.updates_status_requested)
         }
 
-        if(text.isNotBlank())
-            bindGeneral.tvUpdatesAvailableCheck.text = text
-
+        bindGeneral.tvUpdatesAvailableCheck.text = text
     }
+
+
 
     private fun getInitialUiMode(bindGeneral : StubSettingsGeneralBinding){
 

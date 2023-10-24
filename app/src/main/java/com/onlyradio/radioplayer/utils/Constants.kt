@@ -172,19 +172,21 @@ object Constants {
 
     const val UPDATES_AUTO_PREF = "updates auto pref"
 
-    const val UPDATES_AVAILABLE = 0
-    const val UPDATES_DOWNLOADING = 1
-    const val UPDATES_DOWNLOADED = 2
-    const val UPDATES_NOT_AVAILABLE = 3
-    const val UPDATES_INSTALLING = 4
-    const val UPDATES_FAILED = 5
-
 
     // Audio effects
 
-
-
 }
+
+enum class UpdatesStatus {
+    UPDATES_AVAILABLE,
+    UPDATES_DOWNLOADING,
+    UPDATES_DOWNLOADED,
+    UPDATES_NOT_AVAILABLE,
+    UPDATES_INSTALLING,
+    UPDATES_FAILED,
+    UPDATES_REQUESTED
+}
+
 
  object Commands {
 

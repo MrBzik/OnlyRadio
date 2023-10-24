@@ -54,6 +54,7 @@
     <string name="updates_status_downloaded">Updates downloaded</string>
     <string name="updates_status_installing">Installing updates</string>
     <string name="updates_status_failed">Failed to install updates</string>
+    <string name="updates_status_requested">Requesting updates…</string>
     <string name="check_it_out">Check it out</string>
     <string name="community_tip">Know some cool radio stations? You can help community!</string>
 

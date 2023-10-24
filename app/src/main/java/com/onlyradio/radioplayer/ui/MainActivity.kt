@@ -51,9 +51,8 @@ import com.onlyradio.radioplayer.ui.viewmodels.RecordingsViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.SearchDialogsViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.SettingsViewModel
 import com.onlyradio.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
-import com.onlyradio.radioplayer.utils.Constants.UPDATES_DOWNLOADED
-import com.onlyradio.radioplayer.utils.Constants.UPDATES_DOWNLOADING
 import com.onlyradio.radioplayer.utils.Logger
+import com.onlyradio.radioplayer.utils.UpdatesStatus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -246,13 +245,14 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 settingsViewModel.updatesStatus.collectLatest { status ->
+
                     when(status){
 
-                        UPDATES_DOWNLOADING -> {
+                        UpdatesStatus.UPDATES_DOWNLOADING -> {
                             this@MainActivity.makeToast(R.string.update_downloading)
                         }
 
-                        UPDATES_DOWNLOADED -> {
+                        UpdatesStatus.UPDATES_DOWNLOADED -> {
                             try {
                                 this@MainActivity.makeToast(R.string.update_downloaded)
                                 appUpdateManager.completeUpdate()
@@ -260,6 +260,7 @@ class MainActivity : AppCompatActivity() {
                                 this@MainActivity.makeToast(R.string.updates_status_failed)
                             }
                         }
+                        else -> {}
                     }
                 }
             }

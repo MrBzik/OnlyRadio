@@ -53,6 +53,7 @@
     <string name="updates_status_downloaded">Загрузка обновлений завершена</string>
     <string name="updates_status_installing">Установка обновлений</string>
     <string name="updates_status_failed">Обновления не установлены</string>
+    <string name="updates_status_requested">Запрос обновлений…</string>
     <string name="check_it_out">Перейти</string>
     <string name="community_tip">Знаете ещё радиостанции? Вы можете помочь сообществу!</string>
 

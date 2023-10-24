@@ -343,8 +343,8 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>(
 
                     if(!settingsViewModel.isInSettingsExtras){
 
-                        bindGeneral?.let {bindGeneral ->
-                            settingsGeneral.changeUpdateStatus(status, bindGeneral)
+                        bindGeneral?.let { bindGeneral ->
+                            settingsGeneral.onUpdateStatus(status, bindGeneral)
                         }
                     }
                 }

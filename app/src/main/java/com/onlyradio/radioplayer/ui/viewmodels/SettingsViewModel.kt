@@ -20,13 +20,7 @@ import com.onlyradio.radioplayer.utils.Commands.COMMAND_UPDATE_RADIO_PLAYBACK_SP
 import com.onlyradio.radioplayer.utils.Constants
 import com.onlyradio.radioplayer.utils.Constants.TEXT_SIZE_DEFAULT
 import com.onlyradio.radioplayer.utils.Constants.UPDATES_AUTO_PREF
-import com.onlyradio.radioplayer.utils.Constants.UPDATES_AVAILABLE
-import com.onlyradio.radioplayer.utils.Constants.UPDATES_DOWNLOADED
-import com.onlyradio.radioplayer.utils.Constants.UPDATES_DOWNLOADING
-import com.onlyradio.radioplayer.utils.Constants.UPDATES_FAILED
-import com.onlyradio.radioplayer.utils.Constants.UPDATES_INSTALLING
-import com.onlyradio.radioplayer.utils.Constants.UPDATES_NOT_AVAILABLE
-import com.onlyradio.radioplayer.utils.Logger
+import com.onlyradio.radioplayer.utils.UpdatesStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,7 +44,7 @@ class SettingsViewModel @Inject constructor(
 
     private val updatesPref = app.getSharedPreferences(Constants.UPDATES_PREF, Context.MODE_PRIVATE)
 
-    private val _updatesStatus = MutableStateFlow(UPDATES_NOT_AVAILABLE)
+    private val _updatesStatus = MutableStateFlow(UpdatesStatus.UPDATES_NOT_AVAILABLE)
     val updatesStatus = _updatesStatus.asStateFlow()
 
 
@@ -66,8 +60,8 @@ class SettingsViewModel @Inject constructor(
         val isAvailable = isUpdateAvailable && isUpdateAllowed
 
         _updatesStatus.value =
-            if(isAvailable) UPDATES_AVAILABLE
-        else UPDATES_NOT_AVAILABLE
+            if(isAvailable) UpdatesStatus.UPDATES_AVAILABLE
+        else UpdatesStatus.UPDATES_NOT_AVAILABLE
 
         return isAvailable
 
@@ -75,7 +69,8 @@ class SettingsViewModel @Inject constructor(
 
     fun requestUpdates(isToUpdate : Boolean){
 
-        if (_updatesStatus.value == UPDATES_AVAILABLE){
+        if (_updatesStatus.value == UpdatesStatus.UPDATES_AVAILABLE){
+            _updatesStatus.value = UpdatesStatus.UPDATES_REQUESTED
             viewModelScope.launch {
                 _updatesInitialize.send(isToUpdate)
             }
@@ -88,25 +83,24 @@ class SettingsViewModel @Inject constructor(
 
     fun onInstallUpdateStatus(state: InstallState){
 
-        _updatesStatus.value =
             when(state.installStatus()){
 
             InstallStatus.DOWNLOADED -> {
-                UPDATES_DOWNLOADED
+                _updatesStatus.value = UpdatesStatus.UPDATES_DOWNLOADED
             }
 
             InstallStatus.DOWNLOADING -> {
-                UPDATES_DOWNLOADING
+                _updatesStatus.value = UpdatesStatus.UPDATES_DOWNLOADING
             }
 
             InstallStatus.FAILED -> {
-                UPDATES_FAILED
+                _updatesStatus.value = UpdatesStatus.UPDATES_FAILED
             }
 
             InstallStatus.INSTALLING -> {
-                UPDATES_INSTALLING
+                _updatesStatus.value = UpdatesStatus.UPDATES_INSTALLING
             }
-                else -> -1
+
             }
     }
 
