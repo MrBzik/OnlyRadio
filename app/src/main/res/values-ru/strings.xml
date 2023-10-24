@@ -54,6 +54,7 @@
     <string name="updates_status_installing">Установка обновлений</string>
     <string name="updates_status_failed">Обновления не установлены</string>
     <string name="updates_status_requested">Запрос обновлений…</string>
+    <string name="updates_status_pending">Ожидаем обновления…</string>
     <string name="check_it_out">Перейти</string>
     <string name="community_tip">Знаете ещё радиостанции? Вы можете помочь сообществу!</string>
 
@@ -234,6 +235,16 @@
     <string name="no_browser_error_plus_clipboard">Не найден браузер на устройстве. Адрес сайта скопирован в буфер</string>
     <string name="no_browser_error">Не найден браузер на устройстве</string>
     <string name="exorecord_error">Что-то пошло не так…</string>
+
+
+    <!--    Broken Activity-->
+    <string name="broken_title">Установочный файл испорчен!</string>
+    <string name="broken_body">Этого не должно происходить, если приложение скачано из Google Play. Вы можете помочь нажав на нужную кнопку! Или даже оставить комментарий</string>
+    <string name="broken_question">Приложение скачано из Google Play?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="broken_comment">Комментарий можете оставить тут</string>
+    <string name="ready">Готово</string>
 
     <!--    Search Order-->
     <string-array name="search_order_array">

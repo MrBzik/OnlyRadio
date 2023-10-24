@@ -7,10 +7,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.ORIENTATION_HORIZONTAL
 import androidx.viewpager2.widget.ViewPager2.SCROLL_STATE_DRAGGING
@@ -38,7 +39,6 @@ import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_LAZY_LIST
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
-import com.onlyradio.radioplayer.utils.Constants.TITLE_UNKNOWN
 import com.onlyradio.radioplayer.utils.Utils
 import com.onlyradio.radioplayer.utils.addAction
 import com.onlyradio.radioplayer.utils.toRadioStation
@@ -46,8 +46,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.onlyradio.radioplayer.extensions.makeToast
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.DateFormat
-import java.util.Calendar
-import java.util.Date
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -115,8 +113,11 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
         getCurrentPlaylistItems()
 
+    }
 
-
+    override fun onResume() {
+        super.onResume()
+        (activity as MainActivity)
     }
 
 
@@ -213,11 +214,13 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 //        }
 
         bind.viewPager.apply {
-            post {
+
+            doOnLayout {
                 setCurrentItem(mainViewModel.getPlayerCurrentIndex(), false)
-                    observePlayingRadioStation()
-                    bind.viewPager.registerOnPageChangeCallback(pageChangeCallback)
-                post {
+                observePlayingRadioStation()
+                bind.viewPager.registerOnPageChangeCallback(pageChangeCallback)
+
+                doOnLayout {
                     setPageTransformer(PagerZoomOutSlideTransformer())
                     reduceDragSensitivity(2)
                 }

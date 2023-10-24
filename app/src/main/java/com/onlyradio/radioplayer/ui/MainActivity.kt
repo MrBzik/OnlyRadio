@@ -2,6 +2,7 @@ package com.onlyradio.radioplayer.ui
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import android.content.res.Resources.NotFoundException
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
@@ -35,6 +36,7 @@ import com.onlyradio.radioplayer.connectivityObserver.ConnectivityObserver
 import com.onlyradio.radioplayer.connectivityObserver.NetworkConnectivityObserver
 import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.data.local.entities.Recording
+import com.onlyradio.radioplayer.databinding.ActivityCrashBinding
 import com.onlyradio.radioplayer.databinding.ActivityMainBinding
 import com.onlyradio.radioplayer.databinding.StubPlayerActivityMainBinding
 import com.onlyradio.radioplayer.exoPlayer.RadioService
@@ -51,6 +53,7 @@ import com.onlyradio.radioplayer.ui.viewmodels.RecordingsViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.SearchDialogsViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.SettingsViewModel
 import com.onlyradio.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
+import com.onlyradio.radioplayer.utils.CustomException
 import com.onlyradio.radioplayer.utils.Logger
 import com.onlyradio.radioplayer.utils.UpdatesStatus
 import dagger.hilt.android.AndroidEntryPoint
@@ -101,7 +104,7 @@ class MainActivity : AppCompatActivity() {
     private var currentPlayingRecording : Recording? = null
 
 
-    private lateinit var appUpdateManager : AppUpdateManager
+    private var appUpdateManager : AppUpdateManager? = null
     private val updateType = AppUpdateType.FLEXIBLE
 
     private val installStateUpdatedListener = InstallStateUpdatedListener { state ->
@@ -119,19 +122,39 @@ class MainActivity : AppCompatActivity() {
 
 
 
-//    override fun onBackPressed() {
-//
-//        super.onBackPressed()
-//        if(mainViewModel.isInDetailsFragment.value == false) {
-//            this.moveTaskToBack(true)
-//        }  else {
-//            navigation.handleNavigationToFragments(bind.bottomNavigationView.selectedItemId)
-//        }
-//    }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        var crash = false
+
+        setTheme(R.style.Theme_RadioPlayer)
+
+        try {
+            bind = ActivityMainBinding.inflate(layoutInflater)
+            setContentView(bind.root)
+
+        } catch (e : Exception){
+            crash = true
+            val crashBinding : ActivityCrashBinding = ActivityCrashBinding.inflate(layoutInflater)
+            setContentView(crashBinding.root)
+
+            crashBinding.btnYes.setOnClickListener {
+                throw CustomException("Downloaded from Google Play", e)
+            }
+
+            crashBinding.btnNo.setOnClickListener {
+                throw CustomException("Not from Google Play", e)
+            }
+
+            crashBinding.btnSend.setOnClickListener {
+                val text = crashBinding.textInputLayout.editText?.text.toString()
+                if(text.isNotBlank())
+                    throw CustomException(text, e)
+            }
+
+        }
+
+        if(crash) return
 
         setOnBackPressed()
 
@@ -139,18 +162,12 @@ class MainActivity : AppCompatActivity() {
 
         initialCheckForUpdates()
 
-        setTheme(R.style.Theme_RadioPlayer)
-
-        bind = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(bind.root)
 
         bind.stubPlayer.setOnInflateListener{ _, view ->
             bindPlayer = StubPlayerActivityMainBinding.bind(view)
             playerUtils = MainPlayerView(bindPlayer!!, glide, resources.getString(R.string.time_left))
             callPlayerStubRelatedMethods()
         }
-
-//        window.navigationBarColor = ContextCompat.getColor(this, R.color.toolbar)
 
         uiMode = this.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
 
@@ -210,7 +227,7 @@ class MainActivity : AppCompatActivity() {
     private fun initialCheckForUpdates(){
 
         appUpdateManager = AppUpdateManagerFactory.create(applicationContext)
-        appUpdateManager.registerListener(installStateUpdatedListener)
+        appUpdateManager?.registerListener(installStateUpdatedListener)
 
         val isToUpdate = settingsViewModel.checkUpdatesPref()
 
@@ -220,7 +237,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun checkForUpdates(isToUpdate : Boolean){
-        appUpdateManager.appUpdateInfo.addOnSuccessListener { info->
+        appUpdateManager?.appUpdateInfo?.addOnSuccessListener { info->
 
             val isAvailable = settingsViewModel.onUpdatesSuccessListener(info)
 
@@ -232,7 +249,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initializeUpdate(info: AppUpdateInfo){
         try {
-            appUpdateManager.startUpdateFlowForResult(
+            appUpdateManager?.startUpdateFlowForResult(
                 info, this, AppUpdateOptions.defaultOptions(updateType), 123
             )
         } catch (e: Exception){
@@ -255,7 +272,7 @@ class MainActivity : AppCompatActivity() {
                         UpdatesStatus.UPDATES_DOWNLOADED -> {
                             try {
                                 this@MainActivity.makeToast(R.string.update_downloaded)
-                                appUpdateManager.completeUpdate()
+                                appUpdateManager?.completeUpdate()
                             } catch (e: Exception){
                                 this@MainActivity.makeToast(R.string.updates_status_failed)
                             }
@@ -473,7 +490,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        appUpdateManager.unregisterListener(installStateUpdatedListener)
+        appUpdateManager?.unregisterListener(installStateUpdatedListener)
+
     }
 }
 

@@ -77,7 +77,8 @@ class MainPlayerView(private val bind : StubPlayerActivityMainBinding,
 
     fun updateRecordingDuration(dur : Long){
 
-        bind.tvBitrate.text = "$timeLeftPrefix " + Utils.timerFormatCut(dur)
+        if(RadioService.isFromRecording)
+            bind.tvBitrate.text = "$timeLeftPrefix " + Utils.timerFormatCut(dur)
     }
 
 

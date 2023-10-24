@@ -83,7 +83,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onInstallUpdateStatus(state: InstallState){
 
-            when(state.installStatus()){
+        when(state.installStatus()){
 
             InstallStatus.DOWNLOADED -> {
                 _updatesStatus.value = UpdatesStatus.UPDATES_DOWNLOADED
@@ -101,7 +101,10 @@ class SettingsViewModel @Inject constructor(
                 _updatesStatus.value = UpdatesStatus.UPDATES_INSTALLING
             }
 
+            InstallStatus.PENDING -> {
+                _updatesStatus.value = UpdatesStatus.UPDATES_PENDING
             }
+        }
     }
 
     fun checkUpdatesPref() : Boolean {

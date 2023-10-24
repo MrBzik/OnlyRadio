@@ -94,7 +94,7 @@ class NavigationImpl (
 
             mainViewModel.updateIsToPlayLoadAnim(false)
 
-            supportFragmentManager.popBackStack()
+            mainViewModel.onNavigationWithDetails(true)
 
             supportFragmentManager.beginTransaction().apply {
 

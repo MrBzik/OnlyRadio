@@ -73,6 +73,9 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
 
     }
 
+
+
+
     private fun setToolbar(){
 
         if(MainActivity.uiMode == Configuration.UI_MODE_NIGHT_NO){

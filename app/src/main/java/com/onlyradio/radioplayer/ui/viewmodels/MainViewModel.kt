@@ -2,14 +2,11 @@ package com.onlyradio.radioplayer.ui.viewmodels
 
 import android.app.Application
 import android.content.Context
-import android.util.Log
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.onlyradio.radioplayer.adapters.datasources.RadioStationsDataSource
 import com.onlyradio.radioplayer.adapters.datasources.StationsPageLoader
-import com.onlyradio.radioplayer.connectivityObserver.ConnectivityObserver
-import com.onlyradio.radioplayer.connectivityObserver.NetworkConnectivityObserver
 import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.data.remote.entities.RadioStations
 import com.onlyradio.radioplayer.exoPlayer.*
@@ -433,6 +430,15 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    var isStationDetailsNavigated = false
+    var isRecordingsDetailsNavigated = false
+
+    fun onNavigationWithDetails(state : Boolean){
+        if(RadioService.isFromRecording)
+            isRecordingsDetailsNavigated = state
+        else isStationDetailsNavigated = state
+
+    }
 
 }
 

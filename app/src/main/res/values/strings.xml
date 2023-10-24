@@ -55,6 +55,7 @@
     <string name="updates_status_installing">Installing updates</string>
     <string name="updates_status_failed">Failed to install updates</string>
     <string name="updates_status_requested">Requesting updates…</string>
+    <string name="updates_status_pending">Pending updates…</string>
     <string name="check_it_out">Check it out</string>
     <string name="community_tip">Know some cool radio stations? You can help community!</string>
 
@@ -238,6 +239,17 @@
     <string name="exorecord_error">Something went wrong…</string>
     <string name="update_downloading">Update is downloading…</string>
     <string name="update_downloaded">Update downloaded successfully. Restarting app…</string>
+
+
+<!--    Broken Activity-->
+    <string name="broken_title">The build seems to be broken!</string>
+    <string name="broken_body">This should not be happening if you downloaded the app directly from Google Play. Please help me identify the root of this bug. Press the button! Even better, you can leave a comment with more details</string>
+    <string name="broken_question">Did you download the app from Google Play?</string>
+    <string name="yes">Уes</string>
+    <string name="no">No</string>
+    <string name="broken_comment">Leave a comment</string>
+    <string name="ready">Ready</string>
+
 
     <!--    Search Order-->
     <string-array name="search_order_array">

@@ -94,6 +94,8 @@ class SettingsGeneral {
                 context.getString(R.string.updates_status_failed)
             UpdatesStatus.UPDATES_REQUESTED ->
                 context.getString(R.string.updates_status_requested)
+            UpdatesStatus.UPDATES_PENDING ->
+                context.getString(R.string.updates_status_pending)
         }
 
         bindGeneral.tvUpdatesAvailableCheck.text = text
