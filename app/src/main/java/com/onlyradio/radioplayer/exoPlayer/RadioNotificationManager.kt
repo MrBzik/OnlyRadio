@@ -84,6 +84,7 @@ class RadioNotificationManager (
     private val bitmap = ContextCompat.getDrawable(context, R.drawable.splash_screen)?.toBitmap(144, 144)
 
     private val serviceJob = SupervisorJob()
+
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
 
     private val colorPlaceholder = ContextCompat.getColor(context, R.color.main_background)

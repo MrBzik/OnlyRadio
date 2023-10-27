@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -32,7 +31,6 @@ import com.onlyradio.radioplayer.ui.dialogs.TagPickerDialog
 import com.onlyradio.radioplayer.ui.stubs.NoResultMessage
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
-import com.onlyradio.radioplayer.utils.Logger
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -591,6 +589,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         isInitialLaunch = true
         isToHandleNewStationObserver = false
         isNewSearchForAnimations = true
+        pagingRadioAdapter.reset()
 
     }
 

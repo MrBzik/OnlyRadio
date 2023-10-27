@@ -59,7 +59,6 @@ class NavigationImpl (
 
             supportFragmentManager.beginTransaction().apply {
                 replace(R.id.flFragment, radioSearchFragment)
-                addToBackStack(null)
                 commit()
             }
         }

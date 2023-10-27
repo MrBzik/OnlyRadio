@@ -11,7 +11,6 @@ import com.onlyradio.radioplayer.ui.MainActivity
 import com.onlyradio.radioplayer.ui.viewmodels.MainViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.SearchDialogsViewModel
 import com.google.android.material.slider.RangeSlider
-import com.onlyradio.radioplayer.utils.Logger
 import java.util.Locale
 
 
@@ -92,8 +91,6 @@ class SearchParamsDialog (
     }
 
     private fun updateStationsCountForLanguage(){
-
-        Logger.log("UPDATING COUNT")
 
         searchDialogsViewModel.updateLanguageCount {
             bind.tvStationsLangCount.text = "$it $stationsCount"

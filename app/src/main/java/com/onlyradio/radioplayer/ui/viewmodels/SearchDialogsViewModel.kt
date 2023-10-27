@@ -19,7 +19,6 @@ import com.onlyradio.radioplayer.utils.COUNTRY_REGION_SOUTH_AMERICA
 import com.onlyradio.radioplayer.utils.COUNTRY_REGION_THE_CARIBBEAN
 import com.onlyradio.radioplayer.utils.COUNTRY_REGION_WEST_EUROPE
 import com.onlyradio.radioplayer.utils.Language
-import com.onlyradio.radioplayer.utils.Logger
 import com.onlyradio.radioplayer.utils.TAG_BY_CLASSIC
 import com.onlyradio.radioplayer.utils.TAG_BY_EXPERIMENTAL
 import com.onlyradio.radioplayer.utils.TAG_BY_GENRE
@@ -86,8 +85,6 @@ class SearchDialogsViewModel @Inject constructor(
     private var stationsCountForLanguage = 0
 
     fun updateLanguageCount(resultHandler : (Int) -> Unit) = viewModelScope.launch {
-
-        Logger.log("IN FUNCTION")
 
         val newLang = Locale.getDefault().language
 

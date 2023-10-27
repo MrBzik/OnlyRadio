@@ -1,7 +1,6 @@
 package com.onlyradio.radioplayer.adapters
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
@@ -18,7 +17,12 @@ class PagingRadioAdapter @Inject constructor(
 
 ) : PagingDataAdapter<RadioStation, PagingRadioAdapter.RadioItemHolder>(StationsComparator) {
 
+
     val utils = BaseAdapter(glide)
+
+    var currentRadioStationId : String? = null
+
+    var previousItemHolder : RadioItemHolder? = null
 
     class RadioItemHolder (val bind : ItemRadioWithTextBinding) : RecyclerView.ViewHolder(bind.root)
 
@@ -114,9 +118,6 @@ class PagingRadioAdapter @Inject constructor(
         }
     }
 
-    var currentRadioStationId : String? = null
-
-    var previousItemHolder : RadioItemHolder? = null
 
 
 
@@ -129,6 +130,11 @@ class PagingRadioAdapter @Inject constructor(
         override fun areContentsTheSame(oldItem: RadioStation, newItem: RadioStation): Boolean {
             return oldItem.stationuuid == newItem.stationuuid
         }
+    }
+
+    fun reset(){
+        previousItemHolder = null
+        currentRadioStationId = null
     }
 
 }

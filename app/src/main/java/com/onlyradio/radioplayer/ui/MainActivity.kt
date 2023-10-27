@@ -54,7 +54,6 @@ import com.onlyradio.radioplayer.ui.viewmodels.SearchDialogsViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.SettingsViewModel
 import com.onlyradio.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
 import com.onlyradio.radioplayer.utils.CustomException
-import com.onlyradio.radioplayer.utils.Logger
 import com.onlyradio.radioplayer.utils.UpdatesStatus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay

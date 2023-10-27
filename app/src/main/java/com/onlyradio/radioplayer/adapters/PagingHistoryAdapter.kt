@@ -14,7 +14,12 @@ import com.onlyradio.radioplayer.databinding.ItemDateSeparatorEnclosingBinding
 import com.onlyradio.radioplayer.databinding.ItemRadioWithTextBinding
 import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.ui.animations.AdapterFadeAnim.adapterItemFadeIn
+import com.onlyradio.radioplayer.utils.Logger
 import com.onlyradio.radioplayer.utils.Utils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.DateFormat
 import javax.inject.Inject
 
@@ -32,6 +37,11 @@ class PagingHistoryAdapter constructor(
     val utils = BaseAdapter(glide)
 
     private val currentDate = Utils.convertLongToOnlyDate(System.currentTimeMillis(), DateFormat.LONG)
+
+    var currentRadioStationID : String? = null
+    private var selectedAdapterPosition = -2
+
+    private var previousItemHolder : StationViewHolder? = null
 
     class StationViewHolder (val bind: ItemRadioWithTextBinding)
         : RecyclerView.ViewHolder(bind.root)
@@ -193,11 +203,6 @@ class PagingHistoryAdapter constructor(
         }
     }
 
-
-    var currentRadioStationID : String? = null
-    private var selectedAdapterPosition = -2
-
-    private var previousItemHolder : StationViewHolder? = null
 
 
 

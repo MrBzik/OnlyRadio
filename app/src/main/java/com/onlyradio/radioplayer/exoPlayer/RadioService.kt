@@ -264,7 +264,6 @@ class RadioService : MediaBrowserServiceCompat() {
         Virtualizer(1, exoPlayer.audioSessionId)
     }
 
-
     override fun onCreate() {
 
         super.onCreate()
@@ -303,8 +302,6 @@ class RadioService : MediaBrowserServiceCompat() {
         radioServiceConnection.setterForPlayerPos {
             exoPlayer.currentMediaItemIndex
         }
-
-
     }
 
 
@@ -1139,7 +1136,7 @@ class RadioService : MediaBrowserServiceCompat() {
             exoPlayer.removeListener(radioPlayerEventListener)
             exoPlayer.release()
 
-
+            radioNotificationManager.clearServiceJob()
             serviceJob.cancel()
 
             serviceScope.cancel()

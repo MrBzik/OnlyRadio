@@ -196,7 +196,7 @@ class DBOperators (private val service: RadioService) {
             val numberOfDatesToDelete = numberOfDatesInDB - historyDatesPref
             val deleteList = databaseRepository.getDatesToDelete(numberOfDatesToDelete)
 
-             CoroutineScope(Dispatchers.IO).launch {
+             serviceScope.launch(Dispatchers.IO) {
 
                 deleteList.forEach {
 
@@ -210,7 +210,7 @@ class DBOperators (private val service: RadioService) {
 
             val stations = databaseRepository.gatherStationsForCleaning()
 
-            CoroutineScope(Dispatchers.IO).launch {
+            serviceScope.launch(Dispatchers.IO) {
 
                 stations.forEach {
 
@@ -228,7 +228,7 @@ class DBOperators (private val service: RadioService) {
     }
 
 
-     fun upsertNewBookmark() = CoroutineScope(Dispatchers.IO).launch{
+     fun upsertNewBookmark() = serviceScope.launch(Dispatchers.IO) {
 
         if(RadioService.currentlyPlayingSong != Constants.TITLE_UNKNOWN){
 

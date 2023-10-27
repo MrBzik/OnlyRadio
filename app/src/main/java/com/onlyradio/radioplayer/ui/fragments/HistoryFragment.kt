@@ -55,7 +55,7 @@ import com.onlyradio.radioplayer.utils.SpinnerExt
 import com.onlyradio.radioplayer.utils.addAction
 import com.google.android.material.snackbar.Snackbar
 import com.onlyradio.radioplayer.extensions.makeToast
-import com.onlyradio.radioplayer.utils.Utils
+import com.onlyradio.radioplayer.utils.Logger
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -794,6 +794,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         bind.rvHistory.adapter = null
         stationsHistoryAdapter = null
         titlesHistoryAdapter = null
+        Logger.log("isNull: ${stationsHistoryAdapter == null}")
         _bind = null
         isToHandleNewStationObserver = false
         isBookmarkedTitlesObserverSet = false

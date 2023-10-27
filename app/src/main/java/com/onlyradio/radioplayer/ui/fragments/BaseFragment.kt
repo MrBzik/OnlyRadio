@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
 import com.onlyradio.radioplayer.databinding.FragmentSettingsBinding
 import com.onlyradio.radioplayer.ui.MainActivity
@@ -18,6 +19,7 @@ import com.onlyradio.radioplayer.ui.viewmodels.MainViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.RecordingsViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.SearchDialogsViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.SettingsViewModel
+
 
 abstract class BaseFragment<VB: ViewBinding>(
         private val bindingInflater : (inflater : LayoutInflater) -> VB
