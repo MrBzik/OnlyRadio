@@ -16,7 +16,13 @@ import com.onlyradio.radioplayer.data.remote.PixabayApi
 import com.onlyradio.radioplayer.data.remote.RadioApi
 import com.onlyradio.radioplayer.exoPlayer.RadioServiceConnection
 import com.onlyradio.radioplayer.exoPlayer.RadioSource
-import com.onlyradio.radioplayer.repositories.DatabaseRepository
+import com.onlyradio.radioplayer.repositories.BookmarksRepo
+import com.onlyradio.radioplayer.repositories.FavRepo
+import com.onlyradio.radioplayer.repositories.DatesRepo
+import com.onlyradio.radioplayer.repositories.LazyRepo
+import com.onlyradio.radioplayer.repositories.RecRepo
+import com.onlyradio.radioplayer.repositories.TitlesDatesRepo
+import com.onlyradio.radioplayer.repositories.TitlesRepo
 import com.onlyradio.radioplayer.utils.Constants.BASE_RADIO_URL3
 import com.onlyradio.radioplayer.utils.Constants.DATABASE_NAME
 import com.onlyradio.radioplayer.utils.Constants.PIXABAY_BASE_URL
@@ -59,9 +65,49 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesDatabaseRepository(
+    fun providesFavRepository(
         radioDAO: RadioDAO
-    ) = DatabaseRepository(radioDAO)
+    ) = FavRepo(radioDAO)
+
+
+    @Provides
+    @Singleton
+    fun providesRecordingsRepository(
+        radioDAO: RadioDAO
+    ) = RecRepo(radioDAO)
+
+
+    @Provides
+    @Singleton
+    fun providesBookmarksRepository(
+        radioDAO: RadioDAO
+    ) = BookmarksRepo(radioDAO)
+
+
+    @Provides
+    @Singleton
+    fun providesTitlesRepository(
+        radioDAO: RadioDAO
+    ) = TitlesRepo(radioDAO)
+
+    @Provides
+    @Singleton
+    fun providesTitlesDatesRepository(
+        radioDAO: RadioDAO
+    ) = TitlesDatesRepo(radioDAO)
+
+    @Provides
+    @Singleton
+    fun providesDatesRepository(
+        radioDAO: RadioDAO
+    ) = DatesRepo(radioDAO)
+
+    @Provides
+    @Singleton
+    fun providesLazyRepository(
+        radioDAO: RadioDAO
+    ) = LazyRepo(radioDAO)
+
 
     @Provides
     @Singleton

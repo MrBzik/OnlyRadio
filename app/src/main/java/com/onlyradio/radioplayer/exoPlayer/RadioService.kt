@@ -25,9 +25,8 @@ import com.onlyradio.radioplayer.data.local.entities.Recording
 import com.onlyradio.radioplayer.exoPlayer.callbacks.RadioPlaybackPreparer
 import com.onlyradio.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
 import com.onlyradio.radioplayer.exoPlayer.callbacks.RadioPlayerNotificationListener
-import com.onlyradio.radioplayer.repositories.DatabaseRepository
+import com.onlyradio.radioplayer.repositories.FavRepo
 import com.onlyradio.radioplayer.ui.fragments.FavStationsFragment
-import com.onlyradio.radioplayer.utils.Commands.COMMAND_RESTORE_MEDIA_ITEM
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_CHANGE_REVERB_MODE
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_CLEAR_MEDIA_ITEMS
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_NEW_SEARCH
@@ -88,6 +87,10 @@ import com.onlyradio.radioplayer.data.models.OnRestoreMediaItem
 import com.onlyradio.radioplayer.data.models.OnSnackRestore
 import com.onlyradio.radioplayer.exoRecord.ExoRecord
 import com.onlyradio.radioplayer.extensions.makeToast
+import com.onlyradio.radioplayer.repositories.BookmarksRepo
+import com.onlyradio.radioplayer.repositories.DatesRepo
+import com.onlyradio.radioplayer.repositories.LazyRepo
+import com.onlyradio.radioplayer.repositories.TitlesRepo
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_ON_SWIPE_DELETE
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_ON_SWIPE_RESTORE
 import com.onlyradio.radioplayer.utils.Constants.ITEM_ID
@@ -142,7 +145,20 @@ class RadioService : MediaBrowserServiceCompat() {
     }
 
     @Inject
-    lateinit var databaseRepository: DatabaseRepository
+    lateinit var favRepo: FavRepo
+
+    @Inject
+    lateinit var bookmarksRepo: BookmarksRepo
+
+    @Inject
+    lateinit var titlesRepo: TitlesRepo
+
+    @Inject
+    lateinit var datesRepo : DatesRepo
+
+    @Inject
+    lateinit var lazyRepo : LazyRepo
+
 
     private val serviceJob = SupervisorJob()
 
@@ -548,15 +564,15 @@ class RadioService : MediaBrowserServiceCompat() {
                         onRemoveMediaItem(index)
 
                     }
-
-                    COMMAND_RESTORE_MEDIA_ITEM -> {
-
-                        val index = extras?.getInt(ITEM_INDEX, -1) ?: -1
-
-                        onRestoreMediaItem(index)
-
-
-                    }
+//
+//                    COMMAND_RESTORE_MEDIA_ITEM -> {
+//
+//                        val index = extras?.getInt(ITEM_INDEX, -1) ?: -1
+//
+//                        onRestoreMediaItem(index)
+//
+//
+//                    }
 
                     COMMAND_ON_DROP_STATION_IN_PLAYLIST -> {
 
@@ -631,8 +647,6 @@ class RadioService : MediaBrowserServiceCompat() {
             SEARCH_FROM_PLAYLIST -> RadioSource.stationsInPlaylist[index]
             else -> null
         }
-
-        Logger.log("SAVE DELETED : ${lastDeletedStation?.favouredAt}")
     }
 
 
@@ -648,12 +662,12 @@ class RadioService : MediaBrowserServiceCompat() {
                 exoPlayer.removeMediaItem(index)
 
                 if(currentMediaItems == SEARCH_FROM_FAVOURITES){
-
+//                    lastDeletedStation = radioSource.stationsFavoured[index]
                     radioSource.stationsFavoured.removeAt(index)
                     radioSource.stationsFavouredMediaItems.removeAt(index)
 
                 } else if(currentMediaItems == SEARCH_FROM_PLAYLIST){
-
+//                    lastDeletedStation = RadioSource.stationsInPlaylist[index]
                     RadioSource.stationsInPlaylist.removeAt(index)
                     RadioSource.stationsInPlaylistMediaItems.removeAt(index)
 
@@ -717,19 +731,19 @@ class RadioService : MediaBrowserServiceCompat() {
         when(playlist){
 
             SEARCH_FROM_FAVOURITES -> {
-                databaseRepository.updateIsFavouredState(0, stationID)
+                favRepo.updateIsFavouredState(0, stationID)
             }
 
             SEARCH_FROM_PLAYLIST -> {
-                onRestoreMediaItem.timeOfInsertion = databaseRepository.getTimeOfStationPlaylistInsertion(stationID, playlistName)
-                databaseRepository.decrementInPlaylistsCount(stationID)
-                databaseRepository.deleteStationPlaylistCrossRef(stationID, playlistName)
+                onRestoreMediaItem.timeOfInsertion = favRepo.getTimeOfStationPlaylistInsertion(stationID, playlistName)
+                favRepo.decrementInPlaylistsCount(stationID)
+                favRepo.deleteStationPlaylistCrossRef(stationID, playlistName)
             }
 
 
             SEARCH_FROM_LAZY_LIST -> {
                 RadioSource.removeItemFromLazyList(index)
-                databaseRepository.setRadioStationPlayedDuration(stationID, 0)
+                lazyRepo.setRadioStationPlayedDuration(stationID, 0)
             }
         }
 
@@ -756,13 +770,13 @@ class RadioService : MediaBrowserServiceCompat() {
 
             SEARCH_FROM_FAVOURITES -> {
 
-                databaseRepository.updateIsFavouredState(lastDeletedStation?.favouredAt ?: 0, stationID)
+                favRepo.updateIsFavouredState(lastDeletedStation?.favouredAt ?: 0, stationID)
             }
 
             SEARCH_FROM_PLAYLIST -> {
 
-                databaseRepository.incrementInPlaylistsCount(stationID)
-                databaseRepository.insertStationPlaylistCrossRef(StationPlaylistCrossRef(
+                favRepo.incrementInPlaylistsCount(stationID)
+                favRepo.insertStationPlaylistCrossRef(StationPlaylistCrossRef(
                     stationID, playlistName, onRestoreMediaItem.timeOfInsertion
                 ))
 
@@ -770,7 +784,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
             SEARCH_FROM_LAZY_LIST -> {
                 RadioSource.restoreItemFromLazyList(index)
-                databaseRepository.setRadioStationPlayedDuration(stationID, lastDeletedStation?.playDuration ?: 0)
+                lazyRepo.setRadioStationPlayedDuration(stationID, lastDeletedStation?.playDuration ?: 0)
             }
         }
 

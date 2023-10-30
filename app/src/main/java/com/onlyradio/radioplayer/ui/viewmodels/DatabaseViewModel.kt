@@ -9,8 +9,7 @@ import com.onlyradio.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.exoPlayer.RadioServiceConnection
 import com.onlyradio.radioplayer.exoPlayer.RadioSource
-import com.onlyradio.radioplayer.repositories.DatabaseRepository
-import com.onlyradio.radioplayer.utils.Commands.COMMAND_RESTORE_MEDIA_ITEM
+import com.onlyradio.radioplayer.repositories.FavRepo
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_CLEAR_MEDIA_ITEMS
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_ON_DROP_STATION_IN_PLAYLIST
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_ON_SWIPE_DELETE
@@ -36,9 +35,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DatabaseViewModel @Inject constructor(
-        private val repository: DatabaseRepository,
-        private val radioSource: RadioSource,
-        private val radioServiceConnection: RadioServiceConnection
+    private val repository: FavRepo,
+    private val radioSource: RadioSource,
+    private val radioServiceConnection: RadioServiceConnection
 ) : ViewModel() {
 
 
@@ -57,11 +56,6 @@ class DatabaseViewModel @Inject constructor(
         repository.updateIsFavouredState(value, stationID)
     }
 
-
-
-//    fun insertRadioStation(station: RadioStation) = viewModelScope.launch {
-//        repository.insertRadioStation(station)
-//    }
 
     fun insertNewPlayList(playlist: Playlist) = viewModelScope.launch {
         repository.insertNewPlaylist(playlist)
@@ -91,52 +85,15 @@ class DatabaseViewModel @Inject constructor(
     }
 
 
-    fun addMediaItemOnDropToPlaylist(){
+    private fun addMediaItemOnDropToPlaylist(){
         radioServiceConnection.sendCommand(COMMAND_ON_DROP_STATION_IN_PLAYLIST, null)
     }
 
 
-    fun insertStationPlaylistCrossRef(
-                    crossRef: StationPlaylistCrossRef
-                    ) = viewModelScope.launch {
-        repository.incrementInPlaylistsCount(crossRef.stationuuid)
-        repository.insertStationPlaylistCrossRef(crossRef)
-    }
-
-
-
-    suspend fun getTimeOfStationPlaylistInsertion(stationID : String, playlistName : String)
-            = repository.getTimeOfStationPlaylistInsertion(stationID, playlistName)
-
-    fun deleteStationPlaylistCrossRef(stationID: String, playlistName: String) = viewModelScope.launch {
-        repository.decrementInPlaylistsCount(stationID)
-        repository.deleteStationPlaylistCrossRef(stationID, playlistName)
-    }
-
 
     val listOfAllPlaylists = repository.getAllPlaylists()
 
-//    private val stationInFavoured = repository.getAllFavouredStations()
-
-//    private val stationsInLazyPlaylist = repository.getStationsForLazyPlaylist()
-
-
-//     var stationsPlaylistOrder = Transformations.switchMap(
-//        currentPlaylistName) { playlistName ->
-//
-//        repository.subscribeToPlaylistOrder(playlistName)
-//
-//
-//    }
-
-
-    suspend fun getPlaylistOrder(playlistName: String) = repository.getPlaylistOrder(playlistName)
-
-//     var stationsInPlaylist = Transformations.switchMap(
-//        currentPlaylistName) { playlistName ->
-//                repository.subscribeToStationsInPlaylist(playlistName)
-//        }
-
+    private suspend fun getPlaylistOrder(playlistName: String) = repository.getPlaylistOrder(playlistName)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     var stationsInPlaylistFlow = currentPlaylistName.asFlow().flatMapLatest { playlistName ->
@@ -163,21 +120,13 @@ class DatabaseViewModel @Inject constructor(
     }
 
 
-//    var isInFavouriteTab: MutableLiveData<Boolean> = MutableLiveData(true)
-
-    var isInLazyPlaylist = false
-
-//    val observableListOfStations = MediatorLiveData<List<RadioStation>>()
-
     val playlist : MutableLiveData<List<RadioStation>> = MutableLiveData()
-
-//    var isLazyPlaylistSourceSet = false
 
     val favFragStationsSwitch = MutableLiveData(SEARCH_FROM_FAVOURITES)
 
 
 
-    var isToGenerateLazyList = true
+    private var isToGenerateLazyList = true
 
     private val lazyListFlow = flow{
         if(isToGenerateLazyList){
@@ -205,27 +154,7 @@ class DatabaseViewModel @Inject constructor(
         }
     }
 
-    var getAllFavStationsFlow = repository.getAllFavStationsFlow()
-
-//    init {
-//
-//        observableListOfStations.addSource(stationInFavoured) { favStations ->
-//            if (isInFavouriteTab.value == true) {
-//                Log.d("CHECKTAGS", "on change of fav stations")
-//                observableListOfStations.value = favStations
-//
-//            }
-//        }
-//        observableListOfStations.addSource(playlist) { playlistStations ->
-//            if (isInFavouriteTab.value == false && !isInLazyPlaylist) {
-//
-//                observableListOfStations.value = playlistStations
-//            }
-//        }
-//
-//    }
-
-
+    private var getAllFavStationsFlow = repository.getAllFavStationsFlow()
 
 
 
@@ -235,8 +164,6 @@ class DatabaseViewModel @Inject constructor(
             favFragStationsSwitch.value = SEARCH_FROM_PLAYLIST
 
             currentPlaylistName.value = playlistName
-//            isInLazyPlaylist = false
-//            isInFavouriteTab.postValue(false)
     }
 
 
@@ -246,10 +173,6 @@ class DatabaseViewModel @Inject constructor(
 
         favFragStationsSwitch.value = SEARCH_FROM_FAVOURITES
 
-//        isInLazyPlaylist = false
-//        isInFavouriteTab.postValue(true)
-
-//        observableListOfStations.value = stationInFavoured.value
     }
 
     private var lazyListName = ""
@@ -263,20 +186,8 @@ class DatabaseViewModel @Inject constructor(
 
         favFragStationsSwitch.value = SEARCH_FROM_LAZY_LIST
 
-//        isInLazyPlaylist = true
-//        isInFavouriteTab.postValue(false)
         currentPlaylistName.value = lazyListName
 
-
-//        if(isLazyPlaylistSourceSet){
-//            observableListOfStations.value = stationsInLazyPlaylist.value
-//        } else {
-//            observableListOfStations.addSource(stationsInLazyPlaylist){ lazyPlaylist ->
-//                Log.d("CHECKTAGS", "on change of lazy playlist")
-//                observableListOfStations.value = lazyPlaylist
-//            }
-//            isLazyPlaylistSourceSet = true
-//        }
     }
 
 
@@ -300,13 +211,6 @@ class DatabaseViewModel @Inject constructor(
             isToGenerateLazyList = true
             favFragStationsSwitch.value = SEARCH_FROM_LAZY_LIST
 
-    }
-
-
-    fun clearRadioStationPlayedDuration(stationID: String, duration : Long) = viewModelScope.launch{
-        repository.setRadioStationPlayedDuration(
-            stationID, duration
-        )
     }
 
 
@@ -356,21 +260,22 @@ class DatabaseViewModel @Inject constructor(
     }
 
 
-    fun removeMediaItem(index : Int){
+    private fun removeMediaItem(index : Int){
         radioServiceConnection.sendCommand(
             COMMAND_REMOVE_MEDIA_ITEM,
             bundleOf(Pair(Constants.ITEM_INDEX, index)))
     }
 
-    fun restoreMediaItem(index : Int){
-        radioServiceConnection.sendCommand(
-            COMMAND_RESTORE_MEDIA_ITEM,
-            bundleOf(Pair(Constants.ITEM_INDEX, index)))
-    }
+//    fun restoreMediaItem(index : Int){
+//        radioServiceConnection.sendCommand(
+//            COMMAND_RESTORE_MEDIA_ITEM,
+//            bundleOf(Pair(Constants.ITEM_INDEX, index)))
+//    }
 
 
 
     val onSwipeDeleteHandled = radioServiceConnection.onSwipeHandled.receiveAsFlow()
+
 
     fun onSwipeDeleteStation(index : Int, stationID: String){
 
@@ -393,10 +298,55 @@ class DatabaseViewModel @Inject constructor(
         if(favFragStationsSwitch.value == SEARCH_FROM_LAZY_LIST){
             getLazyPlaylist()
         }
-
     }
 
 
+    fun onDragAndDropStation(
+        index: Int,
+        stationID: String,
+        targetPlaylistName: String,
+        onResult: (Boolean) -> Unit
+    ){
+
+        if(favFragStationsSwitch.value == SEARCH_FROM_PLAYLIST && targetPlaylistName == currentPlaylistName.value)
+            return
+
+        viewModelScope.launch {
+
+            if(favFragStationsSwitch.value == RadioService.currentMediaItems){
+                if(favFragStationsSwitch.value != SEARCH_FROM_PLAYLIST || currentPlaylistName.value == RadioService.currentPlaylistName){
+                    removeMediaItem(index)
+                }
+            }
+
+            when(favFragStationsSwitch.value){
+
+                SEARCH_FROM_FAVOURITES -> {
+                    repository.updateIsFavouredState(0, stationID)
+                }
+
+                SEARCH_FROM_PLAYLIST -> {
+                    repository.decrementInPlaylistsCount(stationID)
+                    repository.deleteStationPlaylistCrossRef(stationID, currentPlaylistName.value ?: "")
+                }
+
+                SEARCH_FROM_LAZY_LIST -> {
+                    RadioSource.removeItemFromLazyList(index)
+                    getLazyPlaylist()
+                }
+            }
+
+            checkAndInsertStationPlaylistCrossRef(stationID, targetPlaylistName){ isSuccess ->
+
+                if(isSuccess && RadioService.currentPlaylistName == currentPlaylistName.value &&
+                    RadioService.currentMediaItems == SEARCH_FROM_PLAYLIST)
+                    addMediaItemOnDropToPlaylist()
+
+                onResult(isSuccess)
+
+            }
+        }
+    }
 
 
 }

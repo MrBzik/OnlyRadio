@@ -30,8 +30,6 @@ class PixabayViewModel @Inject constructor(
 
     val togglePlaylistsVisibility : MutableLiveData<Boolean> = MutableLiveData(false)
 
-
-
     private val imageSearchBy : MutableLiveData<String> = MutableLiveData("music")
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)

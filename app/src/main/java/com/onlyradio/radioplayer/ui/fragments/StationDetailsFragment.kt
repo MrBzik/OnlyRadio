@@ -621,8 +621,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
                 requireActivity().snackbarSimple(message)
 
-//                Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
-//                        message, Snackbar.LENGTH_SHORT).show()
 
             }
         }

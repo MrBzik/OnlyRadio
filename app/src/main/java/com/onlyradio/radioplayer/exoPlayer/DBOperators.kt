@@ -25,7 +25,23 @@ class DBOperators (private val service: RadioService) {
     }
 
     private val databaseRepository by lazy {
-        service.databaseRepository
+        service.favRepo
+    }
+
+    private val bookmarksRepo by lazy {
+        service.bookmarksRepo
+    }
+
+    private val titlesRepo by lazy {
+        service.titlesRepo
+    }
+
+    private val datesRepo by lazy {
+        service.datesRepo
+    }
+
+    private val lazyRepo by lazy {
+        service.lazyRepo
     }
 
 
@@ -41,7 +57,7 @@ class DBOperators (private val service: RadioService) {
 
     fun updateStationLastClicked(stationId : String) = serviceScope.launch(Dispatchers.IO){
         RadioService.isToUpdateLiveData = false
-        databaseRepository.updateRadioStationLastClicked(stationId)
+        lazyRepo.updateRadioStationLastClicked(stationId)
     }
 
     private var previousPlayedStationId = ""
@@ -70,7 +86,7 @@ class DBOperators (private val service: RadioService) {
     private suspend fun durationUpdateHelper(){
         val duration = System.currentTimeMillis() - stationStartPlayingTime
         if(duration > 20000 && previousPlayedStationId.isNotBlank()){
-            databaseRepository.updateRadioStationPlayedDuration(
+            lazyRepo.updateRadioStationPlayedDuration(
                 previousPlayedStationId, duration
             )
         }
@@ -92,7 +108,7 @@ class DBOperators (private val service: RadioService) {
         val lastStationId = durationPref.getString(LAST_PLAYED_STATION_ID, "") ?: ""
         if(lastStationId.isNotBlank()){
             val duration = durationPref.getLong(LAST_PLAYED_STATION_DURATION, 0)
-            databaseRepository.updateRadioStationPlayedDuration(
+            lazyRepo.updateRadioStationPlayedDuration(
                 lastStationId, duration
             )
             durationPref.edit().putString(LAST_PLAYED_STATION_ID, "").apply()
@@ -126,12 +142,12 @@ class DBOperators (private val service: RadioService) {
 //    }
 
 
-     fun getLastDateAndCheck() = serviceScope.launch(Dispatchers.IO) {
+     fun getLastDateAndCheck() = serviceScope.launch {
 
 //         testClickOnHistory()
 
 
-        val date = databaseRepository.getLastDate()
+        val date = datesRepo.getLastDate()
         date?.let {
             RadioService.currentDateString = it.date
             RadioService.currentDateLong = it.time
@@ -159,12 +175,12 @@ class DBOperators (private val service: RadioService) {
         if(!isLastDateUpToDate){
             isLastDateUpToDate = true
             val newDate = HistoryDate(RadioService.currentDateString, RadioService.currentDateLong)
-            databaseRepository.insertNewDate(newDate)
+            datesRepo.insertNewDate(newDate)
 
             checkStationsAndReducePlayDurationIfNeeded()
 
         }
-        databaseRepository.insertStationDateCrossRef(StationDateCrossRef(stationID, RadioService.currentDateString))
+        datesRepo.insertStationDateCrossRef(StationDateCrossRef(stationID, RadioService.currentDateString))
 
     }
 
@@ -172,19 +188,19 @@ class DBOperators (private val service: RadioService) {
 
     private suspend fun checkStationsAndReducePlayDurationIfNeeded(){
 
-        val stations = databaseRepository.getStationsForDurationCheck()
+        val stations = lazyRepo.getStationsForDurationCheck()
 
         val time = System.currentTimeMillis()
 
         stations.forEach {
             if(time - it.lastClick > PLAY_DURATION_MILLS_CHECK)
-                databaseRepository.updateStationPlayDuration(it.playDuration / 2, it.stationuuid)
+                lazyRepo.updateStationPlayDuration(it.playDuration / 2, it.stationuuid)
         }
     }
 
     private suspend fun compareDatesWithPrefAndCLeanIfNeeded() {
 
-        val numberOfDatesInDB = databaseRepository.getNumberOfDates()
+        val numberOfDatesInDB = datesRepo.getNumberOfDates()
 
         val historyDatesPref = historySettingsPref.getInt(
             Constants.HISTORY_PREF_DATES, Constants.HISTORY_DATES_PREF_DEFAULT
@@ -193,32 +209,32 @@ class DBOperators (private val service: RadioService) {
         if(historyDatesPref < numberOfDatesInDB) {
 
             val numberOfDatesToDelete = numberOfDatesInDB - historyDatesPref
-            val deleteList = databaseRepository.getDatesToDelete(numberOfDatesToDelete)
+            val deleteList = datesRepo.getDatesToDelete(numberOfDatesToDelete)
 
              serviceScope.launch(Dispatchers.IO) {
 
                 deleteList.forEach {
 
                     launch {
-                        databaseRepository.deleteAllCrossRefWithDate(it.date)
-                        databaseRepository.deleteDate(it)
-                        databaseRepository.deleteTitlesWithDate(it.time)
+                        datesRepo.deleteAllCrossRefWithDate(it.date)
+                        datesRepo.deleteDate(it)
+                        titlesRepo.deleteTitlesWithDate(it.time)
                     }
                 }
             }.join()
 
-            val stations = databaseRepository.gatherStationsForCleaning()
+            val stations = datesRepo.gatherStationsForCleaning()
 
             serviceScope.launch(Dispatchers.IO) {
 
                 stations.forEach {
 
                     launch {
-                        val checkIfInHistory = databaseRepository.checkIfRadioStationInHistory(it.stationuuid)
+                        val checkIfInHistory = datesRepo.checkIfRadioStationInHistory(it.stationuuid)
 
                         if(!checkIfInHistory){
 
-                            databaseRepository.deleteRadioStation(it)
+                            datesRepo.deleteRadioStation(it)
                         }
                     }
                 }
@@ -231,9 +247,9 @@ class DBOperators (private val service: RadioService) {
 
         if(RadioService.currentlyPlayingSong != Constants.TITLE_UNKNOWN){
 
-            databaseRepository.deleteBookmarksByTitle(RadioService.currentlyPlayingSong)
+            bookmarksRepo.deleteBookmarksByTitle(RadioService.currentlyPlayingSong)
 
-            databaseRepository.insertNewBookmarkedTitle(
+            bookmarksRepo.insertNewBookmarkedTitle(
                 BookmarkedTitle(
                     timeStamp = System.currentTimeMillis(),
                     date = RadioService.currentDateLong,
@@ -243,13 +259,13 @@ class DBOperators (private val service: RadioService) {
                 )
             )
 
-            val count = databaseRepository.countBookmarkedTitles()
+            val count = bookmarksRepo.countBookmarkedTitles()
 
             if(count > RadioService.historyPrefBookmark && RadioService.historyPrefBookmark != 100){
 
-                val bookmark = databaseRepository.getLastValidBookmarkedTitle(RadioService.historyPrefBookmark -1)
+                val bookmark = bookmarksRepo.getLastValidBookmarkedTitle(RadioService.historyPrefBookmark -1)
 
-                databaseRepository.cleanBookmarkedTitles(bookmark.timeStamp)
+                bookmarksRepo.cleanBookmarkedTitles(bookmark.timeStamp)
             }
         }
     }
@@ -259,19 +275,19 @@ class DBOperators (private val service: RadioService) {
 
         serviceScope.launch(Dispatchers.IO){
 
-            val checkTitle = databaseRepository.checkTitleTimestamp(title, RadioService.currentDateLong)
+            val checkTitle = titlesRepo.checkTitleTimestamp(title, RadioService.currentDateLong)
 
             val isTitleBookmarked = checkTitle?.isBookmarked
 
             checkTitle?.let {
-                databaseRepository.deleteTitle(it)
+                titlesRepo.deleteTitle(it)
             }
             val stationName = service.currentRadioStation?.name ?: ""
 
             val stationUri = service.currentRadioStation?.favicon ?: ""
 
 
-            databaseRepository.insertNewTitle(
+            titlesRepo.insertNewTitle(
                 Title(
                 timeStamp = System.currentTimeMillis(),
                 date = RadioService.currentDateLong,

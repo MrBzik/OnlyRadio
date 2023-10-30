@@ -23,9 +23,6 @@ interface  RadioDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertRadioStation(station : RadioStation)
 
-    @Query("SELECT * FROM RadioStation WHERE stationuuid =:stationID LIMIT 1")
-    suspend fun getCurrentRadioStation(stationID: String) : RadioStation
-
     @Query("UPDATE RadioStation SET lastClick =:newTime WHERE stationuuid =:stationID")
     suspend fun updateStationLastClicked(newTime : Long, stationID: String)
 
@@ -34,10 +31,6 @@ interface  RadioDAO {
 
     @Query("UPDATE RadioStation SET playDuration =:duration WHERE stationuuid =:stationID")
     suspend fun setRadioStationPlayedDuration(stationID: String, duration: Long)
-
-
-    @Query("SELECT playDuration FROM RadioStation WHERE stationuuid =:stationID LIMIT 1")
-    suspend fun getRadioStationPlayDuration(stationID: String) : Long?
 
     // For favoured stations
 
@@ -144,9 +137,6 @@ interface  RadioDAO {
 
     // Date
 
-    @Query("SELECT EXISTS(SELECT * FROM HistoryDate WHERE date = :currentDate)")
-    suspend fun checkLastDateRecordInDB(currentDate : String) : Boolean
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNewDate(date : HistoryDate)
 
@@ -197,10 +187,6 @@ interface  RadioDAO {
 
     @Delete
     suspend fun deleteDate(date : HistoryDate)
-
-    //test
-    @Query("SELECT COUNT(stationuuid) FROM RadioStation")
-    suspend fun getAllStations() : Int
 
 
     // Title
@@ -261,9 +247,6 @@ interface  RadioDAO {
 
     @Query("SELECT * FROM Recording ORDER BY timeStamp DESC")
     fun getAllRecordings() : LiveData<List<Recording>>
-
-    @Query("SELECT * FROM Recording WHERE id =:id LIMIT 1")
-    suspend fun getCurrentRecording(id : String) : Recording
 
     @Query("DELETE FROM Recording WHERE id =:recId")
     suspend fun deleteRecording(recId : String)

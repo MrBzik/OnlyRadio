@@ -12,7 +12,7 @@ import com.onlyradio.radioplayer.exoPlayer.RadioSource
 import com.onlyradio.radioplayer.exoPlayer.isPlayEnabled
 import com.onlyradio.radioplayer.exoPlayer.isPlaying
 import com.onlyradio.radioplayer.exoPlayer.isPrepared
-import com.onlyradio.radioplayer.repositories.DatabaseRepository
+import com.onlyradio.radioplayer.repositories.RecRepo
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_REMOVE_RECORDING_MEDIA_ITEM
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_RESTORE_RECORDING_MEDIA_ITEM
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_START_RECORDING
@@ -28,8 +28,8 @@ import javax.inject.Inject
 @HiltViewModel
 class RecordingsViewModel @Inject constructor(
     private val app : Application,
-    private val repository: DatabaseRepository,
-    private val radioSource: RadioSource,
+    private val repository: RecRepo,
+    radioSource: RadioSource,
     private val radioServiceConnection: RadioServiceConnection
 
 ) : AndroidViewModel(app) {
@@ -55,7 +55,7 @@ class RecordingsViewModel @Inject constructor(
 //    }
 
 
-    var isRecordingsCheckNeeded = true
+    private var isRecordingsCheckNeeded = true
 
     val durationWithPosition = RadioService.recordingDuration
         .asFlow()

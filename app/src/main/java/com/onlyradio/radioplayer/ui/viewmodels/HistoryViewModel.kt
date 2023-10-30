@@ -20,7 +20,8 @@ import com.onlyradio.radioplayer.data.local.entities.Title
 import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.exoPlayer.RadioServiceConnection
 import com.onlyradio.radioplayer.exoPlayer.RadioSource
-import com.onlyradio.radioplayer.repositories.DatabaseRepository
+import com.onlyradio.radioplayer.repositories.BookmarksRepo
+import com.onlyradio.radioplayer.repositories.TitlesDatesRepo
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_UPDATE_HISTORY_MEDIA_ITEMS
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS
 import com.onlyradio.radioplayer.utils.Constants
@@ -34,9 +35,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
-import java.sql.Date
 import java.text.DateFormat
-import java.util.Calendar
 import javax.inject.Inject
 
 
@@ -47,14 +46,15 @@ const val TAB_BOOKMARKS = 2
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
-    private val repository: DatabaseRepository,
+    private val bookmarksRepo : BookmarksRepo,
+    private val titlesRepo : TitlesDatesRepo,
     private val radioSource: RadioSource,
     private val radioServiceConnection: RadioServiceConnection
 ) : ViewModel() {
 
     // Dates for RecyclerView
 
-    val listOfDates = repository.getListOfDates
+    val listOfDates = titlesRepo.getListOfDates
 
     var selectedDate = 0L
 
@@ -136,7 +136,7 @@ class HistoryViewModel @Inject constructor(
 
 //        Log.d("CHECKTAGS", "callings all titles get fun")
 
-        val response = repository.getTitlesPage(pageIndex * Constants.PAGE_SIZE, pageSize)
+        val response = titlesRepo.getTitlesPage(pageIndex * Constants.PAGE_SIZE, pageSize)
         val titlesWithDates: MutableList<TitleWithDateModel> = mutableListOf()
 
         response.forEach { title ->
@@ -171,7 +171,7 @@ class HistoryViewModel @Inject constructor(
 
 //        Log.d("CHECKTAGS", "callings one title get fun")
 
-        val response = repository.getTitlesInOneDatePage(pageIndex * Constants.PAGE_SIZE, pageSize, selectedDate)
+        val response = titlesRepo.getTitlesInOneDatePage(pageIndex * Constants.PAGE_SIZE, pageSize, selectedDate)
         val titlesWithDates: MutableList<TitleWithDateModel> = mutableListOf()
 
         if(!isTitleOneDateHeaderSet){
@@ -349,21 +349,21 @@ class HistoryViewModel @Inject constructor(
 
     // Bookmarked title
 
-    private val bookmarkedTitlesLivedata = repository.bookmarkedTitlesLiveData()
+    private val bookmarkedTitlesLivedata = bookmarksRepo.bookmarkedTitlesLiveData()
 
     fun deleteBookmarkTitle (title: BookmarkedTitle) = viewModelScope.launch {
-        repository.deleteBookmarkTitle(title)
+        bookmarksRepo.deleteBookmarkTitle(title)
     }
 
     fun restoreBookmarkTitle (title: BookmarkedTitle) = viewModelScope.launch {
-        repository.insertNewBookmarkedTitle(title)
+        bookmarksRepo.insertNewBookmarkedTitle(title)
     }
 
     fun upsertBookmarkedTitle(title : Title) = viewModelScope.launch {
 
-        repository.deleteBookmarksByTitle(title.title)
+        bookmarksRepo.deleteBookmarksByTitle(title.title)
 
-        repository.insertNewBookmarkedTitle(
+        bookmarksRepo.insertNewBookmarkedTitle(
             BookmarkedTitle(
                 timeStamp = System.currentTimeMillis(),
                 date = title.date,
@@ -379,13 +379,13 @@ class HistoryViewModel @Inject constructor(
 
     fun checkAndCleanBookmarkTitles() = viewModelScope.launch {
 
-        val count = repository.countBookmarkedTitles()
+        val count = bookmarksRepo.countBookmarkedTitles()
 
         if(count > RadioService.historyPrefBookmark && RadioService.historyPrefBookmark != 100){
 
-            val bookmark = repository.getLastValidBookmarkedTitle(RadioService.historyPrefBookmark -1)
+            val bookmark = bookmarksRepo.getLastValidBookmarkedTitle(RadioService.historyPrefBookmark -1)
 
-            repository.cleanBookmarkedTitles(bookmark.timeStamp)
+            bookmarksRepo.cleanBookmarkedTitles(bookmark.timeStamp)
 
         }
     }
