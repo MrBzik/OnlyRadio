@@ -44,6 +44,7 @@ import com.onlyradio.radioplayer.utils.addAction
 import com.onlyradio.radioplayer.utils.toRadioStation
 import com.google.android.material.snackbar.Snackbar
 import com.onlyradio.radioplayer.extensions.makeToast
+import com.onlyradio.radioplayer.extensions.snackbarSimple
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.DateFormat
 import javax.inject.Inject
@@ -587,16 +588,18 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
                 currentRadioStation?.let {
                     favViewModel.updateIsFavouredState(0, it.stationuuid)
-                    Snackbar.make(requireActivity().findViewById(R.id.rootLayout),
-                        resources.getString(R.string.removed_from_favs), Snackbar.LENGTH_SHORT).show()
+                    requireActivity().snackbarSimple(R.string.removed_from_favs)
+//                    Snackbar.make(requireActivity().findViewById(R.id.rootLayout),
+//                        resources.getString(R.string.removed_from_favs), Snackbar.LENGTH_SHORT).show()
                     favViewModel.isStationFavoured.postValue(false)
                 }
 
             } else {
                 currentRadioStation?.let {
                     favViewModel.updateIsFavouredState(System.currentTimeMillis(), it.stationuuid)
-                    Snackbar.make(requireActivity().findViewById(R.id.rootLayout),
-                        resources.getString(R.string.saved_to_favs), Snackbar.LENGTH_SHORT).show()
+                    requireActivity().snackbarSimple(R.string.saved_to_favs)
+//                    Snackbar.make(requireActivity().findViewById(R.id.rootLayout),
+//                        resources.getString(R.string.saved_to_favs), Snackbar.LENGTH_SHORT).show()
                     favViewModel.isStationFavoured.postValue(true)
                 }
             }
@@ -616,8 +619,10 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                 val message = if(it) resources.getString(R.string.already_in_playlist) + " " + playlistName
                                else resources.getString(R.string.added_to_playlist) + " " + playlistName
 
-                Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
-                        message, Snackbar.LENGTH_SHORT).show()
+                requireActivity().snackbarSimple(message)
+
+//                Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
+//                        message, Snackbar.LENGTH_SHORT).show()
 
             }
         }

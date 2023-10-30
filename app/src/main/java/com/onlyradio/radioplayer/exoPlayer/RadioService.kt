@@ -15,7 +15,6 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
-import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -84,8 +83,17 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
 import com.onlyradio.radioplayer.R
+import com.onlyradio.radioplayer.data.local.relations.StationPlaylistCrossRef
+import com.onlyradio.radioplayer.data.models.OnRestoreMediaItem
+import com.onlyradio.radioplayer.data.models.OnSnackRestore
 import com.onlyradio.radioplayer.exoRecord.ExoRecord
 import com.onlyradio.radioplayer.extensions.makeToast
+import com.onlyradio.radioplayer.utils.Commands.COMMAND_ON_SWIPE_DELETE
+import com.onlyradio.radioplayer.utils.Commands.COMMAND_ON_SWIPE_RESTORE
+import com.onlyradio.radioplayer.utils.Constants.ITEM_ID
+import com.onlyradio.radioplayer.utils.Constants.ITEM_PLAYLIST
+import com.onlyradio.radioplayer.utils.Constants.ITEM_PLAYLIST_NAME
+import com.onlyradio.radioplayer.utils.Logger
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -524,65 +532,30 @@ class RadioService : MediaBrowserServiceCompat() {
                     }
 
 
+                    COMMAND_ON_SWIPE_DELETE -> {
+                        onSwipeDelete(extras)
+                    }
+
+                    COMMAND_ON_SWIPE_RESTORE -> {
+                        onSwipeRestore()
+                    }
+
+
                     COMMAND_REMOVE_MEDIA_ITEM -> {
 
                         val index = extras?.getInt(ITEM_INDEX, -1) ?: -1
 
-                        if(index != -1){
+                        onRemoveMediaItem(index)
 
-                            if(index == exoPlayer.currentMediaItemIndex){
-
-                                clearMediaItems(true)
-
-                            } else {
-
-//                                if(index < currentPlayingItemPosition)
-//                                    currentPlayingItemPosition --
-                                exoPlayer.removeMediaItem(index)
-
-                                if(currentMediaItems == SEARCH_FROM_FAVOURITES){
-
-                                    lastDeletedStation = radioSource.stationsFavoured[index]
-                                    radioSource.stationsFavoured.removeAt(index)
-                                    radioSource.stationsFavouredMediaItems.removeAt(index)
-
-                                } else if(currentMediaItems == SEARCH_FROM_PLAYLIST){
-
-                                    lastDeletedStation = RadioSource.stationsInPlaylist[index]
-                                    RadioSource.stationsInPlaylist.removeAt(index)
-                                    RadioSource.stationsInPlaylistMediaItems.removeAt(index)
-
-                                }
-                            }
-                        }
                     }
 
                     COMMAND_RESTORE_MEDIA_ITEM -> {
 
                         val index = extras?.getInt(ITEM_INDEX, -1) ?: -1
 
-                        if(index != -1){
+                        onRestoreMediaItem(index)
 
-                            lastDeletedStation?.let { station ->
-                                val mediaItem = MediaItem.fromUri(station.url!!)
-                                exoPlayer.addMediaItem(index, mediaItem)
 
-//                                if(index <= currentPlayingItemPosition)
-//                                    currentPlayingItemPosition ++
-
-                                when (currentMediaItems) {
-                                    SEARCH_FROM_FAVOURITES -> {
-                                        radioSource.stationsFavoured.add(index, station)
-                                        radioSource.stationsFavouredMediaItems.add(index, mediaItem)
-
-                                    }
-                                    SEARCH_FROM_PLAYLIST -> {
-                                        RadioSource.stationsInPlaylist.add(index, station)
-                                        RadioSource.stationsInPlaylistMediaItems.add(index, mediaItem)
-                                    }
-                                }
-                            }
-                        }
                     }
 
                     COMMAND_ON_DROP_STATION_IN_PLAYLIST -> {
@@ -652,6 +625,156 @@ class RadioService : MediaBrowserServiceCompat() {
     }
 
 
+    private fun saveDeletedItem(index : Int, playlist: Int){
+        lastDeletedStation = when(playlist){
+            SEARCH_FROM_FAVOURITES -> radioSource.stationsFavoured[index]
+            SEARCH_FROM_PLAYLIST -> RadioSource.stationsInPlaylist[index]
+            else -> null
+        }
+
+        Logger.log("SAVE DELETED : ${lastDeletedStation?.favouredAt}")
+    }
+
+
+    private fun onRemoveMediaItem(index : Int){
+
+        if(index != -1){
+
+            if(index == exoPlayer.currentMediaItemIndex){
+
+                clearMediaItems(true)
+
+            } else {
+                exoPlayer.removeMediaItem(index)
+
+                if(currentMediaItems == SEARCH_FROM_FAVOURITES){
+
+                    radioSource.stationsFavoured.removeAt(index)
+                    radioSource.stationsFavouredMediaItems.removeAt(index)
+
+                } else if(currentMediaItems == SEARCH_FROM_PLAYLIST){
+
+                    RadioSource.stationsInPlaylist.removeAt(index)
+                    RadioSource.stationsInPlaylistMediaItems.removeAt(index)
+
+                }
+            }
+        }
+    }
+
+
+    private fun onRestoreMediaItem(index: Int) {
+
+        if(index != -1){
+
+            lastDeletedStation?.let { station ->
+                val mediaItem = MediaItem.fromUri(station.url!!)
+                exoPlayer.addMediaItem(index, mediaItem)
+
+                when (currentMediaItems) {
+                    SEARCH_FROM_FAVOURITES -> {
+                        radioSource.stationsFavoured.add(index, station)
+                        radioSource.stationsFavouredMediaItems.add(index, mediaItem)
+
+                    }
+                    SEARCH_FROM_PLAYLIST -> {
+                        RadioSource.stationsInPlaylist.add(index, station)
+                        RadioSource.stationsInPlaylistMediaItems.add(index, mediaItem)
+                    }
+                }
+            }
+        }
+    }
+
+    private lateinit var onRestoreMediaItem : OnRestoreMediaItem
+
+
+    private fun onSwipeDelete(extras : Bundle?) = serviceScope.launch {
+
+        val index = extras?.getInt(ITEM_INDEX, -1) ?: -1
+
+        val playlist = extras?.getInt(ITEM_PLAYLIST, 0) ?: 0
+
+        val playlistName = extras?.getString(ITEM_PLAYLIST_NAME, "") ?: ""
+
+        val stationID = extras?.getString(ITEM_ID) ?: ""
+
+        onRestoreMediaItem = OnRestoreMediaItem(
+            index = index,
+            playlist = playlist,
+            playlistName = playlistName,
+            stationId = stationID
+        )
+
+        saveDeletedItem(index = index, playlist = playlist)
+
+        if(playlist == currentMediaItems){
+            if(playlist != SEARCH_FROM_PLAYLIST || playlistName == currentPlaylistName){
+                onRemoveMediaItem(index)
+            }
+        }
+
+        when(playlist){
+
+            SEARCH_FROM_FAVOURITES -> {
+                databaseRepository.updateIsFavouredState(0, stationID)
+            }
+
+            SEARCH_FROM_PLAYLIST -> {
+                onRestoreMediaItem.timeOfInsertion = databaseRepository.getTimeOfStationPlaylistInsertion(stationID, playlistName)
+                databaseRepository.decrementInPlaylistsCount(stationID)
+                databaseRepository.deleteStationPlaylistCrossRef(stationID, playlistName)
+            }
+
+
+            SEARCH_FROM_LAZY_LIST -> {
+                RadioSource.removeItemFromLazyList(index)
+                databaseRepository.setRadioStationPlayedDuration(stationID, 0)
+            }
+        }
+
+        radioServiceConnection.onSwipeHandled.send(OnSnackRestore(playlist, playlistName))
+
+    }
+
+
+    private fun onSwipeRestore() = serviceScope.launch {
+
+        val playlist = onRestoreMediaItem.playlist
+        val playlistName = onRestoreMediaItem.playlistName
+        val stationID = onRestoreMediaItem.stationId
+        val index = onRestoreMediaItem.index
+
+        if(playlist == currentMediaItems){
+            if(playlist != SEARCH_FROM_PLAYLIST || playlistName == currentPlaylistName){
+                onRestoreMediaItem(index)
+            }
+        }
+
+
+        when(playlist){
+
+            SEARCH_FROM_FAVOURITES -> {
+
+                databaseRepository.updateIsFavouredState(lastDeletedStation?.favouredAt ?: 0, stationID)
+            }
+
+            SEARCH_FROM_PLAYLIST -> {
+
+                databaseRepository.incrementInPlaylistsCount(stationID)
+                databaseRepository.insertStationPlaylistCrossRef(StationPlaylistCrossRef(
+                    stationID, playlistName, onRestoreMediaItem.timeOfInsertion
+                ))
+
+            }
+
+            SEARCH_FROM_LAZY_LIST -> {
+                RadioSource.restoreItemFromLazyList(index)
+                databaseRepository.setRadioStationPlayedDuration(stationID, lastDeletedStation?.playDuration ?: 0)
+            }
+        }
+
+    }
 
 
     private fun updateSpeedPitch(isSpeed : Boolean){

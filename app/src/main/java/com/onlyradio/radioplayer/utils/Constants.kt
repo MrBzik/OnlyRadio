@@ -72,6 +72,8 @@ object Constants {
     const val PLAY_WHEN_READY = "play when ready"
     const val ITEM_INDEX = "index of item"
     const val ITEM_ID = "id of item"
+    const val ITEM_PLAYLIST = "playlist of an item"
+    const val ITEM_PLAYLIST_NAME = "playlist's name of an item"
 
 
     const val IS_CHANGE_MEDIA_ITEMS = "id of station from history"
@@ -209,4 +211,7 @@ enum class UpdatesStatus {
      const val COMMAND_ON_DROP_STATION_IN_PLAYLIST = "command on drop station in playlist"
      const val COMMAND_CHANGE_REVERB_MODE = "change reverb mode"
      const val COMMAND_TOGGLE_REVERB = "change bass boost level"
+
+     const val COMMAND_ON_SWIPE_DELETE = "command on swipe delete"
+     const val COMMAND_ON_SWIPE_RESTORE = "command on swipe restore"
  }

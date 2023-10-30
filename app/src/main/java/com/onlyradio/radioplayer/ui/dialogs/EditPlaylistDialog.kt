@@ -8,7 +8,9 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.RequestManager
@@ -161,12 +163,12 @@ class EditPlaylistDialog (
     private fun observeImagesForAdapter(){
 
         lifecycleScope.launch {
-            pixabayViewModel.imagesFlow.collectLatest {
-                imageAdapter.submitData(it)
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                pixabayViewModel.imagesFlow.collectLatest {
+                    imageAdapter.submitData(it)
+                }
             }
         }
-
-
     }
 
     private fun searchImagesTextChangeListener(){

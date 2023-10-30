@@ -27,8 +27,8 @@ class DatabaseRepository @Inject constructor(
     suspend fun updateRadioStationPlayedDuration (stationId : String, duration : Long) =
         radioDAO.updateRadioStationPlayedDuration(stationId, duration)
 
-    suspend fun clearRadioStationPlayedDuration(stationID: String) =
-        radioDAO.clearRadioStationPlayedDuration(stationID)
+    suspend fun setRadioStationPlayedDuration(stationID: String, duration: Long) =
+        radioDAO.setRadioStationPlayedDuration(stationID, duration)
 
     suspend fun getRadioStationPlayDuration(stationID: String) = radioDAO.getRadioStationPlayDuration(stationID)
 

@@ -32,8 +32,9 @@ interface  RadioDAO {
     @Query("UPDATE RadioStation SET playDuration = playDuration + :duration WHERE stationuuid =:stationID")
     suspend fun updateRadioStationPlayedDuration(stationID: String, duration : Long)
 
-    @Query("UPDATE RadioStation SET playDuration = 0 WHERE stationuuid =:stationID")
-    suspend fun clearRadioStationPlayedDuration(stationID: String)
+    @Query("UPDATE RadioStation SET playDuration =:duration WHERE stationuuid =:stationID")
+    suspend fun setRadioStationPlayedDuration(stationID: String, duration: Long)
+
 
     @Query("SELECT playDuration FROM RadioStation WHERE stationuuid =:stationID LIMIT 1")
     suspend fun getRadioStationPlayDuration(stationID: String) : Long?

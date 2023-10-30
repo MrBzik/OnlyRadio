@@ -13,9 +13,14 @@ import com.onlyradio.radioplayer.repositories.DatabaseRepository
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_RESTORE_MEDIA_ITEM
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_CLEAR_MEDIA_ITEMS
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_ON_DROP_STATION_IN_PLAYLIST
+import com.onlyradio.radioplayer.utils.Commands.COMMAND_ON_SWIPE_DELETE
+import com.onlyradio.radioplayer.utils.Commands.COMMAND_ON_SWIPE_RESTORE
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_REMOVE_MEDIA_ITEM
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_UPDATE_FAV_PLAYLIST
 import com.onlyradio.radioplayer.utils.Constants
+import com.onlyradio.radioplayer.utils.Constants.ITEM_ID
+import com.onlyradio.radioplayer.utils.Constants.ITEM_PLAYLIST
+import com.onlyradio.radioplayer.utils.Constants.ITEM_PLAYLIST_NAME
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_LAZY_LIST
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
@@ -24,6 +29,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -34,25 +40,6 @@ class DatabaseViewModel @Inject constructor(
         private val radioSource: RadioSource,
         private val radioServiceConnection: RadioServiceConnection
 ) : ViewModel() {
-
-
-
-//    val navBarHeight : Int by lazy {
-//        Utils.getNavigationBarHeight(getApplication())
-//    }
-//
-//    val statusBarHeight : Int by lazy {
-//        Utils.getStatusBarHeight(getApplication())
-//    }
-
-
-//    fun getRadioStationPlayDuration(stationID: String, handleResult: (Long) -> Unit) =
-//        viewModelScope.launch {
-//            repository.getRadioStationPlayDuration(stationID)?.also {result ->
-//                handleResult(result)
-//            }
-//        }
-
 
 
 
@@ -115,6 +102,8 @@ class DatabaseViewModel @Inject constructor(
         repository.incrementInPlaylistsCount(crossRef.stationuuid)
         repository.insertStationPlaylistCrossRef(crossRef)
     }
+
+
 
     suspend fun getTimeOfStationPlaylistInsertion(stationID : String, playlistName : String)
             = repository.getTimeOfStationPlaylistInsertion(stationID, playlistName)
@@ -243,9 +232,9 @@ class DatabaseViewModel @Inject constructor(
     fun subscribeToStationsInPlaylist(playlistName: String)
             = viewModelScope.launch {
 
-            favFragStationsSwitch.postValue(SEARCH_FROM_PLAYLIST)
+            favFragStationsSwitch.value = SEARCH_FROM_PLAYLIST
 
-            currentPlaylistName.postValue(playlistName)
+            currentPlaylistName.value = playlistName
 //            isInLazyPlaylist = false
 //            isInFavouriteTab.postValue(false)
     }
@@ -255,7 +244,7 @@ class DatabaseViewModel @Inject constructor(
 
     fun getAllFavouredStations() = viewModelScope.launch {
 
-        favFragStationsSwitch.postValue(SEARCH_FROM_FAVOURITES)
+        favFragStationsSwitch.value = SEARCH_FROM_FAVOURITES
 
 //        isInLazyPlaylist = false
 //        isInFavouriteTab.postValue(true)
@@ -263,16 +252,21 @@ class DatabaseViewModel @Inject constructor(
 //        observableListOfStations.value = stationInFavoured.value
     }
 
+    private var lazyListName = ""
 
-    fun getLazyPlaylist(name : String) {
+    fun setLazyListName(name : String){
+        lazyListName = name
+    }
 
-        favFragStationsSwitch.postValue(SEARCH_FROM_LAZY_LIST)
+
+    fun getLazyPlaylist() {
+
+        favFragStationsSwitch.value = SEARCH_FROM_LAZY_LIST
 
 //        isInLazyPlaylist = true
 //        isInFavouriteTab.postValue(false)
-        currentPlaylistName.postValue(
-            name
-        )
+        currentPlaylistName.value = lazyListName
+
 
 //        if(isLazyPlaylistSourceSet){
 //            observableListOfStations.value = stationsInLazyPlaylist.value
@@ -304,14 +298,14 @@ class DatabaseViewModel @Inject constructor(
 
             RadioSource.clearLazyList()
             isToGenerateLazyList = true
-            favFragStationsSwitch.postValue(SEARCH_FROM_LAZY_LIST)
+            favFragStationsSwitch.value = SEARCH_FROM_LAZY_LIST
 
     }
 
 
-    fun clearRadioStationPlayedDuration(stationID: String) = viewModelScope.launch{
-        repository.clearRadioStationPlayedDuration(
-            stationID
+    fun clearRadioStationPlayedDuration(stationID: String, duration : Long) = viewModelScope.launch{
+        repository.setRadioStationPlayedDuration(
+            stationID, duration
         )
     }
 
@@ -373,6 +367,36 @@ class DatabaseViewModel @Inject constructor(
             COMMAND_RESTORE_MEDIA_ITEM,
             bundleOf(Pair(Constants.ITEM_INDEX, index)))
     }
+
+
+
+    val onSwipeDeleteHandled = radioServiceConnection.onSwipeHandled.receiveAsFlow()
+
+    fun onSwipeDeleteStation(index : Int, stationID: String){
+
+        radioServiceConnection.sendCommand(
+            COMMAND_ON_SWIPE_DELETE,
+            bundleOf(
+                Pair(Constants.ITEM_INDEX, index),
+                Pair(ITEM_PLAYLIST, favFragStationsSwitch.value),
+                Pair(ITEM_PLAYLIST_NAME, currentPlaylistName.value),
+                Pair(ITEM_ID, stationID)
+            )
+        )
+    }
+
+    fun onRestoreStation(){
+        radioServiceConnection.sendCommand(
+            COMMAND_ON_SWIPE_RESTORE, null
+        )
+
+        if(favFragStationsSwitch.value == SEARCH_FROM_LAZY_LIST){
+            getLazyPlaylist()
+        }
+
+    }
+
+
 
 
 }

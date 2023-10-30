@@ -45,6 +45,7 @@ import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.onlyradio.radioplayer.utils.dpToP
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import com.onlyradio.radioplayer.extensions.snackbarSimple
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -123,6 +124,10 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         observePlaylistsVisibilityState()
 
         editPlaylistClickListener()
+
+        setOnSwipeDeleteHandlerFlow()
+
+        setLazyListName()
 
     }
 
@@ -310,10 +315,14 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     }
 
 
-    private fun getLazyList(){
-        favViewModel.getLazyPlaylist(
+    private fun setLazyListName(){
+        favViewModel.setLazyListName(
             resources.getString(R.string.lazy_playlist_name)
         )
+    }
+
+    private fun getLazyList(){
+        favViewModel.getLazyPlaylist()
     }
 
     private fun setPlaylistAdapterClickListeners(){
@@ -417,7 +426,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     private fun observeStations(){
 
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
 
             repeatOnLifecycle(Lifecycle.State.STARTED){
 
@@ -655,18 +664,23 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.bindingAdapterPosition
                 val stationID = mainAdapter.listOfStations[position].stationuuid
-                when (currentTab) {
-                    SEARCH_FROM_FAVOURITES -> {
-                        val favouredAt =  mainAdapter.listOfStations[position].favouredAt
-                        handleSwipeOnFavStation(stationID, favouredAt, position)
-                    }
-                    SEARCH_FROM_PLAYLIST -> {
-                        handleSwipeOnPlaylistStation(stationID, position)
-                    }
-                    else -> {
-                        handleSwipeOnLazyList(stationID, position)
-                    }
-                }
+
+                favViewModel.onSwipeDeleteStation(position, stationID)
+
+//                when (currentTab) {
+//
+//                    SEARCH_FROM_FAVOURITES -> {
+//                        val favouredAt =  mainAdapter.listOfStations[position].favouredAt
+//                        handleSwipeOnFavStation(stationID, favouredAt, position)
+//                    }
+//                    SEARCH_FROM_PLAYLIST -> {
+//                        handleSwipeOnPlaylistStation(stationID, position)
+//                    }
+//                    else -> {
+//                        handleSwipeOnLazyList(stationID, position)
+//                    }
+//
+//                }
             }
         }
     }
@@ -704,7 +718,10 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         }
 
         val playlistName = currentPlaylistName
+
+
         lifecycleScope.launch {
+
             val timeOfInsertion = favViewModel.getTimeOfStationPlaylistInsertion(stationID, playlistName)
             favViewModel.deleteStationPlaylistCrossRef(stationID, playlistName)
             withContext(Dispatchers.Main){
@@ -751,8 +768,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 RadioSource.restoreItemFromLazyList(pos)
                 if(currentTab == SEARCH_FROM_LAZY_LIST){
                     getLazyList()
-//                    mainAdapter.listOfStations = RadioSource.lazyListStations
-//                    mainAdapter.notifyItemInserted(pos)
                 }
 
                 if(RadioService.currentMediaItems == SEARCH_FROM_LAZY_LIST){
@@ -764,7 +779,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                     super.onDismissed(transientBottomBar, event)
                     if(event != DISMISS_EVENT_ACTION) {
-                        favViewModel.clearRadioStationPlayedDuration(stationID)
+                        favViewModel.clearRadioStationPlayedDuration(stationID, 0)
                     }
                 }
             }
@@ -772,6 +787,48 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         }.show()
     }
+
+
+
+    private fun setOnSwipeDeleteHandlerFlow() = viewLifecycleOwner.lifecycleScope.launch {
+
+        repeatOnLifecycle(Lifecycle.State.STARTED){
+
+            favViewModel.onSwipeDeleteHandled.collectLatest {
+
+                val messageId = when(it.playlist){
+
+                    SEARCH_FROM_FAVOURITES -> {
+                        R.string.removed_from_favs
+                    }
+
+                    SEARCH_FROM_PLAYLIST -> {
+                        R.string.removed_from_playlist
+                    }
+
+                    SEARCH_FROM_LAZY_LIST -> {
+                        getLazyList()
+                        R.string.removed_from_lazy_list
+                    }
+
+                    else -> 0
+                }
+
+                var message = resources.getString(messageId)
+
+                if(it.playlist == SEARCH_FROM_PLAYLIST) {
+                    message = message + " " + it.playlistName
+                }
+
+                Snackbar.make(requireActivity().findViewById(R.id.rootLayout), message, Snackbar.LENGTH_LONG).apply {
+                    setAction(resources.getString(R.string.action_undo)){
+                        favViewModel.onRestoreStation()
+                    }
+                }.show()
+            }
+        }
+    }
+
 
 
 
@@ -784,8 +841,10 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                 val message = if(it) resources.getString(R.string.already_in_playlist) + " " + playlistName
                 else resources.getString(R.string.moved_to_playlist) + " " + playlistName
 
-                Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
-                    message, Snackbar.LENGTH_SHORT).show()
+                requireActivity().snackbarSimple(message)
+
+//                Snackbar.make((activity as MainActivity).findViewById(R.id.rootLayout),
+//                    message, Snackbar.LENGTH_SHORT).show()
 
                 if(!it && RadioService.currentPlaylistName == currentPlaylistName &&
                         RadioService.currentMediaItems == SEARCH_FROM_PLAYLIST){

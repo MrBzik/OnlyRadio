@@ -8,7 +8,6 @@ import com.onlyradio.radioplayer.data.local.entities.Title
 import com.onlyradio.radioplayer.data.local.relations.StationDateCrossRef
 import com.onlyradio.radioplayer.utils.Constants
 import com.onlyradio.radioplayer.utils.Utils
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.sql.Date

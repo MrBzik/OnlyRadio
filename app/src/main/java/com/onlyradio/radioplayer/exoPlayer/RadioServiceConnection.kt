@@ -12,9 +12,11 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.onlyradio.radioplayer.data.models.OnSnackRestore
 import com.onlyradio.radioplayer.utils.Constants.NETWORK_ERROR
 import com.onlyradio.radioplayer.utils.Event
 import com.onlyradio.radioplayer.utils.Resource
+import kotlinx.coroutines.channels.Channel
 
 
 class RadioServiceConnection (
@@ -44,6 +46,11 @@ class RadioServiceConnection (
     private var mediaControllerCallback = MediaControllerCallback()
 
     lateinit var playerPosition : (() -> Int)
+
+
+    val onSwipeHandled = Channel<OnSnackRestore>()
+
+
     fun setterForPlayerPos(pos : () -> Int){
         playerPosition = pos
     }
