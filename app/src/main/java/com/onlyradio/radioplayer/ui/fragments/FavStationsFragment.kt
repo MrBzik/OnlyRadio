@@ -23,7 +23,6 @@ import com.onlyradio.radioplayer.adapters.PlaylistsAdapter
 import com.onlyradio.radioplayer.adapters.RadioDatabaseAdapter
 import com.onlyradio.radioplayer.data.local.entities.Playlist
 import com.onlyradio.radioplayer.data.local.entities.RadioStation
-import com.onlyradio.radioplayer.data.local.relations.StationPlaylistCrossRef
 import com.onlyradio.radioplayer.databinding.FragmentFavStationsBinding
 import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.exoPlayer.RadioSource
@@ -43,7 +42,6 @@ import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_LAZY_LIST
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.onlyradio.radioplayer.utils.dpToP
-import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.onlyradio.radioplayer.extensions.snackbarSimple
 import dagger.hilt.android.AndroidEntryPoint
@@ -191,19 +189,11 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     private fun observePlaybackState(){
 
-        mainViewModel.playbackState.observe(viewLifecycleOwner){
+        mainViewModel.isPlaying.observe(viewLifecycleOwner){ isPlaying ->
 
-            it?.let {
-
-                when{
-                    it.isPlaying -> {
-                        mainAdapter.utils.currentPlaybackState = true
-                        mainAdapter.updateStationPlaybackState()
-                    }
-                    it.isPlayEnabled -> {
-                        mainAdapter.utils.currentPlaybackState = false
-                        mainAdapter.updateStationPlaybackState()
-                    }
+            if(!RadioService.isFromRecording){
+                if(mainAdapter.onPlaybackState(isPlaying)){
+                    mainAdapter.updateStationPlaybackState()
                 }
             }
         }
@@ -547,7 +537,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     private fun setMainAdapterClickListener(){
 
-        mainAdapter.utils.setOnClickListener { station, position ->
+        mainAdapter.setOnClickListener { station, position ->
 
             var isToChangeMediaItems = false
 
@@ -582,7 +572,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             setHasFixedSize(true)
             ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this)
 
-            mainAdapter.utils.initialiseValues(requireContext(), settingsViewModel.stationsTitleSize)
+            mainAdapter.initialiseValues(requireContext(), settingsViewModel.stationsTitleSize)
 
 
             if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){

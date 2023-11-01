@@ -12,14 +12,12 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.Spinner
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
-import androidx.paging.PagingData
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,10 +28,7 @@ import com.onlyradio.radioplayer.adapters.HistoryDatesAdapter
 import com.onlyradio.radioplayer.adapters.PagingHistoryAdapter
 import com.onlyradio.radioplayer.adapters.TitleAdapter
 import com.onlyradio.radioplayer.adapters.models.StationWithDateModel
-import com.onlyradio.radioplayer.adapters.models.TitleWithDateModel
-import com.onlyradio.radioplayer.data.local.entities.BookmarkedTitle
 import com.onlyradio.radioplayer.data.local.entities.HistoryDate
-import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.databinding.FragmentHistoryBinding
 import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.exoPlayer.RadioSource
@@ -54,6 +49,7 @@ import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.onlyradio.radioplayer.utils.SpinnerExt
 import com.onlyradio.radioplayer.utils.addAction
 import com.google.android.material.snackbar.Snackbar
+import com.onlyradio.radioplayer.domain.HistoryData
 import com.onlyradio.radioplayer.extensions.makeToast
 import com.onlyradio.radioplayer.utils.Logger
 import dagger.hilt.android.AndroidEntryPoint
@@ -61,7 +57,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.DateFormat
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -332,21 +327,12 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
 
     private fun observePlaybackState(){
-        mainViewModel.playbackState.observe(viewLifecycleOwner){
-            it?.let {
+        mainViewModel.isPlaying.observe(viewLifecycleOwner){ isPlaying ->
 
-                when{
-                    it.isPlaying -> {
-                        stationsHistoryAdapter?.utils?.currentPlaybackState = true
-
-                            stationsHistoryAdapter?.updateStationPlaybackState()
-
-                    }
-                    it.isPlayEnabled -> {
-                        stationsHistoryAdapter?.utils?.currentPlaybackState = false
-
-                            stationsHistoryAdapter?.updateStationPlaybackState()
-
+            if(!RadioService.isFromRecording){
+                stationsHistoryAdapter?.let {
+                    if(it.onPlaybackState(isPlaying)){
+                        it.updateStationPlaybackState()
                     }
                 }
             }
@@ -358,37 +344,36 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
 
-//            Log.d("CHECKTAGS", "collecting currentplayingstation again?")
-
             if(historyViewModel.currentTab.value == TAB_STATIONS
-//                &&
-//                    RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS
 
             ){
+                val index =
+
+                    if(historyViewModel.selectedDate == RadioService.selectedHistoryDate){
+                        mainViewModel.getPlayerCurrentIndex() + 1
+                    } else if(
+                        historyViewModel.selectedDate == 0L
+                        && RadioService.currentMediaItems == SEARCH_FROM_HISTORY) {
+                        adjustHistoryIndex()
+                    } else {
+                        stationsHistoryAdapter?.snapshot()?.items?.indexOfFirst {
+                            it is StationWithDateModel.Station && it.radioStation.stationuuid == station.stationuuid
+                        }
+                    }
 
                 if(isToHandleNewStationObserver){
 
-                    val index =
 
-                        if(historyViewModel.selectedDate == RadioService.selectedHistoryDate){
-                            mainViewModel.getPlayerCurrentIndex() + 1
-                        } else if(
-                            historyViewModel.selectedDate == 0L
-                            && RadioService.currentMediaItems == SEARCH_FROM_HISTORY) {
-                            adjustHistoryIndex()
-                        } else {
-                            stationsHistoryAdapter?.snapshot()?.items?.indexOfFirst {
-                                it is StationWithDateModel.Station && it.radioStation.stationuuid == station.stationuuid
-                            }
-                        }
 
                     if(index != -1 && index != null){
                             handleNewRadioStation(index, station.stationuuid)
-                        } else {
-                            stationsHistoryAdapter?.updateOnStationChange(station.stationuuid, null)
-                    }
+                        }
+//                    else {
+//                            stationsHistoryAdapter?.updateOnStationChange(station.stationuuid, null)
+//                    }
 
                 } else {
+
                     isToHandleNewStationObserver = true
                 }
             }
@@ -468,7 +453,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
             stationsHistoryAdapter?.apply {
 
-                utils.initialiseValues(requireContext(), settingsViewModel.stationsTitleSize)
+                initialiseValues(requireContext(), settingsViewModel.stationsTitleSize)
 
                 addOnPagesUpdatedListener {
                     handleRvAnim()
@@ -476,14 +461,14 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 setStationsAdapterLoadStateListener()
 
-                if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
-                    RadioService.currentPlayingStation.value?.let {
-                        val id =  it.stationuuid
-                        currentRadioStationID = id
-                    }
-                } else {
-                    currentRadioStationID = ""
-                }
+//                if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
+//                    RadioService.currentPlayingStation.value?.let {
+//                        val id =  it.stationuuid
+//                        currentRadioStationID = id
+//                    }
+//                } else {
+//                    currentRadioStationID = ""
+//                }
             }
 
             historyViewModel.setHistoryLiveData()
@@ -684,23 +669,27 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED){
 
-                historyViewModel.observableHistoryPages?.collectLatest{
-                    when(historyViewModel.currentTab.value){
-                        TAB_STATIONS -> {
+                historyViewModel.observableHistoryPages?.collectLatest{ tab ->
+
+                    when(tab){
+                        is HistoryData.StationsFlow -> {
                             stationsHistoryAdapter
-                                ?.submitData(lifecycle, it as PagingData<StationWithDateModel>)
+                                ?.submitData(lifecycle, tab.data)
                             bind.tvHistoryMessage.visibility = View.INVISIBLE
                         }
-                        TAB_TITLES -> {
+
+                        is HistoryData.TitlesFlow -> {
                             titlesHistoryAdapter
-                                ?.submitData(lifecycle, it as PagingData<TitleWithDateModel>)
+                                ?.submitData(lifecycle, tab.data)
                             bind.tvHistoryMessage.visibility = View.INVISIBLE
                         }
-                        TAB_BOOKMARKS -> {
-                            bookmarkedTitlesAdapter.listOfTitles = it as List<BookmarkedTitle>
+
+                        is HistoryData.Bookmarks -> {
+
+                            bookmarkedTitlesAdapter.listOfTitles = tab.list
                             withContext(Dispatchers.Main){
                                 bind.tvHistoryMessage.apply {
-                                    if(it.isEmpty()){
+                                    if(tab.list.isEmpty()){
                                         text = requireContext().resources.getString(R.string.bookmarks_message)
                                         visibility = View.VISIBLE
                                         slideAnim(400, 0, R.anim.fade_in_anim)
@@ -711,6 +700,35 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                             }
                         }
                     }
+
+
+
+//                    when(historyViewModel.currentTab.value){
+//                        TAB_STATIONS -> {
+//                            stationsHistoryAdapter
+//                                ?.submitData(lifecycle, it as PagingData<StationWithDateModel>)
+//                            bind.tvHistoryMessage.visibility = View.INVISIBLE
+//                        }
+//                        TAB_TITLES -> {
+//                            titlesHistoryAdapter
+//                                ?.submitData(lifecycle, it as PagingData<TitleWithDateModel>)
+//                            bind.tvHistoryMessage.visibility = View.INVISIBLE
+//                        }
+//                        TAB_BOOKMARKS -> {
+//                            bookmarkedTitlesAdapter.listOfTitles = it as List<BookmarkedTitle>
+//                            withContext(Dispatchers.Main){
+//                                bind.tvHistoryMessage.apply {
+//                                    if(it.isEmpty()){
+//                                        text = requireContext().resources.getString(R.string.bookmarks_message)
+//                                        visibility = View.VISIBLE
+//                                        slideAnim(400, 0, R.anim.fade_in_anim)
+//                                    } else {
+//                                        visibility = View.INVISIBLE
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
                 }
             }
         }
@@ -720,7 +738,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private fun setupAdapterClickListener(){
 
-        stationsHistoryAdapter?.utils?.setOnClickListener { station, position ->
+        stationsHistoryAdapter?.setOnClickListener { station, position ->
 
             val flag = if(historyViewModel.selectedDate == 0L){
                 SEARCH_FROM_HISTORY
@@ -794,7 +812,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         bind.rvHistory.adapter = null
         stationsHistoryAdapter = null
         titlesHistoryAdapter = null
-        Logger.log("isNull: ${stationsHistoryAdapter == null}")
         _bind = null
         isToHandleNewStationObserver = false
         isBookmarkedTitlesObserverSet = false

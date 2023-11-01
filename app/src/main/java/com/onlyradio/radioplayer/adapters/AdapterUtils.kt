@@ -11,27 +11,57 @@ import com.onlyradio.radioplayer.databinding.ItemRadioWithTextBinding
 import com.onlyradio.radioplayer.extensions.loadImage
 import com.onlyradio.radioplayer.utils.RandomColors
 
+interface AdapterUtils {
 
-class BaseAdapter(
-    private val glide : RequestManager) {
+    fun initialiseValues(context : Context, fontSize : Float)
+
+    fun restoreState(bind: ItemRadioWithTextBinding)
+
+    fun handleStationPlaybackState(bind: ItemRadioWithTextBinding)
+
+    fun onPlaybackState(isPlaying: Boolean) : Boolean
+
+    fun handleBinding(
+        bind: ItemRadioWithTextBinding,
+        station: RadioStation,
+        position : Int,
+        checkPosition : () -> Int,
+        glide : RequestManager
+    )
+
+    var onItemClickListener : ((RadioStation, Int) -> Unit)?
+
+    fun setOnClickListener(listener : (RadioStation, Int) -> Unit)
+}
+
+class AdapterUtilsImpl : AdapterUtils {
 
     private val randColors = RandomColors()
 
-    var currentPlaybackState = false
-    var defaultTextColor = 0
-    var selectedTextColor = 0
-    var defaultSecondaryTextColor = 0
-    var selectedSecondaryTextColor = 0
+    private var currentPlaybackState = false
+    private var defaultTextColor = 0
+    private var selectedTextColor = 0
+    private var defaultSecondaryTextColor = 0
+    private var selectedSecondaryTextColor = 0
 
     var alpha = 0.1f
-    var titleSize = 18f
+    private var titleSize = 18f
 
     private val defaultBG = R.drawable.item_radio_bg_default
     private val playingBG = R.drawable.item_radio_bg_playing
     private val pausedBG = R.drawable.item_radio_bg_paused
 
 
-    fun initialiseValues(context : Context, fontSize : Float){
+    override fun onPlaybackState(isPlaying: Boolean) : Boolean {
+        if(currentPlaybackState != isPlaying){
+            currentPlaybackState = isPlaying
+            return true
+        }
+        return false
+    }
+
+
+    override fun initialiseValues(context : Context, fontSize : Float){
         defaultTextColor = ContextCompat.getColor(context, R.color.default_text_color)
         selectedTextColor = ContextCompat.getColor(context, R.color.selected_text_color)
 
@@ -41,7 +71,7 @@ class BaseAdapter(
         titleSize = fontSize
     }
 
-     fun restoreState(bind: ItemRadioWithTextBinding){
+    override fun restoreState(bind: ItemRadioWithTextBinding){
         bind.apply {
             radioItemRootLayout.setBackgroundResource(defaultBG)
             tvPrimary.setTextColor(defaultTextColor)
@@ -51,7 +81,7 @@ class BaseAdapter(
         }
     }
 
-     fun handleStationPlaybackState(bind: ItemRadioWithTextBinding){
+    override fun handleStationPlaybackState(bind: ItemRadioWithTextBinding){
 
         if(currentPlaybackState){
             bind.apply {
@@ -72,12 +102,12 @@ class BaseAdapter(
         }
     }
 
-    fun handleBinding(
+    override fun handleBinding(
         bind: ItemRadioWithTextBinding,
         station: RadioStation,
         position : Int,
-        saveImage : (Drawable) -> Unit = {},
-        checkPosition : () -> Int
+        checkPosition : () -> Int,
+        glide : RequestManager
     ){
 
         bind.apply {
@@ -137,13 +167,10 @@ class BaseAdapter(
         }
     }
 
-    var onItemClickListener : ((RadioStation, Int) -> Unit)? = null
+    override var onItemClickListener : ((RadioStation, Int) -> Unit)? = null
 
-    fun setOnClickListener(listener : (RadioStation, Int) -> Unit){
+    override fun setOnClickListener(listener : (RadioStation, Int) -> Unit){
         onItemClickListener = listener
     }
 
 }
-
-
-

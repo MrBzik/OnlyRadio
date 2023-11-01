@@ -17,6 +17,7 @@ import com.onlyradio.radioplayer.adapters.models.StationWithDateModel
 import com.onlyradio.radioplayer.adapters.models.TitleWithDateModel
 import com.onlyradio.radioplayer.data.local.entities.BookmarkedTitle
 import com.onlyradio.radioplayer.data.local.entities.Title
+import com.onlyradio.radioplayer.domain.HistoryData
 import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.exoPlayer.RadioServiceConnection
 import com.onlyradio.radioplayer.exoPlayer.RadioSource
@@ -34,6 +35,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.text.DateFormat
 import javax.inject.Inject
@@ -250,12 +252,12 @@ class HistoryViewModel @Inject constructor(
     }
 
 
-    private var historyFlow : Flow<PagingData<StationWithDateModel>>?  = null
+    private var historyFlow : Flow<PagingData<StationWithDateModel>>? = null
 
     private var titlesFlow : Flow<PagingData<TitleWithDateModel>>? = null
 
 
-    var observableHistoryPages : Flow<Any>? = null
+    var observableHistoryPages : Flow<HistoryData>? = null
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun initiateHistory(){
@@ -264,7 +266,9 @@ class HistoryViewModel @Inject constructor(
         }.flatMapLatest {tab ->
             if(tab == TAB_STATIONS){
                 if(selectedDate == 0L)
-                    historyFlow?: emptyFlow()
+                    (historyFlow?: emptyFlow()).map {
+                        HistoryData.StationsFlow(it)
+                    }
                 else
                     Pager(
                         config = PagingConfig(
@@ -274,11 +278,16 @@ class HistoryViewModel @Inject constructor(
                         pagingSourceFactory = {
                             HistoryOneDateSource(oneDateHistoryLoader)
                         }
-                    ).flow
+                    ).flow.map {
+                        HistoryData.StationsFlow(it)
+                    }
 
             } else if (tab == TAB_TITLES){
                 if(selectedDate == 0L)
-                    titlesFlow ?: emptyFlow()
+                    (titlesFlow ?: emptyFlow()).map {
+                        HistoryData.TitlesFlow(it)
+                    }
+
                 else {
                     isTitleOneDateHeaderSet = false
                     isTitleOneDateFooterSet = false
@@ -290,11 +299,15 @@ class HistoryViewModel @Inject constructor(
                         ), pagingSourceFactory = {
                             TitlesDataSource(oneDateTitleLoader, Constants.PAGE_SIZE)
                         }
-                    ).flow
+                    ).flow.map {
+                        HistoryData.TitlesFlow(it)
+                    }
                 }
             }
             else
-                bookmarkedTitlesLivedata
+                bookmarkedTitlesLivedata.map {
+                    HistoryData.Bookmarks(it)
+                }
         }
     }
 

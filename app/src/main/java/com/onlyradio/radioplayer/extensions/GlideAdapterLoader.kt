@@ -22,7 +22,6 @@ fun RequestManager.loadImage(
     ivItemImage: ImageView,
     alpha : Float,
     position: Int,
-    saveImage : (Drawable) -> Unit = {},
     updatedHolderPos : () -> Int,
 ){
     load(uri)
@@ -47,7 +46,7 @@ fun RequestManager.loadImage(
             ): Boolean {
                 if(dataSource.name == "REMOTE"){
 
-                    saveImage(resource)
+//                    saveImage(resource)
 
                     tvPlaceholder.fadeOut(FADE_OUT_DURATION, alpha, position){ pos ->
                         if(pos != updatedHolderPos()) {

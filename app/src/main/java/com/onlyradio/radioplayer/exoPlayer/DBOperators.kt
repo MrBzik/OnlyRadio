@@ -53,15 +53,13 @@ class DBOperators (private val service: RadioService) {
         service.getSharedPreferences(Constants.HISTORY_PREF, Context.MODE_PRIVATE)
     }
 
+    private var previousPlayedStationId = ""
+    private var stationStartPlayingTime = 0L
 
 
     fun updateStationLastClicked(stationId : String) = serviceScope.launch(Dispatchers.IO){
-        RadioService.isToUpdateLiveData = false
         lazyRepo.updateRadioStationLastClicked(stationId)
     }
-
-    private var previousPlayedStationId = ""
-    private var stationStartPlayingTime = 0L
 
     fun updateStationPlayedDuration() = serviceScope.launch(Dispatchers.IO){
 

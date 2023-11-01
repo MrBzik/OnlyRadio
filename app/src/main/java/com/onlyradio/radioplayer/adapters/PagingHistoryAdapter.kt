@@ -30,11 +30,9 @@ private const val TYPE_DATE_SEPARATOR_ENCLOSING = 2
 
 
 class PagingHistoryAdapter constructor(
-   glide : RequestManager,
+   private val glide : RequestManager,
    private val todayStr : String,
-) : PagingDataAdapter<StationWithDateModel, RecyclerView.ViewHolder>(StationsComparator) {
-
-    val utils = BaseAdapter(glide)
+) : PagingDataAdapter<StationWithDateModel, RecyclerView.ViewHolder>(StationsComparator), AdapterUtils by AdapterUtilsImpl() {
 
     private val currentDate = Utils.convertLongToOnlyDate(System.currentTimeMillis(), DateFormat.LONG)
 
@@ -71,7 +69,7 @@ class PagingHistoryAdapter constructor(
 
                         val item = getItem(holder.bindingAdapterPosition) as StationWithDateModel.Station
 
-                        utils.onItemClickListener?.let { click ->
+                        onItemClickListener?.let { click ->
 
                             click(item.radioStation, holder.bindingAdapterPosition)
                         }
@@ -81,7 +79,7 @@ class PagingHistoryAdapter constructor(
                             if(selectedAdapterPosition != holder.bindingAdapterPosition){
 
                                 previousItemHolder?.bind?.let {
-                                    utils.restoreState(it)
+                                    restoreState(it)
                                 }
                             }
                         }
@@ -92,7 +90,7 @@ class PagingHistoryAdapter constructor(
 
                             previousItemHolder?.bind?.let {
 
-                                utils.restoreState(it)
+                                restoreState(it)
                             }
 
                         }
@@ -122,10 +120,10 @@ class PagingHistoryAdapter constructor(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, @SuppressLint("RecyclerView") position: Int) {
 
-        val item = getItem(position)
+        val item = getItem(position) ?: return
 
-        if(item is StationWithDateModel.DateSeparator)
-            (holder as DateSeparatorViewHolder).apply {
+        when (item) {
+            is StationWithDateModel.DateSeparator -> (holder as DateSeparatorViewHolder).apply {
                 if(currentDate == item.date){
                     bind.tvDate.text = todayStr
                 } else {
@@ -133,8 +131,7 @@ class PagingHistoryAdapter constructor(
                 }
             }
 
-        else if(item is StationWithDateModel.DateSeparatorEnclosing)
-            (holder as DateSeparatorEnclosingViewHolder).apply {
+            is StationWithDateModel.DateSeparatorEnclosing -> (holder as DateSeparatorEnclosingViewHolder).apply {
                 if(currentDate == item.date){
                     bind.tvDate.text = todayStr
                 } else {
@@ -142,30 +139,38 @@ class PagingHistoryAdapter constructor(
                 }
             }
 
-        else if (item is StationWithDateModel.Station){
-            (holder as StationViewHolder).bind.apply {
+            is StationWithDateModel.Station -> {
 
-                val station = item.radioStation
+                (holder as StationViewHolder).bind.apply {
 
-                utils.handleBinding(this, station, position){
-                    holder.bindingAdapterPosition
-                }
+                    val station = item.radioStation
+
+                    handleBinding(
+                        bind = this,
+                        station = station,
+                        position = position,
+                        glide = glide,
+                        checkPosition = {
+                            holder.bindingAdapterPosition
+                        }
+                    )
 
 
-                if(station.stationuuid == currentRadioStationID){
+                    if(station.stationuuid == currentRadioStationID){
 
                         previousItemHolder?.bind?.let {
-                            utils.restoreState(it)
+                            restoreState(it)
                         }
 
                         previousItemHolder = holder
                         selectedAdapterPosition = holder.bindingAdapterPosition
-                        utils.handleStationPlaybackState(this)
+                        handleStationPlaybackState(this)
 
-                } else
+                    } else
 
-                    utils.restoreState(this)
+                        restoreState(this)
 
+                }
             }
         }
 
@@ -179,7 +184,7 @@ class PagingHistoryAdapter constructor(
     fun updateStationPlaybackState(){
        previousItemHolder?.let{
            if(it.bindingAdapterPosition == selectedAdapterPosition){
-               utils.handleStationPlaybackState(it.bind)
+               handleStationPlaybackState(it.bind)
            }
        }
     }
@@ -191,14 +196,14 @@ class PagingHistoryAdapter constructor(
         if(stationId != currentRadioStationID) {
             currentRadioStationID = stationId
             previousItemHolder?.bind?.let {
-                utils.restoreState(it)
+                restoreState(it)
             }
         }
         holder?.let {
             selectedAdapterPosition = holder.bindingAdapterPosition
             previousItemHolder = holder
 
-            utils.handleStationPlaybackState(holder.bind)
+            handleStationPlaybackState(holder.bind)
 
         }
     }

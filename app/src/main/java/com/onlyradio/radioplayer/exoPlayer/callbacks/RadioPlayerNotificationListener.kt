@@ -1,5 +1,6 @@
 package com.onlyradio.radioplayer.exoPlayer.callbacks
 
+import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Notification
 import android.app.Service
 import android.content.Intent
@@ -48,8 +49,7 @@ class RadioPlayerNotificationListener (
     ) {
 
 
-            super.onNotificationPosted(notificationId, notification, ongoing)
-
+        super.onNotificationPosted(notificationId, notification, ongoing)
 
         radioService.apply {
 
@@ -59,17 +59,17 @@ class RadioPlayerNotificationListener (
                     Intent(applicationContext, this::class.java)
                     )
 
-//                startForegroundService()
-                if(Build.VERSION.SDK_INT >= 29){
-                    startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+                if(Build.VERSION.SDK_INT >= 31){
+                    try {
+                        startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+                        isForegroundService = true
+                    } catch (e : ForegroundServiceStartNotAllowedException){/**/}
                 }
 
                 else {
                     startForeground(NOTIFICATION_ID, notification)
+                    isForegroundService = true
                 }
-
-                isForegroundService = true
-
             }
         }
     }

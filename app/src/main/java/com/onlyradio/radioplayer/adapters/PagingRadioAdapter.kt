@@ -10,19 +10,19 @@ import com.bumptech.glide.RequestManager
 import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.databinding.ItemRadioWithTextBinding
 import com.onlyradio.radioplayer.ui.animations.AdapterFadeAnim.adapterItemFadeIn
+import com.onlyradio.radioplayer.utils.Logger
 import javax.inject.Inject
 
 class PagingRadioAdapter @Inject constructor(
     private val glide : RequestManager
 
-) : PagingDataAdapter<RadioStation, PagingRadioAdapter.RadioItemHolder>(StationsComparator) {
+) : PagingDataAdapter<RadioStation, PagingRadioAdapter.RadioItemHolder>(StationsComparator), AdapterUtils by AdapterUtilsImpl() {
 
 
-    val utils = BaseAdapter(glide)
+    private var selectedRadioStationId = ""
 
-    var currentRadioStationId : String? = null
+    private var selectedAdapterPosition = -2
 
-    var previousItemHolder : RadioItemHolder? = null
 
     class RadioItemHolder (val bind : ItemRadioWithTextBinding) : RecyclerView.ViewHolder(bind.root)
 
@@ -39,10 +39,10 @@ class PagingRadioAdapter @Inject constructor(
                 val item = getItem(holder.bindingAdapterPosition)
 
                 item?.let { station ->
-                    utils.onItemClickListener?.let { click ->
+                    onItemClickListener?.let { click ->
                         click(station, holder.bindingAdapterPosition)
 
-                        updateOnStationChange(station, holder, true)
+//                        updateOnStationChange(station, holder, true)
                     }
                 }
             }
@@ -52,33 +52,54 @@ class PagingRadioAdapter @Inject constructor(
 
     }
 
-    override fun onBindViewHolder(holder: RadioItemHolder, @SuppressLint("RecyclerView") position: Int) {
 
+    override fun onBindViewHolder(
+        holder: RadioItemHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+
+        if(payloads.isEmpty())
+            super.onBindViewHolder(holder, position, payloads)
+        else {
+
+            if(payloads[0] is Int){
+                val id = getItem(position)?.stationuuid
+                if(selectedRadioStationId == id)
+                    handleStationPlaybackState(holder.bind)
+
+            } else restoreState(holder.bind)
+        }
+
+    }
+
+
+
+    override fun onBindViewHolder(holder: RadioItemHolder, @SuppressLint("RecyclerView") position: Int) {
         val station = getItem(position)!!
 
         holder.bind.apply {
-
-            utils.handleBinding(
+            handleBinding(
                 bind = this,
                 station = station,
-                position = position)
-               {
-                holder.bindingAdapterPosition
-            }
+                position = position,
+                glide = glide,
+                checkPosition = {
+                    holder.bindingAdapterPosition
+                }
+            )
+
         }
 
-        if(station.stationuuid == currentRadioStationId){
-            selectedAdapterPosition = holder.bindingAdapterPosition
-            previousItemHolder = holder
-            utils.handleStationPlaybackState(holder.bind)
+        if(station.stationuuid == selectedRadioStationId){
 
-        } else utils.restoreState(holder.bind)
+            handleStationPlaybackState(holder.bind)
+
+        } else restoreState(holder.bind)
 
         adapterItemFadeIn(holder.itemView)
 
     }
-
-    private var selectedAdapterPosition = -2
 
 
     override fun onViewRecycled(holder: RadioItemHolder) {
@@ -87,37 +108,26 @@ class PagingRadioAdapter @Inject constructor(
     }
 
 
+    fun updateSelectedItemValues(index : Int, id : String){
+        selectedAdapterPosition = index
+        selectedRadioStationId = id
+    }
+
+
+    fun onNewPlayingItem(newIndex : Int, id : String){
+
+        if(selectedAdapterPosition >= 0)
+            notifyItemChanged(selectedAdapterPosition, 1f)
+        updateSelectedItemValues(newIndex, id)
+        notifyItemChanged(selectedAdapterPosition, 1)
+    }
+
+
     fun updateStationPlaybackState(){
-        previousItemHolder?.let{
-            if(it.bindingAdapterPosition == selectedAdapterPosition){
-                utils.handleStationPlaybackState(it.bind)
-            }
+        if(selectedAdapterPosition >= 0){
+            notifyItemChanged(selectedAdapterPosition, 1)
         }
     }
-
-
-    fun updateOnStationChange(station : RadioStation, holder : RadioItemHolder?,
-                              isClicked : Boolean = false
-    ){
-
-        if(station.stationuuid != currentRadioStationId) {
-
-            currentRadioStationId = station.stationuuid
-            previousItemHolder?.bind?.let {
-                utils.restoreState(it)
-            }
-        }
-        holder?.let {
-            selectedAdapterPosition = holder.bindingAdapterPosition
-            previousItemHolder = holder
-            if(!isClicked){
-                utils.handleStationPlaybackState(holder.bind)
-            }
-        } ?: kotlin.run {
-            selectedAdapterPosition = -2
-        }
-    }
-
 
 
 
@@ -131,12 +141,6 @@ class PagingRadioAdapter @Inject constructor(
             return oldItem.stationuuid == newItem.stationuuid
         }
     }
-
-    fun reset(){
-        previousItemHolder = null
-        currentRadioStationId = null
-    }
-
 }
 
 

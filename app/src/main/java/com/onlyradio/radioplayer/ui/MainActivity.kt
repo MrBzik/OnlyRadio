@@ -2,17 +2,13 @@ package com.onlyradio.radioplayer.ui
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import android.content.res.Resources.NotFoundException
 import android.os.Bundle
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.doOnLayout
@@ -20,8 +16,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewModelScope
-import androidx.navigation.findNavController
 import com.bumptech.glide.RequestManager
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
@@ -29,8 +23,6 @@ import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
-import com.google.android.play.core.install.model.UpdateAvailability
-import com.google.android.play.core.ktx.isFlexibleUpdateAllowed
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.connectivityObserver.ConnectivityObserver
 import com.onlyradio.radioplayer.connectivityObserver.NetworkConnectivityObserver
@@ -56,7 +48,6 @@ import com.onlyradio.radioplayer.utils.Constants.TEXT_SIZE_STATION_TITLE_PREF
 import com.onlyradio.radioplayer.utils.CustomException
 import com.onlyradio.radioplayer.utils.UpdatesStatus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -467,7 +458,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun observePlaybackStateToChangeIcons (){
 
-        mainViewModel.playbackState.observe(this){
+        mainViewModel.isPlaying.observe(this){
 
             playerUtils?.handleIcons(it)
 

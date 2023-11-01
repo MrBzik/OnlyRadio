@@ -11,7 +11,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.ORIENTATION_HORIZONTAL
 import androidx.viewpager2.widget.ViewPager2.SCROLL_STATE_DRAGGING
@@ -266,7 +265,7 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
             if(isToTogglePlayStation){
                 val newStation = viewPagerAdapter.listOfStations[position]
 
-                val playWhenReady = mainViewModel.playbackState.value?.isPlaying ?: true
+                val playWhenReady = mainViewModel.isPlaying.value ?: false
 
                 mainViewModel.playOrToggleStation(
                     stationId = newStation.stationuuid, searchFlag =  RadioService.currentMediaItems,

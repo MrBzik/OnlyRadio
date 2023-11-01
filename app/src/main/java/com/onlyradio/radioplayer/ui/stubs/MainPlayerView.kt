@@ -32,28 +32,25 @@ class MainPlayerView(private val bind : StubPlayerActivityMainBinding,
 
 
 
-     fun handleIcons (playbackState: PlaybackStateCompat?){
+     fun handleIcons (playbackState: Boolean){
+         when{
+             playbackState -> {
+                 bind.ivTogglePlayCurrentStation
+                     .setImageResource(R.drawable.ic_pause_play)
+                 bind.tvStationTitle.apply {
+                     setTextColor(ContextCompat.getColor(bind.root.context,R.color.selected_text_color))
+                 }
+             }
+             !playbackState -> {
+                 bind.ivTogglePlayCurrentStation
+                     .setImageResource(R.drawable.ic_play_pause)
+                 bind.tvStationTitle.apply {
+                     setTextColor(ContextCompat.getColor(bind.root.context, R.color.regular_text_color))
+                 }
+             }
 
-        playbackState?.let {
-            when{
-                it.isPlaying -> {
-                    bind.ivTogglePlayCurrentStation
-                        .setImageResource(R.drawable.ic_pause_play)
-                    bind.tvStationTitle.apply {
-                        setTextColor(ContextCompat.getColor(bind.root.context,R.color.selected_text_color))
-                    }
-                }
-                it.isPlayEnabled -> {
-                    bind.ivTogglePlayCurrentStation
-                        .setImageResource(R.drawable.ic_play_pause)
-                    bind.tvStationTitle.apply {
-                        setTextColor(ContextCompat.getColor(bind.root.context, R.color.regular_text_color))
-                    }
-                }
-
-                else -> Unit
-            }
-        }
+             else -> Unit
+         }
     }
 
 

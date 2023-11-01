@@ -37,7 +37,6 @@ import com.onlyradio.radioplayer.utils.Constants.SEARCH_PREF_NAME
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_PREF_ORDER
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_PREF_TAG
 import com.onlyradio.radioplayer.utils.Constants.VALID_URL_PREF
-import com.onlyradio.radioplayer.utils.Logger
 import com.onlyradio.radioplayer.utils.toRadioStation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -57,7 +56,8 @@ class MainViewModel @Inject constructor(
 //       val isConnected = radioServiceConnection.isConnected
        val currentRadioStation = radioServiceConnection.currentRadioStation
        val networkError = radioServiceConnection.networkError
-       val playbackState = radioServiceConnection.playbackState
+
+       val isPlaying = radioServiceConnection.isPlaying.asLiveData()
 
         var isPlayerFragInitialized = false
 
@@ -370,7 +370,7 @@ class MainViewModel @Inject constructor(
         isToChangeMediaItems : Boolean
     ) : Boolean {
 
-        val isPrepared = playbackState.value?.isPrepared ?: false
+        val isPrepared = radioServiceConnection.isPlaybackStatePrepared
 
         if(isPrepared && stationId == RadioService.currentPlayingStation.value?.stationuuid
             && RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS
@@ -380,15 +380,15 @@ class MainViewModel @Inject constructor(
 
             var isToPlay = false
 
-            playbackState.value?.let { playbackState ->
+            isPlaying.value?.let { playbackState ->
                 when {
-                    playbackState.isPlaying -> {
+                    playbackState -> {
                         if(isToChangeMediaItems) isToPlay = false
                         else
                             radioServiceConnection.transportControls.pause()
                     }
 
-                    playbackState.isPlayEnabled -> {
+                    !playbackState -> {
                         if(isToChangeMediaItems) isToPlay = true
                         else
                             radioServiceConnection.transportControls.play()

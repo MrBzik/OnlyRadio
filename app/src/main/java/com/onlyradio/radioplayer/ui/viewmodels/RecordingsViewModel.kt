@@ -9,9 +9,6 @@ import com.onlyradio.radioplayer.data.local.entities.Recording
 import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.exoPlayer.RadioServiceConnection
 import com.onlyradio.radioplayer.exoPlayer.RadioSource
-import com.onlyradio.radioplayer.exoPlayer.isPlayEnabled
-import com.onlyradio.radioplayer.exoPlayer.isPlaying
-import com.onlyradio.radioplayer.exoPlayer.isPrepared
 import com.onlyradio.radioplayer.repositories.RecRepo
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_REMOVE_RECORDING_MEDIA_ITEM
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_RESTORE_RECORDING_MEDIA_ITEM
@@ -34,7 +31,7 @@ class RecordingsViewModel @Inject constructor(
 
 ) : AndroidViewModel(app) {
 
-    val playbackState = radioServiceConnection.playbackState
+    val isPlaying = radioServiceConnection.isPlaying
 
     // Recordings
 
@@ -128,22 +125,23 @@ class RecordingsViewModel @Inject constructor(
 
         val isToChangeMediaItems = RadioService.currentMediaItems != Constants.SEARCH_FROM_RECORDINGS
 
-        val isPrepared = playbackState.value?.isPrepared ?: false
+        val isPrepared = radioServiceConnection.isPlaybackStatePrepared
 
         val id = rec.id
 
         if(isPrepared && id == RadioService.currentPlayingRecording.value?.id
             && RadioService.currentMediaItems == Constants.SEARCH_FROM_RECORDINGS
         ) {
-            playbackState.value?.let { playbackState ->
+            isPlaying.value.let { isPlaying ->
+
                 when {
-                    playbackState.isPlaying -> {
+                    isPlaying -> {
 
                         radioServiceConnection.transportControls.pause()
                         return false
                     }
 
-                    playbackState.isPlayEnabled -> {
+                    !isPlaying -> {
 
                         radioServiceConnection.transportControls.play()
                         return true

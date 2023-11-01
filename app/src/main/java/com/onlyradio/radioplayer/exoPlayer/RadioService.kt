@@ -255,8 +255,6 @@ class RadioService : MediaBrowserServiceCompat() {
 
         var isToReconnect = true
 
-        var isToUpdateLiveData = true
-
         var bufferSizeInMills = 0
 //        var bufferSizeInBytes = 0
         var bufferForPlayback = 0

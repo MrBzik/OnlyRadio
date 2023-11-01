@@ -3,6 +3,12 @@ package com.onlyradio.radioplayer.exoPlayer
 import android.os.SystemClock
 import android.support.v4.media.session.PlaybackStateCompat
 
+
+//enum class PlaybackState {
+//    IS_PLAYING, IS_PLAY_ENABLED
+//}
+
+
 inline val PlaybackStateCompat.isPrepared
     get() = state == PlaybackStateCompat.STATE_BUFFERING ||
             state == PlaybackStateCompat.STATE_PLAYING ||

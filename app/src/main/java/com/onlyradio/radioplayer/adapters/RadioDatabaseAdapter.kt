@@ -17,10 +17,9 @@ import com.onlyradio.radioplayer.ui.fragments.FavStationsFragment
 import javax.inject.Inject
 
 class RadioDatabaseAdapter @Inject constructor(
-    glide : RequestManager
-) : RecyclerView.Adapter<RadioDatabaseAdapter.RadioItemHolder>() {
+    private val glide : RequestManager
+) : RecyclerView.Adapter<RadioDatabaseAdapter.RadioItemHolder>(), AdapterUtils by AdapterUtilsImpl() {
 
-    val utils = BaseAdapter(glide)
 
     class RadioItemHolder (val bind : ItemRadioWithTextBinding) : RecyclerView.ViewHolder(bind.root)
 
@@ -49,7 +48,7 @@ class RadioDatabaseAdapter @Inject constructor(
 
             if(holder.bindingAdapterPosition >= 0){
                 val station = listOfStations[holder.bindingAdapterPosition]
-                utils.onItemClickListener?.let { click ->
+                onItemClickListener?.let { click ->
                     click(station, holder.bindingAdapterPosition)
 
                     updateOnStationChange(station, holder, true)
@@ -64,17 +63,23 @@ class RadioDatabaseAdapter @Inject constructor(
         val station = listOfStations[position]
 
         holder.bind.apply {
-           utils.handleBinding(holder.bind, station, position){
-               holder.bindingAdapterPosition
-           }
+             handleBinding(
+                 bind = holder.bind,
+                 station = station,
+                 position = position,
+                 checkPosition = {
+                     holder.bindingAdapterPosition
+                 },
+                 glide = glide
+             )
         }
 
         if(station.stationuuid == currentRadioStationId) {
             selectedAdapterPosition = holder.bindingAdapterPosition
             previousItemHolder = holder
-            utils.handleStationPlaybackState(holder.bind)
+            handleStationPlaybackState(holder.bind)
         } else
-            utils.restoreState(holder.bind)
+            restoreState(holder.bind)
 
         adapterItemFadeIn(holder.itemView)
 
@@ -95,7 +100,7 @@ class RadioDatabaseAdapter @Inject constructor(
     fun updateStationPlaybackState(){
         previousItemHolder?.let{
             if(it.bindingAdapterPosition == selectedAdapterPosition){
-                utils.handleStationPlaybackState(it.bind)
+                handleStationPlaybackState(it.bind)
             }
         }
     }
@@ -106,14 +111,14 @@ class RadioDatabaseAdapter @Inject constructor(
         if(station.stationuuid != currentRadioStationId) {
             currentRadioStationId = station.stationuuid
             previousItemHolder?.bind?.let {
-                utils.restoreState(it)
+                restoreState(it)
             }
         }
         holder?.let {
             selectedAdapterPosition = holder.bindingAdapterPosition
             previousItemHolder = holder
             if(!isClicked){
-                utils.handleStationPlaybackState(holder.bind)
+                handleStationPlaybackState(holder.bind)
             }
         } ?: kotlin.run {
             selectedAdapterPosition = -2

@@ -17,6 +17,8 @@ import com.onlyradio.radioplayer.utils.Constants.NETWORK_ERROR
 import com.onlyradio.radioplayer.utils.Event
 import com.onlyradio.radioplayer.utils.Resource
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 
 class RadioServiceConnection (
@@ -35,8 +37,10 @@ class RadioServiceConnection (
     private val _networkError = MutableLiveData<Event<Resource<Boolean>>>()
     val networkError : LiveData<Event<Resource<Boolean>>> = _networkError
 
-    private val _playbackState = MutableLiveData<PlaybackStateCompat?>()
-    val playbackState : LiveData<PlaybackStateCompat?> = _playbackState
+    var isPlaybackStatePrepared = false
+
+    private val _playState = MutableStateFlow(false)
+    val isPlaying = _playState.asStateFlow()
 
     private val _currentRadioStation = MutableLiveData<MediaMetadataCompat?>()
     val currentRadioStation : LiveData<MediaMetadataCompat?> = _currentRadioStation
@@ -140,7 +144,18 @@ class RadioServiceConnection (
 
 
        override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-           _playbackState.postValue(state)
+           state?.let {
+
+               isPlaybackStatePrepared = state.isPrepared
+
+               if(state.isPlaying)
+                   _playState.value = true
+               else if(state.isPlayEnabled)
+                   _playState.value = false
+           }
+
+//
+//           _playbackState.postValue(state)
        }
 
        override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
