@@ -228,7 +228,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         bind.rvSearchStations.apply {
 
             post {
-                scrollToPosition(position)
+                smoothScrollToPosition(position)
 
                 post {
 

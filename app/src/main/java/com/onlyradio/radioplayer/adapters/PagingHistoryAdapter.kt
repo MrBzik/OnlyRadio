@@ -1,27 +1,22 @@
 package com.onlyradio.radioplayer.adapters
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.LOGGER
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.onlyradio.radioplayer.adapters.models.StationWithDateModel
-import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.databinding.ItemDateSeparatorBinding
 import com.onlyradio.radioplayer.databinding.ItemDateSeparatorEnclosingBinding
 import com.onlyradio.radioplayer.databinding.ItemRadioWithTextBinding
-import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.ui.animations.AdapterFadeAnim.adapterItemFadeIn
 import com.onlyradio.radioplayer.utils.Logger
 import com.onlyradio.radioplayer.utils.Utils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.text.DateFormat
-import javax.inject.Inject
 
 
 private const val TYPE_RADIO_STATION = 0
@@ -36,7 +31,8 @@ class PagingHistoryAdapter constructor(
 
     private val currentDate = Utils.convertLongToOnlyDate(System.currentTimeMillis(), DateFormat.LONG)
 
-    var currentRadioStationID : String? = null
+
+    private var selectedRadioStationId : String? = null
     private var selectedAdapterPosition = -2
 
     private var previousItemHolder : StationViewHolder? = null
@@ -74,28 +70,30 @@ class PagingHistoryAdapter constructor(
                             click(item.radioStation, holder.bindingAdapterPosition)
                         }
 
-                        if(item.radioStation.stationuuid == currentRadioStationID){
+//                        if(item.radioStation.stationuuid == this.selectedRadioStationId){
+//
+//                            if(selectedAdapterPosition != holder.bindingAdapterPosition){
+//
+//                                previousItemHolder?.bind?.let {
+//                                    restoreState(it)
+//                                }
+//                            }
+//                        }
+//                        else {
+//
+//                            selectedAdapterPosition = holder.bindingAdapterPosition
+//                            this.selectedRadioStationId = item.radioStation.stationuuid
+//
+//                            previousItemHolder?.bind?.let {
+//
+//                                restoreState(it)
+//                            }
+//
+//                        }
+//                        selectedAdapterPosition = holder.bindingAdapterPosition
+//                        previousItemHolder = holder
 
-                            if(selectedAdapterPosition != holder.bindingAdapterPosition){
 
-                                previousItemHolder?.bind?.let {
-                                    restoreState(it)
-                                }
-                            }
-                        }
-                        else {
-
-                            selectedAdapterPosition = holder.bindingAdapterPosition
-                            currentRadioStationID = item.radioStation.stationuuid
-
-                            previousItemHolder?.bind?.let {
-
-                                restoreState(it)
-                            }
-
-                        }
-                        selectedAdapterPosition = holder.bindingAdapterPosition
-                        previousItemHolder = holder
                     }
                 }
 
@@ -118,7 +116,10 @@ class PagingHistoryAdapter constructor(
     }
 
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, @SuppressLint("RecyclerView") position: Int) {
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        @SuppressLint("RecyclerView") position: Int
+    ) {
 
         val item = getItem(position) ?: return
 
@@ -156,13 +157,13 @@ class PagingHistoryAdapter constructor(
                     )
 
 
-                    if(station.stationuuid == currentRadioStationID){
+                    if(station.stationuuid == selectedRadioStationId){
 
-                        previousItemHolder?.bind?.let {
-                            restoreState(it)
-                        }
+//                        previousItemHolder?.bind?.let {
+//                            restoreState(it)
+//                        }
 
-                        previousItemHolder = holder
+//                        previousItemHolder = holder
                         selectedAdapterPosition = holder.bindingAdapterPosition
                         handleStationPlaybackState(this)
 
@@ -178,35 +179,89 @@ class PagingHistoryAdapter constructor(
 
     }
 
+
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        @SuppressLint("RecyclerView") position: Int,
+        payloads: MutableList<Any>
+    ) {
+
+        if(payloads.isEmpty())
+            super.onBindViewHolder(holder, position, payloads)
+        else {
+
+            val item = getItem(position) ?: return
+
+            if(item is StationWithDateModel.Station){
+
+                Logger.log("Update for : $position, restore = ${payloads[0] !is Int}")
+
+                (holder as StationViewHolder).apply {
+                    if(payloads[0] is Int){
+                        if(selectedRadioStationId == item.radioStation.stationuuid){
+                            selectedAdapterPosition = position
+                            handleStationPlaybackState(holder.bind)
+                        }
+                    } else restoreState(holder.bind)
+                }
+            }
+        }
+    }
+
 //    var separatorDefault = 0
 
 
+    fun updateSelectedItemValues(index : Int, id : String){
+        selectedAdapterPosition = index
+        selectedRadioStationId = id
+    }
+
+
+    fun onNewPlayingItem(newIndex : Int, id : String){
+
+
+        if(selectedAdapterPosition >= 0)
+            notifyItemChanged(selectedAdapterPosition, 1f)
+        updateSelectedItemValues(newIndex, id)
+        notifyItemChanged(selectedAdapterPosition, 1)
+    }
+
+
     fun updateStationPlaybackState(){
-       previousItemHolder?.let{
-           if(it.bindingAdapterPosition == selectedAdapterPosition){
-               handleStationPlaybackState(it.bind)
-           }
-       }
-    }
-
-
-    fun updateOnStationChange(stationId : String,
-                              holder : StationViewHolder?
-    ){
-        if(stationId != currentRadioStationID) {
-            currentRadioStationID = stationId
-            previousItemHolder?.bind?.let {
-                restoreState(it)
-            }
-        }
-        holder?.let {
-            selectedAdapterPosition = holder.bindingAdapterPosition
-            previousItemHolder = holder
-
-            handleStationPlaybackState(holder.bind)
-
+        if(selectedAdapterPosition >= 0){
+            notifyItemChanged(selectedAdapterPosition, 1)
         }
     }
+
+
+
+
+//    fun updateStationPlaybackState(){
+//       previousItemHolder?.let{
+//           if(it.bindingAdapterPosition == selectedAdapterPosition){
+//               handleStationPlaybackState(it.bind)
+//           }
+//       }
+//    }
+
+
+//    fun updateOnStationChange(stationId : String,
+//                              holder : StationViewHolder?
+//    ){
+//        if(stationId != this.selectedRadioStationId) {
+//            this.selectedRadioStationId = stationId
+//            previousItemHolder?.bind?.let {
+//                restoreState(it)
+//            }
+//        }
+//        holder?.let {
+//            selectedAdapterPosition = holder.bindingAdapterPosition
+//            previousItemHolder = holder
+//
+//            handleStationPlaybackState(holder.bind)
+//
+//        }
+//    }
 
 
 

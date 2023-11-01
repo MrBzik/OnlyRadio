@@ -347,6 +347,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             if(historyViewModel.currentTab.value == TAB_STATIONS
 
             ){
+
+                val id = station.stationuuid
                 val index =
 
                     if(historyViewModel.selectedDate == RadioService.selectedHistoryDate){
@@ -359,13 +361,12 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                         stationsHistoryAdapter?.snapshot()?.items?.indexOfFirst {
                             it is StationWithDateModel.Station && it.radioStation.stationuuid == station.stationuuid
                         }
-                    }
+                    } ?: -1
+
 
                 if(isToHandleNewStationObserver){
 
-
-
-                    if(index != -1 && index != null){
+                    if(index != -1){
                             handleNewRadioStation(index, station.stationuuid)
                         }
 //                    else {
@@ -373,8 +374,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 //                    }
 
                 } else {
-
                     isToHandleNewStationObserver = true
+                    stationsHistoryAdapter?.updateSelectedItemValues(index, id)
                 }
             }
         }
@@ -413,12 +414,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         bind.rvHistory.post {
 
-            val holder = bind.rvHistory
-                .findViewHolderForAdapterPosition(position)
-
-            holder?.let {
-                stationsHistoryAdapter?.updateOnStationChange(stationId, holder as PagingHistoryAdapter.StationViewHolder)
-            }
+            stationsHistoryAdapter?.onNewPlayingItem(position, stationId)
         }
     }
 
@@ -761,9 +757,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
            val isNewItem = mainViewModel.playOrToggleStation(station.stationuuid, flag,
                 itemIndex = position, isToChangeMediaItems = isToChangeMediaItems)
 
-            if(isToChangeMediaItems || isNewItem){
-                isToHandleNewStationObserver = false
-            }
+//            if(isToChangeMediaItems || isNewItem){
+//                isToHandleNewStationObserver = false
+//            }
         }
     }
 
