@@ -364,6 +364,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                     } ?: -1
 
 
+                Logger.log("INDEX IS : $index")
+
+
                 if(isToHandleNewStationObserver){
 
                     if(index != -1){
@@ -387,22 +390,16 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         val map = mainViewModel.radioSource.allHistoryMap
         val index = mainViewModel.getPlayerCurrentIndex()
 
-        if(index < map[0] - 2)
-            return index + 1
+        var shift = 1
 
-        else {
-            var shift = 3
-
-            for(i in 1 until map.size){
-
-                if (index < map[i] - 2)
-                    break
-                else shift += 2
-            }
-
-            return index + shift
-
+        for(i in map.indices){
+            if(index < map[i] - shift - 1)
+                break
+            else shift += 2
         }
+
+        return index + shift
+
     }
 
 
@@ -453,6 +450,16 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 addOnPagesUpdatedListener {
                     handleRvAnim()
+                }
+
+                restoreState {
+                    bind.rvHistory.post {
+                        try {
+                            handleRestoreState(it)
+                        } catch (e : Exception){
+                            Logger.log(e.stackTraceToString())
+                        }
+                    }
                 }
 
                 setStationsAdapterLoadStateListener()

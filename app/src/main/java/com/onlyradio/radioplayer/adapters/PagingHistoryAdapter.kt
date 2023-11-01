@@ -17,6 +17,7 @@ import com.onlyradio.radioplayer.ui.animations.AdapterFadeAnim.adapterItemFadeIn
 import com.onlyradio.radioplayer.utils.Logger
 import com.onlyradio.radioplayer.utils.Utils
 import java.text.DateFormat
+import java.util.Stack
 
 
 private const val TYPE_RADIO_STATION = 0
@@ -36,6 +37,8 @@ class PagingHistoryAdapter constructor(
     private var selectedAdapterPosition = -2
 
     private var previousItemHolder : StationViewHolder? = null
+
+//    private val selectedStack = Stack<Int>()
 
     class StationViewHolder (val bind: ItemRadioWithTextBinding)
         : RecyclerView.ViewHolder(bind.root)
@@ -66,6 +69,8 @@ class PagingHistoryAdapter constructor(
                         val item = getItem(holder.bindingAdapterPosition) as StationWithDateModel.Station
 
                         onItemClickListener?.let { click ->
+
+                            Logger.log("CLICK: ${holder.bindingAdapterPosition}")
 
                             click(item.radioStation, holder.bindingAdapterPosition)
                         }
@@ -159,12 +164,14 @@ class PagingHistoryAdapter constructor(
 
                     if(station.stationuuid == selectedRadioStationId){
 
-//                        previousItemHolder?.bind?.let {
-//                            restoreState(it)
-//                        }
+                        if(holder.bindingAdapterPosition != selectedAdapterPosition){
+                            restoreState?.let {
+                                it(selectedAdapterPosition)
+                            }
+                            selectedAdapterPosition = holder.bindingAdapterPosition
+                        }
 
-//                        previousItemHolder = holder
-                        selectedAdapterPosition = holder.bindingAdapterPosition
+
                         handleStationPlaybackState(this)
 
                     } else
@@ -190,6 +197,8 @@ class PagingHistoryAdapter constructor(
             super.onBindViewHolder(holder, position, payloads)
         else {
 
+            Logger.log("NOTIFY INDEX: $selectedAdapterPosition")
+
             val item = getItem(position) ?: return
 
             if(item is StationWithDateModel.Station){
@@ -199,8 +208,8 @@ class PagingHistoryAdapter constructor(
                 (holder as StationViewHolder).apply {
                     if(payloads[0] is Int){
                         if(selectedRadioStationId == item.radioStation.stationuuid){
-                            selectedAdapterPosition = position
                             handleStationPlaybackState(holder.bind)
+//                            selectedStack.push(selectedAdapterPosition)
                         }
                     } else restoreState(holder.bind)
                 }
@@ -210,6 +219,14 @@ class PagingHistoryAdapter constructor(
 
 //    var separatorDefault = 0
 
+    private var restoreState : ((pos : Int) -> Unit)? = null
+    fun restoreState(onRestore : (pos : Int) -> Unit){
+        restoreState = onRestore
+    }
+
+    fun handleRestoreState(pos : Int){
+        notifyItemChanged(pos, 1f)
+    }
 
     fun updateSelectedItemValues(index : Int, id : String){
         selectedAdapterPosition = index
@@ -218,12 +235,13 @@ class PagingHistoryAdapter constructor(
 
 
     fun onNewPlayingItem(newIndex : Int, id : String){
-
-
+        Logger.log("on new playing item: old: $selectedAdapterPosition, new: $newIndex")
+//        while (selectedStack.isNotEmpty())
+//            notifyItemChanged(selectedStack.pop(), 1f)
         if(selectedAdapterPosition >= 0)
             notifyItemChanged(selectedAdapterPosition, 1f)
         updateSelectedItemValues(newIndex, id)
-        notifyItemChanged(selectedAdapterPosition, 1)
+        notifyItemChanged(newIndex, 1)
     }
 
 

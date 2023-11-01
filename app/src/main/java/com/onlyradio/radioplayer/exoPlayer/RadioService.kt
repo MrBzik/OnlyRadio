@@ -1206,20 +1206,31 @@ class RadioService : MediaBrowserServiceCompat() {
 
     private fun adjustIndexFromHistory(index : Int) : Int {
 
-        return if(index < radioSource.allHistoryMap[0])
-            index -1
-        else {
+        val map = radioSource.allHistoryMap
 
-            var shift = 3
+        var shift = 1
 
-            for(i in 1 until radioSource.allHistoryMap.size){
-
-                if( index < radioSource.allHistoryMap[i])
-                    break
-                else shift += 2
-            }
-            index - shift
+        for(i in map.indices){
+            if(index < map[i])
+                break
+            else shift += 2
         }
+
+        return index - shift
+
+//        return if(index < map[0])
+//            index -1
+//        else {
+//            var shift = 3
+//
+//            for(i in 1 until map.size){
+//
+//                if( index < map[i])
+//                    break
+//                else shift += 2
+//            }
+//            index - shift
+//        }
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
