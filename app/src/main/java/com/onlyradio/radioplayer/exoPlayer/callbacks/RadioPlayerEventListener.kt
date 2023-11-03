@@ -146,7 +146,7 @@ class RadioPlayerEventListener (
                         RadioService.currentPlayingRecording.postValue(recording)
 
                         radioService.currentRadioStation?.let {
-                            RadioService.currentPlayingStation.postValue(null)
+                            RadioService.currentPlayingStation.value = (null)
                             radioService.currentRadioStation = null
                         }
                     }
@@ -159,7 +159,7 @@ class RadioPlayerEventListener (
             station?.let {
 
                 radioService.currentRadioStation = it
-                RadioService.currentPlayingStation.postValue(it)
+                RadioService.currentPlayingStation.value = (it)
 
                 radioService.currentRecording?.let {
                     RadioService.currentPlayingRecording.postValue(null)

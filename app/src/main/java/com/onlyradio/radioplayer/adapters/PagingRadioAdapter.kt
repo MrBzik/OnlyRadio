@@ -64,9 +64,7 @@ class PagingRadioAdapter @Inject constructor(
         else {
 
             if(payloads[0] is Int){
-                val id = getItem(position)?.stationuuid
-                if(selectedRadioStationId == id)
-                    handleStationPlaybackState(holder.bind)
+                handleStationPlaybackState(holder.bind)
 
             } else restoreState(holder.bind)
         }
@@ -108,17 +106,18 @@ class PagingRadioAdapter @Inject constructor(
     }
 
 
-    fun updateSelectedItemValues(index : Int, id : String){
+    fun updateSelectedItemValues(index : Int, id : String, isPlaying: Boolean){
+        currentPlaybackState = isPlaying
         selectedAdapterPosition = index
         selectedRadioStationId = id
     }
 
 
-    fun onNewPlayingItem(newIndex : Int, id : String){
-
-        if(selectedAdapterPosition >= 0)
+    fun onNewPlayingItem(newIndex : Int, id : String, isPlaying : Boolean){
+        Logger.log("onNewItem: old: $selectedAdapterPosition, new: $newIndex")
+        if(selectedAdapterPosition >= 0 && selectedAdapterPosition != newIndex)
             notifyItemChanged(selectedAdapterPosition, 1f)
-        updateSelectedItemValues(newIndex, id)
+        updateSelectedItemValues(newIndex, id, isPlaying)
         notifyItemChanged(selectedAdapterPosition, 1)
     }
 

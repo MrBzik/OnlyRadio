@@ -23,9 +23,13 @@ import com.onlyradio.radioplayer.exoPlayer.RadioServiceConnection
 import com.onlyradio.radioplayer.exoPlayer.RadioSource
 import com.onlyradio.radioplayer.repositories.BookmarksRepo
 import com.onlyradio.radioplayer.repositories.TitlesDatesRepo
+import com.onlyradio.radioplayer.utils.Commands.COMMAND_SWAP_MEDIA_ITEMS
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_UPDATE_HISTORY_MEDIA_ITEMS
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS
 import com.onlyradio.radioplayer.utils.Constants
+import com.onlyradio.radioplayer.utils.Constants.ITEM_ID
+import com.onlyradio.radioplayer.utils.Constants.ITEM_INDEX
+import com.onlyradio.radioplayer.utils.Constants.ITEM_INDEX_OLD
 import com.onlyradio.radioplayer.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -134,6 +138,7 @@ class HistoryViewModel @Inject constructor(
     private var isTitleHeaderSet = false
     private var dateToString = ""
 
+
     private suspend fun getTitlesInAllDates(pageIndex : Int, pageSize : Int) : List<TitleWithDateModel>{
 
 //        Log.d("CHECKTAGS", "callings all titles get fun")
@@ -203,6 +208,42 @@ class HistoryViewModel @Inject constructor(
 
 
 
+    fun onBindingToNewPosition(oldPos : Int, newPos : Int){
+        radioServiceConnection.sendCommand(COMMAND_SWAP_MEDIA_ITEMS,
+            bundleOf(
+                Pair(ITEM_INDEX, newPos),
+                Pair(ITEM_INDEX_OLD, oldPos)
+            )
+        )
+    }
+
+
+    fun isToChangeMediaItems() : Pair<Int, Boolean> {
+
+        val flag = if(selectedDate == 0L){
+            Constants.SEARCH_FROM_HISTORY
+        } else
+            Constants.SEARCH_FROM_HISTORY_ONE_DATE
+
+        var isToChangeMediaItems = false
+
+        if(selectedDate > 0 &&
+            RadioService.selectedHistoryDate != selectedDate){
+            RadioService.selectedHistoryDate = selectedDate
+            RadioSource.updateHistoryOneDateStations()
+            isToChangeMediaItems = true
+        }
+
+        else if (RadioService.currentMediaItems != flag){
+            isToChangeMediaItems = true
+        }
+
+        return Pair(flag, isToChangeMediaItems)
+
+    }
+
+
+
     private val _currentTab = MutableStateFlow(TAB_STATIONS)
     val currentTab = _currentTab.asStateFlow()
 
@@ -258,6 +299,8 @@ class HistoryViewModel @Inject constructor(
 
 
     var observableHistoryPages : Flow<HistoryData>? = null
+
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun initiateHistory(){

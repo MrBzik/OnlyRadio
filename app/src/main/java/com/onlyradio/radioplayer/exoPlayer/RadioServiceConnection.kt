@@ -15,6 +15,7 @@ import androidx.lifecycle.MutableLiveData
 import com.onlyradio.radioplayer.data.models.OnSnackRestore
 import com.onlyradio.radioplayer.utils.Constants.NETWORK_ERROR
 import com.onlyradio.radioplayer.utils.Event
+import com.onlyradio.radioplayer.utils.Logger
 import com.onlyradio.radioplayer.utils.Resource
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,8 +43,8 @@ class RadioServiceConnection (
     private val _playState = MutableStateFlow(false)
     val isPlaying = _playState.asStateFlow()
 
-    private val _currentRadioStation = MutableLiveData<MediaMetadataCompat?>()
-    val currentRadioStation : LiveData<MediaMetadataCompat?> = _currentRadioStation
+    private val _currentRadioStation = MutableStateFlow<MediaMetadataCompat?>(null)
+    val currentRadioStation = _currentRadioStation.asStateFlow()
 
     lateinit var mediaController : MediaControllerCompat
 
@@ -159,8 +160,7 @@ class RadioServiceConnection (
        }
 
        override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
-
-           _currentRadioStation.postValue(metadata)
+           _currentRadioStation.value = metadata
        }
 
        override fun onSessionEvent(event: String?, extras: Bundle?) {

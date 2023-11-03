@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,8 +18,10 @@ import com.onlyradio.radioplayer.adapters.PagingRadioAdapter
 import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.databinding.FragmentRadioSearchBinding
 import com.onlyradio.radioplayer.databinding.StubNoResultMessageBinding
+import com.onlyradio.radioplayer.domain.PlayingStationState
 import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.extensions.makeToast
+import com.onlyradio.radioplayer.extensions.observeFlow
 import com.onlyradio.radioplayer.ui.MainActivity
 import com.onlyradio.radioplayer.ui.animations.TextLoadAnim
 import com.onlyradio.radioplayer.ui.animations.slideAnim
@@ -27,10 +30,15 @@ import com.onlyradio.radioplayer.ui.dialogs.NameAutoDialog
 import com.onlyradio.radioplayer.ui.dialogs.SearchParamsDialog
 import com.onlyradio.radioplayer.ui.dialogs.TagPickerDialog
 import com.onlyradio.radioplayer.ui.stubs.NoResultMessage
+import com.onlyradio.radioplayer.ui.viewmodels.TAB_STATIONS
+import com.onlyradio.radioplayer.utils.Constants.CLICK_DEBOUNCE
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.onlyradio.radioplayer.utils.Logger
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -66,6 +74,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         initiateNewSearch = { initiateNewSearch() }
     )
 
+    private var stationClickJob : Job? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -82,9 +91,11 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         subscribeToStationsFlow()
 
-        observePlaybackState()
+        observeStationWithPlayback()
 
-        observeNewStation()
+//        observePlaybackState()
+//
+//        observeNewStation()
 
         setRecyclerViewAttachChildrenListener()
 
@@ -184,28 +195,63 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     }
 
 
-    private fun observeNewStation(){
+    private fun observeStationWithPlayback(){
 
-        RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
+        observeFlow(mainViewModel.isPlayingFlow.combine(RadioService.currentPlayingStation.asFlow()){ isPlaying, station ->
+            PlayingStationState(station?.stationuuid ?: "", isPlaying)
+        }){ state ->
+            if(RadioService.isFromRecording) return@observeFlow
 
-            val index = getCurrentItemPosition(station)
-            val id = station.stationuuid
+            val id = state.stationId
+            val index = getCurrentItemPosition(id)
 
-            if(isToHandleNewStationObserver){
-
-                if(index != -1){
-                    handleNewRadioStation(index, id)
-                }
-            }
-            else {
+            if(!isToHandleNewStationObserver){
                 isToHandleNewStationObserver = true
-                pagingRadioAdapter.updateSelectedItemValues(index, id)
+                pagingRadioAdapter.updateSelectedItemValues(index, id, state.isPlaying)
+                return@observeFlow
+            }
+
+
+            if(index >= 0){
+                handleNewRadioStation(index, id, state.isPlaying)
             }
         }
     }
 
 
-    private fun getCurrentItemPosition(station : RadioStation?) : Int {
+//    private fun observePlaybackState(){
+//        mainViewModel.isPlaying.observe(viewLifecycleOwner){ isPlaying ->
+//
+//            if(!RadioService.isFromRecording){
+//                if(pagingRadioAdapter.onPlaybackState(isPlaying)){
+//                    pagingRadioAdapter.updateStationPlaybackState()
+//                }
+//            }
+//        }
+//    }
+//
+//    private fun observeNewStation(){
+//
+//        RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
+//
+//            val index = getCurrentItemPosition(station.stationuuid)
+//            val id = station.stationuuid
+//
+//            if(isToHandleNewStationObserver){
+//
+//                if(index != -1){
+//                    handleNewRadioStation(index, id, false)
+//                }
+//            }
+//            else {
+//                isToHandleNewStationObserver = true
+//                pagingRadioAdapter.updateSelectedItemValues(index, id)
+//            }
+//        }
+//    }
+
+
+    private fun getCurrentItemPosition(stationId : String?) : Int {
 
         return if(RadioService.currentMediaItems == SEARCH_FROM_API )
 
@@ -215,7 +261,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
             pagingRadioAdapter.snapshot().items
                 .indexOfFirst {
-                    it.stationuuid == (station?.stationuuid
+                    it.stationuuid == (stationId
                         ?: RadioService.currentPlayingStation.value?.stationuuid)
 
         }
@@ -223,7 +269,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     }
 
 
-    private fun handleNewRadioStation(position : Int, stationId : String){
+    private fun handleNewRadioStation(position : Int, stationId : String, isPlaying: Boolean){
 
         bind.rvSearchStations.apply {
 
@@ -232,24 +278,13 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
                 post {
 
-                    pagingRadioAdapter.onNewPlayingItem(position, stationId)
+                    pagingRadioAdapter.onNewPlayingItem(position, stationId, isPlaying)
 
                 }
             }
         }
     }
 
-
-    private fun observePlaybackState(){
-        mainViewModel.isPlaying.observe(viewLifecycleOwner){ isPlaying ->
-
-            if(!RadioService.isFromRecording){
-                if(pagingRadioAdapter.onPlaybackState(isPlaying)){
-                    pagingRadioAdapter.updateStationPlaybackState()
-                }
-            }
-        }
-    }
 
 
 
@@ -257,10 +292,17 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
         pagingRadioAdapter.setOnClickListener { station, index ->
 
-           val isToChangeMediaItems = RadioService.currentMediaItems != SEARCH_FROM_API
+            if(stationClickJob?.isActive == true)
+                return@setOnClickListener
 
-            mainViewModel.playOrToggleStation(station.stationuuid, SEARCH_FROM_API,
-                itemIndex = index, isToChangeMediaItems = isToChangeMediaItems)
+            stationClickJob = lifecycleScope.launch {
+                val isToChangeMediaItems = RadioService.currentMediaItems != SEARCH_FROM_API
+
+                mainViewModel.playOrToggleStation(station.stationuuid, SEARCH_FROM_API,
+                    itemIndex = index, isToChangeMediaItems = isToChangeMediaItems)
+
+                delay(CLICK_DEBOUNCE)
+            }
         }
     }
 

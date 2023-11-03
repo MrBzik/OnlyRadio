@@ -19,6 +19,7 @@ import com.onlyradio.radioplayer.utils.Constants.BASE_RADIO_URL1
 import com.onlyradio.radioplayer.utils.Constants.BASE_RADIO_URL2
 import com.onlyradio.radioplayer.utils.Constants.BASE_RADIO_URL3
 import com.onlyradio.radioplayer.utils.Constants.IS_CHANGE_MEDIA_ITEMS
+import com.onlyradio.radioplayer.utils.Constants.IS_HISTORY_SWAP
 import com.onlyradio.radioplayer.utils.Constants.IS_NAME_EXACT
 import com.onlyradio.radioplayer.utils.Constants.IS_NEW_SEARCH
 import com.onlyradio.radioplayer.utils.Constants.IS_SAME_STATION
@@ -27,6 +28,7 @@ import com.onlyradio.radioplayer.utils.Constants.ITEM_INDEX
 import com.onlyradio.radioplayer.utils.Constants.PAGE_SIZE
 import com.onlyradio.radioplayer.utils.Constants.PLAY_WHEN_READY
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FLAG
+import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FULL_COUNTRY_NAME
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY
@@ -58,6 +60,8 @@ class MainViewModel @Inject constructor(
        val networkError = radioServiceConnection.networkError
 
        val isPlaying = radioServiceConnection.isPlaying.asLiveData()
+
+       val isPlayingFlow = radioServiceConnection.isPlaying
 
         var isPlayerFragInitialized = false
 
@@ -366,69 +370,32 @@ class MainViewModel @Inject constructor(
         searchFlag : Int,
         playWhenReady : Boolean = true,
         itemIndex : Int = -1,
-//            historyItemId : String? = null,
+        isHistorySwap : Boolean = false,
         isToChangeMediaItems : Boolean
-    ) : Boolean {
+    )  {
 
+        RadioService.currentMediaItems = searchFlag
         val isPrepared = radioServiceConnection.isPlaybackStatePrepared
+        val isSameItem = stationId == RadioService.currentPlayingStation.value?.stationuuid
+                && RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS
 
-        if(isPrepared && stationId == RadioService.currentPlayingStation.value?.stationuuid
-            && RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS
-        ){
-
-            RadioService.currentMediaItems = searchFlag
-
-            var isToPlay = false
-
-            isPlaying.value?.let { playbackState ->
-                when {
-                    playbackState -> {
-                        if(isToChangeMediaItems) isToPlay = false
-                        else
-                            radioServiceConnection.transportControls.pause()
-                    }
-
-                    !playbackState -> {
-                        if(isToChangeMediaItems) isToPlay = true
-                        else
-                            radioServiceConnection.transportControls.play()
-                    }
-                }
-            }
-
-            if(isToChangeMediaItems){
-
-                radioServiceConnection.transportControls
-                    .playFromMediaId(stationId, bundleOf(
-                        Pair(SEARCH_FLAG, searchFlag),
-                        Pair(PLAY_WHEN_READY, isToPlay),
-                        Pair(ITEM_INDEX, itemIndex),
-                        Pair(IS_CHANGE_MEDIA_ITEMS, true),
-                        Pair(IS_SAME_STATION, true)
-                    ))
-            }
-
-            return false
-        } else {
-
-//                id?.let {
-//                    radioServiceConnection.sendCommand(COMMAND_UPDATE_HISTORY,
-//                    bundleOf(Pair(ITEM_ID, it))
-//                    )
-//                }
-
-            RadioService.currentMediaItems = searchFlag
-            radioServiceConnection.transportControls
-                .playFromMediaId(stationId, bundleOf(
-                    Pair(SEARCH_FLAG, searchFlag),
-                    Pair(PLAY_WHEN_READY, playWhenReady),
-                    Pair(ITEM_INDEX, itemIndex),
-                    Pair(IS_CHANGE_MEDIA_ITEMS, isToChangeMediaItems),
-                    Pair(IS_SAME_STATION, false)
-                ))
-
-            return true
+        val isPlaying = isPlaying.value ?: false
+        if(isSameItem && isPrepared && !isToChangeMediaItems && !isHistorySwap){
+            if (isPlaying) radioServiceConnection.transportControls.pause()
+            else radioServiceConnection.transportControls.play()
+            return
         }
+
+        radioServiceConnection.transportControls
+            .playFromMediaId(stationId, bundleOf(
+                Pair(SEARCH_FLAG, searchFlag),
+                Pair(PLAY_WHEN_READY, if(isSameItem) !isPlaying else playWhenReady),
+                Pair(ITEM_INDEX, itemIndex),
+                Pair(IS_CHANGE_MEDIA_ITEMS, isToChangeMediaItems),
+                Pair(IS_SAME_STATION, isSameItem),
+                Pair(IS_HISTORY_SWAP, isHistorySwap)
+            ))
+
     }
 
 //    var isStationDetailsNavigated = false

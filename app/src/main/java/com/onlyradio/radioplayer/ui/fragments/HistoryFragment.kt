@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
@@ -31,9 +32,6 @@ import com.onlyradio.radioplayer.adapters.models.StationWithDateModel
 import com.onlyradio.radioplayer.data.local.entities.HistoryDate
 import com.onlyradio.radioplayer.databinding.FragmentHistoryBinding
 import com.onlyradio.radioplayer.exoPlayer.RadioService
-import com.onlyradio.radioplayer.exoPlayer.RadioSource
-import com.onlyradio.radioplayer.exoPlayer.isPlayEnabled
-import com.onlyradio.radioplayer.exoPlayer.isPlaying
 import com.onlyradio.radioplayer.ui.MainActivity
 import com.onlyradio.radioplayer.ui.animations.BounceEdgeEffectFactory
 import com.onlyradio.radioplayer.ui.animations.SwapTitlesUi
@@ -44,19 +42,26 @@ import com.onlyradio.radioplayer.ui.viewmodels.TAB_STATIONS
 import com.onlyradio.radioplayer.ui.viewmodels.TAB_TITLES
 import com.onlyradio.radioplayer.utils.Constants.FRAG_HISTORY
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
-import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
-import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.onlyradio.radioplayer.utils.SpinnerExt
 import com.onlyradio.radioplayer.utils.addAction
 import com.google.android.material.snackbar.Snackbar
 import com.onlyradio.radioplayer.domain.HistoryData
+import com.onlyradio.radioplayer.domain.PlayingStationState
 import com.onlyradio.radioplayer.extensions.makeToast
+import com.onlyradio.radioplayer.extensions.observeFlow
+import com.onlyradio.radioplayer.utils.Constants.CLICK_DEBOUNCE
+import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
 import com.onlyradio.radioplayer.utils.Logger
+import com.onlyradio.radioplayer.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.DateFormat
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -90,6 +95,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         ContextCompat.getSystemService(requireContext(), ClipboardManager::class.java)
     }
 
+    private var stationsClickJob : Job? = null
+
 
     companion object{
 
@@ -103,9 +110,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
         setupRecyclerView()
 
-        observePlaybackState()
-
-        observeNewStation()
+        observeStationWithPlayback()
 
         observeListOfDates()
 
@@ -124,6 +129,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         setFabPickDateClickListener()
 
         collectCurrentTabChanges()
+
+
 
     }
 
@@ -294,7 +301,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
 
 
-
     private fun setDatesSpinnerSelectListener(){
 
         bind.spinnerDates.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
@@ -325,63 +331,42 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
 
 
+    private fun observeStationWithPlayback(){
 
-    private fun observePlaybackState(){
-        mainViewModel.isPlaying.observe(viewLifecycleOwner){ isPlaying ->
+        observeFlow(mainViewModel.isPlayingFlow.combine(RadioService.currentPlayingStation.asFlow()){ isPlaying, station ->
+            PlayingStationState(station?.stationuuid ?: "", isPlaying)
+        }){ state ->
 
-            if(!RadioService.isFromRecording){
-                stationsHistoryAdapter?.let {
-                    if(it.onPlaybackState(isPlaying)){
-                        it.updateStationPlaybackState()
-                    }
+            if(historyViewModel.currentTab.value == TAB_STATIONS
+            ){
+                val id = state.stationId
+
+                val index = calculateIndex(id)
+
+                if(index >= 0){
+                    handleNewRadioStation(index, id, state.isPlaying)
                 }
             }
         }
     }
 
+    private fun calculateIndex(id : String) : Int {
 
-    private fun observeNewStation(){
-
-        RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
-
-            if(historyViewModel.currentTab.value == TAB_STATIONS
-
-            ){
-
-                val id = station.stationuuid
-                val index =
-
-                    if(historyViewModel.selectedDate == RadioService.selectedHistoryDate){
-                        mainViewModel.getPlayerCurrentIndex() + 1
-                    } else if(
-                        historyViewModel.selectedDate == 0L
-                        && RadioService.currentMediaItems == SEARCH_FROM_HISTORY) {
-                        adjustHistoryIndex()
-                    } else {
-                        stationsHistoryAdapter?.snapshot()?.items?.indexOfFirst {
-                            it is StationWithDateModel.Station && it.radioStation.stationuuid == station.stationuuid
-                        }
-                    } ?: -1
-
-
-                Logger.log("INDEX IS : $index")
-
-
-                if(isToHandleNewStationObserver){
-
-                    if(index != -1){
-                            handleNewRadioStation(index, station.stationuuid)
-                        }
-//                    else {
-//                            stationsHistoryAdapter?.updateOnStationChange(station.stationuuid, null)
-//                    }
-
-                } else {
-                    isToHandleNewStationObserver = true
-                    stationsHistoryAdapter?.updateSelectedItemValues(index, id)
-                }
+        return if(
+            RadioService.currentMediaItems == SEARCH_FROM_HISTORY_ONE_DATE &&
+            historyViewModel.selectedDate == RadioService.selectedHistoryDate){
+            mainViewModel.getPlayerCurrentIndex() + 1
+        } else if(
+            historyViewModel.selectedDate == 0L
+            && RadioService.currentMediaItems == SEARCH_FROM_HISTORY) {
+            adjustHistoryIndex()
+        } else {
+            stationsHistoryAdapter?.snapshot()?.items?.indexOfFirst {
+                it is StationWithDateModel.Station && it.radioStation.stationuuid == id
             }
-        }
+        } ?: -1
+
+
     }
 
 
@@ -403,15 +388,13 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     }
 
 
+    private fun handleNewRadioStation(position : Int, stationId : String, isPlaying : Boolean){
 
-
-    private fun handleNewRadioStation(position : Int, stationId : String){
-
-        bind.rvHistory.smoothScrollToPosition(position)
+        if(stationsHistoryAdapter?.getForSameItem(stationId) == null )
+            bind.rvHistory.smoothScrollToPosition(position)
 
         bind.rvHistory.post {
-
-            stationsHistoryAdapter?.onNewPlayingItem(position, stationId)
+            stationsHistoryAdapter?.onNewPlayingItem(position, stationId, isPlaying)
         }
     }
 
@@ -450,12 +433,16 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 addOnPagesUpdatedListener {
                     handleRvAnim()
+                    RadioService.currentPlayingStation.value?.let { station ->
+                        onNewFlow(calculateIndex(station.stationuuid))
+                    }
                 }
 
-                restoreState {
+                restoreState { oldPos, newPos ->
                     bind.rvHistory.post {
                         try {
-                            handleRestoreState(it)
+                            handleRestoreState(oldPos)
+                            historyViewModel.onBindingToNewPosition(oldPos, newPos)
                         } catch (e : Exception){
                             Logger.log(e.stackTraceToString())
                         }
@@ -463,15 +450,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 }
 
                 setStationsAdapterLoadStateListener()
-
-//                if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
-//                    RadioService.currentPlayingStation.value?.let {
-//                        val id =  it.stationuuid
-//                        currentRadioStationID = id
-//                    }
-//                } else {
-//                    currentRadioStationID = ""
-//                }
             }
 
             historyViewModel.setHistoryLiveData()
@@ -653,8 +631,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         }
     }
 
-
-
     private fun switchTitlesStationsUi(isToAnimate: Boolean) =
         SwapTitlesUi.swap(
             conditionA = historyViewModel.currentTab.value == TAB_STATIONS,
@@ -676,15 +652,14 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                     when(tab){
                         is HistoryData.StationsFlow -> {
-                            stationsHistoryAdapter
-                                ?.submitData(lifecycle, tab.data)
                             bind.tvHistoryMessage.visibility = View.INVISIBLE
+                            stationsHistoryAdapter?.submitData(lifecycle, tab.data)
+
                         }
 
                         is HistoryData.TitlesFlow -> {
-                            titlesHistoryAdapter
-                                ?.submitData(lifecycle, tab.data)
                             bind.tvHistoryMessage.visibility = View.INVISIBLE
+                            titlesHistoryAdapter?.submitData(lifecycle, tab.data)
                         }
 
                         is HistoryData.Bookmarks -> {
@@ -703,35 +678,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                             }
                         }
                     }
-
-
-
-//                    when(historyViewModel.currentTab.value){
-//                        TAB_STATIONS -> {
-//                            stationsHistoryAdapter
-//                                ?.submitData(lifecycle, it as PagingData<StationWithDateModel>)
-//                            bind.tvHistoryMessage.visibility = View.INVISIBLE
-//                        }
-//                        TAB_TITLES -> {
-//                            titlesHistoryAdapter
-//                                ?.submitData(lifecycle, it as PagingData<TitleWithDateModel>)
-//                            bind.tvHistoryMessage.visibility = View.INVISIBLE
-//                        }
-//                        TAB_BOOKMARKS -> {
-//                            bookmarkedTitlesAdapter.listOfTitles = it as List<BookmarkedTitle>
-//                            withContext(Dispatchers.Main){
-//                                bind.tvHistoryMessage.apply {
-//                                    if(it.isEmpty()){
-//                                        text = requireContext().resources.getString(R.string.bookmarks_message)
-//                                        visibility = View.VISIBLE
-//                                        slideAnim(400, 0, R.anim.fade_in_anim)
-//                                    } else {
-//                                        visibility = View.INVISIBLE
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
                 }
             }
         }
@@ -739,30 +685,28 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
 
 
+
     private fun setupAdapterClickListener(){
 
-        stationsHistoryAdapter?.setOnClickListener { station, position ->
+        stationsHistoryAdapter?.setOnClickListener { station, position, isToSwap ->
 
-            val flag = if(historyViewModel.selectedDate == 0L){
-                SEARCH_FROM_HISTORY
-            } else
-                SEARCH_FROM_HISTORY_ONE_DATE
+            if(stationsClickJob?.isActive == true)
+                return@setOnClickListener
 
-          var isToChangeMediaItems = false
+            stationsClickJob = lifecycleScope.launch {
+                val params = historyViewModel.isToChangeMediaItems()
 
-          if(historyViewModel.selectedDate > 0 &&
-                RadioService.selectedHistoryDate != historyViewModel.selectedDate){
-                RadioService.selectedHistoryDate = historyViewModel.selectedDate
-                RadioSource.updateHistoryOneDateStations()
-                isToChangeMediaItems = true
+                mainViewModel.playOrToggleStation(
+                    stationId = station.stationuuid,
+                    searchFlag = params.first,
+                    itemIndex = position,
+                    isToChangeMediaItems = params.second,
+                    isHistorySwap = isToSwap
+                )
+                delay(CLICK_DEBOUNCE)
             }
 
-            else if (RadioService.currentMediaItems != flag){
-                isToChangeMediaItems = true
-            }
 
-           val isNewItem = mainViewModel.playOrToggleStation(station.stationuuid, flag,
-                itemIndex = position, isToChangeMediaItems = isToChangeMediaItems)
 
 //            if(isToChangeMediaItems || isNewItem){
 //                isToHandleNewStationObserver = false

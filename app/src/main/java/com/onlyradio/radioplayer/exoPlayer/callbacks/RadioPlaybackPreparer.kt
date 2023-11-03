@@ -12,15 +12,16 @@ import com.onlyradio.radioplayer.utils.Constants.PLAY_WHEN_READY
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FLAG
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
+import com.onlyradio.radioplayer.utils.Constants.IS_HISTORY_SWAP
 
 class RadioPlaybackPreparer (
-
     private val radioSource: RadioSource,
     private val playerPrepared : (
 //        MediaMetadataCompat?,
-                                  flag: Int, playWhenReady : Boolean,
-                                  itemIndex : Int, isToChangeMediaItems : Boolean,
-                                  isSameStation : Boolean
+        flag: Int, playWhenReady : Boolean,
+        itemIndex : Int, isToChangeMediaItems : Boolean,
+        isSameStation : Boolean,
+        isHistorySwap : Boolean
     ) -> Unit,
     private val onCommand : (String, Bundle?) -> Unit
         ) : MediaSessionConnector.PlaybackPreparer {
@@ -45,29 +46,21 @@ class RadioPlaybackPreparer (
 
     override fun onPrepareFromMediaId(mediaId: String, playWhenReady: Boolean, extras: Bundle?) {
 
+        if (extras == null) return
 
-        var flag = 666
+        val flag = extras.getInt(SEARCH_FLAG, 0)
 
-        var isToPlay = true
+        val isToPlay = extras.getBoolean(PLAY_WHEN_READY, true)
 
-        var index = -1
+        val index = extras.getInt(ITEM_INDEX, -1)
 
-        var isToChangeMediaItems = false
+        val isToChangeMediaItems = extras.getBoolean(IS_CHANGE_MEDIA_ITEMS, false)
 
-        var isSameStation = false
+        val isSameStation = extras.getBoolean(IS_SAME_STATION, false)
 
-//        var historyId = ""
+        val isHistorySwap = extras.getBoolean(IS_HISTORY_SWAP, false)
 
-        extras?.let {
-            flag = it.getInt(SEARCH_FLAG, 0)
-            isToPlay = it.getBoolean(PLAY_WHEN_READY, true)
-            index = it.getInt(ITEM_INDEX, -1)
-            isToChangeMediaItems = it.getBoolean(IS_CHANGE_MEDIA_ITEMS, false)
-            isSameStation = it.getBoolean(IS_SAME_STATION, false)
-        }
-
-
-            playerPrepared(flag, isToPlay, index, isToChangeMediaItems, isSameStation)
+        playerPrepared(flag, isToPlay, index, isToChangeMediaItems, isSameStation, isHistorySwap)
 
     }
 

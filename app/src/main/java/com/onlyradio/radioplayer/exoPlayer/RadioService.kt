@@ -20,23 +20,48 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.media.MediaBrowserServiceCompat
 import com.bumptech.glide.RequestManager
+import com.google.android.exoplayer2.DefaultLoadControl
+import com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_MAX_BUFFER_MS
+import com.google.android.exoplayer2.DefaultRenderersFactory
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackParameters
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.audio.AudioAttributes
+import com.google.android.exoplayer2.audio.AuxEffectInfo
+import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
+import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
+import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
+import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.data.local.entities.Recording
+import com.onlyradio.radioplayer.data.local.relations.StationPlaylistCrossRef
+import com.onlyradio.radioplayer.data.models.OnRestoreMediaItem
+import com.onlyradio.radioplayer.data.models.OnSnackRestore
 import com.onlyradio.radioplayer.exoPlayer.callbacks.RadioPlaybackPreparer
 import com.onlyradio.radioplayer.exoPlayer.callbacks.RadioPlayerEventListener
 import com.onlyradio.radioplayer.exoPlayer.callbacks.RadioPlayerNotificationListener
+import com.onlyradio.radioplayer.exoRecord.ExoRecord
+import com.onlyradio.radioplayer.extensions.makeToast
+import com.onlyradio.radioplayer.repositories.BookmarksRepo
+import com.onlyradio.radioplayer.repositories.DatesRepo
 import com.onlyradio.radioplayer.repositories.FavRepo
+import com.onlyradio.radioplayer.repositories.LazyRepo
+import com.onlyradio.radioplayer.repositories.TitlesRepo
 import com.onlyradio.radioplayer.ui.fragments.FavStationsFragment
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_CHANGE_REVERB_MODE
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_CLEAR_MEDIA_ITEMS
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_NEW_SEARCH
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_ON_DROP_STATION_IN_PLAYLIST
+import com.onlyradio.radioplayer.utils.Commands.COMMAND_ON_SWIPE_DELETE
+import com.onlyradio.radioplayer.utils.Commands.COMMAND_ON_SWIPE_RESTORE
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_REMOVE_MEDIA_ITEM
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_REMOVE_RECORDING_MEDIA_ITEM
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_RESTART_PLAYER
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_RESTORE_RECORDING_MEDIA_ITEM
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_START_RECORDING
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_STOP_RECORDING
+import com.onlyradio.radioplayer.utils.Commands.COMMAND_SWAP_MEDIA_ITEMS
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_TOGGLE_REVERB
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_UPDATE_FAV_PLAYLIST
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_UPDATE_HISTORY_MEDIA_ITEMS
@@ -51,7 +76,11 @@ import com.onlyradio.radioplayer.utils.Constants.FOREGROUND_PREF
 import com.onlyradio.radioplayer.utils.Constants.IS_ADAPTIVE_LOADER_TO_USE
 import com.onlyradio.radioplayer.utils.Constants.IS_NEW_SEARCH
 import com.onlyradio.radioplayer.utils.Constants.IS_TO_CLEAR_HISTORY_ITEMS
+import com.onlyradio.radioplayer.utils.Constants.ITEM_ID
+import com.onlyradio.radioplayer.utils.Constants.ITEM_INDEX_OLD
 import com.onlyradio.radioplayer.utils.Constants.ITEM_INDEX
+import com.onlyradio.radioplayer.utils.Constants.ITEM_PLAYLIST
+import com.onlyradio.radioplayer.utils.Constants.ITEM_PLAYLIST_NAME
 import com.onlyradio.radioplayer.utils.Constants.MEDIA_ROOT_ID
 import com.onlyradio.radioplayer.utils.Constants.NO_ITEMS
 import com.onlyradio.radioplayer.utils.Constants.NO_PLAYLIST
@@ -67,36 +96,9 @@ import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_LAZY_LIST
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.onlyradio.radioplayer.utils.Constants.TITLE_UNKNOWN
+import com.onlyradio.radioplayer.utils.Logger
 import com.onlyradio.radioplayer.utils.Utils
 import com.onlyradio.radioplayer.utils.setPreset
-import com.google.android.exoplayer2.DefaultLoadControl
-import com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_MAX_BUFFER_MS
-import com.google.android.exoplayer2.DefaultRenderersFactory
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.PlaybackParameters
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.audio.AudioAttributes
-import com.google.android.exoplayer2.audio.AuxEffectInfo
-import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
-import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
-import com.google.android.exoplayer2.upstream.DefaultDataSource.Factory
-import com.onlyradio.radioplayer.R
-import com.onlyradio.radioplayer.data.local.relations.StationPlaylistCrossRef
-import com.onlyradio.radioplayer.data.models.OnRestoreMediaItem
-import com.onlyradio.radioplayer.data.models.OnSnackRestore
-import com.onlyradio.radioplayer.exoRecord.ExoRecord
-import com.onlyradio.radioplayer.extensions.makeToast
-import com.onlyradio.radioplayer.repositories.BookmarksRepo
-import com.onlyradio.radioplayer.repositories.DatesRepo
-import com.onlyradio.radioplayer.repositories.LazyRepo
-import com.onlyradio.radioplayer.repositories.TitlesRepo
-import com.onlyradio.radioplayer.utils.Commands.COMMAND_ON_SWIPE_DELETE
-import com.onlyradio.radioplayer.utils.Commands.COMMAND_ON_SWIPE_RESTORE
-import com.onlyradio.radioplayer.utils.Constants.ITEM_ID
-import com.onlyradio.radioplayer.utils.Constants.ITEM_PLAYLIST
-import com.onlyradio.radioplayer.utils.Constants.ITEM_PLAYLIST_NAME
-import com.onlyradio.radioplayer.utils.Logger
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -105,8 +107,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.lang.IllegalArgumentException
 import java.sql.Date
+import java.text.DateFormat
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -391,9 +393,13 @@ class RadioService : MediaBrowserServiceCompat() {
     private fun initializePlaybackPreparer() : RadioPlaybackPreparer {
         return RadioPlaybackPreparer(
             radioSource = radioSource,
-            playerPrepared = { flag, playWhenReady, itemIndex, isToChangeMediaItems, isSameStation ->
+            playerPrepared = { flag, playWhenReady, itemIndex, isToChangeMediaItems, isSameStation, isHistorySwap ->
 
                 var index = itemIndex
+
+                val date = Utils.convertLongToOnlyDate(selectedHistoryDate, DateFormat.MEDIUM)
+
+                Logger.log("PREPARE FLAG: $flag, index: $itemIndex, date: $date")
 
                 val isFromRecordings = flag == SEARCH_FROM_RECORDINGS
 
@@ -408,7 +414,8 @@ class RadioService : MediaBrowserServiceCompat() {
                     itemIndex =  index,
                     isToChangeMediaItems = isToChangeMediaItems,
                     isFromRecordings = isFromRecordings,
-                    isSameStation = isSameStation
+                    isSameStation = isSameStation,
+                    isHistorySwap = isHistorySwap
                 )
 
             },
@@ -562,6 +569,15 @@ class RadioService : MediaBrowserServiceCompat() {
                         onRemoveMediaItem(index)
 
                     }
+
+                    COMMAND_SWAP_MEDIA_ITEMS -> {
+
+                        extras?.let {
+                            swapMediaItems(it)
+                        }
+
+                    }
+
 //
 //                    COMMAND_RESTORE_MEDIA_ITEM -> {
 //
@@ -1078,14 +1094,43 @@ class RadioService : MediaBrowserServiceCompat() {
     }
 
 
+    private fun swapMediaItems(extras: Bundle){
+
+        val oldPos = adjustIndexFromHistory(extras.getInt(ITEM_INDEX_OLD))
+        val newPos = adjustIndexFromHistory(extras.getInt(ITEM_INDEX))
+
+        Logger.log("CUR POS is : $oldPos")
+        Logger.log("NEW POS IS : $newPos")
+
+        try {
+            val l = minOf(oldPos, newPos)
+            val r = maxOf(oldPos, newPos)
+
+            exoPlayer.moveMediaItem(l, r)
+            exoPlayer.moveMediaItem(r - 1, l)
+
+        } catch (e : Exception){
+            Logger.log(e.stackTraceToString())
+        }
+
+//                Assertions.checkArgument(fromIndex >= 0 && fromIndex <= toIndex && newFromIndex >= 0)
+
+
+        Logger.log("AFTER SHIFT POS IS : ${exoPlayer.currentMediaItemIndex}")
+
+    }
+
+
     private fun preparePlayer(
         playNow : Boolean,
         itemIndex : Int = -1,
         isToChangeMediaItems : Boolean = true,
         isFromRecordings : Boolean = false,
-        isSameStation : Boolean
+        isSameStation : Boolean,
+        isHistorySwap : Boolean = false
 
     ){
+
 
         isFromRecording = isFromRecordings
 
@@ -1105,15 +1150,16 @@ class RadioService : MediaBrowserServiceCompat() {
             delay(200)
 
             if(isToChangeMediaItems)
-                updateMediaItems( currentMediaItems, isSameStation, itemIndex)
+                updateMediaItems(currentMediaItems, isSameStation, itemIndex)
 
 
-            if(!isSameStation){
+            if(!isSameStation || isHistorySwap){
                 if(itemIndex >= 0 && exoPlayer.mediaItemCount > 0){
                     exoPlayer.seekToDefaultPosition(itemIndex)
                 }
                 exoPlayer.prepare()
             }
+
 
             exoPlayer.playWhenReady = playNow
         }
@@ -1154,8 +1200,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
             }
             SEARCH_FROM_HISTORY_ONE_DATE -> {
-
                 RadioSource.stationsFromHistoryOneDateMediaItems
+
 
             }
             SEARCH_FROM_LAZY_LIST -> {
@@ -1179,15 +1225,15 @@ class RadioService : MediaBrowserServiceCompat() {
 
             clearMediaItems(false)
 
-            if(index == 0){
-                if(items.size != 1)
-                    exoPlayer.addMediaItems(items.subList(1, items.lastIndex))
-            } else {
+            if(items.size == 1) return
 
+            if(index == 0){
+                exoPlayer.addMediaItems(items.subList(1, items.lastIndex))
+            } else {
                 exoPlayer.addMediaItems(0, items.subList(0, index))
 
                 if(index < items.lastIndex){
-                    exoPlayer.addMediaItems(items.subList(index + 1, items.lastIndex))
+                    exoPlayer.addMediaItems(items.subList(index + 1, items.size))
                 }
             }
 
@@ -1200,6 +1246,7 @@ class RadioService : MediaBrowserServiceCompat() {
 
             exoPlayer.setMediaItems(items)
         }
+
     }
 
     var isToIgnoreMediaItem = false

@@ -9,9 +9,12 @@ import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.databinding.ItemRadioWithTextBinding
 import com.onlyradio.radioplayer.extensions.loadImage
+import com.onlyradio.radioplayer.utils.Logger
 import com.onlyradio.radioplayer.utils.RandomColors
 
 interface AdapterUtils {
+
+    var currentPlaybackState : Boolean
 
     fun initialiseValues(context : Context, fontSize : Float)
 
@@ -30,15 +33,19 @@ interface AdapterUtils {
     )
 
     var onItemClickListener : ((RadioStation, Int) -> Unit)?
-
+    var historyItemClickListener : ((RadioStation, Int, Boolean) -> Unit)?
     fun setOnClickListener(listener : (RadioStation, Int) -> Unit)
+
+    fun setOnClickListener(listener : (RadioStation, Int, Boolean) -> Unit)
+
+
 }
 
 class AdapterUtilsImpl : AdapterUtils {
 
     private val randColors = RandomColors()
 
-    private var currentPlaybackState = false
+    override var currentPlaybackState = false
     private var defaultTextColor = 0
     private var selectedTextColor = 0
     private var defaultSecondaryTextColor = 0
@@ -82,7 +89,6 @@ class AdapterUtilsImpl : AdapterUtils {
     }
 
     override fun handleStationPlaybackState(bind: ItemRadioWithTextBinding){
-
         if(currentPlaybackState){
             bind.apply {
                 radioItemRootLayout.setBackgroundResource(playingBG)
@@ -169,8 +175,13 @@ class AdapterUtilsImpl : AdapterUtils {
 
     override var onItemClickListener : ((RadioStation, Int) -> Unit)? = null
 
+    override var historyItemClickListener: ((RadioStation, Int, Boolean) -> Unit)? = null
+
     override fun setOnClickListener(listener : (RadioStation, Int) -> Unit){
         onItemClickListener = listener
+    }
+    override fun setOnClickListener(listener: (RadioStation, Int, Boolean) -> Unit) {
+        historyItemClickListener = listener
     }
 
 }

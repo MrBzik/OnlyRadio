@@ -354,6 +354,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun observeNewStation(){
 
+
+
         RadioService.currentPlayingStation.observe(this){ station ->
 
             currentPlayingStation = station

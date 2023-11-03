@@ -58,6 +58,8 @@ object Constants {
 
     const val IS_NEW_SEARCH = "is new search"
 
+    const val CLICK_DEBOUNCE = 300L
+
     // MEDIA ITEMS
 
     const val NO_ITEMS = -2
@@ -71,6 +73,7 @@ object Constants {
     const val SEARCH_FROM_LAZY_LIST = 6
     const val PLAY_WHEN_READY = "play when ready"
     const val ITEM_INDEX = "index of item"
+    const val ITEM_INDEX_OLD = "previous id of an item"
     const val ITEM_ID = "id of item"
     const val ITEM_PLAYLIST = "playlist of an item"
     const val ITEM_PLAYLIST_NAME = "playlist's name of an item"
@@ -78,6 +81,8 @@ object Constants {
 
     const val IS_CHANGE_MEDIA_ITEMS = "id of station from history"
     const val IS_SAME_STATION = "is same radio station"
+
+    const val IS_HISTORY_SWAP = "is from history"
 
     const val TITLE_UNKNOWN = "Playing: no info"
 
@@ -211,7 +216,7 @@ enum class UpdatesStatus {
      const val COMMAND_ON_DROP_STATION_IN_PLAYLIST = "command on drop station in playlist"
      const val COMMAND_CHANGE_REVERB_MODE = "change reverb mode"
      const val COMMAND_TOGGLE_REVERB = "change bass boost level"
-
+     const val COMMAND_SWAP_MEDIA_ITEMS = "swap places of media items"
      const val COMMAND_ON_SWIPE_DELETE = "command on swipe delete"
      const val COMMAND_ON_SWIPE_RESTORE = "command on swipe restore"
  }
