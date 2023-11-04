@@ -29,6 +29,7 @@ import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.onlyradio.radioplayer.utils.toMediaMetadataCompat
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
+import com.onlyradio.radioplayer.utils.Logger
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -68,12 +69,17 @@ class RadioSource @Inject constructor(
 
         var stationsInPlaylist = mutableListOf<RadioStation>()
         var stationsInPlaylistMediaItems = mutableListOf<MediaItem>()
+        var stationsInPlaylistVisual = mutableListOf<RadioStation>()
 //        var isStationsInPlaylistUpdated = false
 
 
-        fun updatePlaylistStations(list : List<RadioStation>){
-           stationsInPlaylist = list.toMutableList()
-           stationsInPlaylistMediaItems = list.map {
+        fun updateVisualPlaylist(list : List<RadioStation>){
+            stationsInPlaylistVisual = list.toMutableList()
+        }
+
+        fun updatePlaylistStations(){
+           stationsInPlaylist = stationsInPlaylistVisual
+           stationsInPlaylistMediaItems = stationsInPlaylistVisual.map {
                MediaItem.fromUri(it.url!!)
            }.toMutableList()
 //            isStationsInPlaylistUpdated = true

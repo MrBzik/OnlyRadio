@@ -113,10 +113,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         observeStationWithPlaybackState()
 
-//        observeNewStation()
-
-//        observePlaybackState()
-
         subscribeToObservers()
 
         setMainAdapterClickListener()
@@ -168,31 +164,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     }
 
 
-//    private fun observeNewStation(){
-//
-//        RadioService.currentPlayingStation.observe(viewLifecycleOwner) { station ->
-//
-//            currentStation = station
-//
-////            if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
-//
-//            if (isToHandleNewStationObserver) {
-//
-//                    val index = getCurrentItemPosition(station.stationuuid)
-//
-//                    if (index != -1) {
-//                        handleNewRadioStation(index, station)
-//                    } else {
-//                        mainAdapter.updateOnStationChange(station, null)
-//                    }
-//                }
-//            else {
-//                    isToHandleNewStationObserver = true
-//                }
-////            }
-//        }
-//    }
-
     private fun getCurrentItemPosition(
         stationId: String?,
         list : List<RadioStation> = mainAdapter.listOfStations
@@ -223,18 +194,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         }
     }
 
-
-//    private fun observePlaybackState(){
-//
-//        mainViewModel.isPlaying.observe(viewLifecycleOwner){ isPlaying ->
-//
-//            if(!RadioService.isFromRecording){
-//                if(mainAdapter.onPlaybackState(isPlaying)){
-//                    mainAdapter.updateStationPlaybackState()
-//                }
-//            }
-//        }
-//    }
 
 
     private fun editPlaylistClickListener(){
@@ -418,8 +377,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         observeStations()
 
-//        observeUnfilteredPlaylist()
-
     }
 
 
@@ -599,33 +556,14 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             if(clickJob?.isActive == true) return@setOnClickListener
 
-//            var isToChangeMediaItems = false
-//
-//
-//           // When click on station from playlist and before that was another playlist or this is the first playlist
-//            if(currentPlaylistName != RadioService.currentPlaylistName && currentTab == SEARCH_FROM_PLAYLIST) {
-//                RadioSource.updatePlaylistStations(mainAdapter.listOfStations)
-//                RadioService.currentPlaylistName = currentPlaylistName
-//                isToChangeMediaItems = true
-//            }
-//
-//                // When flag changed
-//            else if(currentTab != RadioService.currentMediaItems){
-//                isToChangeMediaItems = true
-//
-//            }
-
             clickJob = lifecycleScope.launch {
 
-                favViewModel.isToChangeMediaItems { isToChangeMediaItems ->
-                    mainViewModel.playOrToggleStation(
-                        stationId = station.stationuuid,
-                        searchFlag = currentTab,
-                        itemIndex = position,
-                        isToChangeMediaItems = isToChangeMediaItems
-                    )
-                }
-
+                mainViewModel.playOrToggleStation(
+                    stationId = station.stationuuid,
+                    searchFlag = currentTab,
+                    itemIndex = position,
+                    isToChangeMediaItems = favViewModel.isToChangeMediaItems()
+                )
                 delay(CLICK_DEBOUNCE)
             }
         }
@@ -642,16 +580,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this)
 
             mainAdapter.initialiseValues(requireContext(), settingsViewModel.stationsTitleSize)
-
-
-//            if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
-//                RadioService.currentPlayingStation.value?.let {
-//                    val id =  it.stationuuid
-//                    mainAdapter.selectedRadioStationId = id
-//                }
-//            } else {
-//                mainAdapter.selectedRadioStationId = ""
-//            }
 
             layoutAnimation = (activity as MainActivity).layoutAnimationController
 

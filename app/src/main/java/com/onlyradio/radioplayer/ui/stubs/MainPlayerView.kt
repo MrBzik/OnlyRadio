@@ -1,5 +1,6 @@
 package com.onlyradio.radioplayer.ui.stubs
 
+import android.graphics.drawable.AnimatedVectorDrawable
 import android.support.v4.media.session.PlaybackStateCompat
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -32,25 +33,20 @@ class MainPlayerView(private val bind : StubPlayerActivityMainBinding,
 
 
 
-     fun handleIcons (playbackState: Boolean){
-         when{
-             playbackState -> {
-                 bind.ivTogglePlayCurrentStation
-                     .setImageResource(R.drawable.ic_pause_play)
-                 bind.tvStationTitle.apply {
-                     setTextColor(ContextCompat.getColor(bind.root.context,R.color.selected_text_color))
-                 }
-             }
-             !playbackState -> {
-                 bind.ivTogglePlayCurrentStation
-                     .setImageResource(R.drawable.ic_play_pause)
-                 bind.tvStationTitle.apply {
-                     setTextColor(ContextCompat.getColor(bind.root.context, R.color.regular_text_color))
-                 }
-             }
+    fun handleIcons (playbackState: Boolean){
 
-             else -> Unit
-         }
+        val colorId = if (playbackState)
+            R.color.selected_text_color
+        else R.color.regular_text_color
+        val drawableId = if (playbackState)
+            R.drawable.play_state_animate_to_playing
+        else R.drawable.play_state_animate_to_pause
+
+        val drawable = ContextCompat.getDrawable(bind.root.context, drawableId) as AnimatedVectorDrawable
+        bind.ivTogglePlayCurrentStation.setImageDrawable(drawable)
+        drawable.start()
+
+        bind.tvStationTitle.setTextColor(ContextCompat.getColor(bind.root.context, colorId))
     }
 
 

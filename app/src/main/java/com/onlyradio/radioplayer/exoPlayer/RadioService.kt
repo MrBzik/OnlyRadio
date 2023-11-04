@@ -655,13 +655,6 @@ class RadioService : MediaBrowserServiceCompat() {
     }
 
 
-    private fun saveDeletedItem(index : Int, playlist: Int){
-        lastDeletedStation = when(playlist){
-            SEARCH_FROM_FAVOURITES -> radioSource.stationsFavoured[index]
-            SEARCH_FROM_PLAYLIST -> RadioSource.stationsInPlaylist[index]
-            else -> null
-        }
-    }
 
 
     private fun onRemoveMediaItem(index : Int){
@@ -763,6 +756,15 @@ class RadioService : MediaBrowserServiceCompat() {
 
         radioServiceConnection.onSwipeHandled.send(OnSnackRestore(playlist, playlistName))
 
+    }
+
+
+    private fun saveDeletedItem(index : Int, playlist: Int){
+        lastDeletedStation = when(playlist){
+            SEARCH_FROM_FAVOURITES -> radioSource.stationsFavoured[index]
+            SEARCH_FROM_PLAYLIST -> RadioSource.stationsInPlaylistVisual[index]
+            else -> null
+        }
     }
 
 

@@ -55,15 +55,14 @@ class DatabaseViewModel @Inject constructor(
     var currentPlaylistName: MutableLiveData<String> = MutableLiveData("")
 
 
-    fun isToChangeMediaItems(onCompleted: (Boolean) -> Unit) = viewModelScope.launch {
+    fun isToChangeMediaItems() : Boolean {
 
         var isToChangeMediaItems = false
 
         // When click on station from playlist and before that was another playlist or this is the first playlist
         if(currentPlaylistName.value != RadioService.currentPlaylistName && favFragStationsSwitch.value == SEARCH_FROM_PLAYLIST) {
 
-            val list = stationsInPlaylistFlow.first()
-            RadioSource.updatePlaylistStations(list)
+            RadioSource.updatePlaylistStations()
 
             RadioService.currentPlaylistName = currentPlaylistName.value ?: ""
             isToChangeMediaItems = true
@@ -75,7 +74,7 @@ class DatabaseViewModel @Inject constructor(
 
         }
 
-        onCompleted(isToChangeMediaItems)
+        return isToChangeMediaItems
 
     }
 
@@ -132,7 +131,9 @@ class DatabaseViewModel @Inject constructor(
     var stationsInPlaylistFlow = currentPlaylistName.asFlow().flatMapLatest { playlistName ->
         repository.getStationsInPlaylistFlow(playlistName).map {
             it?.let {
-                sortStationsInPlaylist(it.radioStations, playlistName)
+                val list = sortStationsInPlaylist(it.radioStations, playlistName)
+                RadioSource.updateVisualPlaylist(list)
+                list
             } ?: emptyList()
         }
     }

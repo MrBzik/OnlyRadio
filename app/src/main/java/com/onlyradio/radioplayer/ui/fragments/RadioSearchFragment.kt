@@ -307,7 +307,7 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private fun setRecyclerViewAttachChildrenListener(){
 
-        var isInitialLaunch = false
+        var isInitialLaunch = true
 
         bind.rvSearchStations.addOnChildAttachStateChangeListener(
             object : RecyclerView.OnChildAttachStateChangeListener{
