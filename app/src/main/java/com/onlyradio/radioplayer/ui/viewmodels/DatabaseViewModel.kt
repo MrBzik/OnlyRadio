@@ -23,12 +23,20 @@ import com.onlyradio.radioplayer.utils.Constants.ITEM_PLAYLIST_NAME
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_LAZY_LIST
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
+import com.onlyradio.radioplayer.utils.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -45,6 +53,31 @@ class DatabaseViewModel @Inject constructor(
     val isStationFavoured: MutableLiveData<Boolean> = MutableLiveData()
 
     var currentPlaylistName: MutableLiveData<String> = MutableLiveData("")
+
+
+    fun isToChangeMediaItems(onCompleted: (Boolean) -> Unit) = viewModelScope.launch {
+
+        var isToChangeMediaItems = false
+
+        // When click on station from playlist and before that was another playlist or this is the first playlist
+        if(currentPlaylistName.value != RadioService.currentPlaylistName && favFragStationsSwitch.value == SEARCH_FROM_PLAYLIST) {
+
+            val list = stationsInPlaylistFlow.first()
+            RadioSource.updatePlaylistStations(list)
+
+            RadioService.currentPlaylistName = currentPlaylistName.value ?: ""
+            isToChangeMediaItems = true
+        }
+
+        // When flag changed
+        else if(favFragStationsSwitch.value != RadioService.currentMediaItems){
+            isToChangeMediaItems = true
+
+        }
+
+        onCompleted(isToChangeMediaItems)
+
+    }
 
 
     fun checkIfStationIsFavoured(stationID: String) = viewModelScope.launch {
@@ -141,12 +174,10 @@ class DatabaseViewModel @Inject constructor(
 
     }
 
-
     @OptIn(ExperimentalCoroutinesApi::class)
     val favFragStationsFlow = favFragStationsSwitch.asFlow().flatMapLatest {
         when (it) {
             SEARCH_FROM_FAVOURITES -> {
-
                 getAllFavStationsFlow
             }
             SEARCH_FROM_PLAYLIST -> stationsInPlaylistFlow
@@ -154,8 +185,8 @@ class DatabaseViewModel @Inject constructor(
         }
     }
 
-    private var getAllFavStationsFlow = repository.getAllFavStationsFlow()
 
+    private var getAllFavStationsFlow = repository.getAllFavStationsFlow()
 
 
     fun subscribeToStationsInPlaylist(playlistName: String)

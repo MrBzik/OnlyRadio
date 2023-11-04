@@ -1,6 +1,7 @@
 package com.onlyradio.radioplayer.adapters
 
 import android.content.Context
+import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -9,6 +10,7 @@ import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.databinding.ItemRadioWithTextBinding
 import com.onlyradio.radioplayer.extensions.loadImage
+import com.onlyradio.radioplayer.ui.animations.slideAnim
 import com.onlyradio.radioplayer.utils.Logger
 import com.onlyradio.radioplayer.utils.RandomColors
 
@@ -80,6 +82,9 @@ class AdapterUtilsImpl : AdapterUtils {
 
     override fun restoreState(bind: ItemRadioWithTextBinding){
         bind.apply {
+            viewPlayState?.let {
+                it.background = null
+            }
             radioItemRootLayout.setBackgroundResource(defaultBG)
             tvPrimary.setTextColor(defaultTextColor)
 
@@ -91,6 +96,16 @@ class AdapterUtilsImpl : AdapterUtils {
     override fun handleStationPlaybackState(bind: ItemRadioWithTextBinding){
         if(currentPlaybackState){
             bind.apply {
+                viewPlayState?.let {
+                    if(it.background == null){
+                        it.background = ContextCompat.getDrawable(it.context, R.drawable.ic_music_note)
+                        it.slideAnim(300, 0, R.anim.scale_in)
+                    } else {
+                        val drawable = ContextCompat.getDrawable(it.context, R.drawable.play_state_playing) as AnimatedVectorDrawable
+                        it.background = drawable
+                        drawable.start()
+                    }
+                }
                 radioItemRootLayout.setBackgroundResource(playingBG)
                 tvPrimary.setTextColor(selectedTextColor)
 
@@ -100,6 +115,16 @@ class AdapterUtilsImpl : AdapterUtils {
 
         } else {
             bind.apply {
+                viewPlayState?.let {
+
+                    if(it.background == null){
+                        it.background = ContextCompat.getDrawable(it.context, R.drawable.play_state_pause_def)
+                        it.slideAnim(300, 0, R.anim.scale_in)
+                    }
+                    val drawable = ContextCompat.getDrawable(it.context, R.drawable.play_state_stop) as AnimatedVectorDrawable
+                    it.background = drawable
+                    drawable.start()
+                }
                 radioItemRootLayout.setBackgroundResource(pausedBG)
                 tvPrimary.setTextColor(defaultTextColor)
 

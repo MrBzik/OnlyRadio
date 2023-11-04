@@ -51,8 +51,8 @@ import com.onlyradio.radioplayer.extensions.makeToast
 import com.onlyradio.radioplayer.extensions.observeFlow
 import com.onlyradio.radioplayer.utils.Constants.CLICK_DEBOUNCE
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
+import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.onlyradio.radioplayer.utils.Logger
-import com.onlyradio.radioplayer.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -61,7 +61,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.DateFormat
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -82,8 +81,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     @Inject
     lateinit var bookmarkedTitlesAdapter : BookmarkedTitlesAdapter
-
-    private var isToHandleNewStationObserver = false
 
     private var isBookmarkedTitlesObserverSet = false
 
@@ -259,6 +256,8 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
     private fun observeListOfDates(){
 
+        var isSpinnerSet = false
+
         historyViewModel.listOfDates.observe(viewLifecycleOwner){
 
             numberOfDates = it.size
@@ -295,9 +294,6 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             }
         }
     }
-
-
-    private var isSpinnerSet = false
 
 
 
@@ -337,14 +333,16 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
             PlayingStationState(station?.stationuuid ?: "", isPlaying)
         }){ state ->
 
-            if(historyViewModel.currentTab.value == TAB_STATIONS
+            if(historyViewModel.currentTab.value == TAB_STATIONS && RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS
             ){
+                stationsHistoryAdapter?.setPlaybackState(state.isPlaying)
+
                 val id = state.stationId
 
                 val index = calculateIndex(id)
 
                 if(index >= 0){
-                    handleNewRadioStation(index, id, state.isPlaying)
+                    handleNewRadioStation(index, id)
                 }
             }
         }
@@ -388,13 +386,16 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
     }
 
 
-    private fun handleNewRadioStation(position : Int, stationId : String, isPlaying : Boolean){
+    private fun handleNewRadioStation(position : Int, stationId : String){
 
-        if(stationsHistoryAdapter?.getForSameItem(stationId) == null )
+        if(stationsHistoryAdapter?.isSameId(stationId) == false)
             bind.rvHistory.smoothScrollToPosition(position)
 
         bind.rvHistory.post {
-            stationsHistoryAdapter?.onNewPlayingItem(position, stationId, isPlaying)
+            bind.rvHistory.findViewHolderForAdapterPosition(position)?.let { holder ->
+                if(holder is PagingHistoryAdapter.StationViewHolder)
+                    stationsHistoryAdapter?.onNewPlayingItem(position, stationId, holder)
+            }
         }
     }
 
@@ -434,14 +435,16 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
                 addOnPagesUpdatedListener {
                     handleRvAnim()
                     RadioService.currentPlayingStation.value?.let { station ->
-                        onNewFlow(calculateIndex(station.stationuuid))
+                        val index = calculateIndex(station.stationuuid)
+                        updateSelectedValues(index, station.stationuuid)
+                        setPlaybackState(mainViewModel.isPlaying.value ?: false)
                     }
                 }
 
-                restoreState { oldPos, newPos ->
+                onBindToNewPos { oldPos, newPos ->
                     bind.rvHistory.post {
                         try {
-                            handleRestoreState(oldPos)
+                            restoreState(oldPos)
                             historyViewModel.onBindingToNewPosition(oldPos, newPos)
                         } catch (e : Exception){
                             Logger.log(e.stackTraceToString())
@@ -760,9 +763,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
         stationsHistoryAdapter = null
         titlesHistoryAdapter = null
         _bind = null
-        isToHandleNewStationObserver = false
         isBookmarkedTitlesObserverSet = false
-        isSpinnerSet = false
     }
 
 

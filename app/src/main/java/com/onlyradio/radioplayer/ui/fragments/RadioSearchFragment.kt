@@ -51,8 +51,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private var isNewSearchForAnimations = true
 
-    private var isInitialLaunch = true
-
     @Inject
     lateinit var pagingRadioAdapter : PagingRadioAdapter
 
@@ -61,13 +59,9 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
     private var textLoadAnim : TextLoadAnim? = null
 
-    private var isToHandleNewStationObserver = false
-
     private var isToInitiateNewSearch = false
 
     private var bindNoResultMessage : StubNoResultMessageBinding? = null
-
-    private var isBindNoResultMessageInflated = false
 
     private var noResultMessage = NoResultMessage(
         postInitiateNewSearch = {isToInitiateNewSearch = true},
@@ -140,9 +134,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     private fun setSearchButton(){
 
         if(!mainViewModel.isFullAutoSearch){
-//            setDragListenerForLayout()
-//            setDragListenerForButton()
-//            getFabSearchPositionIfNeeded()
             listenSearchButton()
         }
     }
@@ -180,6 +171,9 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
 
     private fun observeNoResultDetector(){
+
+        var isBindNoResultMessageInflated = false
+
         mainViewModel.noResultDetection.observe(viewLifecycleOwner){ noResult ->
             if(noResult){
                 if(!isBindNoResultMessageInflated){
@@ -196,6 +190,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
 
     private fun observeStationWithPlayback(){
+
+        var isToHandleNewStationObserver = false
 
         observeFlow(mainViewModel.isPlayingFlow.combine(RadioService.currentPlayingStation.asFlow()){ isPlaying, station ->
             PlayingStationState(station?.stationuuid ?: "", isPlaying)
@@ -219,36 +215,6 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
     }
 
 
-//    private fun observePlaybackState(){
-//        mainViewModel.isPlaying.observe(viewLifecycleOwner){ isPlaying ->
-//
-//            if(!RadioService.isFromRecording){
-//                if(pagingRadioAdapter.onPlaybackState(isPlaying)){
-//                    pagingRadioAdapter.updateStationPlaybackState()
-//                }
-//            }
-//        }
-//    }
-//
-//    private fun observeNewStation(){
-//
-//        RadioService.currentPlayingStation.observe(viewLifecycleOwner){ station ->
-//
-//            val index = getCurrentItemPosition(station.stationuuid)
-//            val id = station.stationuuid
-//
-//            if(isToHandleNewStationObserver){
-//
-//                if(index != -1){
-//                    handleNewRadioStation(index, id, false)
-//                }
-//            }
-//            else {
-//                isToHandleNewStationObserver = true
-//                pagingRadioAdapter.updateSelectedItemValues(index, id)
-//            }
-//        }
-//    }
 
 
     private fun getCurrentItemPosition(stationId : String?) : Int {
@@ -274,12 +240,15 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         bind.rvSearchStations.apply {
 
             post {
-                smoothScrollToPosition(position)
+                if(!pagingRadioAdapter.isSameId(stationId))
+                    smoothScrollToPosition(position)
 
                 post {
 
-                    pagingRadioAdapter.onNewPlayingItem(position, stationId, isPlaying)
-
+                    findViewHolderForAdapterPosition(position)?.let {holder ->
+                        if(holder is PagingRadioAdapter.RadioItemHolder)
+                            pagingRadioAdapter.onNewPlayingItem(position, stationId, isPlaying, holder)
+                    }
                 }
             }
         }
@@ -337,6 +306,9 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
 
     private fun setRecyclerViewAttachChildrenListener(){
+
+        var isInitialLaunch = false
+
         bind.rvSearchStations.addOnChildAttachStateChangeListener(
             object : RecyclerView.OnChildAttachStateChangeListener{
                 override fun onChildViewAttachedToWindow(view: View) {
@@ -378,15 +350,8 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
 
 
     private fun subscribeToStationsFlow(){
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED){
-                mainViewModel.stationsFlow.collectLatest {
-
-                    pagingRadioAdapter.submitData(it)
-
-                }
-            }
+        observeFlow(mainViewModel.stationsFlow){
+            pagingRadioAdapter.submitData(it)
         }
     }
 
@@ -525,30 +490,18 @@ class RadioSearchFragment : BaseFragment<FragmentRadioSearchBinding>(
         mainViewModel.hasInternetConnection.observe(viewLifecycleOwner){
 
             bind.ivNoInternet.isVisible = !it
-
-
-//            if(mainViewModel.isWaitingForNewSearch || mainViewModel.isWaitingForNewPage){
-//                bind.ivNoInternet.isVisible = true
-//            }
-
         }
-
-//        mainViewModel.isServerNotResponding.observe(viewLifecycleOwner){
-//            bind.ivNoInternet.isVisible = it
-//        }
     }
 
 
     override fun onDestroyView() {
         super.onDestroyView()
         noResultMessage.isNoResultClickLogicSet = false
-        isBindNoResultMessageInflated = false
         bind.rvSearchStations.adapter = null
+        pagingRadioAdapter.restoreState()
         textLoadAnim = null
         _bind = null
         bindNoResultMessage = null
-        isInitialLaunch = true
-        isToHandleNewStationObserver = false
         isNewSearchForAnimations = true
 
     }

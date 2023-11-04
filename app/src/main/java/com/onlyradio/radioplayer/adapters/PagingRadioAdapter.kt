@@ -41,8 +41,6 @@ class PagingRadioAdapter @Inject constructor(
                 item?.let { station ->
                     onItemClickListener?.let { click ->
                         click(station, holder.bindingAdapterPosition)
-
-//                        updateOnStationChange(station, holder, true)
                     }
                 }
             }
@@ -62,13 +60,8 @@ class PagingRadioAdapter @Inject constructor(
         if(payloads.isEmpty())
             super.onBindViewHolder(holder, position, payloads)
         else {
-
-            if(payloads[0] is Int){
-                handleStationPlaybackState(holder.bind)
-
-            } else restoreState(holder.bind)
+            restoreState(holder.bind)
         }
-
     }
 
 
@@ -105,7 +98,6 @@ class PagingRadioAdapter @Inject constructor(
         glide.clear(holder.bind.ivItemImage)
     }
 
-
     fun updateSelectedItemValues(index : Int, id : String, isPlaying: Boolean){
         currentPlaybackState = isPlaying
         selectedAdapterPosition = index
@@ -113,19 +105,20 @@ class PagingRadioAdapter @Inject constructor(
     }
 
 
-    fun onNewPlayingItem(newIndex : Int, id : String, isPlaying : Boolean){
-        Logger.log("onNewItem: old: $selectedAdapterPosition, new: $newIndex")
+    fun onNewPlayingItem(newIndex : Int, id : String, isPlaying : Boolean, holder: RadioItemHolder){
         if(selectedAdapterPosition >= 0 && selectedAdapterPosition != newIndex)
-            notifyItemChanged(selectedAdapterPosition, 1f)
+            notifyItemChanged(selectedAdapterPosition, 1)
         updateSelectedItemValues(newIndex, id, isPlaying)
-        notifyItemChanged(selectedAdapterPosition, 1)
+        handleStationPlaybackState(holder.bind)
     }
 
+    fun isSameId(id: String) : Boolean {
+        return selectedRadioStationId == id
+    }
 
-    fun updateStationPlaybackState(){
-        if(selectedAdapterPosition >= 0){
-            notifyItemChanged(selectedAdapterPosition, 1)
-        }
+    fun restoreState(){
+        selectedRadioStationId = ""
+        selectedAdapterPosition = -2
     }
 
 

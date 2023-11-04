@@ -171,8 +171,8 @@ class HistoryViewModel @Inject constructor(
     }
 
 
-    var isTitleOneDateHeaderSet = false
-    var isTitleOneDateFooterSet = false
+    private var isTitleOneDateHeaderSet = false
+    private var isTitleOneDateFooterSet = false
 
     private suspend fun getTitlesInOneDate(pageIndex : Int, pageSize : Int): List<TitleWithDateModel> {
 

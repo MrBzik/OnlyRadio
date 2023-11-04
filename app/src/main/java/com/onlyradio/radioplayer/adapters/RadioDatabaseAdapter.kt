@@ -14,6 +14,7 @@ import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.databinding.ItemRadioWithTextBinding
 import com.onlyradio.radioplayer.ui.animations.AdapterFadeAnim.adapterItemFadeIn
 import com.onlyradio.radioplayer.ui.fragments.FavStationsFragment
+import com.onlyradio.radioplayer.utils.Logger
 import javax.inject.Inject
 
 class RadioDatabaseAdapter @Inject constructor(
@@ -21,6 +22,11 @@ class RadioDatabaseAdapter @Inject constructor(
 ) : RecyclerView.Adapter<RadioDatabaseAdapter.RadioItemHolder>(), AdapterUtils by AdapterUtilsImpl() {
 
 
+    private var selectedAdapterPosition = -2
+
+    private var selectedRadioStationId = ""
+
+//    private var previousItemHolder : RadioItemHolder? = null
     class RadioItemHolder (val bind : ItemRadioWithTextBinding) : RecyclerView.ViewHolder(bind.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RadioItemHolder {
@@ -51,7 +57,7 @@ class RadioDatabaseAdapter @Inject constructor(
                 onItemClickListener?.let { click ->
                     click(station, holder.bindingAdapterPosition)
 
-                    updateOnStationChange(station, holder, true)
+//                    updateOnStationChange(station, holder, true)
                 }
             }
         }
@@ -74,9 +80,9 @@ class RadioDatabaseAdapter @Inject constructor(
              )
         }
 
-        if(station.stationuuid == currentRadioStationId) {
+        if(station.stationuuid == selectedRadioStationId) {
             selectedAdapterPosition = holder.bindingAdapterPosition
-            previousItemHolder = holder
+//            previousItemHolder = holder
             handleStationPlaybackState(holder.bind)
         } else
             restoreState(holder.bind)
@@ -85,45 +91,79 @@ class RadioDatabaseAdapter @Inject constructor(
 
     }
 
-    private var selectedAdapterPosition = -2
 
-
-//    var separatorDefault = 0
-
-    var currentRadioStationId : String? = null
-
-    private var previousItemHolder : RadioItemHolder? = null
-
-
-
-
-    fun updateStationPlaybackState(){
-        previousItemHolder?.let{
-            if(it.bindingAdapterPosition == selectedAdapterPosition){
-                handleStationPlaybackState(it.bind)
-            }
+    override fun onBindViewHolder(
+        holder: RadioItemHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        if(payloads.isEmpty())
+            super.onBindViewHolder(holder, position, payloads)
+        else {
+            restoreState(holder.bind)
         }
     }
 
-    fun updateOnStationChange(station : RadioStation, holder : RadioItemHolder?,
-                              isClicked : Boolean = false
-    ){
-        if(station.stationuuid != currentRadioStationId) {
-            currentRadioStationId = station.stationuuid
-            previousItemHolder?.bind?.let {
-                restoreState(it)
-            }
-        }
-        holder?.let {
-            selectedAdapterPosition = holder.bindingAdapterPosition
-            previousItemHolder = holder
-            if(!isClicked){
-                handleStationPlaybackState(holder.bind)
-            }
-        } ?: kotlin.run {
-            selectedAdapterPosition = -2
-        }
+    fun updateSelectedItemValues(index : Int, id : String){
+        selectedAdapterPosition = index
+        selectedRadioStationId = id
     }
+
+    fun updatePlaybackState(isPlaying: Boolean){
+        currentPlaybackState = isPlaying
+    }
+
+
+    fun isSameId(id: String) : Boolean {
+        return selectedRadioStationId == id
+    }
+
+    fun onNewPlayingItem(newIndex : Int, id : String, holder: RadioItemHolder){
+        Logger.log("PREV INDEX: $selectedAdapterPosition, newIndex: $newIndex")
+        if(selectedAdapterPosition >= 0 && selectedAdapterPosition != newIndex)
+            notifyItemChanged(selectedAdapterPosition, 1)
+        updateSelectedItemValues(newIndex, id)
+        Logger.log("isPlaying: $currentPlaybackState")
+        handleStationPlaybackState(holder.bind)
+    }
+
+    fun updateSelectedIndex(index: Int){
+        selectedAdapterPosition = index
+    }
+
+    fun restoreState(){
+        selectedRadioStationId = ""
+        selectedAdapterPosition = -2
+    }
+
+
+//    fun updateStationPlaybackState(){
+//        previousItemHolder?.let{
+//            if(it.bindingAdapterPosition == selectedAdapterPosition){
+//                handleStationPlaybackState(it.bind)
+//            }
+//        }
+//    }
+//
+//    fun updateOnStationChange(station : RadioStation, holder : RadioItemHolder?,
+//                              isClicked : Boolean = false
+//    ){
+//        if(station.stationuuid != currentRadioStationId) {
+//            currentRadioStationId = station.stationuuid
+//            previousItemHolder?.bind?.let {
+//                restoreState(it)
+//            }
+//        }
+//        holder?.let {
+//            selectedAdapterPosition = holder.bindingAdapterPosition
+//            previousItemHolder = holder
+//            if(!isClicked){
+//                handleStationPlaybackState(holder.bind)
+//            }
+//        } ?: kotlin.run {
+//            selectedAdapterPosition = -2
+//        }
+//    }
 
 
     override fun getItemCount(): Int {

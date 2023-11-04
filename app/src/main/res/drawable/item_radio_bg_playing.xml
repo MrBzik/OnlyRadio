@@ -13,12 +13,15 @@
         </shape>
     </item>
 
-    <item
-        android:drawable="@drawable/ic_music_note"
-        android:gravity="end"
-        android:height="75dp"
-        android:width="75dp"
-        >
-    </item>
 
 </ripple>
+
+<!--<item-->
+<!--android:drawable="@drawable/ic_music_note"-->
+<!--android:gravity="end"-->
+<!--android:height="75dp"-->
+<!--android:width="75dp"-->
+<!--    >-->
+
+
+<!--</item>-->

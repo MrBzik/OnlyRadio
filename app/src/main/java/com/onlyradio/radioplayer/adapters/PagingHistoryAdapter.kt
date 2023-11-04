@@ -8,12 +8,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.onlyradio.radioplayer.adapters.models.StationWithDateModel
-import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.databinding.ItemDateSeparatorBinding
 import com.onlyradio.radioplayer.databinding.ItemDateSeparatorEnclosingBinding
 import com.onlyradio.radioplayer.databinding.ItemRadioWithTextBinding
 import com.onlyradio.radioplayer.ui.animations.AdapterFadeAnim.adapterItemFadeIn
-import com.onlyradio.radioplayer.utils.Logger
 import com.onlyradio.radioplayer.utils.Utils
 import java.text.DateFormat
 
@@ -138,7 +136,7 @@ class PagingHistoryAdapter constructor(
                     if(station.stationuuid == selectedRadioStationId){
                         if(holder.bindingAdapterPosition != selectedAdapterPosition){
 
-                            restoreState?.let {
+                            onBindToNewPos?.let {
                                 it(selectedAdapterPosition, holder.bindingAdapterPosition)
                             }
                             selectedAdapterPosition = holder.bindingAdapterPosition
@@ -162,62 +160,45 @@ class PagingHistoryAdapter constructor(
         @SuppressLint("RecyclerView") position: Int,
         payloads: MutableList<Any>
     ) {
-
         if(payloads.isEmpty())
             super.onBindViewHolder(holder, position, payloads)
         else {
-
             if(holder is StationViewHolder){
-                if(payloads[0] is Int){
-                    handleStationPlaybackState(holder.bind)
-                } else restoreState(holder.bind)
+                restoreState(holder.bind)
             }
-
-//            val item = getItem(position) ?: return
-//
-//            if(item is StationWithDateModel.Station){
-//
-//                (holder as StationViewHolder).apply {
-//                    if(payloads[0] is Int){
-//                        if(selectedRadioStationId == item.radioStation.stationuuid){
-//                            handleStationPlaybackState(holder.bind)
-//                        }
-//                    } else restoreState(holder.bind)
-//                }
-//            }
         }
     }
 
 //    var separatorDefault = 0
 
-    private var restoreState : ((oldPos : Int, newPos : Int) -> Unit)? = null
-    fun restoreState(onRestore : (oldPos : Int, newPos : Int) -> Unit){
-        restoreState = onRestore
+    private var onBindToNewPos : ((oldPos : Int, newPos : Int) -> Unit)? = null
+    fun onBindToNewPos(onRestore : (oldPos : Int, newPos : Int) -> Unit){
+        onBindToNewPos = onRestore
     }
 
-    fun handleRestoreState(pos : Int){
-        notifyItemChanged(pos, 1f)
+    fun restoreState(pos : Int){
+        notifyItemChanged(pos, 1)
     }
 
-    fun onNewFlow(index: Int){
-        selectedAdapterPosition = index
-    }
-
-    fun getForSameItem(id: String) : Int? {
-        if(id == selectedRadioStationId && selectedAdapterPosition >= 0)
-            return selectedAdapterPosition
-        return null
-    }
-
-    fun onNewPlayingItem(newIndex : Int, id : String, isPlaying: Boolean){
+    fun setPlaybackState(isPlaying: Boolean){
         currentPlaybackState = isPlaying
-        if(selectedAdapterPosition >= 0 && selectedAdapterPosition != newIndex)
-            notifyItemChanged(selectedAdapterPosition, 1f)
-        selectedAdapterPosition = newIndex
-        selectedRadioStationId = id
-        notifyItemChanged(newIndex, 1)
     }
 
+    fun updateSelectedValues(index: Int, stationId: String){
+        selectedAdapterPosition = index
+        selectedRadioStationId = stationId
+    }
+
+    fun isSameId(id: String) : Boolean {
+        return selectedRadioStationId == id
+    }
+
+    fun onNewPlayingItem(newIndex : Int, id : String, holder : StationViewHolder){
+        if(selectedAdapterPosition >= 0 && selectedAdapterPosition != newIndex)
+            notifyItemChanged(selectedAdapterPosition, 1)
+        updateSelectedValues(newIndex, id)
+        handleStationPlaybackState(holder.bind)
+    }
 
 
     override fun getItemViewType(position: Int): Int {

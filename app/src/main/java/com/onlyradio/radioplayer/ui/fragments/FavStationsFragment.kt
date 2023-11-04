@@ -4,6 +4,7 @@ package com.onlyradio.radioplayer.ui.fragments
 import android.content.res.Configuration
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -12,6 +13,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -26,8 +28,6 @@ import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.databinding.FragmentFavStationsBinding
 import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.exoPlayer.RadioSource
-import com.onlyradio.radioplayer.exoPlayer.isPlayEnabled
-import com.onlyradio.radioplayer.exoPlayer.isPlaying
 import com.onlyradio.radioplayer.ui.MainActivity
 import com.onlyradio.radioplayer.ui.animations.BounceEdgeEffectFactory
 import com.onlyradio.radioplayer.ui.animations.SwipeToDeleteCallback
@@ -43,10 +43,18 @@ import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.onlyradio.radioplayer.utils.dpToP
 import com.google.android.material.snackbar.Snackbar
+import com.onlyradio.radioplayer.domain.PlayingStationState
+import com.onlyradio.radioplayer.extensions.observeFlow
 import com.onlyradio.radioplayer.extensions.snackbarSimple
+import com.onlyradio.radioplayer.utils.Constants
+import com.onlyradio.radioplayer.utils.Constants.CLICK_DEBOUNCE
+import com.onlyradio.radioplayer.utils.Logger
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -68,9 +76,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     private var isPlaylistsVisible = false
 
-    private var searchFlag : Int = 1
-
-    private var currentStation : RadioStation? = null
 
     @Inject
     lateinit var mainAdapter: RadioDatabaseAdapter
@@ -84,10 +89,9 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     private var currentPlaylistPosition = 0
 
-    private var isToHandleNewStationObserver = false
-
     private var isOnViewCreated = false
 
+    private var currentStationId = ""
     companion object{
 
         var dragAndDropItemPos = -1
@@ -107,9 +111,11 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
         setupPlaylistRecycleView()
 
-        observeNewStation()
+        observeStationWithPlaybackState()
 
-        observePlaybackState()
+//        observeNewStation()
+
+//        observePlaybackState()
 
         subscribeToObservers()
 
@@ -130,74 +136,105 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     }
 
 
+    private fun observeStationWithPlaybackState(){
 
+        var isToHandleNewStationObserver = false
 
-    private fun observeNewStation(){
+        observeFlow(mainViewModel.isPlayingFlow.combine(RadioService.currentPlayingStation.asFlow()){ isPlaying, station ->
+            PlayingStationState(station?.stationuuid ?: "", isPlaying)
+        }){ state ->
 
-        RadioService.currentPlayingStation.observe(viewLifecycleOwner) { station ->
+            if(RadioService.isFromRecording) return@observeFlow
 
-            currentStation = station
+            mainAdapter.updatePlaybackState(state.isPlaying)
 
-//            if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
+            currentStationId = state.stationId
 
-            if (isToHandleNewStationObserver) {
+            val id = state.stationId
+            val index = getCurrentItemPosition(id)
 
-                    val index = getCurrentItemPosition(station)
+            Logger.log("ON NEW ST: $index")
 
-                    if (index != -1) {
-                        handleNewRadioStation(index, station)
-                    } else {
-                        mainAdapter.updateOnStationChange(station, null)
-                    }
-                }
-            else {
-                    isToHandleNewStationObserver = true
-                }
-//            }
+            if(!isToHandleNewStationObserver){
+                isToHandleNewStationObserver = true
+                mainAdapter.updateSelectedItemValues(index, id)
+                return@observeFlow
+            }
+
+            if(index >= 0){
+                handleNewRadioStation(index, id)
+            }
         }
     }
 
-    private fun getCurrentItemPosition(station : RadioStation?) : Int {
-        if(currentTab == SEARCH_FROM_FAVOURITES && RadioService.currentMediaItems == SEARCH_FROM_FAVOURITES ||
-            currentTab == SEARCH_FROM_PLAYLIST && RadioService.currentMediaItems == SEARCH_FROM_PLAYLIST &&
-            currentPlaylistName == RadioService.currentPlaylistName ||
-            currentTab == SEARCH_FROM_LAZY_LIST && RadioService.currentMediaItems == SEARCH_FROM_LAZY_LIST
-        )
-            return mainViewModel.getPlayerCurrentIndex()
 
-        else return mainAdapter.listOfStations
-            .indexOfFirst {
-                it.stationuuid == station?.stationuuid
+//    private fun observeNewStation(){
+//
+//        RadioService.currentPlayingStation.observe(viewLifecycleOwner) { station ->
+//
+//            currentStation = station
+//
+////            if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
+//
+//            if (isToHandleNewStationObserver) {
+//
+//                    val index = getCurrentItemPosition(station.stationuuid)
+//
+//                    if (index != -1) {
+//                        handleNewRadioStation(index, station)
+//                    } else {
+//                        mainAdapter.updateOnStationChange(station, null)
+//                    }
+//                }
+//            else {
+//                    isToHandleNewStationObserver = true
+//                }
+////            }
+//        }
+//    }
+
+    private fun getCurrentItemPosition(
+        stationId: String?,
+        list : List<RadioStation> = mainAdapter.listOfStations
+    ) : Int {
+        return if(currentTab == RadioService.currentMediaItems && currentTab != SEARCH_FROM_PLAYLIST ||
+            currentTab == RadioService.currentMediaItems && currentPlaylistName == RadioService.currentPlaylistName){
+            mainViewModel.getPlayerCurrentIndex()
+        }
+
+        else
+            list.indexOfFirst {
+                it.stationuuid == stationId
             }
     }
 
-    private fun handleNewRadioStation(position : Int, station : RadioStation){
+    private fun handleNewRadioStation(position : Int, stationId : String){
 
-        bind.rvFavStations.smoothScrollToPosition(position)
+        if(!mainAdapter.isSameId(stationId))
+            bind.rvFavStations.smoothScrollToPosition(position)
 
         bind.rvFavStations.post {
 
-            val holder = bind.rvFavStations
-                .findViewHolderForAdapterPosition(position)
-
-            holder?.let {
-                mainAdapter.updateOnStationChange(station, holder as RadioDatabaseAdapter.RadioItemHolder)
-            }
-        }
-    }
-
-
-    private fun observePlaybackState(){
-
-        mainViewModel.isPlaying.observe(viewLifecycleOwner){ isPlaying ->
-
-            if(!RadioService.isFromRecording){
-                if(mainAdapter.onPlaybackState(isPlaying)){
-                    mainAdapter.updateStationPlaybackState()
+            bind.rvFavStations
+                .findViewHolderForAdapterPosition(position)?.let {
+                    if(it is RadioDatabaseAdapter.RadioItemHolder)
+                        mainAdapter.onNewPlayingItem(position, stationId, it)
                 }
-            }
         }
     }
+
+
+//    private fun observePlaybackState(){
+//
+//        mainViewModel.isPlaying.observe(viewLifecycleOwner){ isPlaying ->
+//
+//            if(!RadioService.isFromRecording){
+//                if(mainAdapter.onPlaybackState(isPlaying)){
+//                    mainAdapter.updateStationPlaybackState()
+//                }
+//            }
+//        }
+//    }
 
 
     private fun editPlaylistClickListener(){
@@ -385,33 +422,53 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     }
 
+
+    private fun initialRvAnimAndScroll(index: Int){
+
+        bind.rvFavStations.apply {
+            post {
+                if(index != -1){
+                    scrollToPosition(index)
+                }
+
+                scheduleLayoutAnimation()
+            }
+        }
+    }
+
     private fun observeStations(){
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        var isInitialLaunch = true
 
-            repeatOnLifecycle(Lifecycle.State.STARTED){
+        observeFlow(favViewModel.favFragStationsFlow){
+            mainAdapter.listOfStations = it
+            val newIndex = getCurrentItemPosition(currentStationId, it)
 
-                favViewModel.favFragStationsFlow.collectLatest {
+            Logger.log("ON NEW ITEMS: $newIndex")
 
-                    mainAdapter.listOfStations = it
+            mainAdapter.updateSelectedIndex(newIndex)
 
-                    withContext(Dispatchers.Main){
-                        bind.tvPlaylistMessage.apply {
-                            if(it.isEmpty()){
-                                text = requireContext().resources.getString(
-                                    when(favViewModel.favFragStationsSwitch.value){
-                                        SEARCH_FROM_FAVOURITES -> R.string.fav_frag_hint
-                                        SEARCH_FROM_PLAYLIST -> R.string.playlist__hint
-                                        else -> R.string.lazy_list_hint
-                                    }
-                                )
-                                visibility = View.VISIBLE
-                                slideAnim(400, 0, R.anim.fade_in_anim)
+            if(isInitialLaunch){
+                isInitialLaunch = false
+                initialRvAnimAndScroll(newIndex)
+            }
+
+
+            withContext(Dispatchers.Main){
+                bind.tvPlaylistMessage.apply {
+                    if(it.isEmpty()){
+                        text = requireContext().resources.getString(
+                            when(favViewModel.favFragStationsSwitch.value){
+                                SEARCH_FROM_FAVOURITES -> R.string.fav_frag_hint
+                                SEARCH_FROM_PLAYLIST -> R.string.playlist__hint
+                                else -> R.string.lazy_list_hint
                             }
-                            else {
-                                visibility = View.INVISIBLE
-                            }
-                        }
+                        )
+                        visibility = View.VISIBLE
+                        slideAnim(400, 0, R.anim.fade_in_anim)
+                    }
+                    else {
+                        visibility = View.INVISIBLE
                     }
                 }
             }
@@ -428,7 +485,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             playlistAdapter.currentTab = it
 
-            searchFlag = it
         }
 
 
@@ -537,28 +593,41 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     private fun setMainAdapterClickListener(){
 
+        var clickJob : Job? = null
+
         mainAdapter.setOnClickListener { station, position ->
 
-            var isToChangeMediaItems = false
+            if(clickJob?.isActive == true) return@setOnClickListener
 
+//            var isToChangeMediaItems = false
+//
+//
+//           // When click on station from playlist and before that was another playlist or this is the first playlist
+//            if(currentPlaylistName != RadioService.currentPlaylistName && currentTab == SEARCH_FROM_PLAYLIST) {
+//                RadioSource.updatePlaylistStations(mainAdapter.listOfStations)
+//                RadioService.currentPlaylistName = currentPlaylistName
+//                isToChangeMediaItems = true
+//            }
+//
+//                // When flag changed
+//            else if(currentTab != RadioService.currentMediaItems){
+//                isToChangeMediaItems = true
+//
+//            }
 
-           // When click on station from playlist and before that was another playlist or this is the first playlist
-            if(currentPlaylistName != RadioService.currentPlaylistName && currentTab == SEARCH_FROM_PLAYLIST) {
-                RadioSource.updatePlaylistStations(mainAdapter.listOfStations)
-                RadioService.currentPlaylistName = currentPlaylistName
-                isToChangeMediaItems = true
+            clickJob = lifecycleScope.launch {
+
+                favViewModel.isToChangeMediaItems { isToChangeMediaItems ->
+                    mainViewModel.playOrToggleStation(
+                        stationId = station.stationuuid,
+                        searchFlag = currentTab,
+                        itemIndex = position,
+                        isToChangeMediaItems = isToChangeMediaItems
+                    )
+                }
+
+                delay(CLICK_DEBOUNCE)
             }
-
-                // When flag changed
-            else if(searchFlag != RadioService.currentMediaItems){
-                isToChangeMediaItems = true
-
-            }
-
-
-
-            mainViewModel.playOrToggleStation(station.stationuuid, searchFlag, itemIndex = position, isToChangeMediaItems =
-            isToChangeMediaItems)
         }
     }
 
@@ -575,27 +644,16 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
             mainAdapter.initialiseValues(requireContext(), settingsViewModel.stationsTitleSize)
 
 
-            if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
-                RadioService.currentPlayingStation.value?.let {
-                    val id =  it.stationuuid
-                    mainAdapter.currentRadioStationId = id
-                }
-            } else{
-                mainAdapter.currentRadioStationId = ""
-            }
+//            if(RadioService.currentMediaItems != SEARCH_FROM_RECORDINGS){
+//                RadioService.currentPlayingStation.value?.let {
+//                    val id =  it.stationuuid
+//                    mainAdapter.selectedRadioStationId = id
+//                }
+//            } else {
+//                mainAdapter.selectedRadioStationId = ""
+//            }
 
             layoutAnimation = (activity as MainActivity).layoutAnimationController
-
-            post {
-
-                    val index = getCurrentItemPosition(RadioService.currentPlayingStation.value)
-
-                    if(index != -1){
-                        scrollToPosition(index)
-                    }
-
-                    scheduleLayoutAnimation()
-                }
 
         }
     }
@@ -678,7 +736,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         bind.rvFavStations.adapter = null
         bind.rvPlaylists.adapter = null
         _bind = null
-        isToHandleNewStationObserver = false
     }
 
 
