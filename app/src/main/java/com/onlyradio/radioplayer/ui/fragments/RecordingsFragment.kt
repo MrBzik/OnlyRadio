@@ -360,7 +360,6 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>(
                         if(RadioService.currentMediaItems == SEARCH_FROM_RECORDINGS){
                             recordingsViewModel.restoreRecordingMediaItem(position)
                         }
-
                     }
                 }.show()
 

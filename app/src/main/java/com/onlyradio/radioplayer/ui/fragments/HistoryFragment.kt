@@ -49,6 +49,7 @@ import com.onlyradio.radioplayer.domain.HistoryData
 import com.onlyradio.radioplayer.domain.PlayingStationState
 import com.onlyradio.radioplayer.extensions.makeToast
 import com.onlyradio.radioplayer.extensions.observeFlow
+import com.onlyradio.radioplayer.extensions.snackbarWithAction
 import com.onlyradio.radioplayer.utils.Constants.CLICK_DEBOUNCE
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_HISTORY_ONE_DATE
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
@@ -731,16 +732,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>(
 
                 historyViewModel.deleteBookmarkTitle(bookmark)
 
-                Snackbar.make(
-                    requireActivity().findViewById(R.id.rootLayout),
-                    resources.getString(R.string.bookmark_deleted),
-                    Snackbar.LENGTH_LONG
-                ).apply {
-
-                    setAction(resources.getString(R.string.action_undo)){
-                        historyViewModel.restoreBookmarkTitle(bookmark)
-                    }
-                }.show()
+                requireActivity().snackbarWithAction(R.string.bookmark_deleted){
+                    historyViewModel.restoreBookmarkTitle(bookmark)
+                }
             }
         }
     }

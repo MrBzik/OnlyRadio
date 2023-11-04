@@ -17,10 +17,11 @@ import com.onlyradio.radioplayer.utils.RandomColors
 import com.onlyradio.radioplayer.utils.Utils
 
 
-class MainPlayerView(private val bind : StubPlayerActivityMainBinding,
-                     private val glide : RequestManager,
-                     private val timeLeftPrefix : String
-                     )  {
+class MainPlayerView(
+    private val bind: StubPlayerActivityMainBinding,
+    private val glide: RequestManager,
+    private val timeLeftPrefix: String
+)  {
 
 
     fun slideInPlayer(){

@@ -25,8 +25,6 @@ class RadioDatabaseAdapter @Inject constructor(
     private var selectedAdapterPosition = -2
 
     private var selectedRadioStationId = ""
-
-//    private var previousItemHolder : RadioItemHolder? = null
     class RadioItemHolder (val bind : ItemRadioWithTextBinding) : RecyclerView.ViewHolder(bind.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RadioItemHolder {
@@ -137,33 +135,6 @@ class RadioDatabaseAdapter @Inject constructor(
     }
 
 
-//    fun updateStationPlaybackState(){
-//        previousItemHolder?.let{
-//            if(it.bindingAdapterPosition == selectedAdapterPosition){
-//                handleStationPlaybackState(it.bind)
-//            }
-//        }
-//    }
-//
-//    fun updateOnStationChange(station : RadioStation, holder : RadioItemHolder?,
-//                              isClicked : Boolean = false
-//    ){
-//        if(station.stationuuid != currentRadioStationId) {
-//            currentRadioStationId = station.stationuuid
-//            previousItemHolder?.bind?.let {
-//                restoreState(it)
-//            }
-//        }
-//        holder?.let {
-//            selectedAdapterPosition = holder.bindingAdapterPosition
-//            previousItemHolder = holder
-//            if(!isClicked){
-//                handleStationPlaybackState(holder.bind)
-//            }
-//        } ?: kotlin.run {
-//            selectedAdapterPosition = -2
-//        }
-//    }
 
 
     override fun getItemCount(): Int {

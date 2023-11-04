@@ -26,8 +26,6 @@ private const val FOOTER_ADD_PLAYLIST = 1
 private const val HEADER_PLAYLIST = 2
 
 
-
-
 class PlaylistsAdapter @Inject constructor(
     private val glide : RequestManager,
     private val isFooterNeeded : Boolean
@@ -36,8 +34,8 @@ class PlaylistsAdapter @Inject constructor(
 
     var strokeWidth = 0
     var strokeColor = 0
-    var isDarkMode = MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES
-    var highlightedViewHolder : PlaylistHolder? = null
+    private var isDarkMode = MainActivity.uiMode == Configuration.UI_MODE_NIGHT_YES
+    private var highlightedViewHolder : PlaylistHolder? = null
     var currentPlaylistName = ""
     var currentTab = SEARCH_FROM_FAVOURITES
 
@@ -299,6 +297,10 @@ class PlaylistsAdapter @Inject constructor(
 
     fun setDragAndDrop (dragAndDrop : (stationID: String, playlistName : String) -> Unit){
         handleDragAndDrop = dragAndDrop
+    }
+
+    fun clearReferences(){
+        highlightedViewHolder = null
     }
 
 

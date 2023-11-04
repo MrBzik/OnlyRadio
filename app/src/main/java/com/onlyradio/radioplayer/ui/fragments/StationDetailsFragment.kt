@@ -588,8 +588,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                 currentRadioStation?.let {
                     favViewModel.updateIsFavouredState(0, it.stationuuid)
                     requireActivity().snackbarSimple(R.string.removed_from_favs)
-//                    Snackbar.make(requireActivity().findViewById(R.id.rootLayout),
-//                        resources.getString(R.string.removed_from_favs), Snackbar.LENGTH_SHORT).show()
                     favViewModel.isStationFavoured.postValue(false)
                 }
 
@@ -597,8 +595,6 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
                 currentRadioStation?.let {
                     favViewModel.updateIsFavouredState(System.currentTimeMillis(), it.stationuuid)
                     requireActivity().snackbarSimple(R.string.saved_to_favs)
-//                    Snackbar.make(requireActivity().findViewById(R.id.rootLayout),
-//                        resources.getString(R.string.saved_to_favs), Snackbar.LENGTH_SHORT).show()
                     favViewModel.isStationFavoured.postValue(true)
                 }
             }

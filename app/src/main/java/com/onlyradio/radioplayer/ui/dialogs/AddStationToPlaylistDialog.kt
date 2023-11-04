@@ -85,6 +85,7 @@ class AddStationToPlaylistDialog(
     override fun onStop() {
         super.onStop()
         bind.rvPlaylists.adapter = null
+        playlistsAdapter.clearReferences()
         _bind = null
     }
 

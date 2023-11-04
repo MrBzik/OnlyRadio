@@ -46,6 +46,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.onlyradio.radioplayer.domain.PlayingStationState
 import com.onlyradio.radioplayer.extensions.observeFlow
 import com.onlyradio.radioplayer.extensions.snackbarSimple
+import com.onlyradio.radioplayer.extensions.snackbarWithAction
 import com.onlyradio.radioplayer.utils.Constants
 import com.onlyradio.radioplayer.utils.Constants.CLICK_DEBOUNCE
 import com.onlyradio.radioplayer.utils.Logger
@@ -353,6 +354,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                     else resources.getString(R.string.moved_to_playlist) + " " + playlistName
 
                     requireActivity().snackbarSimple(message)
+
                 }
             }
         }
@@ -648,11 +650,9 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                     message = message + " " + it.playlistName
                 }
 
-                Snackbar.make(requireActivity().findViewById(R.id.rootLayout), message, Snackbar.LENGTH_LONG).apply {
-                    setAction(resources.getString(R.string.action_undo)){
-                        favViewModel.onRestoreStation()
-                    }
-                }.show()
+                requireActivity().snackbarWithAction(message){
+                    favViewModel.onRestoreStation()
+                }
             }
         }
     }
@@ -660,9 +660,9 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
     override fun onDestroyView() {
         super.onDestroyView()
-
         bind.rvFavStations.adapter = null
         bind.rvPlaylists.adapter = null
+        playlistAdapter.clearReferences()
         _bind = null
     }
 

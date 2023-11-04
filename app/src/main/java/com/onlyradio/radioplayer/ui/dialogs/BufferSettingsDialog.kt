@@ -12,7 +12,10 @@ import com.onlyradio.radioplayer.utils.Constants.BUFFER_FOR_PLAYBACK
 import com.onlyradio.radioplayer.utils.Constants.BUFFER_SIZE_IN_MILLS
 import com.onlyradio.radioplayer.utils.Constants.IS_ADAPTIVE_LOADER_TO_USE
 import com.google.android.material.slider.RangeSlider
+import com.onlyradio.radioplayer.utils.Logger
 
+
+const val MAX_PLAYBACK_BUFFER = 30000f
 class BufferSettingsDialog (
     private val requireContext : Context,
     private val buffPref : SharedPreferences,
@@ -83,6 +86,13 @@ class BufferSettingsDialog (
                     val newValue = slider.values.first().toInt()
 
                     bind.tvBufferInSecondsTitle.text = "$newValue $secSuffix"
+
+                    setRangePlaybackBuffer(
+                        maxValue = (newValue * 1000).toFloat(),
+                        initialValue = bind.rangeSliderPlaybackBuffer.values.first().toInt(),
+                        isRecreated = true
+                    )
+
                 }
             })
 
@@ -122,21 +132,29 @@ class BufferSettingsDialog (
 //        }
 //    }
 
-    private fun setRangePlaybackBuffer(){
+
+
+    private fun setRangePlaybackBuffer(
+        maxValue : Float = MAX_PLAYBACK_BUFFER,
+        initialValue : Int = RadioService.bufferForPlayback,
+        isRecreated : Boolean = false
+    ){
         bind.rangeSliderPlaybackBuffer.apply {
             valueFrom = 1000f
-            valueTo = 30000f
+            valueTo = minOf(maxValue, MAX_PLAYBACK_BUFFER)
             stepSize = 1000f
 
-            val initialValue = RadioService.bufferForPlayback
+            val minValue = minOf(initialValue.toFloat(), valueTo)
 
-            bind.tvPlaybackBufferValue.text = "${initialValue / 1000} $secSuffix"
+            bind.tvPlaybackBufferValue.text = "${minValue.toInt() / 1000} $secSuffix"
 
-            values = listOf(initialValue.toFloat())
+            values = listOf(minValue)
+
+            if(isRecreated) return
+
 
             setLabelFormatter { value ->
                 "${value.toInt() / 1000} $secSuffix"
-
             }
 
             addOnSliderTouchListener(object : RangeSlider.OnSliderTouchListener{

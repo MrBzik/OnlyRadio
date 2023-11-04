@@ -934,7 +934,12 @@ class RadioService : MediaBrowserServiceCompat() {
             .setHandleAudioBecomingNoisy(true)
             .setMediaSourceFactory(MyMediaSourceFactory(this@RadioService, dataSourceFactory, checkIntervals))
             .setLoadControl(DefaultLoadControl.Builder()
-                .setBufferDurationsMs(bufferSizeInMills, bufferSizeInMills, bufferForPlayback, 5000)
+                .setBufferDurationsMs(
+                    bufferSizeInMills,
+                    bufferSizeInMills,
+                    minOf(bufferSizeInMills, bufferForPlayback),
+                    5000
+                )
 //                .setTargetBufferBytes(bites)
                 .build())
 //            .setBandwidthMeter(
