@@ -9,7 +9,6 @@ import android.text.format.Formatter
 import android.view.View
 import android.widget.SeekBar
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.onlyradio.radioplayer.data.local.entities.Recording

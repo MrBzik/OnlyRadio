@@ -4,15 +4,15 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.ResultReceiver
 import android.support.v4.media.session.PlaybackStateCompat
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.onlyradio.radioplayer.exoPlayer.RadioSource
 import com.onlyradio.radioplayer.utils.Constants.IS_CHANGE_MEDIA_ITEMS
+import com.onlyradio.radioplayer.utils.Constants.IS_HISTORY_SWAP
 import com.onlyradio.radioplayer.utils.Constants.IS_SAME_STATION
 import com.onlyradio.radioplayer.utils.Constants.ITEM_INDEX
 import com.onlyradio.radioplayer.utils.Constants.PLAY_WHEN_READY
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FLAG
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
-import com.onlyradio.radioplayer.utils.Constants.IS_HISTORY_SWAP
 
 class RadioPlaybackPreparer (
     private val radioSource: RadioSource,

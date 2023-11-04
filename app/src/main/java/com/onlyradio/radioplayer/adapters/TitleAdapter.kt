@@ -13,14 +13,12 @@ import com.onlyradio.radioplayer.data.local.entities.Title
 import com.onlyradio.radioplayer.databinding.ItemDateSeparatorBinding
 import com.onlyradio.radioplayer.databinding.ItemDateSeparatorEnclosingBinding
 import com.onlyradio.radioplayer.databinding.ItemTitleBinding
-import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.extensions.loadImage
 import com.onlyradio.radioplayer.ui.animations.AdapterFadeAnim.adapterItemFadeIn
 import com.onlyradio.radioplayer.utils.RandomColors
 import com.onlyradio.radioplayer.utils.Utils
 import com.onlyradio.radioplayer.utils.Utils.convertLongToDate
 import java.text.DateFormat
-import javax.inject.Inject
 
 
 private const val TYPE_TITLE = 0

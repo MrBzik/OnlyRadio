@@ -27,7 +27,6 @@ import com.onlyradio.radioplayer.utils.Commands.COMMAND_SWAP_MEDIA_ITEMS
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_UPDATE_HISTORY_MEDIA_ITEMS
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_UPDATE_HISTORY_ONE_DATE_MEDIA_ITEMS
 import com.onlyradio.radioplayer.utils.Constants
-import com.onlyradio.radioplayer.utils.Constants.ITEM_ID
 import com.onlyradio.radioplayer.utils.Constants.ITEM_INDEX
 import com.onlyradio.radioplayer.utils.Constants.ITEM_INDEX_OLD
 import com.onlyradio.radioplayer.utils.Utils

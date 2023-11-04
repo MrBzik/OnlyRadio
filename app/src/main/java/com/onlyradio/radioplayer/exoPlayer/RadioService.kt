@@ -77,8 +77,8 @@ import com.onlyradio.radioplayer.utils.Constants.IS_ADAPTIVE_LOADER_TO_USE
 import com.onlyradio.radioplayer.utils.Constants.IS_NEW_SEARCH
 import com.onlyradio.radioplayer.utils.Constants.IS_TO_CLEAR_HISTORY_ITEMS
 import com.onlyradio.radioplayer.utils.Constants.ITEM_ID
-import com.onlyradio.radioplayer.utils.Constants.ITEM_INDEX_OLD
 import com.onlyradio.radioplayer.utils.Constants.ITEM_INDEX
+import com.onlyradio.radioplayer.utils.Constants.ITEM_INDEX_OLD
 import com.onlyradio.radioplayer.utils.Constants.ITEM_PLAYLIST
 import com.onlyradio.radioplayer.utils.Constants.ITEM_PLAYLIST_NAME
 import com.onlyradio.radioplayer.utils.Constants.MEDIA_ROOT_ID
@@ -108,7 +108,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.sql.Date
-import java.text.DateFormat
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -396,10 +395,6 @@ class RadioService : MediaBrowserServiceCompat() {
             playerPrepared = { flag, playWhenReady, itemIndex, isToChangeMediaItems, isSameStation, isHistorySwap ->
 
                 var index = itemIndex
-
-                val date = Utils.convertLongToOnlyDate(selectedHistoryDate, DateFormat.MEDIUM)
-
-                Logger.log("PREPARE FLAG: $flag, index: $itemIndex, date: $date")
 
                 val isFromRecordings = flag == SEARCH_FROM_RECORDINGS
 
@@ -1106,9 +1101,6 @@ class RadioService : MediaBrowserServiceCompat() {
         val oldPos = adjustIndexFromHistory(extras.getInt(ITEM_INDEX_OLD))
         val newPos = adjustIndexFromHistory(extras.getInt(ITEM_INDEX))
 
-        Logger.log("CUR POS is : $oldPos")
-        Logger.log("NEW POS IS : $newPos")
-
         try {
             val l = minOf(oldPos, newPos)
             val r = maxOf(oldPos, newPos)
@@ -1122,8 +1114,6 @@ class RadioService : MediaBrowserServiceCompat() {
 
 //                Assertions.checkArgument(fromIndex >= 0 && fromIndex <= toIndex && newFromIndex >= 0)
 
-
-        Logger.log("AFTER SHIFT POS IS : ${exoPlayer.currentMediaItemIndex}")
 
     }
 

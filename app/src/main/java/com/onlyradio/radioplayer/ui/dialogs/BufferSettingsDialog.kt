@@ -5,14 +5,13 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.google.android.material.slider.RangeSlider
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.databinding.DialogBufferSettingsBinding
 import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.utils.Constants.BUFFER_FOR_PLAYBACK
 import com.onlyradio.radioplayer.utils.Constants.BUFFER_SIZE_IN_MILLS
 import com.onlyradio.radioplayer.utils.Constants.IS_ADAPTIVE_LOADER_TO_USE
-import com.google.android.material.slider.RangeSlider
-import com.onlyradio.radioplayer.utils.Logger
 
 
 const val MAX_PLAYBACK_BUFFER = 30000f

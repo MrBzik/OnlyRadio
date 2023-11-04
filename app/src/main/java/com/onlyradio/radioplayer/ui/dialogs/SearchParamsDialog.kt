@@ -5,12 +5,12 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.text.InputType
 import android.widget.ArrayAdapter
+import com.google.android.material.slider.RangeSlider
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.databinding.DialogSearchParamsBinding
 import com.onlyradio.radioplayer.ui.MainActivity
 import com.onlyradio.radioplayer.ui.viewmodels.MainViewModel
 import com.onlyradio.radioplayer.ui.viewmodels.SearchDialogsViewModel
-import com.google.android.material.slider.RangeSlider
 import java.util.Locale
 
 

@@ -16,6 +16,7 @@ import androidx.viewpager2.widget.ViewPager2.ORIENTATION_HORIZONTAL
 import androidx.viewpager2.widget.ViewPager2.SCROLL_STATE_DRAGGING
 import androidx.viewpager2.widget.ViewPager2.SCROLL_STATE_IDLE
 import com.bumptech.glide.RequestManager
+import com.google.android.material.snackbar.Snackbar
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.adapters.ViewPagerStationsAdapter
 import com.onlyradio.radioplayer.data.local.entities.Playlist
@@ -24,7 +25,8 @@ import com.onlyradio.radioplayer.data.local.entities.Title
 import com.onlyradio.radioplayer.databinding.FragmentStationDetailsBinding
 import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.exoPlayer.RadioSource
-import com.onlyradio.radioplayer.exoPlayer.isPlaying
+import com.onlyradio.radioplayer.extensions.makeToast
+import com.onlyradio.radioplayer.extensions.snackbarSimple
 import com.onlyradio.radioplayer.ui.MainActivity
 import com.onlyradio.radioplayer.ui.animations.PagerZoomOutSlideTransformer
 import com.onlyradio.radioplayer.ui.animations.reduceDragSensitivity
@@ -41,9 +43,6 @@ import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.onlyradio.radioplayer.utils.Utils
 import com.onlyradio.radioplayer.utils.addAction
 import com.onlyradio.radioplayer.utils.toRadioStation
-import com.google.android.material.snackbar.Snackbar
-import com.onlyradio.radioplayer.extensions.makeToast
-import com.onlyradio.radioplayer.extensions.snackbarSimple
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.DateFormat
 import javax.inject.Inject

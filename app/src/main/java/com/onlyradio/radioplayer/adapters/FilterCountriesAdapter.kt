@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.onlyradio.radioplayer.adapters.models.CountryWithRegion
 import com.onlyradio.radioplayer.databinding.ItemCountryBinding

@@ -10,8 +10,6 @@ import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.data.local.entities.HistoryDate
 import com.onlyradio.radioplayer.utils.Utils
 import java.text.DateFormat
-import java.util.Calendar
-import java.util.Date
 
 
 class HistoryDatesAdapter(

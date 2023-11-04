@@ -17,8 +17,8 @@ import com.onlyradio.radioplayer.data.remote.RadioApi
 import com.onlyradio.radioplayer.exoPlayer.RadioServiceConnection
 import com.onlyradio.radioplayer.exoPlayer.RadioSource
 import com.onlyradio.radioplayer.repositories.BookmarksRepo
-import com.onlyradio.radioplayer.repositories.FavRepo
 import com.onlyradio.radioplayer.repositories.DatesRepo
+import com.onlyradio.radioplayer.repositories.FavRepo
 import com.onlyradio.radioplayer.repositories.LazyRepo
 import com.onlyradio.radioplayer.repositories.RecRepo
 import com.onlyradio.radioplayer.repositories.TitlesDatesRepo

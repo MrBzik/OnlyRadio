@@ -4,12 +4,10 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.LOGGER
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.install.InstallState
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
-import com.google.android.play.core.ktx.installStatus
 import com.google.android.play.core.ktx.isFlexibleUpdateAllowed
 import com.onlyradio.radioplayer.exoPlayer.RadioServiceConnection
 import com.onlyradio.radioplayer.utils.Commands.COMMAND_CHANGE_REVERB_MODE

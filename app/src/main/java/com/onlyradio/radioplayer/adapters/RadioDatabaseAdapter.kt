@@ -14,7 +14,6 @@ import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.databinding.ItemRadioWithTextBinding
 import com.onlyradio.radioplayer.ui.animations.AdapterFadeAnim.adapterItemFadeIn
 import com.onlyradio.radioplayer.ui.fragments.FavStationsFragment
-import com.onlyradio.radioplayer.utils.Logger
 import javax.inject.Inject
 
 class RadioDatabaseAdapter @Inject constructor(
@@ -117,11 +116,9 @@ class RadioDatabaseAdapter @Inject constructor(
     }
 
     fun onNewPlayingItem(newIndex : Int, id : String, holder: RadioItemHolder){
-        Logger.log("PREV INDEX: $selectedAdapterPosition, newIndex: $newIndex")
         if(selectedAdapterPosition >= 0 && selectedAdapterPosition != newIndex)
             notifyItemChanged(selectedAdapterPosition, 1)
         updateSelectedItemValues(newIndex, id)
-        Logger.log("isPlaying: $currentPlaybackState")
         handleStationPlaybackState(holder.bind)
     }
 

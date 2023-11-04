@@ -11,13 +11,13 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.bumptech.glide.RequestManager
-import com.onlyradio.radioplayer.R
-import com.onlyradio.radioplayer.utils.Constants.CHANNEL_ID
-import com.onlyradio.radioplayer.utils.Constants.NOTIFICATION_ID
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.ui.PlayerNotificationManager.MediaDescriptionAdapter
 import com.google.android.exoplayer2.ui.PlayerNotificationManager.NotificationListener
+import com.onlyradio.radioplayer.R
+import com.onlyradio.radioplayer.utils.Constants.CHANNEL_ID
+import com.onlyradio.radioplayer.utils.Constants.NOTIFICATION_ID
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

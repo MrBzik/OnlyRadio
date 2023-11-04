@@ -4,7 +4,6 @@ package com.onlyradio.radioplayer.ui.fragments
 import android.content.res.Configuration
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -26,8 +25,11 @@ import com.onlyradio.radioplayer.adapters.RadioDatabaseAdapter
 import com.onlyradio.radioplayer.data.local.entities.Playlist
 import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.databinding.FragmentFavStationsBinding
+import com.onlyradio.radioplayer.domain.PlayingStationState
 import com.onlyradio.radioplayer.exoPlayer.RadioService
-import com.onlyradio.radioplayer.exoPlayer.RadioSource
+import com.onlyradio.radioplayer.extensions.observeFlow
+import com.onlyradio.radioplayer.extensions.snackbarSimple
+import com.onlyradio.radioplayer.extensions.snackbarWithAction
 import com.onlyradio.radioplayer.ui.MainActivity
 import com.onlyradio.radioplayer.ui.animations.BounceEdgeEffectFactory
 import com.onlyradio.radioplayer.ui.animations.SwipeToDeleteCallback
@@ -37,19 +39,11 @@ import com.onlyradio.radioplayer.ui.dialogs.CreatePlaylistDialog
 import com.onlyradio.radioplayer.ui.dialogs.EditPlaylistDialog
 import com.onlyradio.radioplayer.ui.dialogs.RemovePlaylistDialog
 import com.onlyradio.radioplayer.ui.viewmodels.PixabayViewModel
+import com.onlyradio.radioplayer.utils.Constants.CLICK_DEBOUNCE
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_LAZY_LIST
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
-import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.onlyradio.radioplayer.utils.dpToP
-import com.google.android.material.snackbar.Snackbar
-import com.onlyradio.radioplayer.domain.PlayingStationState
-import com.onlyradio.radioplayer.extensions.observeFlow
-import com.onlyradio.radioplayer.extensions.snackbarSimple
-import com.onlyradio.radioplayer.extensions.snackbarWithAction
-import com.onlyradio.radioplayer.utils.Constants
-import com.onlyradio.radioplayer.utils.Constants.CLICK_DEBOUNCE
-import com.onlyradio.radioplayer.utils.Logger
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -149,8 +143,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
 
             val id = state.stationId
             val index = getCurrentItemPosition(id)
-
-            Logger.log("ON NEW ST: $index")
 
             if(!isToHandleNewStationObserver){
                 isToHandleNewStationObserver = true
@@ -402,8 +394,6 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
         observeFlow(favViewModel.favFragStationsFlow){
             mainAdapter.listOfStations = it
             val newIndex = getCurrentItemPosition(currentStationId, it)
-
-            Logger.log("ON NEW ITEMS: $newIndex")
 
             mainAdapter.updateSelectedIndex(newIndex)
 

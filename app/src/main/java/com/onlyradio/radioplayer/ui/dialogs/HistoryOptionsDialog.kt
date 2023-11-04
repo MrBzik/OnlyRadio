@@ -4,13 +4,13 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
+import com.google.android.material.slider.RangeSlider
+import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.databinding.DialogHistoryOptionsBinding
 import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.utils.Constants
 import com.onlyradio.radioplayer.utils.Constants.HISTORY_PREF_BOOKMARK
 import com.onlyradio.radioplayer.utils.Constants.HISTORY_PREF_DATES
-import com.google.android.material.slider.RangeSlider
-import com.onlyradio.radioplayer.R
 
 class HistoryOptionsDialog (
     private val requireContext : Context,

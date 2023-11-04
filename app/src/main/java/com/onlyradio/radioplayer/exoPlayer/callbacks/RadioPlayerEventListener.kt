@@ -1,11 +1,16 @@
 package com.onlyradio.radioplayer.exoPlayer.callbacks
 
 import android.app.Service.STOP_FOREGROUND_DETACH
-import android.widget.Toast
 import androidx.core.text.isDigitsOnly
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.MediaMetadata
+import com.google.android.exoplayer2.PlaybackException
+import com.google.android.exoplayer2.Player
+import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.exoPlayer.RadioSource
+import com.onlyradio.radioplayer.extensions.makeToast
 import com.onlyradio.radioplayer.utils.Constants.NO_PLAYLIST
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
@@ -16,12 +21,6 @@ import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.onlyradio.radioplayer.utils.Constants.TITLE_UNKNOWN
 import com.onlyradio.radioplayer.utils.toRadioStation
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.MediaMetadata
-import com.google.android.exoplayer2.PlaybackException
-import com.google.android.exoplayer2.Player
-import com.onlyradio.radioplayer.R
-import com.onlyradio.radioplayer.extensions.makeToast
 
 class RadioPlayerEventListener (
     private val radioService : RadioService

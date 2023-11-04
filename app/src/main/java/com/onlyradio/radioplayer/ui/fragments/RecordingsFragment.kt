@@ -12,6 +12,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.adapters.RecordingsAdapter
 import com.onlyradio.radioplayer.data.local.entities.Recording
@@ -24,8 +26,6 @@ import com.onlyradio.radioplayer.ui.animations.slideAnim
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.onlyradio.radioplayer.utils.TextViewOutlined
 import com.onlyradio.radioplayer.utils.Utils
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

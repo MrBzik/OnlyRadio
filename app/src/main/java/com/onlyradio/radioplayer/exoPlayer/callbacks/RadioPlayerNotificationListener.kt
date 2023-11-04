@@ -7,9 +7,9 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.core.content.ContextCompat
+import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.utils.Constants.NOTIFICATION_ID
-import com.google.android.exoplayer2.ui.PlayerNotificationManager
 
 class RadioPlayerNotificationListener (
     private val radioService : RadioService

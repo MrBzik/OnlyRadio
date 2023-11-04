@@ -3,7 +3,6 @@ package com.onlyradio.radioplayer.ui.dialogs
 import android.content.Context
 import android.os.Bundle
 import android.view.WindowManager
-import android.widget.Toast
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.databinding.DialogRenameRecordingBinding
 import com.onlyradio.radioplayer.extensions.makeToast

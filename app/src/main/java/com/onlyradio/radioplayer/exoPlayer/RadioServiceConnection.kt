@@ -15,7 +15,6 @@ import androidx.lifecycle.MutableLiveData
 import com.onlyradio.radioplayer.data.models.OnSnackRestore
 import com.onlyradio.radioplayer.utils.Constants.NETWORK_ERROR
 import com.onlyradio.radioplayer.utils.Event
-import com.onlyradio.radioplayer.utils.Logger
 import com.onlyradio.radioplayer.utils.Resource
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

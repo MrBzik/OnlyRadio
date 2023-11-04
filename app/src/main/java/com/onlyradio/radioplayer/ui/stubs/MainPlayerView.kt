@@ -1,15 +1,12 @@
 package com.onlyradio.radioplayer.ui.stubs
 
 import android.graphics.drawable.AnimatedVectorDrawable
-import android.support.v4.media.session.PlaybackStateCompat
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.RequestManager
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.databinding.StubPlayerActivityMainBinding
 import com.onlyradio.radioplayer.exoPlayer.RadioService
-import com.onlyradio.radioplayer.exoPlayer.isPlayEnabled
-import com.onlyradio.radioplayer.exoPlayer.isPlaying
 import com.onlyradio.radioplayer.extensions.loadSingleImage
 import com.onlyradio.radioplayer.ui.animations.slideAnim
 import com.onlyradio.radioplayer.utils.Constants

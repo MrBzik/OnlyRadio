@@ -28,7 +28,6 @@ import com.onlyradio.radioplayer.utils.Constants.ITEM_INDEX
 import com.onlyradio.radioplayer.utils.Constants.PAGE_SIZE
 import com.onlyradio.radioplayer.utils.Constants.PLAY_WHEN_READY
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FLAG
-import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_RECORDINGS
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FULL_COUNTRY_NAME
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_PREF_COUNTRY

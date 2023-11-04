@@ -2,7 +2,6 @@ package com.onlyradio.radioplayer.adapters
 
 import android.content.Context
 import android.graphics.drawable.AnimatedVectorDrawable
-import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.RequestManager
@@ -11,7 +10,6 @@ import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.databinding.ItemRadioWithTextBinding
 import com.onlyradio.radioplayer.extensions.loadImage
 import com.onlyradio.radioplayer.ui.animations.slideAnim
-import com.onlyradio.radioplayer.utils.Logger
 import com.onlyradio.radioplayer.utils.RandomColors
 
 interface AdapterUtils {

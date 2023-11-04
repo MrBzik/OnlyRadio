@@ -3,6 +3,8 @@ package com.onlyradio.radioplayer.ui.dialogs
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import com.google.android.material.slider.RangeSlider
+import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.databinding.DialogRecordingOptionsBinding
 import com.onlyradio.radioplayer.exoPlayer.RadioService
 import com.onlyradio.radioplayer.utils.Constants.RECORDING_AUTO_STOP_PREF
@@ -14,9 +16,6 @@ import com.onlyradio.radioplayer.utils.Constants.REC_QUALITY_LOW
 import com.onlyradio.radioplayer.utils.Constants.REC_QUALITY_MAX
 import com.onlyradio.radioplayer.utils.Constants.REC_QUALITY_MEDIUM
 import com.onlyradio.radioplayer.utils.Constants.REC_QUALITY_ULTRA
-import com.onlyradio.radioplayer.utils.RecPref
-import com.google.android.material.slider.RangeSlider
-import com.onlyradio.radioplayer.R
 
 
 class RecordingOptionsDialog (

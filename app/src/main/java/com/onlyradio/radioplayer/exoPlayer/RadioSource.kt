@@ -12,6 +12,8 @@ import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_URI
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
 import com.onlyradio.radioplayer.data.local.RadioDAO
 import com.onlyradio.radioplayer.data.local.entities.RadioStation
 import com.onlyradio.radioplayer.data.local.entities.Recording
@@ -25,11 +27,6 @@ import com.onlyradio.radioplayer.utils.Constants.BASE_RADIO_URL
 import com.onlyradio.radioplayer.utils.Constants.BASE_RADIO_URL3
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
-import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_HISTORY
-import com.onlyradio.radioplayer.utils.toMediaMetadataCompat
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.onlyradio.radioplayer.utils.Logger
 import retrofit2.Response
 import javax.inject.Inject
 

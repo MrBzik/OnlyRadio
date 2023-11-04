@@ -11,10 +11,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.onlyradio.radioplayer.BuildConfig
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.databinding.FragmentSettingsBinding
 import com.onlyradio.radioplayer.databinding.StubSettingsExtrasBinding
@@ -34,14 +32,10 @@ import com.onlyradio.radioplayer.ui.dialogs.RecordingOptionsDialog
 import com.onlyradio.radioplayer.ui.stubs.GeneralDialogsCall
 import com.onlyradio.radioplayer.ui.stubs.SettingsExtras
 import com.onlyradio.radioplayer.ui.stubs.SettingsGeneral
-import com.onlyradio.radioplayer.ui.viewmodels.BluetoothViewModel
 import com.onlyradio.radioplayer.utils.Constants.BUFFER_PREF
-import com.onlyradio.radioplayer.utils.Constants.DARK_MODE_PREF
 import com.onlyradio.radioplayer.utils.Constants.FRAG_OPTIONS
 import com.onlyradio.radioplayer.utils.Constants.HISTORY_PREF
 import com.onlyradio.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
-import com.onlyradio.radioplayer.utils.Constants.REC_QUALITY_DEF
-import com.onlyradio.radioplayer.utils.RecPref
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
