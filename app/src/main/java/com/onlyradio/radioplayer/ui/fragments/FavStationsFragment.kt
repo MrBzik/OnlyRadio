@@ -43,6 +43,7 @@ import com.onlyradio.radioplayer.utils.Constants.CLICK_DEBOUNCE
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_LAZY_LIST
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_PLAYLIST
+import com.onlyradio.radioplayer.utils.Logger
 import com.onlyradio.radioplayer.utils.dpToP
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -428,6 +429,7 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
     private fun observeFavOrPlaylistState(){
 
         favViewModel.favFragStationsSwitch.observe(viewLifecycleOwner) {
+
             updateUiOnTabChange(it)
 
             currentTab = it
@@ -628,9 +630,9 @@ class FavStationsFragment : BaseFragment<FragmentFavStationsBinding>(
                     }
 
                     else -> {
-                        favViewModel.getLazyPlaylist()
                         R.string.removed_from_lazy_list
                     }
+
 
                 }
 

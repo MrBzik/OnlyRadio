@@ -75,9 +75,4 @@ class FavRepo @Inject constructor(
 
 
 
-    // Lazy playlist
-
-    suspend fun getStationsForLazyPlaylist () = radioDAO.getStationsForLazyPlaylist()
-
-
 }

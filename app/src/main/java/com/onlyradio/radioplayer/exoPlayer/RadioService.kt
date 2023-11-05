@@ -744,7 +744,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
 
             SEARCH_FROM_LAZY_LIST -> {
-                RadioSource.removeItemFromLazyList(index)
+                radioSource.removeItemFromLazyList(index)
+//                RadioSource.removeItemFromLazyList(index)
                 lazyRepo.setRadioStationPlayedDuration(stationID, 0)
             }
         }
@@ -776,7 +777,6 @@ class RadioService : MediaBrowserServiceCompat() {
             }
         }
 
-
         when(playlist){
 
             SEARCH_FROM_FAVOURITES -> {
@@ -794,11 +794,11 @@ class RadioService : MediaBrowserServiceCompat() {
             }
 
             SEARCH_FROM_LAZY_LIST -> {
-                RadioSource.restoreItemFromLazyList(index)
+                radioSource.restoreItemFromLazyList(index)
+//                RadioSource.restoreItemFromLazyList(index)
                 lazyRepo.setRadioStationPlayedDuration(stationID, lastDeletedStation?.playDuration ?: 0)
             }
         }
-
     }
 
 
@@ -1202,8 +1202,8 @@ class RadioService : MediaBrowserServiceCompat() {
 
             }
             SEARCH_FROM_LAZY_LIST -> {
-                RadioSource.lazyListMediaItems
-
+//                RadioSource.lazyListMediaItems
+                radioSource.lazyListMediaItems
             }
             SEARCH_FROM_RECORDINGS -> {
                 stationsFromRecordingsMediaItems

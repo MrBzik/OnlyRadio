@@ -157,7 +157,8 @@ class StationDetailsFragment : BaseFragment<FragmentStationDetailsBinding>(
 
             SEARCH_FROM_LAZY_LIST -> {
                 listName = resources.getString(R.string.lazy_playlist_name)
-                RadioSource.lazyListStations
+//                RadioSource.lazyListStations
+                mainViewModel.radioSource.lazyListStations
             }
 
 

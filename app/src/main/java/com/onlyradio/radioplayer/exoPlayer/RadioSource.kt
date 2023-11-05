@@ -27,6 +27,8 @@ import com.onlyradio.radioplayer.utils.Constants.BASE_RADIO_URL
 import com.onlyradio.radioplayer.utils.Constants.BASE_RADIO_URL3
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_API
 import com.onlyradio.radioplayer.utils.Constants.SEARCH_FROM_FAVOURITES
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -60,7 +62,47 @@ class RadioSource @Inject constructor(
 
 
 
-//    var stationsFromPlaylistMetadata = mutableListOf<MediaMetadataCompat>()
+
+    val lazyListFlow : MutableStateFlow<List<RadioStation>> = MutableStateFlow(emptyList())
+    var lazyListStations = mutableListOf<RadioStation>()
+    var lazyListMediaItems = mutableListOf<MediaItem>()
+
+    private var isToGenerateLazyList = true
+    suspend fun initiateLazyList(){
+        if(!isToGenerateLazyList) return
+        val list = radioDAO.getStationsForLazyPlaylist()
+        lazyListStations = list.toMutableList()
+        lazyListMediaItems = lazyListStations.map { station ->
+            MediaItem.fromUri(station.url!!)
+        }.toMutableList()
+        lazyListFlow.value = list
+        isToGenerateLazyList = false
+    }
+
+    fun removeItemFromLazyList(index : Int){
+        RadioService.lastDeletedStation = lazyListStations[index]
+        lazyListStations.removeAt(index)
+        lazyListMediaItems.removeAt(index)
+        lazyListFlow.value = lazyListStations.toMutableList()
+    }
+
+    fun restoreItemFromLazyList(index : Int){
+        RadioService.lastDeletedStation?.let {station ->
+            lazyListStations.add(index, station)
+            val mediaItem = MediaItem.fromUri(station.url!!)
+            lazyListMediaItems.add(index, mediaItem)
+            lazyListFlow.value = lazyListStations.toMutableList()
+        }
+    }
+
+    fun clearLazyList(){
+        lazyListStations = mutableListOf()
+        lazyListMediaItems = mutableListOf()
+        lazyListFlow.value = emptyList()
+        isToGenerateLazyList = true
+    }
+
+
 
     companion object{
 
@@ -101,39 +143,6 @@ class RadioSource @Inject constructor(
                 MediaItem.fromUri(station.url!!)
             }.toMutableList()
 //            isStationsFromHistoryOneDateUpdated = true
-        }
-
-
-        var lazyListStations = mutableListOf<RadioStation>()
-        var lazyListMediaItems = mutableListOf<MediaItem>()
-//        var isLazyListUpdated = false
-
-        fun initiateLazyList(list : List<RadioStation>){
-            lazyListStations = list.toMutableList()
-            lazyListMediaItems = lazyListStations.map {station ->
-            MediaItem.fromUri(station.url!!)
-            }.toMutableList()
-//            isLazyListUpdated = true
-        }
-
-        fun removeItemFromLazyList(index : Int){
-            RadioService.lastDeletedStation = lazyListStations[index]
-            lazyListStations.removeAt(index)
-            lazyListMediaItems.removeAt(index)
-        }
-
-        fun restoreItemFromLazyList(index : Int){
-            RadioService.lastDeletedStation?.let {station ->
-                lazyListStations.add(index, station)
-                val mediaItem = MediaItem.fromUri(station.url!!)
-                lazyListMediaItems.add(index, mediaItem)
-
-            }
-        }
-
-        fun clearLazyList(){
-            lazyListStations = mutableListOf()
-            lazyListMediaItems = mutableListOf()
         }
     }
 

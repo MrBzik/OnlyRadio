@@ -137,7 +137,8 @@ class RadioPlayerEventListener (
                         station = RadioSource.stationsFromHistoryOneDate[index]
 
                     SEARCH_FROM_LAZY_LIST ->
-                        station = RadioSource.lazyListStations[index]
+                        station = radioService.radioSource.lazyListStations[index]
+//                            RadioSource.lazyListStations[index]
 
                     SEARCH_FROM_RECORDINGS -> {
                         val recording = radioService.stationsFromRecordings[index]

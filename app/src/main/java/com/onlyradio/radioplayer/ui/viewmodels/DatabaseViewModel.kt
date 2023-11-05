@@ -151,22 +151,6 @@ class DatabaseViewModel @Inject constructor(
     val favFragStationsSwitch = MutableLiveData(SEARCH_FROM_FAVOURITES)
 
 
-
-    private var isToGenerateLazyList = true
-
-    private val lazyListFlow = flow{
-        if(isToGenerateLazyList){
-            isToGenerateLazyList = false
-            val list = repository.getStationsForLazyPlaylist()
-            RadioSource.initiateLazyList(list)
-            emit(list)
-        } else {
-            val list = RadioSource.lazyListStations.toList()
-            emit(list)
-        }
-
-    }
-
     @OptIn(ExperimentalCoroutinesApi::class)
     val favFragStationsFlow = favFragStationsSwitch.asFlow().flatMapLatest {
         when (it) {
@@ -174,7 +158,7 @@ class DatabaseViewModel @Inject constructor(
                 getAllFavStationsFlow
             }
             SEARCH_FROM_PLAYLIST -> stationsInPlaylistFlow
-            else -> lazyListFlow
+            else -> radioSource.lazyListFlow
         }
     }
 
@@ -212,15 +196,18 @@ class DatabaseViewModel @Inject constructor(
 
         currentPlaylistName.value = lazyListName
 
+        viewModelScope.launch {
+            radioSource.initiateLazyList()
+        }
     }
 
 
     fun exportStationFromLazyList(playlistName : String) =
         viewModelScope.launch{
 
-        for(i in RadioSource.lazyListStations.indices){
+        for(i in radioSource.lazyListStations.indices){
             handleCheckAndInsertStationInPlaylist(
-                stationID = RadioSource.lazyListStations[i].stationuuid,
+                stationID = radioSource.lazyListStations[i].stationuuid,
                 playlistName = playlistName
             ) {}
         }
@@ -231,8 +218,9 @@ class DatabaseViewModel @Inject constructor(
                 radioServiceConnection.sendCommand(COMMAND_CLEAR_MEDIA_ITEMS, null)
             }
 
-            RadioSource.clearLazyList()
-            isToGenerateLazyList = true
+            radioSource.clearLazyList()
+
+//            RadioSource.clearLazyList()
             favFragStationsSwitch.value = SEARCH_FROM_LAZY_LIST
 
     }
@@ -319,9 +307,9 @@ class DatabaseViewModel @Inject constructor(
             COMMAND_ON_SWIPE_RESTORE, null
         )
 
-        if(favFragStationsSwitch.value == SEARCH_FROM_LAZY_LIST){
-            getLazyPlaylist()
-        }
+//        if(favFragStationsSwitch.value == SEARCH_FROM_LAZY_LIST){
+//            getLazyPlaylist()
+//        }
     }
 
 
@@ -355,8 +343,10 @@ class DatabaseViewModel @Inject constructor(
                 }
 
                 SEARCH_FROM_LAZY_LIST -> {
-                    RadioSource.removeItemFromLazyList(index)
-                    getLazyPlaylist()
+                    radioSource.removeItemFromLazyList(index)
+
+//                    RadioSource.removeItemFromLazyList(index)
+//                    getLazyPlaylist()
                 }
             }
 
