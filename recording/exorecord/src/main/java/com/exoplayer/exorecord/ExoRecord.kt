@@ -1,4 +1,4 @@
-package com.onlyradio.radioplayer.exoRecord
+package com.exoplayer.exorecord
 
 import android.app.Application
 import kotlinx.coroutines.Dispatchers

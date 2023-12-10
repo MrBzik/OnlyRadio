@@ -1,7 +1,6 @@
-package com.onlyradio.radioplayer.vorbis
+package com.ogg.vorbis
 
-import android.util.Log
-import com.onlyradio.radioplayer.vorbis.models.VorbisInfo
+import com.ogg.vorbis.models.VorbisInfo
 import java.io.IOException
 
 internal class VorbisFileOutputStream : AudioOutputStream {
@@ -22,7 +21,6 @@ internal class VorbisFileOutputStream : AudioOutputStream {
     constructor(fileName: String, s: VorbisInfo) {
         info = s
         oggStreamIdx = create(fileName, s)
-        Log.e("OGG", "OggStreamIDx = $oggStreamIdx")
     }
 
     constructor(fileName: String) {
@@ -32,7 +30,6 @@ internal class VorbisFileOutputStream : AudioOutputStream {
     @Throws(IOException::class)
     override fun close() {
         closeStreamIdx(oggStreamIdx)
-        Log.e("OGG", "Close = $oggStreamIdx")
     }
 
     /**
@@ -52,10 +49,6 @@ internal class VorbisFileOutputStream : AudioOutputStream {
     @Throws(IOException::class)
     override fun write(buffer: ShortArray, offset: Int, length: Int) {
         writeStreamIdx(oggStreamIdx, buffer, offset, length)
-        Log.e(
-            "OGG",
-            "Writing = { " + oggStreamIdx + ", " + buffer.size + ", " + offset + ", " + length + " }"
-        )
     }
 
 

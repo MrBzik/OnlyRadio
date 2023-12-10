@@ -1,12 +1,10 @@
-package com.onlyradio.radioplayer.exoRecord
+package com.exoplayer.exorecord
 
 import android.content.Context
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.audio.AudioProcessor
-import com.onlyradio.radioplayer.exoPlayer.RadioService
-import com.onlyradio.radioplayer.vorbis.VorbisFileOutputStream
-import com.onlyradio.radioplayer.vorbis.models.VorbisInfo
+import com.ogg.vorbis.VorbisWrapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,9 +23,8 @@ class ExoRecordProcessor constructor(
     private var bytePerFrame: Int = 0
 
     private var encoding: Int = 0
-    private var isActive: Boolean = false
 
-    private var isRecording = false
+    private var isActive = false
 
     private var processBuffer: ByteBuffer = AudioProcessor.EMPTY_BUFFER
     private var outputBuffer: ByteBuffer? = null
@@ -35,7 +32,7 @@ class ExoRecordProcessor constructor(
     private var inputEnded: Boolean = false
     private var fileName: String = ""
 
-    private var vorbis : VorbisFileOutputStream? = null
+    private var vorbis : VorbisWrapper? = null
 
     init {
         outputBuffer = AudioProcessor.EMPTY_BUFFER
@@ -54,17 +51,16 @@ class ExoRecordProcessor constructor(
         this.encoding = inputAudioFormat.encoding
         this.bytePerFrame = inputAudioFormat.bytesPerFrame
 
-        isActive = !RadioService.isFromRecording
+        isActive = true
 
         return inputAudioFormat
     }
 
     override fun isActive() = isActive
 
-
     private fun recordBuffer(inputBuffer: ByteBuffer) {
 
-        if (isActive && isRecording) {
+        if (isActive) {
             val buffer = ByteArray(1024)
 
             while (inputBuffer.hasRemaining()) {
@@ -183,25 +179,20 @@ class ExoRecordProcessor constructor(
 
         val filePath = applicationContext.filesDir.absolutePath.toString() + "/" + fileName
 
-        vorbis = VorbisFileOutputStream(
-            filePath,
-            VorbisInfo(
-                channels = channelCount,
-                sampleRate = sampleRateHz,
-                quality = quality
-            )
-        )
+        vorbis = VorbisWrapper.Builder()
+            .setPath(filePath)
+            .setChannels(channelCount)
+            .setSampleRate(sampleRateHz)
+            .setQuality(quality)
+            .build()
 
         isActive = true
-        isRecording = true
-
 
         return fileName
     }
 
     override suspend fun stopRecording(): IExoRecord.Record {
         isActive = false
-        isRecording = false
         vorbis?.close()
         vorbis = null
         return IExoRecord.Record(fileName, sampleRateHz, bytePerFrame, channelCount)

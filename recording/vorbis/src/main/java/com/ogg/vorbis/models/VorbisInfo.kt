@@ -1,6 +1,6 @@
-package com.onlyradio.radioplayer.vorbis.models
+package com.ogg.vorbis.models
 
-data class VorbisInfo(
+internal data class VorbisInfo(
     /**
      * The number of channels to be encoded. For your sake, here are the official channel positions for the first five according to Xiph.org.
      * one channel - the stream is monophonic

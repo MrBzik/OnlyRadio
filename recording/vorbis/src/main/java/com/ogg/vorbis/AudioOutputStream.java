@@ -1,4 +1,4 @@
-package com.onlyradio.radioplayer.vorbis;
+package com.ogg.vorbis;
 
 import java.io.Closeable;
 import java.io.IOException;

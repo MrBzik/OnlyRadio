@@ -1,4 +1,4 @@
-package com.onlyradio.radioplayer.exoRecord
+package com.exoplayer.exorecord
 
 interface IExoRecord {
 

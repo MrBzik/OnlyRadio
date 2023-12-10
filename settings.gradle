@@ -15,3 +15,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "RadioPlayer"
 include ':app'
+include ':recording'
+include ':recording:vorbis'
+include ':recording:exorecord'

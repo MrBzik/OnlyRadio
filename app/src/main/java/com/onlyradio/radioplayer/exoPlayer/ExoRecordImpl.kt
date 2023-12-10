@@ -4,10 +4,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.media.MediaExtractor
 import android.media.MediaFormat
+import com.exoplayer.exorecord.ExoRecord
+import com.exoplayer.exorecord.IExoRecord
 import com.onlyradio.radioplayer.R
 import com.onlyradio.radioplayer.data.local.entities.Recording
-import com.onlyradio.radioplayer.exoRecord.ExoRecord
-import com.onlyradio.radioplayer.exoRecord.IExoRecord
 import com.onlyradio.radioplayer.extensions.makeToast
 import com.onlyradio.radioplayer.utils.Constants.RECORDING_QUALITY_PREF
 import com.onlyradio.radioplayer.utils.Constants.REC_QUALITY_DEF
@@ -51,7 +51,7 @@ class ExoRecordImpl (private val service: RadioService) {
     }
 
 
-    private val exoRecordListener = object : ExoRecord.ExoRecordListener{
+    private val exoRecordListener = object : ExoRecord.ExoRecordListener {
 
         lateinit var timer : Timer
         var duration = 0L

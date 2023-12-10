@@ -32,7 +32,7 @@ static struct output_stream output_streams[MAX_OUTPUTSTREAMS];
  * http://svn.xiph.org/trunk/vorbis/examples/encoder_example.c
  * Returns a pointer to the stream struct related to that current vorbis file.
  */
-jint Java_com_onlyradio_radioplayer_vorbis_VorbisFileOutputStream_create(
+jint Java_com_ogg_vorbis_VorbisFileOutputStream_create(
         JNIEnv* env,
         jobject this,
         jstring path,
@@ -155,7 +155,7 @@ jint Java_com_onlyradio_radioplayer_vorbis_VorbisFileOutputStream_create(
 /* Write out to the file handle
  *
  */
-jint Java_com_onlyradio_radioplayer_vorbis_VorbisFileOutputStream_writeStreamIdx(
+jint Java_com_ogg_vorbis_VorbisFileOutputStream_writeStreamIdx(
         JNIEnv* env,
         jobject this,
         jint sidx,
@@ -250,7 +250,7 @@ jint Java_com_onlyradio_radioplayer_vorbis_VorbisFileOutputStream_writeStreamIdx
 /*
  * Clean up stream info.
  */
-void Java_com_onlyradio_radioplayer_vorbis_VorbisFileOutputStream_closeStreamIdx(
+void Java_com_ogg_vorbis_VorbisFileOutputStream_closeStreamIdx(
         JNIEnv* env,
         jobject this,
         jint sidx

@@ -2,6 +2,7 @@ package com.onlyradio.radioplayer.dagger
 
 import android.app.Application
 import android.content.Context
+import com.exoplayer.exorecord.ExoRecord
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.DefaultRenderersFactory
@@ -11,7 +12,6 @@ import com.google.android.exoplayer2.audio.AudioCapabilities.getCapabilities
 import com.google.android.exoplayer2.audio.AudioSink
 import com.google.android.exoplayer2.audio.DefaultAudioSink
 import com.google.android.exoplayer2.upstream.*
-import com.onlyradio.radioplayer.exoRecord.ExoRecord
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

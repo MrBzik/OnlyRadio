@@ -19,6 +19,3 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
-
--keepclassmembers class com.onlyradio.radioplayer.data** {*;}
--keepclassmembers class com.onlyradio.radioplayer.adapters.models.serializable** {*;}
